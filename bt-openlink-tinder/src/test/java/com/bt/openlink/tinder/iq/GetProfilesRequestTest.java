@@ -1,11 +1,5 @@
 package com.bt.openlink.tinder.iq;
 
-import com.bt.openlink.tinder.Fixtures;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.xmpp.packet.IQ;
-
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.contains;
@@ -13,6 +7,13 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.xmlunit.matchers.CompareMatcher.isIdenticalTo;
+
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.xmpp.packet.IQ;
+
+import com.bt.openlink.tinder.Fixtures;
 
 @SuppressWarnings({ "OptionalGetWithoutIsPresent", "ConstantConditions" })
 public class GetProfilesRequestTest {
@@ -116,8 +117,6 @@ public class GetProfilesRequestTest {
         final IQ iq = Fixtures.iqFrom(GET_PROFILES_REQUEST_WITH_BAD_VALUES);
 
         final GetProfilesRequest request = GetProfilesRequest.from(iq);
-
-        System.out.println(request.getParseErrors());
 
         assertThat(request.getParseErrors(), contains(
                 "Invalid stanza; missing or incorrect 'type' attribute",
