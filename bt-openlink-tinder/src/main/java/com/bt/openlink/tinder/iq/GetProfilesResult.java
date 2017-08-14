@@ -24,9 +24,9 @@ public class GetProfilesResult extends OpenlinkIQ {
         super(builder, parseErrors);
         this.profiles = Collections.unmodifiableList(builder.profiles);
         final Element outElement = TinderPacketUtil.addCommandIOOutputElement(this, OpenlinkXmppNamespace.OPENLINK_GET_PROFILES);
-        final Element profilesElement = outElement.addElement("profiles");
+        final Element profilesElement = outElement.addElement(OpenlinkXmppNamespace.TAG_PROFILES);
         getProfiles().forEach(profile -> {
-            final Element profileElement = profilesElement.addElement("profile");
+            final Element profileElement = profilesElement.addElement(OpenlinkXmppNamespace.TAG_PROFILE);
             profile.profileId().ifPresent(profileId -> profileElement.addAttribute("id", profileId.value()));
         });
 
@@ -40,12 +40,12 @@ public class GetProfilesResult extends OpenlinkIQ {
                 .setFrom(iq.getFrom())
                 .setID(iq.getID())
                 .setType(iq.getType());
-        final Element profilesElement = TinderPacketUtil.getChildElement(TinderPacketUtil.getIOOutElement(iq), "profiles");
+        final Element profilesElement = TinderPacketUtil.getChildElement(TinderPacketUtil.getIOOutElement(iq), OpenlinkXmppNamespace.TAG_PROFILES);
         final List<String> parseErrors = new ArrayList<>();
         if (profilesElement == null) {
             parseErrors.add(String.format("Invalid %s; missing 'profiles' element is mandatory", DESCRIPTION));
         } else {
-            final List<Element> profileElements = profilesElement.elements("profile");
+            final List<Element> profileElements = profilesElement.elements(OpenlinkXmppNamespace.TAG_PROFILE);
             profileElements.forEach(profileElement -> {
                 final Optional<ProfileId> profileId = ProfileId.from(TinderPacketUtil.getAttributeString(profileElement, "id", true, DESCRIPTION, parseErrors));
                 final Profile profile = Profile.Builder.start()

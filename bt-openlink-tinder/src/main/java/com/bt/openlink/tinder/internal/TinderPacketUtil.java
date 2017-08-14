@@ -27,12 +27,12 @@ public final class TinderPacketUtil {
 
     @Nullable
     public static Element getIOInElement(@Nonnull final IQ iq) {
-        return getChildElement(iq.getChildElement(), "iodata", "in");
+        return getChildElement(iq.getChildElement(), OpenlinkXmppNamespace.TAG_IODATA, OpenlinkXmppNamespace.TAG_IN);
     }
 
     @Nullable
     public static Element getIOOutElement(@Nonnull final IQ iq) {
-        return getChildElement(iq.getChildElement(), "iodata", "out");
+        return getChildElement(iq.getChildElement(), OpenlinkXmppNamespace.TAG_IODATA, OpenlinkXmppNamespace.TAG_OUT);
     }
 
     @Nullable
@@ -200,9 +200,9 @@ public final class TinderPacketUtil {
         final Element commandElement = addCommandElement(request);
         commandElement.addAttribute("action", "execute");
         commandElement.addAttribute("node", namespace.uri());
-        final Element ioInputElement = commandElement.addElement("iodata", OpenlinkXmppNamespace.XMPP_IO_DATA.uri());
+        final Element ioInputElement = commandElement.addElement(OpenlinkXmppNamespace.TAG_IODATA, OpenlinkXmppNamespace.XMPP_IO_DATA.uri());
         ioInputElement.addAttribute("type", "input");
-        return ioInputElement.addElement("in");
+        return ioInputElement.addElement(OpenlinkXmppNamespace.TAG_IN);
     }
 
     @Nonnull
@@ -210,9 +210,9 @@ public final class TinderPacketUtil {
         final Element commandElement = addCommandElement(result);
         commandElement.addAttribute("status", "completed");
         commandElement.addAttribute("node", namespace.uri());
-        final Element ioInputElement = commandElement.addElement("iodata", OpenlinkXmppNamespace.XMPP_IO_DATA.uri());
+        final Element ioInputElement = commandElement.addElement(OpenlinkXmppNamespace.TAG_IODATA, OpenlinkXmppNamespace.XMPP_IO_DATA.uri());
         ioInputElement.addAttribute("type", "output");
-        return ioInputElement.addElement("out");
+        return ioInputElement.addElement(OpenlinkXmppNamespace.TAG_OUT);
     }
 
     @Nonnull

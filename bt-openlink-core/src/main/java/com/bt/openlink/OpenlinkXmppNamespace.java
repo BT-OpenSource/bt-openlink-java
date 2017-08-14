@@ -2,6 +2,7 @@ package com.bt.openlink;
 
 @SuppressWarnings("unused")
 public enum OpenlinkXmppNamespace {
+
     XMPP_PUBSUB("http://jabber.org/protocol/pubsub", "Publish-Subscribe"),
     XMPP_PUBSUB_EVENT("http://jabber.org/protocol/pubsub#event", "Publish-Subscribe event"),
     XMPP_DISCO_INFO("http://jabber.org/protocol/disco#info", "Service Discovery information"),
@@ -22,6 +23,12 @@ public enum OpenlinkXmppNamespace {
     OPENLINK_SET_FEATURES("http://xmpp.org/protocol/openlink:01:00:00#set-features", "Set features"),
     OPENLINK_QUERY_FEATURES("http://xmpp.org/protocol/openlink:01:00:00#query-features", "Query features"),
     OPENLINK_GET_CALL_HISTORY("http://xmpp.org/protocol/openlink:01:00:00#get-call-history", "Get call history");
+
+    public static final String TAG_IODATA = "iodata";
+    public static final String TAG_IN = "in";
+    public static final String TAG_OUT = "out";
+    public static final String TAG_PROFILES = "profiles";
+    public static final String TAG_PROFILE = "profile";
 
     private final String uri;
     private final String label;

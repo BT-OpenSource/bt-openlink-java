@@ -21,7 +21,7 @@ public class GetProfilesRequest extends OpenlinkIQ {
     @Nonnull
     static IQ from(XmlPullParser parser) throws IOException, XmlPullParserException {
 
-        moveToStartOfTag(parser, "iodata", "in", "jid");
+        moveToStartOfTag(parser, OpenlinkXmppNamespace.TAG_IODATA, OpenlinkXmppNamespace.TAG_IN, "jid");
         final String jid;
         if ("jid".equals(parser.getName())) {
             jid = parser.nextText();
@@ -45,14 +45,14 @@ public class GetProfilesRequest extends OpenlinkIQ {
         xml.attribute("action", "execute")
                 .attribute("node", OpenlinkXmppNamespace.OPENLINK_GET_PROFILES.uri())
                 .rightAngleBracket();
-        xml.halfOpenElement("iodata")
+        xml.halfOpenElement(OpenlinkXmppNamespace.TAG_IODATA)
                 .attribute("xmlns", OpenlinkXmppNamespace.XMPP_IO_DATA.uri())
                 .attribute("type", "input")
                 .rightAngleBracket();
-        xml.halfOpenElement("in").rightAngleBracket();
+        xml.halfOpenElement(OpenlinkXmppNamespace.TAG_IN).rightAngleBracket();
         xml.optElement("jid", jid);
-        xml.closeElement("in");
-        xml.closeElement("iodata");
+        xml.closeElement(OpenlinkXmppNamespace.TAG_IN);
+        xml.closeElement(OpenlinkXmppNamespace.TAG_IODATA);
         return xml;
     }
 

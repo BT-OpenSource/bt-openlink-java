@@ -1,19 +1,21 @@
 package com.bt.openlink.smack.iq;
 
-import com.bt.openlink.OpenlinkXmppNamespace;
-import com.bt.openlink.type.Profile;
-import com.bt.openlink.type.ProfileId;
-import org.jivesoftware.smack.packet.IQ;
-import org.jivesoftware.smack.util.ParserUtils;
-import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserException;
-
-import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+
+import javax.annotation.Nonnull;
+
+import org.jivesoftware.smack.packet.IQ;
+import org.jivesoftware.smack.util.ParserUtils;
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
+
+import com.bt.openlink.OpenlinkXmppNamespace;
+import com.bt.openlink.type.Profile;
+import com.bt.openlink.type.ProfileId;
 
 public class GetProfilesResult extends OpenlinkIQ {
     @Nonnull private final List<Profile> profiles;
@@ -21,12 +23,12 @@ public class GetProfilesResult extends OpenlinkIQ {
     @Nonnull
     static IQ from(XmlPullParser parser) throws IOException, XmlPullParserException {
 
-        moveToStartOfTag(parser, "iodata", "out", "profiles", "profile");
+        moveToStartOfTag(parser, OpenlinkXmppNamespace.TAG_IODATA, OpenlinkXmppNamespace.TAG_OUT, OpenlinkXmppNamespace.TAG_PROFILES, OpenlinkXmppNamespace.TAG_PROFILE);
 
         final Builder builder = Builder.start();
 
         final List<String> parseErrors = new ArrayList<>();
-        while ("profile".equals(parser.getName())) {
+        while (OpenlinkXmppNamespace.TAG_PROFILE.equals(parser.getName())) {
 
             final Optional<ProfileId> profileId = ProfileId.from(parser.getAttributeValue("", "id"));
             final Profile profile = Profile.Builder.start()
@@ -50,20 +52,20 @@ public class GetProfilesResult extends OpenlinkIQ {
         xml.attribute("status", "completed")
                 .attribute("node", OpenlinkXmppNamespace.OPENLINK_GET_PROFILES.uri())
                 .rightAngleBracket();
-        xml.halfOpenElement("iodata")
+        xml.halfOpenElement(OpenlinkXmppNamespace.TAG_IODATA)
                 .attribute("xmlns", OpenlinkXmppNamespace.XMPP_IO_DATA.uri())
                 .attribute("type", "output")
                 .rightAngleBracket();
-        xml.halfOpenElement("out").rightAngleBracket();
-        xml.halfOpenElement("profiles").attribute("xmlns", "http://xmpp.org/protocol/openlink:01:00:00/profiles").rightAngleBracket();
+        xml.halfOpenElement(OpenlinkXmppNamespace.TAG_OUT).rightAngleBracket();
+        xml.halfOpenElement(OpenlinkXmppNamespace.TAG_PROFILES).attribute("xmlns", "http://xmpp.org/protocol/openlink:01:00:00/profiles").rightAngleBracket();
         for (final Profile profile : profiles) {
-            xml.halfOpenElement("profile");
-            profile.profileId().ifPresent((profileId) -> xml.attribute("id", profileId.value()));
+            xml.halfOpenElement(OpenlinkXmppNamespace.TAG_PROFILE);
+            profile.profileId().ifPresent(profileId -> xml.attribute("id", profileId.value()));
             xml.closeEmptyElement();
         }
-        xml.closeElement("profiles");
-        xml.closeElement("out");
-        xml.closeElement("iodata");
+        xml.closeElement(OpenlinkXmppNamespace.TAG_PROFILES);
+        xml.closeElement(OpenlinkXmppNamespace.TAG_OUT);
+        xml.closeElement(OpenlinkXmppNamespace.TAG_IODATA);
         return xml;
     }
 
