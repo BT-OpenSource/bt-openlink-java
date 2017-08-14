@@ -40,7 +40,7 @@ abstract class OpenlinkIQ extends IQ {
         return parseErrors;
     }
 
-    static abstract class IQBuilder<B extends IQBuilder> {
+    abstract static class IQBuilder<B extends IQBuilder> {
 
         @Nullable Jid to;
         @Nullable Jid from;

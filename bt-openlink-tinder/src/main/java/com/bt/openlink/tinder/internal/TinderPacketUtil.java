@@ -22,6 +22,9 @@ public final class TinderPacketUtil {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
+    private TinderPacketUtil() {
+    }
+
     @Nullable
     public static Element getIOInElement(@Nonnull final IQ iq) {
         return getChildElement(iq.getChildElement(), "iodata", "in");
