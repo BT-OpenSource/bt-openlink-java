@@ -6,11 +6,9 @@ allprojects {
     repositories {
         jcenter()
     }
-}
-
-subprojects {
     version = '0.0.1-SNAPSHOT'
 }
+
 
 configure(subprojects) {
 
