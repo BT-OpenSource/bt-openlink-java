@@ -1,27 +1,21 @@
 package com.bt.openlink.smack.iq;
 
+import com.bt.openlink.OpenlinkXmppNamespace;
+import com.bt.openlink.type.Profile;
+import com.bt.openlink.type.ProfileId;
+import org.jivesoftware.smack.packet.IQ;
+import org.jivesoftware.smack.util.ParserUtils;
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
+
+import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import com.bt.openlink.type.Profile;
-import com.bt.openlink.type.ProfileId;
-import org.jivesoftware.smack.packet.IQ;
-import org.jivesoftware.smack.util.ParserUtils;
-import org.jxmpp.jid.Jid;
-import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserException;
-
-import com.bt.openlink.OpenlinkXmppNamespace;
-import com.bt.openlink.smack.internal.SmackPacketUtil;
-
 public class GetProfilesResult extends OpenlinkIQ {
-    private static final String DESCRIPTION = "get-profiles result";
     @Nonnull private final List<Profile> profiles;
 
     @Nonnull

@@ -71,7 +71,7 @@ public class GetProfilesRequest extends OpenlinkIQ {
         @Nonnull
         @Override
         protected Type getExpectedType() {
-            return Type.get;
+            return Type.set;
         }
 
         @Override

@@ -8,7 +8,6 @@ import static org.xmlunit.matchers.CompareMatcher.isIdenticalTo;
 
 import java.util.List;
 
-import com.bt.openlink.OpenlinkXmppNamespace;
 import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.provider.ProviderManager;
 import org.jivesoftware.smack.util.PacketParserUtils;
@@ -18,6 +17,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import com.bt.openlink.OpenlinkXmppNamespace;
 import com.bt.openlink.smack.Fixtures;
 import com.bt.openlink.type.Profile;
 
@@ -192,28 +192,6 @@ public class GetProfilesResultTest {
         assertThat(profiles.get(1).profileId().get().value(), is("UCTrader1-trader1@btsm11"));
 
         assertThat(result.getParseErrors(), is(empty()));
-    }
-
-    @Test
-    public void willReturnParsingErrors() throws Exception {
-
-        final GetProfilesResult result = PacketParserUtils.parseStanza(GET_PROFILES_RESULT_WITH_BAD_VALUES);
-
-        assertThat(result.getParseErrors(), contains(
-                "Invalid stanza; missing or incorrect 'type' attribute",
-                "Invalid stanza; missing 'to' attribute is mandatory",
-                "Invalid stanza; missing 'from' attribute is mandatory",
-                "Invalid stanza; missing 'id' attribute is mandatory",
-                "Invalid get-profiles result; missing 'profiles' element is mandatory"));
-    }
-
-    @Test
-    public void willReturnANoProfilesParsingError() throws Exception {
-
-        final GetProfilesResult result = PacketParserUtils.parseStanza(GET_PROFILES_RESULT_WITH_NO_PROFILES);
-
-        assertThat(result.getParseErrors(), contains(
-                "Invalid get-profiles result; no 'profile' elements present"));
     }
 
 }
