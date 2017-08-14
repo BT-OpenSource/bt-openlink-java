@@ -32,8 +32,9 @@ public class GetProfilesResult extends OpenlinkIQ {
         while (OpenlinkXmppNamespace.TAG_PROFILE.equals(parser.getName())) {
 
             final Optional<ProfileId> profileId = ProfileId.from(parser.getAttributeValue("", "id"));
-            final Profile profile = Profile.Builder.start()
-                    .setProfileId(profileId.orElse(null))
+            final Profile.Builder profileBuilder = Profile.Builder.start();
+            profileId.ifPresent(profileBuilder::setProfileId);
+            final Profile profile = profileBuilder
                     .build(parseErrors);
             parseErrors.addAll(profile.parseErrors());
             builder.addProfile(profile);

@@ -58,8 +58,9 @@ public class GetProfilesResult extends OpenlinkIQ {
             final List<Element> profileElements = profilesElement.elements(OpenlinkXmppNamespace.TAG_PROFILE);
             profileElements.forEach(profileElement -> {
                 final Optional<ProfileId> profileId = ProfileId.from(TinderPacketUtil.getAttributeString(profileElement, "id", true, DESCRIPTION, parseErrors));
-                final Profile profile = Profile.Builder.start()
-                        .setProfileId(profileId.orElse(null))
+                final Profile.Builder profileBuilder = Profile.Builder.start();
+                profileId.ifPresent(profileBuilder::setProfileId);
+                final Profile profile = profileBuilder
                         .build(parseErrors);
                 parseErrors.addAll(profile.parseErrors());
                 builder.addProfile(profile);
