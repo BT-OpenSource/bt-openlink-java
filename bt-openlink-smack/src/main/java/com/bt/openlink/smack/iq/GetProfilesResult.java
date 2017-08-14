@@ -8,6 +8,7 @@ import java.util.Optional;
 
 import javax.annotation.Nonnull;
 
+import com.bt.openlink.type.Site;
 import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.util.ParserUtils;
 import org.xmlpull.v1.XmlPullParser;
@@ -32,7 +33,7 @@ public class GetProfilesResult extends OpenlinkIQ {
 
             final Optional<ProfileId> profileId = ProfileId.from(parser.getAttributeValue("", "id"));
             final Profile profile = Profile.Builder.start()
-                    .withProfileId(profileId.orElse(null))
+                    .setProfileId(profileId.orElse(null))
                     .build(parseErrors);
             parseErrors.addAll(profile.parseErrors());
             builder.addProfile(profile);
@@ -61,7 +62,20 @@ public class GetProfilesResult extends OpenlinkIQ {
         for (final Profile profile : profiles) {
             xml.halfOpenElement(OpenlinkXmppNamespace.TAG_PROFILE);
             profile.profileId().ifPresent(profileId -> xml.attribute("id", profileId.value()));
-            xml.closeEmptyElement();
+            xml.rightAngleBracket();
+            final Optional<Site> optionalSite = profile.getSite();
+            if (optionalSite.isPresent()) {
+                final Site site = optionalSite.get();
+                xml.halfOpenElement("site");
+                site.getId().ifPresent(id -> xml.attribute("id", String.valueOf(id)));
+                site.isDefault().ifPresent(isDefault -> xml.attribute("default", String.valueOf(isDefault)));
+                site.getType().ifPresent(type -> xml.attribute("type", type.name()));
+                xml.rightAngleBracket();
+                site.getName().ifPresent(xml::escape);
+                xml.closeElement("site");
+            }
+
+            xml.closeElement(OpenlinkXmppNamespace.TAG_PROFILE);
         }
         xml.closeElement(OpenlinkXmppNamespace.TAG_PROFILES);
         xml.closeElement(OpenlinkXmppNamespace.TAG_OUT);

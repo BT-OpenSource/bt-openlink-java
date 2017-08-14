@@ -10,9 +10,11 @@ import java.util.Optional;
 public final class Profile {
     @Nullable private final ProfileId profileId;
     @Nonnull private final List<String> parseErrors;
+    @Nullable private final Site site;
 
     private Profile(@Nonnull final Builder builder, @Nullable final List<String> parseErrors) {
         this.profileId = builder.profileId;
+        this.site = builder.site;
         if (parseErrors == null) {
             this.parseErrors = Collections.emptyList();
         } else {
@@ -30,9 +32,15 @@ public final class Profile {
         return Optional.ofNullable(profileId);
     }
 
+    @Nonnull
+    public Optional<Site> getSite() {
+        return Optional.ofNullable(site);
+    }
+
     public static final class Builder {
 
         @Nullable private ProfileId profileId = null;
+        @Nullable private Site site = null;
 
         private Builder() {
         }
@@ -44,6 +52,12 @@ public final class Profile {
 
         @Nonnull
         public Profile build() {
+            if(profileId == null ) {
+                throw new IllegalStateException("The profileId has not been set");
+            }
+            if(site == null ) {
+                throw new IllegalStateException("The site has not been set");
+            }
             return new Profile(this, null);
         }
 
@@ -52,8 +66,13 @@ public final class Profile {
             return new Profile(this, parseErrors);
         }
 
-        public Builder withProfileId(@Nullable final ProfileId profileId) {
+        public Builder setProfileId(@Nonnull final ProfileId profileId) {
             this.profileId = profileId;
+            return this;
+        }
+
+        public Builder setSite(@Nonnull Site site) {
+            this.site = site;
             return this;
         }
     }

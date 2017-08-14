@@ -8,6 +8,7 @@ import static org.xmlunit.matchers.CompareMatcher.isIdenticalTo;
 
 import java.util.List;
 
+import com.bt.openlink.type.Site;
 import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.provider.ProviderManager;
 import org.jivesoftware.smack.util.PacketParserUtils;
@@ -138,15 +139,24 @@ public class GetProfilesResultTest {
                 "    <iodata xmlns=\"urn:xmpp:tmp:io-data\" type=\"output\">\n" +
                 "      <out>\n" +
                 "        <profiles xmlns=\"http://xmpp.org/protocol/openlink:01:00:00/profiles\">" +
-                "          <profile id=\"" + Fixtures.PROFILE_ID + "\"/>\n" +
+                "          <profile id=\"" + Fixtures.PROFILE_ID + "\">\n" +
+                "            <site default=\"true\" id=\"42\" type=\"BTSM\">test-site-name</site>\n" +
+                "           </profile>\n" +
                 "        </profiles>" +
                 "      </out>\n" +
                 "    </iodata>\n" +
                 "  </command>\n" +
                 "</iq>";
 
+        final Site site = Site.Builder.start()
+                .setId(42)
+                .setDefault(true)
+                .setType(Site.Type.BTSM)
+                .setName("test-site-name")
+                .build();
         final Profile profile = Profile.Builder.start()
-                .withProfileId(Fixtures.PROFILE_ID)
+                .setProfileId(Fixtures.PROFILE_ID)
+                .setSite(site)
                 .build();
         final GetProfilesResult result = GetProfilesResult.Builder.start()
                 .setStanzaId(Fixtures.STANZA_ID)
@@ -155,18 +165,39 @@ public class GetProfilesResultTest {
                 .addProfile(profile)
                 .build();
 
-        System.out.println(result.toXML());
-
         assertThat(result.toXML().toString(), isIdenticalTo(expectedXML).ignoreWhitespace());
     }
 
     @Test
-    public void willNotBuildAPacketWithDuplicateFeatureIds() throws Exception {
+    public void willNotBuildAPacketWithoutASite() throws Exception {
+
+        expectedException.expect(IllegalStateException.class);
+        expectedException.expectMessage("The site has not been set");
+        final Profile profile = Profile.Builder.start()
+                .setProfileId(Fixtures.PROFILE_ID)
+                .build();
+        GetProfilesResult.Builder.start()
+                .setStanzaId(Fixtures.STANZA_ID)
+                .setTo(Fixtures.TO_JID)
+                .setFrom(Fixtures.FROM_JID)
+                .addProfile(profile)
+                .build();
+    }
+
+    @Test
+    public void willNotBuildAPacketWithDuplicateProfileIds() throws Exception {
 
         expectedException.expect(IllegalArgumentException.class);
         expectedException.expectMessage("The profile id must be unique");
+        final Site site = Site.Builder.start()
+                .setId(42)
+                .setDefault(true)
+                .setType(Site.Type.BTSM)
+                .setName("test-site-name")
+                .build();
         final Profile profile = Profile.Builder.start()
-                .withProfileId(Fixtures.PROFILE_ID)
+                .setProfileId(Fixtures.PROFILE_ID)
+                .setSite(site)
                 .build();
         GetProfilesResult.Builder.start()
                 .setStanzaId(Fixtures.STANZA_ID)

@@ -8,6 +8,7 @@ import java.util.Optional;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.bt.openlink.type.Site;
 import org.dom4j.Element;
 import org.xmpp.packet.IQ;
 
@@ -28,6 +29,15 @@ public class GetProfilesResult extends OpenlinkIQ {
         getProfiles().forEach(profile -> {
             final Element profileElement = profilesElement.addElement(OpenlinkXmppNamespace.TAG_PROFILE);
             profile.profileId().ifPresent(profileId -> profileElement.addAttribute("id", profileId.value()));
+            final Optional<Site> optionalSite = profile.getSite();
+            if (optionalSite.isPresent()) {
+                final Site site = optionalSite.get();
+                final Element siteElement = profileElement.addElement("site");
+                site.getId().ifPresent(id -> siteElement.addAttribute("id", String.valueOf(id)));
+                site.isDefault().ifPresent(isDefault -> siteElement.addAttribute("default", String.valueOf(isDefault)));
+                site.getType().ifPresent(type -> siteElement.addAttribute("type", type.name()));
+                site.getName().ifPresent(siteElement::setText);
+            }
         });
 
     }
@@ -49,7 +59,7 @@ public class GetProfilesResult extends OpenlinkIQ {
             profileElements.forEach(profileElement -> {
                 final Optional<ProfileId> profileId = ProfileId.from(TinderPacketUtil.getAttributeString(profileElement, "id", true, DESCRIPTION, parseErrors));
                 final Profile profile = Profile.Builder.start()
-                        .withProfileId(profileId.orElse(null))
+                        .setProfileId(profileId.orElse(null))
                         .build(parseErrors);
                 parseErrors.addAll(profile.parseErrors());
                 builder.addProfile(profile);
