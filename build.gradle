@@ -1,0 +1,23 @@
+allprojects {
+    repositories {
+        jcenter()
+    }
+}
+
+subprojects {
+    version = '0.0.1-SNAPSHOT'
+}
+
+configure(subprojects) {
+    apply plugin: 'java'
+
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+
+    sourceSets {
+        // Make the compileOnly dependencies available when compiling/running tests
+        test.compileClasspath += configurations.compileOnly
+        test.runtimeClasspath += configurations.compileOnly
+    }
+
+}

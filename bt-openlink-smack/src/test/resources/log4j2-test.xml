@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+    <Appenders>
+        <Console name="stdout" target="SYSTEM_OUT">
+            <PatternLayout>
+                <Pattern>%d %-5p [%c{1}] %X - %m%n</Pattern>
+            </PatternLayout>
+        </Console>
+        <File name="file" fileName="build/reports/tests/test.log">
+            <PatternLayout>
+                <Pattern>%d %-5p [%c{1}] %X - %m%n</Pattern>
+            </PatternLayout>
+        </File>
+    </Appenders>
+
+    <Loggers>
+        <Logger name="root" level="debug">
+            <appender-ref ref="stdout"/>
+            <appender-ref ref="file"/>
+        </Logger>
+
+        <Logger name="org.apache.http.wire" level="INFO" additivity="false">
+            <appender-ref ref="stdout"/>
+            <appender-ref ref="file"/>
+        </Logger>
+
+    </Loggers>
+</Configuration>

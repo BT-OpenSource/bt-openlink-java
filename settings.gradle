@@ -1,0 +1,5 @@
+rootProject.name = 'bt-openlink'
+
+include 'bt-openlink-core'
+include 'bt-openlink-tinder'
+include 'bt-openlink-smack'
