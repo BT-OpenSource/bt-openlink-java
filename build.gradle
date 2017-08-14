@@ -13,6 +13,7 @@ allprojects {
 configure(subprojects) {
 
     apply plugin: 'java'
+    apply plugin: 'jacoco'
 
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
