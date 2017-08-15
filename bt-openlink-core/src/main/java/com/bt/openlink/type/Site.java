@@ -73,9 +73,6 @@ public class Site {
             if (id == null) {
                 throw new IllegalStateException("The site id has not been set");
             }
-            if (isDefault == null) {
-                throw new IllegalStateException("The site default indicator has not been set");
-            }
             if (type == null) {
                 throw new IllegalStateException("The site type has not been set");
             }

@@ -69,18 +69,4 @@ public class SiteTest {
                 .build();
 
     }
-
-    @Test
-    public void willNotBuildASiteWithoutADefaultIndicator() throws Exception {
-
-        expectedException.expect(IllegalStateException.class);
-        expectedException.expectMessage("The site default indicator has not been set");
-
-        Site.Builder.start()
-                .setName("test-site-name")
-                .setType(Site.Type.CISCO)
-                .setId(42)
-                .build();
-
-    }
 }
