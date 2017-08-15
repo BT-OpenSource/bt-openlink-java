@@ -1,19 +1,21 @@
 package com.bt.openlink.tinder.internal;
 
-import com.bt.openlink.OpenlinkXmppNamespace;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.List;
+import java.util.Optional;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dom4j.Element;
 import org.xmpp.packet.IQ;
 import org.xmpp.packet.JID;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
-import java.util.List;
-import java.util.Optional;
+import com.bt.openlink.OpenlinkXmppNamespace;
 
 /**
  * This class is for internal use by the library only; users of the API should not access this class directly.
@@ -152,22 +154,34 @@ public final class TinderPacketUtil {
     }
 
     @Nullable
-    public static String getAttributeString(@Nullable final Element element, @Nonnull final String attributeName) {
-        return getAttributeString(element, attributeName, false, null, null);
+    public static String getStringAttribute(@Nullable final Element element, @Nonnull final String attributeName) {
+        return getStringAttribute(element, attributeName, false, null, null);
     }
 
-    @Nonnull
-    public static Optional<JID> toTinderJID(@Nullable final String textualJID) {
+    @Nullable
+    public static Long getLongAttribute(final Element siteElement, final String id, final boolean isRequired, final String description, final List<String> parseErrors) {
+        final String stringValue = getStringAttribute(siteElement, id, isRequired, description, parseErrors);
+        if (stringValue == null || stringValue.isEmpty()) {
+            return null;
+        }
         try {
-            return textualJID == null || textualJID.isEmpty() ? Optional.empty() : Optional.of(new JID(textualJID));
-        } catch (final IllegalArgumentException e) {
-            LOGGER.info("Supplied text is an invalid JID [textualJID={}]", textualJID, e);
-            return Optional.empty();
+            return Long.valueOf(stringValue);
+        } catch (final NumberFormatException e) {
+            return null;
         }
     }
 
     @Nullable
-    public static String getAttributeString(
+    public static Boolean getBooleanAttribute(final Element siteElement, final String id, final boolean isRequired, final String description, final List<String> parseErrors) {
+        final String stringValue = getStringAttribute(siteElement, id, isRequired, description, parseErrors);
+        if (stringValue == null || stringValue.isEmpty()) {
+            return null;
+        }
+        return Boolean.valueOf(stringValue);
+    }
+
+    @Nullable
+    public static String getStringAttribute(
             @Nullable final Element element,
             @Nonnull final String attributeName,
             final boolean isRequired,

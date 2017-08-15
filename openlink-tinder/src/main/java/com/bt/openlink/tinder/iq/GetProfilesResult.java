@@ -8,7 +8,6 @@ import java.util.Optional;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.bt.openlink.type.Site;
 import org.dom4j.Element;
 import org.xmpp.packet.IQ;
 
@@ -16,6 +15,7 @@ import com.bt.openlink.OpenlinkXmppNamespace;
 import com.bt.openlink.tinder.internal.TinderPacketUtil;
 import com.bt.openlink.type.Profile;
 import com.bt.openlink.type.ProfileId;
+import com.bt.openlink.type.Site;
 
 public class GetProfilesResult extends OpenlinkIQ {
     private static final String DESCRIPTION = "get-profiles result";
@@ -57,8 +57,20 @@ public class GetProfilesResult extends OpenlinkIQ {
         } else {
             final List<Element> profileElements = profilesElement.elements(OpenlinkXmppNamespace.TAG_PROFILE);
             profileElements.forEach(profileElement -> {
-                final Optional<ProfileId> profileId = ProfileId.from(TinderPacketUtil.getAttributeString(profileElement, "id", true, DESCRIPTION, parseErrors));
+                final Optional<ProfileId> profileId = ProfileId.from(TinderPacketUtil.getStringAttribute(profileElement, "id", true, DESCRIPTION, parseErrors));
                 final Profile.Builder profileBuilder = Profile.Builder.start();
+                final Element siteElement = profileElement.element("site");
+                if (siteElement != null) {
+                    final Site.Builder siteBuilder = Site.Builder.start()
+                            .setName(siteElement.getText());
+                    final Optional<Long> id = Optional.ofNullable(TinderPacketUtil.getLongAttribute(siteElement, "id", true, DESCRIPTION, parseErrors));
+                    id.ifPresent(siteBuilder::setId);
+                    final Optional<Boolean> isDefault = Optional.ofNullable(TinderPacketUtil.getBooleanAttribute(siteElement, "default", false, DESCRIPTION, parseErrors));
+                    isDefault.ifPresent(siteBuilder::setDefault);
+                    final Optional<Site.Type> type = Site.Type.from(TinderPacketUtil.getStringAttribute(siteElement, "type", true, DESCRIPTION, parseErrors));
+                    type.ifPresent(siteBuilder::setType);
+                    profileBuilder.setSite(siteBuilder.build(parseErrors));
+                }
                 profileId.ifPresent(profileBuilder::setProfileId);
                 final Profile profile = profileBuilder
                         .build(parseErrors);

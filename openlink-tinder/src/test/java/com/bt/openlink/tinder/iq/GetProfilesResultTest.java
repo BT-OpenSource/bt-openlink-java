@@ -8,7 +8,6 @@ import static org.xmlunit.matchers.CompareMatcher.isIdenticalTo;
 
 import java.util.List;
 
-import com.bt.openlink.type.Site;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -16,6 +15,7 @@ import org.xmpp.packet.IQ;
 
 import com.bt.openlink.tinder.Fixtures;
 import com.bt.openlink.type.Profile;
+import com.bt.openlink.type.Site;
 
 @SuppressWarnings({ "OptionalGetWithoutIsPresent", "ConstantConditions" })
 public class GetProfilesResultTest {
@@ -28,7 +28,7 @@ public class GetProfilesResultTest {
             "      <out>\n" +
             "        <profiles xmlns=\"http://xmpp.org/protocol/openlink:01:00:00/profiles\">\n" +
             "          <profile default=\"true\" device=\"uta\" id=\"UCTrader1-trader1@btsm1\" label=\"7001\" online=\"true\">\n" +
-            "            <site default=\"false\" id=\"1\" type=\"BTSM\">itrader-dev-sm-1</site>\n" +
+            "            <site default=\"false\" id=\"1\" type=\"IPT\">itrader-dev-sm-1</site>\n" +
             "            <actions>\n" +
             "              <action id=\"AnswerCall\" label=\"Answers an alerting call on active profile device\"/>\n" +
             "              <action id=\"ClearCall\" label=\"Clears the call\"/>\n" +
@@ -47,7 +47,7 @@ public class GetProfilesResultTest {
             "            </actions>\n" +
             "          </profile>\n" +
             "          <profile default=\"true\" device=\"uta\" id=\"UCTrader1-trader1@btsm11\" label=\"7001\" online=\"true\">\n" +
-            "            <site default=\"true\" id=\"11\" type=\"BTSM\">itrader-dev-sm-5</site>\n" +
+            "            <site default=\"true\" id=\"11\" type=\"ITS\">itrader-dev-sm-5</site>\n" +
             "            <actions>\n" +
             "              <action id=\"AnswerCall\" label=\"Answers an alerting call on active profile device\"/>\n" +
             "              <action id=\"ClearCall\" label=\"Clears the call\"/>\n" +
@@ -202,9 +202,25 @@ public class GetProfilesResultTest {
         assertThat(result.getID(), is(Fixtures.STANZA_ID));
         assertThat(result.getType(), is(IQ.Type.result));
         final List<Profile> profiles = result.getProfiles();
-        assertThat(profiles.size(), is(2));
-        assertThat(profiles.get(0).profileId().get().value(), is("UCTrader1-trader1@btsm1"));
-        assertThat(profiles.get(1).profileId().get().value(), is("UCTrader1-trader1@btsm11"));
+        int i = 0;
+
+        Profile profile = profiles.get(i++);
+        Site site = profile.getSite().get();
+        assertThat(profile.profileId().get().value(), is("UCTrader1-trader1@btsm1"));
+        assertThat(site.getId().get(), is(1L));
+        assertThat(site.getType().get(), is(Site.Type.IPT));
+        assertThat(site.isDefault().get(), is(false));
+        assertThat(site.getName().get(), is("itrader-dev-sm-1"));
+
+        profile = profiles.get(i++);
+        site = profile.getSite().get();
+        assertThat(profile.profileId().get().value(), is("UCTrader1-trader1@btsm11"));
+        assertThat(site.getId().get(), is(11L));
+        assertThat(site.getType().get(), is(Site.Type.ITS));
+        assertThat(site.isDefault().get(), is(true));
+        assertThat(site.getName().get(), is("itrader-dev-sm-5"));
+
+        assertThat(profiles.size(),is(i));
 
         assertThat(result.getParseErrors(), is(empty()));
     }

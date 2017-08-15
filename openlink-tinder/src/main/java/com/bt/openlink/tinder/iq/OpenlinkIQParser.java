@@ -1,14 +1,16 @@
 package com.bt.openlink.tinder.iq;
 
-import com.bt.openlink.OpenlinkXmppNamespace;
-import com.bt.openlink.tinder.internal.TinderPacketUtil;
-import org.dom4j.Element;
-import org.xmpp.packet.IQ;
+import java.util.Arrays;
+import java.util.List;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.Arrays;
-import java.util.List;
+
+import org.dom4j.Element;
+import org.xmpp.packet.IQ;
+
+import com.bt.openlink.OpenlinkXmppNamespace;
+import com.bt.openlink.tinder.internal.TinderPacketUtil;
 
 public final class OpenlinkIQParser {
 
@@ -44,7 +46,7 @@ public final class OpenlinkIQParser {
     @Nonnull
     public static IQ parse(@Nonnull final IQ iq) {
         final Element commandElement = iq.getChildElement();
-        final String node = TinderPacketUtil.getAttributeString(commandElement, "node");
+        final String node = TinderPacketUtil.getStringAttribute(commandElement, "node");
         final IQ.Type type = iq.getType();
         for (final IQMatcher iqMatcher : STANZA_TYPE_MATCHER_LIST) {
             if (iqMatcher.matches(node, type)) {

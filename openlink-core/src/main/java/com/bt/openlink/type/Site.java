@@ -1,15 +1,25 @@
 package com.bt.openlink.type;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 public class Site {
 
     public enum Type {
-        BTSM, CISCO, ITP, ITS
+        BTSM, CISCO, IPT, ITS;
+
+        public static Optional<Type> from(@Nullable final String value) {
+            for (final Type type : Type.values()) {
+                if(type.name().equals(value)) {
+                    return Optional.of(type);
+                }
+            }
+            return Optional.empty();
+        }
     }
 
     @Nullable private final Long id;
