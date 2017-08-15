@@ -235,4 +235,21 @@ public class GetProfilesResultTest {
                 "Invalid get-profiles result; no 'profile' elements present"));
     }
 
+    @Test
+    public void willBuildAResultFromARequest() throws Exception {
+
+        final GetProfilesRequest request = GetProfilesRequest.Builder.start()
+                .setTo(Fixtures.TO_JID)
+                .setFrom(Fixtures.FROM_JID)
+                .setID(Fixtures.STANZA_ID)
+                .setJID(Fixtures.USER_JID)
+                .build();
+
+        final GetProfilesResult result = GetProfilesResult.Builder.start(request)
+                .build();
+        
+        assertThat(result.getID(),is(request.getID()));
+        assertThat(result.getTo(),is(request.getFrom()));
+        assertThat(result.getFrom(),is(request.getTo()));
+    }
 }

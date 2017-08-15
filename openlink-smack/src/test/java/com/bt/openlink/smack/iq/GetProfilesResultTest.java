@@ -225,4 +225,23 @@ public class GetProfilesResultTest {
         assertThat(result.getParseErrors(), is(empty()));
     }
 
+    @Test
+    public void willBuildAResultFromARequest() throws Exception {
+
+        final GetProfilesRequest request = GetProfilesRequest.Builder.start()
+                .setTo(Fixtures.TO_JID)
+                .setFrom(Fixtures.FROM_JID)
+                .setStanzaId(Fixtures.STANZA_ID)
+                .setJid(Fixtures.USER_JID)
+                .build();
+
+        final GetProfilesResult result = GetProfilesResult.Builder.start(request)
+                .build();
+
+        assertThat(result.getStanzaId(),is(request.getStanzaId()));
+        assertThat(result.getTo(),is(request.getFrom()));
+        assertThat(result.getFrom(),is(request.getTo()));
+    }
+
+
 }

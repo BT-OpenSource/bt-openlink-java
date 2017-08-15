@@ -98,6 +98,14 @@ public class GetProfilesResult extends OpenlinkIQ {
         }
 
         @Nonnull
+        public static Builder start(@Nonnull final GetProfilesRequest request) {
+            return new Builder()
+                    .setID(request.getID())
+                    .setFrom(request.getTo())
+                    .setTo(request.getFrom());
+        }
+
+        @Nonnull
         public GetProfilesResult build() {
             validateBuilder();
             return new GetProfilesResult(this, null);
