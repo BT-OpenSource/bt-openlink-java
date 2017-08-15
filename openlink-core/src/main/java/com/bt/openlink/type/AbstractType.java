@@ -1,13 +1,14 @@
 package com.bt.openlink.type;
 
+import java.util.Objects;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.Objects;
 
 public class AbstractType<T> {
     private final T value;
 
-    AbstractType(final T value) {
+    protected AbstractType(final T value) {
         this.value = value;
     }
 
