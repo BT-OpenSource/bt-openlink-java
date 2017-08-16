@@ -20,6 +20,21 @@ import com.bt.openlink.type.Site;
 @SuppressWarnings({ "OptionalGetWithoutIsPresent", "ConstantConditions" })
 public class GetProfilesResultTest {
 
+    private static final Site SITE = Site.Builder.start()
+            .setId(42)
+            .setDefault(true)
+            .setType(Site.Type.BTSM)
+            .setName("test-site-name")
+            .build();
+    private static final Profile PROFILE = Profile.Builder.start()
+            .setProfileId(Fixtures.PROFILE_ID)
+            .setDefault(true)
+            .setDevice("uta")
+            .setLabel("7001")
+            .setOnline(true)
+            .setSite(SITE)
+            .build();
+
     @Rule public final ExpectedException expectedException = ExpectedException.none();
 
     private static final String GET_PROFILES_RESULT_WITH_NO_NOTES = "<iq type=\"result\" id=\"" + Fixtures.STANZA_ID + "\" to=\"" + Fixtures.TO_JID + "\" from=\"" + Fixtures.FROM_JID + "\">\n" +
@@ -124,7 +139,7 @@ public class GetProfilesResultTest {
                 "    <iodata xmlns=\"urn:xmpp:tmp:io-data\" type=\"output\">\n" +
                 "      <out>\n" +
                 "        <profiles>" +
-                "          <profile id=\"" + Fixtures.PROFILE_ID + "\">\n" +
+                "          <profile default=\"true\" device=\"uta\" id=\"" + Fixtures.PROFILE_ID + "\" label=\"7001\" online=\"true\">\n" +
                 "           <site default=\"true\" id=\"42\" type=\"BTSM\">test-site-name</site>\n" +
                 "          </profile>\n" +
                 "        </profiles>" +
@@ -133,40 +148,14 @@ public class GetProfilesResultTest {
                 "  </command>\n" +
                 "</iq>";
 
-        final Site site = Site.Builder.start()
-                .setId(42)
-                .setDefault(true)
-                .setType(Site.Type.BTSM)
-                .setName("test-site-name")
-                .build();
-        final Profile profile = Profile.Builder.start()
-                .setProfileId(Fixtures.PROFILE_ID)
-                .setSite(site)
-                .build();
         final GetProfilesResult result = GetProfilesResult.Builder.start()
                 .setID(Fixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
-                .addProfile(profile)
+                .addProfile(PROFILE)
                 .build();
 
         assertThat(result.toXML(), isIdenticalTo(expectedXML).ignoreWhitespace());
-    }
-
-    @Test
-    public void willNotBuildAPacketWithoutASite() throws Exception {
-
-        expectedException.expect(IllegalStateException.class);
-        expectedException.expectMessage("The site has not been set");
-        final Profile profile = Profile.Builder.start()
-                .setProfileId(Fixtures.PROFILE_ID)
-                .build();
-        GetProfilesResult.Builder.start()
-                .setID(Fixtures.STANZA_ID)
-                .setTo(Fixtures.TO_JID)
-                .setFrom(Fixtures.FROM_JID)
-                .addProfile(profile)
-                .build();
     }
 
     @Test
@@ -174,22 +163,12 @@ public class GetProfilesResultTest {
 
         expectedException.expect(IllegalArgumentException.class);
         expectedException.expectMessage("The profile id must be unique");
-        final Site site = Site.Builder.start()
-                .setId(42)
-                .setDefault(true)
-                .setType(Site.Type.BTSM)
-                .setName("test-site-name")
-                .build();
-        final Profile profile = Profile.Builder.start()
-                .setProfileId(Fixtures.PROFILE_ID)
-                .setSite(site)
-                .build();
         GetProfilesResult.Builder.start()
                 .setID(Fixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
-                .addProfile(profile)
-                .addProfile(profile)
+                .addProfile(PROFILE)
+                .addProfile(PROFILE)
                 .build();
     }
 
@@ -220,7 +199,7 @@ public class GetProfilesResultTest {
         assertThat(site.isDefault().get(), is(true));
         assertThat(site.getName().get(), is("itrader-dev-sm-5"));
 
-        assertThat(profiles.size(),is(i));
+        assertThat(profiles.size(), is(i));
 
         assertThat(result.getParseErrors(), is(empty()));
     }
@@ -263,9 +242,9 @@ public class GetProfilesResultTest {
 
         final GetProfilesResult result = GetProfilesResult.Builder.start(request)
                 .build();
-        
-        assertThat(result.getID(),is(request.getID()));
-        assertThat(result.getTo(),is(request.getFrom()));
-        assertThat(result.getFrom(),is(request.getTo()));
+
+        assertThat(result.getID(), is(request.getID()));
+        assertThat(result.getTo(), is(request.getFrom()));
+        assertThat(result.getFrom(), is(request.getTo()));
     }
 }

@@ -1,14 +1,12 @@
 package com.bt.openlink.smack.iq;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.empty;
 import static org.junit.Assert.assertThat;
 import static org.xmlunit.matchers.CompareMatcher.isIdenticalTo;
 
 import java.util.List;
 
-import com.bt.openlink.type.Site;
 import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.provider.ProviderManager;
 import org.jivesoftware.smack.util.PacketParserUtils;
@@ -21,9 +19,25 @@ import org.junit.rules.ExpectedException;
 import com.bt.openlink.OpenlinkXmppNamespace;
 import com.bt.openlink.smack.Fixtures;
 import com.bt.openlink.type.Profile;
+import com.bt.openlink.type.Site;
 
 @SuppressWarnings({ "OptionalGetWithoutIsPresent", "ConstantConditions" })
 public class GetProfilesResultTest {
+
+    private static final Site SITE = Site.Builder.start()
+            .setId(42)
+            .setDefault(true)
+            .setType(Site.Type.BTSM)
+            .setName("test-site-name")
+            .build();
+    private static final Profile PROFILE = Profile.Builder.start()
+            .setProfileId(Fixtures.PROFILE_ID)
+            .setDefault(true)
+            .setDevice("uta")
+            .setLabel("7001")
+            .setOnline(true)
+            .setSite(SITE)
+            .build();
 
     @Rule public final ExpectedException expectedException = ExpectedException.none();
 
@@ -148,40 +162,14 @@ public class GetProfilesResultTest {
                 "  </command>\n" +
                 "</iq>";
 
-        final Site site = Site.Builder.start()
-                .setId(42)
-                .setDefault(true)
-                .setType(Site.Type.BTSM)
-                .setName("test-site-name")
-                .build();
-        final Profile profile = Profile.Builder.start()
-                .setProfileId(Fixtures.PROFILE_ID)
-                .setSite(site)
-                .build();
         final GetProfilesResult result = GetProfilesResult.Builder.start()
                 .setStanzaId(Fixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
-                .addProfile(profile)
+                .addProfile(PROFILE)
                 .build();
 
         assertThat(result.toXML().toString(), isIdenticalTo(expectedXML).ignoreWhitespace());
-    }
-
-    @Test
-    public void willNotBuildAPacketWithoutASite() throws Exception {
-
-        expectedException.expect(IllegalStateException.class);
-        expectedException.expectMessage("The site has not been set");
-        final Profile profile = Profile.Builder.start()
-                .setProfileId(Fixtures.PROFILE_ID)
-                .build();
-        GetProfilesResult.Builder.start()
-                .setStanzaId(Fixtures.STANZA_ID)
-                .setTo(Fixtures.TO_JID)
-                .setFrom(Fixtures.FROM_JID)
-                .addProfile(profile)
-                .build();
     }
 
     @Test
@@ -189,22 +177,12 @@ public class GetProfilesResultTest {
 
         expectedException.expect(IllegalArgumentException.class);
         expectedException.expectMessage("The profile id must be unique");
-        final Site site = Site.Builder.start()
-                .setId(42)
-                .setDefault(true)
-                .setType(Site.Type.BTSM)
-                .setName("test-site-name")
-                .build();
-        final Profile profile = Profile.Builder.start()
-                .setProfileId(Fixtures.PROFILE_ID)
-                .setSite(site)
-                .build();
         GetProfilesResult.Builder.start()
                 .setStanzaId(Fixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
-                .addProfile(profile)
-                .addProfile(profile)
+                .addProfile(PROFILE)
+                .addProfile(PROFILE)
                 .build();
     }
 
@@ -238,10 +216,9 @@ public class GetProfilesResultTest {
         final GetProfilesResult result = GetProfilesResult.Builder.start(request)
                 .build();
 
-        assertThat(result.getStanzaId(),is(request.getStanzaId()));
-        assertThat(result.getTo(),is(request.getFrom()));
-        assertThat(result.getFrom(),is(request.getTo()));
+        assertThat(result.getStanzaId(), is(request.getStanzaId()));
+        assertThat(result.getTo(), is(request.getFrom()));
+        assertThat(result.getFrom(), is(request.getTo()));
     }
-
 
 }

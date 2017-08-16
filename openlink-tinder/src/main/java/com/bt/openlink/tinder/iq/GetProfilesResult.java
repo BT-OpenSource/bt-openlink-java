@@ -29,6 +29,10 @@ public class GetProfilesResult extends OpenlinkIQ {
         getProfiles().forEach(profile -> {
             final Element profileElement = profilesElement.addElement(OpenlinkXmppNamespace.TAG_PROFILE);
             profile.profileId().ifPresent(profileId -> profileElement.addAttribute("id", profileId.value()));
+            profile.isDefault().ifPresent(isDefault -> profileElement.addAttribute("default", String.valueOf(isDefault)));
+            profile.getDevice().ifPresent(device -> profileElement.addAttribute("device", device));
+            profile.getLabel().ifPresent(label -> profileElement.addAttribute("label", label));
+            profile.isOnline().ifPresent(online -> profileElement.addAttribute("online", String.valueOf(online)));
             final Optional<Site> optionalSite = profile.getSite();
             if (optionalSite.isPresent()) {
                 final Site site = optionalSite.get();
@@ -57,21 +61,29 @@ public class GetProfilesResult extends OpenlinkIQ {
         } else {
             final List<Element> profileElements = profilesElement.elements(OpenlinkXmppNamespace.TAG_PROFILE);
             profileElements.forEach(profileElement -> {
-                final Optional<ProfileId> profileId = ProfileId.from(TinderPacketUtil.getStringAttribute(profileElement, "id", true, DESCRIPTION, parseErrors));
                 final Profile.Builder profileBuilder = Profile.Builder.start();
+                final Optional<ProfileId> profileId = ProfileId.from(TinderPacketUtil.getStringAttribute(profileElement, "id", true, DESCRIPTION, parseErrors));
+                profileId.ifPresent(profileBuilder::setProfileId);
+                final Optional<Boolean> isDefault = Optional.ofNullable(TinderPacketUtil.getBooleanAttribute(profileElement, "default", true, DESCRIPTION, parseErrors));
+                isDefault.ifPresent(profileBuilder::setDefault);
+                final Optional<String> device = Optional.ofNullable(TinderPacketUtil.getStringAttribute(profileElement, "device", false, DESCRIPTION, parseErrors));
+                device.ifPresent(profileBuilder::setDevice);
+                final Optional<String> label = Optional.ofNullable(TinderPacketUtil.getStringAttribute(profileElement, "label", false, DESCRIPTION, parseErrors));
+                label.ifPresent(profileBuilder::setLabel);
+                final Optional<Boolean> online = Optional.ofNullable(TinderPacketUtil.getBooleanAttribute(profileElement, "online", true, DESCRIPTION, parseErrors));
+                online.ifPresent(profileBuilder::setOnline);
                 final Element siteElement = profileElement.element("site");
                 if (siteElement != null) {
                     final Site.Builder siteBuilder = Site.Builder.start()
                             .setName(siteElement.getText());
                     final Optional<Long> id = Optional.ofNullable(TinderPacketUtil.getLongAttribute(siteElement, "id", true, DESCRIPTION, parseErrors));
                     id.ifPresent(siteBuilder::setId);
-                    final Optional<Boolean> isDefault = Optional.ofNullable(TinderPacketUtil.getBooleanAttribute(siteElement, "default", false, DESCRIPTION, parseErrors));
-                    isDefault.ifPresent(siteBuilder::setDefault);
+                    final Optional<Boolean> isDefaultSite = Optional.ofNullable(TinderPacketUtil.getBooleanAttribute(siteElement, "default", false, DESCRIPTION, parseErrors));
+                    isDefaultSite.ifPresent(siteBuilder::setDefault);
                     final Optional<Site.Type> type = Site.Type.from(TinderPacketUtil.getStringAttribute(siteElement, "type", true, DESCRIPTION, parseErrors));
                     type.ifPresent(siteBuilder::setType);
                     profileBuilder.setSite(siteBuilder.build(parseErrors));
                 }
-                profileId.ifPresent(profileBuilder::setProfileId);
                 final Profile profile = profileBuilder
                         .build(parseErrors);
                 parseErrors.addAll(profile.parseErrors());
