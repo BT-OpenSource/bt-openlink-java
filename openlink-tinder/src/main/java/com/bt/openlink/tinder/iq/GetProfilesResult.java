@@ -15,6 +15,7 @@ import com.bt.openlink.OpenlinkXmppNamespace;
 import com.bt.openlink.tinder.internal.TinderPacketUtil;
 import com.bt.openlink.type.Profile;
 import com.bt.openlink.type.ProfileId;
+import com.bt.openlink.type.RequestAction;
 import com.bt.openlink.type.Site;
 
 public class GetProfilesResult extends OpenlinkIQ {
@@ -25,10 +26,10 @@ public class GetProfilesResult extends OpenlinkIQ {
         super(builder, parseErrors);
         this.profiles = Collections.unmodifiableList(builder.profiles);
         final Element outElement = TinderPacketUtil.addCommandIOOutputElement(this, OpenlinkXmppNamespace.OPENLINK_GET_PROFILES);
-        final Element profilesElement = outElement.addElement(OpenlinkXmppNamespace.TAG_PROFILES);
+        final Element profilesElement = outElement.addElement(OpenlinkXmppNamespace.TAG_PROFILES, OpenlinkXmppNamespace.OPENLINK_PROFILES.uri());
         getProfiles().forEach(profile -> {
             final Element profileElement = profilesElement.addElement(OpenlinkXmppNamespace.TAG_PROFILE);
-            profile.profileId().ifPresent(profileId -> profileElement.addAttribute("id", profileId.value()));
+            profile.getProfileId().ifPresent(profileId -> profileElement.addAttribute("id", profileId.value()));
             profile.isDefault().ifPresent(isDefault -> profileElement.addAttribute("default", String.valueOf(isDefault)));
             profile.getDevice().ifPresent(device -> profileElement.addAttribute("device", device));
             profile.getLabel().ifPresent(label -> profileElement.addAttribute("label", label));
@@ -42,8 +43,13 @@ public class GetProfilesResult extends OpenlinkIQ {
                 site.getType().ifPresent(type -> siteElement.addAttribute("type", type.name()));
                 site.getName().ifPresent(siteElement::setText);
             }
+            final Element actionsElement = profileElement.addElement("actions");
+            for (final RequestAction requestAction : profile.getActions()) {
+                final Element actionElement = actionsElement.addElement("action");
+                actionElement.addAttribute("id", requestAction.getId());
+                actionElement.addAttribute("label", requestAction.getLabel());
+            }
         });
-
     }
 
     @SuppressWarnings("unchecked")
@@ -84,9 +90,17 @@ public class GetProfilesResult extends OpenlinkIQ {
                     type.ifPresent(siteBuilder::setType);
                     profileBuilder.setSite(siteBuilder.build(parseErrors));
                 }
+                final Element actionsElement = TinderPacketUtil.getChildElement(profileElement, "actions");
+                if (actionsElement != null) {
+                    final List<Element> actionElements = actionsElement.elements("action");
+                    for (final Element actionElement : actionElements) {
+                        final Optional<RequestAction> requestAction = RequestAction.from(TinderPacketUtil.getStringAttribute(actionElement, "id", true, DESCRIPTION, parseErrors));
+                        requestAction.ifPresent(profileBuilder::addAction);
+                    }
+                }
                 final Profile profile = profileBuilder
                         .build(parseErrors);
-                parseErrors.addAll(profile.parseErrors());
+                parseErrors.addAll(profile.getParseErrors());
                 builder.addProfile(profile);
             });
             if (profileElements.isEmpty()) {
@@ -143,7 +157,7 @@ public class GetProfilesResult extends OpenlinkIQ {
         @Nonnull
         public Builder addProfile(@Nonnull final Profile profile) {
             this.profiles.forEach(existingProfile -> {
-                if (existingProfile.profileId().equals(profile.profileId())) {
+                if (existingProfile.getProfileId().equals(profile.getProfileId())) {
                     throw new IllegalArgumentException("The profile id must be unique");
                 }
             });

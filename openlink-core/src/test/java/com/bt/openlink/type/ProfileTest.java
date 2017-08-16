@@ -32,7 +32,7 @@ public class ProfileTest {
                 .build();
 
         assertThat(profile.getSite().get(), is(SITE));
-        assertThat(profile.profileId().get(), is(profileId));
+        assertThat(profile.getProfileId().get(), is(profileId));
         assertThat(profile.isDefault().get(), is(true));
         assertThat(profile.getDevice().get(), is("test-device"));
         assertThat(profile.getLabel().get(), is("test-label"));

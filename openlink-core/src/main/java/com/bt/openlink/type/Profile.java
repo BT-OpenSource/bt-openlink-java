@@ -16,6 +16,7 @@ public final class Profile {
     @Nullable private final String label;
     @Nullable private final Boolean online;
     @Nullable private final Site site;
+    @Nonnull final List<RequestAction> actions;
 
     private Profile(@Nonnull final Builder builder, @Nullable final List<String> parseErrors) {
         this.profileId = builder.profileId;
@@ -24,6 +25,7 @@ public final class Profile {
         this.label = builder.label;
         this.online = builder.online;
         this.site = builder.site;
+        this.actions = builder.actions;
         if (parseErrors == null) {
             this.parseErrors = Collections.emptyList();
         } else {
@@ -32,12 +34,12 @@ public final class Profile {
     }
 
     @Nonnull
-    public List<String> parseErrors() {
+    public List<String> getParseErrors() {
         return new ArrayList<>(parseErrors);
     }
 
     @Nonnull
-    public Optional<ProfileId> profileId() {
+    public Optional<ProfileId> getProfileId() {
         return Optional.ofNullable(profileId);
     }
 
@@ -66,6 +68,11 @@ public final class Profile {
         return Optional.ofNullable(site);
     }
 
+    @Nonnull
+    public List<RequestAction> getActions() {
+        return actions;
+    }
+
     public static final class Builder {
 
         @Nullable private ProfileId profileId = null;
@@ -74,6 +81,7 @@ public final class Profile {
         @Nullable private String device;
         @Nullable private String label;
         @Nullable private Boolean online;
+        @Nonnull private final List<RequestAction> actions = new ArrayList<>();
 
         private Builder() {
         }
@@ -135,6 +143,11 @@ public final class Profile {
 
         public Builder setSite(@Nonnull Site site) {
             this.site = site;
+            return this;
+        }
+
+        public Builder addAction(@Nonnull RequestAction action) {
+            actions.add(action);
             return this;
         }
     }

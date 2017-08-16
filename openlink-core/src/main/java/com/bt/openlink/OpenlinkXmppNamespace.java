@@ -10,6 +10,7 @@ public enum OpenlinkXmppNamespace {
     XMPP_IO_DATA("urn:xmpp:tmp:io-data", "IO data"),
     OPENLINK_GET_PROFILES("http://xmpp.org/protocol/openlink:01:00:00#get-profiles", "Get profiles"),
     OPENLINK_GET_PROFILE("http://xmpp.org/protocol/openlink:01:00:00#get-profile", "Get profile"),
+    OPENLINK_PROFILES("http://xmpp.org/protocol/openlink:01:00:00/profiles", "Profiles"),
     OPENLINK_GET_INTERESTS("http://xmpp.org/protocol/openlink:01:00:00#get-interests", "Get interests"),
     OPENLINK_GET_INTEREST("http://xmpp.org/protocol/openlink:01:00:00#get-interest", "Get interest"),
     OPENLINK_GET_FEATURES("http://xmpp.org/protocol/openlink:01:00:00#get-features", "Get features"),

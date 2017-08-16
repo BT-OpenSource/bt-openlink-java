@@ -8,7 +8,6 @@ import java.util.Optional;
 
 import javax.annotation.Nonnull;
 
-import com.bt.openlink.type.Site;
 import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.util.ParserUtils;
 import org.xmlpull.v1.XmlPullParser;
@@ -17,6 +16,7 @@ import org.xmlpull.v1.XmlPullParserException;
 import com.bt.openlink.OpenlinkXmppNamespace;
 import com.bt.openlink.type.Profile;
 import com.bt.openlink.type.ProfileId;
+import com.bt.openlink.type.Site;
 
 public class GetProfilesResult extends OpenlinkIQ {
     @Nonnull private final List<Profile> profiles;
@@ -36,7 +36,7 @@ public class GetProfilesResult extends OpenlinkIQ {
             profileId.ifPresent(profileBuilder::setProfileId);
             final Profile profile = profileBuilder
                     .build(parseErrors);
-            parseErrors.addAll(profile.parseErrors());
+            parseErrors.addAll(profile.getParseErrors());
             builder.addProfile(profile);
             ParserUtils.forwardToEndTagOfDepth(parser, parser.getDepth());
             parser.nextTag();
@@ -62,7 +62,7 @@ public class GetProfilesResult extends OpenlinkIQ {
         xml.halfOpenElement(OpenlinkXmppNamespace.TAG_PROFILES).attribute("xmlns", "http://xmpp.org/protocol/openlink:01:00:00/profiles").rightAngleBracket();
         for (final Profile profile : profiles) {
             xml.halfOpenElement(OpenlinkXmppNamespace.TAG_PROFILE);
-            profile.profileId().ifPresent(profileId -> xml.attribute("id", profileId.value()));
+            profile.getProfileId().ifPresent(profileId -> xml.attribute("id", profileId.value()));
             xml.rightAngleBracket();
             final Optional<Site> optionalSite = profile.getSite();
             if (optionalSite.isPresent()) {
@@ -129,7 +129,7 @@ public class GetProfilesResult extends OpenlinkIQ {
         @Nonnull
         public Builder addProfile(@Nonnull final Profile profile) {
             this.profiles.forEach(existingProfile -> {
-                if (existingProfile.profileId().equals(profile.profileId())) {
+                if (existingProfile.getProfileId().equals(profile.getProfileId())) {
                     throw new IllegalArgumentException("The profile id must be unique");
                 }
             });
