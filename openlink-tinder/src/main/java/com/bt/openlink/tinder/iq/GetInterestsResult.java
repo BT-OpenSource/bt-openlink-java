@@ -58,9 +58,9 @@ public class GetInterestsResult extends OpenlinkIQ {
             for (final Element interestElement : interestElements) {
                 final Interest.Builder interestBuilder = Interest.Builder.start();
                 final Optional<InterestId> interestId = InterestId.from(TinderPacketUtil.getStringAttribute(interestElement, "id", true, DESCRIPTION, parseErrors));
-                interestId.ifPresent(interestBuilder::setInterestId);
+                interestId.ifPresent(interestBuilder::setId);
                 final Optional<InterestType> interestType = InterestType.from(TinderPacketUtil.getStringAttribute(interestElement, "type", true, DESCRIPTION, parseErrors));
-                interestType.ifPresent(interestBuilder::setInterestType);
+                interestType.ifPresent(interestBuilder::setType);
                 final Optional<String> label = Optional.ofNullable(TinderPacketUtil.getStringAttribute(interestElement, "label", true, DESCRIPTION, parseErrors));
                 label.ifPresent(interestBuilder::setLabel);
                 final Optional<Boolean> isDefault = Optional.ofNullable(TinderPacketUtil.getBooleanAttribute(interestElement, "default", true, DESCRIPTION, parseErrors));

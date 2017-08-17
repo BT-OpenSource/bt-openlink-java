@@ -77,12 +77,12 @@ public final class Interest {
             return new Interest(this, parseErrors);
         }
 
-        public Builder setInterestId(@Nonnull final InterestId interestId) {
+        public Builder setId(@Nonnull final InterestId interestId) {
             this.interestId = interestId;
             return this;
         }
 
-        public Builder setInterestType(@Nonnull final InterestType interestType) {
+        public Builder setType(@Nonnull final InterestType interestType) {
             this.interestType = interestType;
             return this;
         }

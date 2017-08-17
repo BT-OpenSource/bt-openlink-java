@@ -24,7 +24,7 @@ public class ProfileTest {
         final ProfileId profileId = ProfileId.from("test-profile-id").orElseThrow(IllegalArgumentException::new);
         final Profile profile = Profile.Builder.start()
                 .setSite(SITE)
-                .setProfileId(profileId)
+                .setId(profileId)
                 .setDefault(true)
                 .setDevice("test-device")
                 .setLabel("test-label")
@@ -46,7 +46,7 @@ public class ProfileTest {
         expectedException.expectMessage("The site has not been set");
 
         Profile.Builder.start()
-                .setProfileId(ProfileId.from("test-profile-id").orElseThrow(IllegalArgumentException::new))
+                .setId(ProfileId.from("test-profile-id").orElseThrow(IllegalArgumentException::new))
                 .build();
     }
 
@@ -69,7 +69,7 @@ public class ProfileTest {
 
         Profile.Builder.start()
                 .setSite(SITE)
-                .setProfileId(ProfileId.from("test-profile-id").orElseThrow(IllegalArgumentException::new))
+                .setId(ProfileId.from("test-profile-id").orElseThrow(IllegalArgumentException::new))
                 .build();
     }
 
@@ -81,7 +81,7 @@ public class ProfileTest {
 
         Profile.Builder.start()
                 .setSite(SITE)
-                .setProfileId(ProfileId.from("test-profile-id").orElseThrow(IllegalArgumentException::new))
+                .setId(ProfileId.from("test-profile-id").orElseThrow(IllegalArgumentException::new))
                 .setDefault(false)
                 .build();
     }
@@ -94,7 +94,7 @@ public class ProfileTest {
 
         Profile.Builder.start()
                 .setSite(SITE)
-                .setProfileId(ProfileId.from("test-profile-id").orElseThrow(IllegalArgumentException::new))
+                .setId(ProfileId.from("test-profile-id").orElseThrow(IllegalArgumentException::new))
                 .setDefault(false)
                 .setLabel("test-label")
                 .build();

@@ -69,7 +69,7 @@ public class GetProfilesResult extends OpenlinkIQ {
             profileElements.forEach(profileElement -> {
                 final Profile.Builder profileBuilder = Profile.Builder.start();
                 final Optional<ProfileId> profileId = ProfileId.from(TinderPacketUtil.getStringAttribute(profileElement, "id", true, DESCRIPTION, parseErrors));
-                profileId.ifPresent(profileBuilder::setProfileId);
+                profileId.ifPresent(profileBuilder::setId);
                 final Optional<Boolean> isDefault = Optional.ofNullable(TinderPacketUtil.getBooleanAttribute(profileElement, "default", true, DESCRIPTION, parseErrors));
                 isDefault.ifPresent(profileBuilder::setDefault);
                 final Optional<String> device = Optional.ofNullable(TinderPacketUtil.getStringAttribute(profileElement, "device", false, DESCRIPTION, parseErrors));

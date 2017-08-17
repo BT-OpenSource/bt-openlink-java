@@ -72,20 +72,20 @@ public class GetInterestsResultTest {
     public void willGenerateAnXmppStanza() throws Exception {
 
         final Interest interest1 = Interest.Builder.start()
-                .setInterestId(Fixtures.INTEREST_ID)
-                .setInterestType(InterestType.from("DirectoryNumber").get())
+                .setId(Fixtures.INTEREST_ID)
+                .setType(InterestType.from("DirectoryNumber").get())
                 .setLabel("6001/1")
                 .setDefault(true)
                 .build();
         final Interest interest2 = Interest.Builder.start()
-                .setInterestId(InterestId.from("sip:6001@uta.bt.com-DirectDial-2trader1@btsm11").get())
-                .setInterestType(InterestType.from("DirectoryNumber").get())
+                .setId(InterestId.from("sip:6001@uta.bt.com-DirectDial-2trader1@btsm11").get())
+                .setType(InterestType.from("DirectoryNumber").get())
                 .setLabel("6001/2")
                 .setDefault(true)
                 .build();
         final Interest interest3 = Interest.Builder.start()
-                .setInterestId(InterestId.from("sip:6002@uta.bt.com-DirectDial-1trader1@btsm11").get())
-                .setInterestType(InterestType.from("DirectoryNumber").get())
+                .setId(InterestId.from("sip:6002@uta.bt.com-DirectDial-1trader1@btsm11").get())
+                .setType(InterestType.from("DirectoryNumber").get())
                 .setLabel("6002/1")
                 .setDefault(false)
                 .build();
@@ -107,7 +107,7 @@ public class GetInterestsResultTest {
         expectedException.expect(IllegalArgumentException.class);
         expectedException.expectMessage("The interest id must be unique");
         final Interest interest = Interest.Builder.start()
-                .setInterestId(Fixtures.INTEREST_ID)
+                .setId(Fixtures.INTEREST_ID)
                 .build();
         GetInterestsResult.Builder.start()
                 .setID(Fixtures.STANZA_ID)

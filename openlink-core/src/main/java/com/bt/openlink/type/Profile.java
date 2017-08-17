@@ -116,7 +116,7 @@ public final class Profile {
             return new Profile(this, parseErrors);
         }
 
-        public Builder setProfileId(@Nonnull final ProfileId profileId) {
+        public Builder setId(@Nonnull final ProfileId profileId) {
             this.profileId = profileId;
             return this;
         }

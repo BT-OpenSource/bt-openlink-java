@@ -31,7 +31,7 @@ public class GetProfilesResultTest {
             .setName("test-site-name")
             .build();
     private static final Profile PROFILE = Profile.Builder.start()
-            .setProfileId(Fixtures.PROFILE_ID)
+            .setId(Fixtures.PROFILE_ID)
             .setDefault(true)
             .setDevice("uta")
             .setLabel("7001")

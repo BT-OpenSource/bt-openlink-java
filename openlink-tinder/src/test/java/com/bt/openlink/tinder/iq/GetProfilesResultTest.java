@@ -29,7 +29,7 @@ public class GetProfilesResultTest {
             .setName("test-site-name")
             .build();
     private static final Profile PROFILE_1 = Profile.Builder.start()
-            .setProfileId(Fixtures.PROFILE_ID)
+            .setId(Fixtures.PROFILE_ID)
             .setDefault(true)
             .setDevice("uta")
             .setLabel("7001")
@@ -46,7 +46,7 @@ public class GetProfilesResultTest {
             .build();
     public static final ProfileId PROFILE_ID_2 = ProfileId.from("test-profile-id-2").get();
     private static final Profile PROFILE_2 = Profile.Builder.start()
-            .setProfileId(PROFILE_ID_2)
+            .setId(PROFILE_ID_2)
             .setDefault(true)
             .setDevice("uta")
             .setLabel("7001")

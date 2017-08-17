@@ -33,7 +33,7 @@ public class GetProfilesResult extends OpenlinkIQ {
 
             final Optional<ProfileId> profileId = ProfileId.from(parser.getAttributeValue("", "id"));
             final Profile.Builder profileBuilder = Profile.Builder.start();
-            profileId.ifPresent(profileBuilder::setProfileId);
+            profileId.ifPresent(profileBuilder::setId);
             final Profile profile = profileBuilder
                     .build(parseErrors);
             parseErrors.addAll(profile.getParseErrors());
