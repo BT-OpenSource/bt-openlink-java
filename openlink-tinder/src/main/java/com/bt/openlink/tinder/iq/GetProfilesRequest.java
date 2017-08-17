@@ -22,8 +22,7 @@ public class GetProfilesRequest extends OpenlinkIQ {
         super(builder, parseErrors);
         this.jid = builder.jid;
         final Element inElement = TinderPacketUtil.addCommandIOInputElement(this, OpenlinkXmppNamespace.OPENLINK_GET_PROFILES);
-        TinderPacketUtil.addElementWithTextIfNotNull(inElement, "jid", getJID().orElse(null));
-
+        TinderPacketUtil.addElementWithTextIfNotNull(inElement, "jid", jid);
     }
 
     @Nonnull
