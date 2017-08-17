@@ -73,6 +73,16 @@ public final class Interest {
         return Objects.hash(interestId, interestType, label, isDefault);
     }
 
+    @Override
+    public String toString() {
+        return "Interest[" +
+                "interestId=" + interestId +
+                ", interestType=" + interestType +
+                ", label='" + label + '\'' +
+                ", isDefault=" + isDefault +
+                ']';
+    }
+
     public static final class Builder {
 
         @Nullable private InterestId interestId = null;

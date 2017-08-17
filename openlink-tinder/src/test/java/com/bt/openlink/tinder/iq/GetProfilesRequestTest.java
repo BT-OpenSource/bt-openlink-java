@@ -133,7 +133,6 @@ public class GetProfilesRequestTest {
         final GetProfilesRequest request = GetProfilesRequest.from(iq);
 
         assertThat(request.toXML(), isIdenticalTo(iq.toXML()).ignoreWhitespace());
-
     }
 
 }

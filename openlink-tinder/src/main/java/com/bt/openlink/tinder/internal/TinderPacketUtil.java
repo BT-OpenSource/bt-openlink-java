@@ -1,28 +1,20 @@
 package com.bt.openlink.tinder.internal;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
-import java.util.List;
-import java.util.Optional;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import com.bt.openlink.OpenlinkXmppNamespace;
 import org.dom4j.Element;
 import org.xmpp.packet.IQ;
 import org.xmpp.packet.JID;
 
-import com.bt.openlink.OpenlinkXmppNamespace;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * This class is for internal use by the library only; users of the API should not access this class directly.
  */
 public final class TinderPacketUtil {
-
-    private static final Logger LOGGER = LogManager.getLogger();
 
     private TinderPacketUtil() {
     }
@@ -64,76 +56,6 @@ public final class TinderPacketUtil {
     }
 
     @Nullable
-    protected static Element addElementWithTextIfNotNull(
-            @Nonnull final Element elementToAddTo,
-            @Nonnull final String elementName,
-            @Nullable final LocalDate date,
-            @Nonnull final DateTimeFormatter dateTimeFormatter) {
-        if (date != null) {
-            final Element callerElement = elementToAddTo.addElement(elementName);
-            callerElement.setText(dateTimeFormatter.format(date));
-            return callerElement;
-        } else {
-            return null;
-        }
-    }
-
-    protected static void addElementAttributeIfNotNull(
-            @Nonnull final Element elementToAddTo,
-            @Nonnull final String attributeName,
-            @Nullable final String attributeValue) {
-        if (attributeValue != null) {
-            elementToAddTo.addAttribute(attributeName, attributeValue);
-        }
-    }
-
-    @Nullable
-    protected static Integer getChildElementInteger(
-            @Nonnull final Element parentElement,
-            @Nonnull final String childElementName,
-            @Nonnull final String stanzaDescription,
-            @Nonnull final List<String> parseErrors) {
-        final String childElementText = getChildElementString(parentElement, childElementName);
-        if (childElementText != null) {
-            try {
-                return Integer.parseInt(childElementText);
-            } catch (final NumberFormatException ignored) {
-                parseErrors.add(String.format("Invalid %s; invalid %s '%s'; please supply an integer", stanzaDescription, childElementName, childElementText));
-                return null;
-            }
-        }
-        return null;
-    }
-
-    @Nullable
-    protected static LocalDate getChildElementLocalDate(
-            @Nonnull final Element parentElement,
-            @Nonnull final String childElementName,
-            @Nonnull final DateTimeFormatter dateTimeFormatter,
-            @Nonnull final String stanzaDescription,
-            @Nonnull final String dateFormat,
-            @Nonnull final List<String> parseErrors) {
-        final String dateText = getChildElementString(parentElement, childElementName);
-        if (dateText != null) {
-            try {
-                return LocalDate.parse(dateText, dateTimeFormatter);
-            } catch (final DateTimeParseException e) {
-                LOGGER.info("Supplied text is an invalid date [dateText={}]", dateText, e);
-                parseErrors.add(String.format("Invalid %s; invalid %s '%s'; date format is '%s'", stanzaDescription, childElementName, dateText, dateFormat));
-                return null;
-            }
-        }
-        return null;
-    }
-
-    @Nullable
-    public static String getChildElementString(
-            @Nonnull final Element parentElement,
-            @Nonnull final String childElementName) {
-        return getChildElementString(parentElement, childElementName, false, null, null);
-    }
-
-    @Nullable
     public static String getChildElementString(
             @Nullable final Element parentElement,
             @Nonnull final String childElementName,
@@ -153,50 +75,45 @@ public final class TinderPacketUtil {
         return null;
     }
 
-    @Nullable
-    public static String getStringAttribute(@Nullable final Element element, @Nonnull final String attributeName) {
-        return getStringAttribute(element, attributeName, false, null, null);
+    @Nonnull
+    public static Optional<String> getStringAttribute(@Nullable final Element element, @Nonnull final String attributeName) {
+        return getStringAttribute(element, attributeName, false, "", Collections.emptyList());
     }
 
-    @Nullable
-    public static Long getLongAttribute(final Element siteElement, final String id, final boolean isRequired, final String description, final List<String> parseErrors) {
-        final String stringValue = getStringAttribute(siteElement, id, isRequired, description, parseErrors);
-        if (stringValue == null || stringValue.isEmpty()) {
-            return null;
-        }
-        try {
-            return Long.valueOf(stringValue);
-        } catch (final NumberFormatException e) {
-            return null;
-        }
-    }
-
-    @Nullable
-    public static Boolean getBooleanAttribute(final Element siteElement, final String id, final boolean isRequired, final String description, final List<String> parseErrors) {
-        final String stringValue = getStringAttribute(siteElement, id, isRequired, description, parseErrors);
-        if (stringValue == null || stringValue.isEmpty()) {
-            return null;
-        }
-        return Boolean.valueOf(stringValue);
-    }
-
-    @Nullable
-    public static String getStringAttribute(
+    @Nonnull
+    public static Optional<String> getStringAttribute(
             @Nullable final Element element,
             @Nonnull final String attributeName,
             final boolean isRequired,
-            final String stanzaDescription,
-            final List<String> parseErrors) {
+            @Nonnull final String stanzaDescription,
+            @Nonnull final List<String> parseErrors) {
         final String attributeValue;
         if (element == null) {
             attributeValue = null;
         } else {
-            attributeValue = element.attributeValue(attributeName);
+            final String valueString = element.attributeValue(attributeName);
+            attributeValue = valueString == null || valueString.isEmpty() ? null : valueString;
         }
         if (attributeValue == null && isRequired) {
             parseErrors.add(String.format("Invalid %s; missing '%s' attribute is mandatory", stanzaDescription, attributeName));
         }
-        return attributeValue;
+        return Optional.ofNullable(attributeValue);
+    }
+
+    @Nonnull
+    public static Optional<Long> getLongAttribute(final Element siteElement, final String id, final boolean isRequired, final String description, final List<String> parseErrors) {
+        final Optional<String> stringValue = getStringAttribute(siteElement, id, isRequired, description, parseErrors);
+        try {
+            return stringValue.map(Long::valueOf);
+        } catch (final NumberFormatException e) {
+            return Optional.empty();
+        }
+    }
+
+    @Nonnull
+    public static Optional<Boolean> getBooleanAttribute(final Element siteElement, final String id, final boolean isRequired, final String description, final List<String> parseErrors) {
+        final Optional<String> stringValue = getStringAttribute(siteElement, id, isRequired, description, parseErrors);
+        return stringValue.map(Boolean::valueOf);
     }
 
     @Nonnull
@@ -230,7 +147,7 @@ public final class TinderPacketUtil {
     }
 
     @Nonnull
-    public static Optional<JID> getTinderJID(String jidString) {
+    public static Optional<JID> getJID(String jidString) {
         return jidString == null || jidString.isEmpty() ? Optional.empty() : Optional.of(new JID(jidString));
     }
 

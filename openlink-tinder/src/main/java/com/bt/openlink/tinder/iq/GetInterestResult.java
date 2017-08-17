@@ -56,13 +56,13 @@ public class GetInterestResult extends OpenlinkIQ {
             parseErrors.add("Invalid get-interest result; missing 'interest' element is mandatory");
         } else {
             final Interest.Builder interestBuilder = Interest.Builder.start();
-            final Optional<InterestId> interestId = InterestId.from(TinderPacketUtil.getStringAttribute(interestElement, "id", true, DESCRIPTION, parseErrors));
+            final Optional<InterestId> interestId = InterestId.from(TinderPacketUtil.getStringAttribute(interestElement, "id", true, DESCRIPTION, parseErrors).orElse(null));
             interestId.ifPresent(interestBuilder::setId);
-            final Optional<InterestType> interestType = InterestType.from(TinderPacketUtil.getStringAttribute(interestElement, "type", true, DESCRIPTION, parseErrors));
+            final Optional<InterestType> interestType = InterestType.from(TinderPacketUtil.getStringAttribute(interestElement, "type", true, DESCRIPTION, parseErrors).orElse(null));
             interestType.ifPresent(interestBuilder::setType);
-            final Optional<String> label = Optional.ofNullable(TinderPacketUtil.getStringAttribute(interestElement, "label", true, DESCRIPTION, parseErrors));
+            final Optional<String> label = Optional.ofNullable(TinderPacketUtil.getStringAttribute(interestElement, "label", true, DESCRIPTION, parseErrors).orElse(null));
             label.ifPresent(interestBuilder::setLabel);
-            final Optional<Boolean> isDefault = Optional.ofNullable(TinderPacketUtil.getBooleanAttribute(interestElement, "default", true, DESCRIPTION, parseErrors));
+            final Optional<Boolean> isDefault = TinderPacketUtil.getBooleanAttribute(interestElement, "default", true, DESCRIPTION, parseErrors);
             isDefault.ifPresent(interestBuilder::setDefault);
             builder.setInterest(interestBuilder.build());
         }

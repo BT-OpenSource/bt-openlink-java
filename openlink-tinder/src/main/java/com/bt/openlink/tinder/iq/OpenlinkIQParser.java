@@ -2,6 +2,7 @@ package com.bt.openlink.tinder.iq;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -45,15 +46,18 @@ public final class OpenlinkIQParser {
             new IQMatcher(OpenlinkXmppNamespace.OPENLINK_GET_INTERESTS, IQ.Type.result, GetInterestsResult::from),
             new IQMatcher(OpenlinkXmppNamespace.OPENLINK_GET_INTEREST, IQ.Type.set, GetInterestRequest::from),
             new IQMatcher(OpenlinkXmppNamespace.OPENLINK_GET_INTEREST, IQ.Type.result, GetInterestResult::from)
-    );
+            );
 
     @Nonnull
     public static IQ parse(@Nonnull final IQ iq) {
         final Element commandElement = iq.getChildElement();
-        final String node = TinderPacketUtil.getStringAttribute(commandElement, "node");
+        final Optional<String> node = TinderPacketUtil.getStringAttribute(commandElement, "node");
+        if (!node.isPresent()) {
+            return iq;
+        }
         final IQ.Type type = iq.getType();
         for (final IQMatcher iqMatcher : STANZA_TYPE_MATCHER_LIST) {
-            if (iqMatcher.matches(node, type)) {
+            if (iqMatcher.matches(node.get(), type)) {
                 return iqMatcher.stanzaFactory.from(iq);
             }
         }

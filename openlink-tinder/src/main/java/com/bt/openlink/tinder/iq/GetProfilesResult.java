@@ -68,25 +68,25 @@ public class GetProfilesResult extends OpenlinkIQ {
             final List<Element> profileElements = profilesElement.elements(OpenlinkXmppNamespace.TAG_PROFILE);
             profileElements.forEach(profileElement -> {
                 final Profile.Builder profileBuilder = Profile.Builder.start();
-                final Optional<ProfileId> profileId = ProfileId.from(TinderPacketUtil.getStringAttribute(profileElement, "id", true, DESCRIPTION, parseErrors));
+                final Optional<ProfileId> profileId = ProfileId.from(TinderPacketUtil.getStringAttribute(profileElement, "id", true, DESCRIPTION, parseErrors).orElse(null));
                 profileId.ifPresent(profileBuilder::setId);
-                final Optional<Boolean> isDefault = Optional.ofNullable(TinderPacketUtil.getBooleanAttribute(profileElement, "default", true, DESCRIPTION, parseErrors));
+                final Optional<Boolean> isDefault = TinderPacketUtil.getBooleanAttribute(profileElement, "default", true, DESCRIPTION, parseErrors);
                 isDefault.ifPresent(profileBuilder::setDefault);
-                final Optional<String> device = Optional.ofNullable(TinderPacketUtil.getStringAttribute(profileElement, "device", false, DESCRIPTION, parseErrors));
+                final Optional<String> device = Optional.ofNullable(TinderPacketUtil.getStringAttribute(profileElement, "device", false, DESCRIPTION, parseErrors).orElse(null));
                 device.ifPresent(profileBuilder::setDevice);
-                final Optional<String> label = Optional.ofNullable(TinderPacketUtil.getStringAttribute(profileElement, "label", false, DESCRIPTION, parseErrors));
+                final Optional<String> label = Optional.ofNullable(TinderPacketUtil.getStringAttribute(profileElement, "label", false, DESCRIPTION, parseErrors).orElse(null));
                 label.ifPresent(profileBuilder::setLabel);
-                final Optional<Boolean> online = Optional.ofNullable(TinderPacketUtil.getBooleanAttribute(profileElement, "online", true, DESCRIPTION, parseErrors));
+                final Optional<Boolean> online = TinderPacketUtil.getBooleanAttribute(profileElement, "online", true, DESCRIPTION, parseErrors);
                 online.ifPresent(profileBuilder::setOnline);
                 final Element siteElement = profileElement.element("site");
                 if (siteElement != null) {
                     final Site.Builder siteBuilder = Site.Builder.start()
                             .setName(siteElement.getText());
-                    final Optional<Long> id = Optional.ofNullable(TinderPacketUtil.getLongAttribute(siteElement, "id", true, DESCRIPTION, parseErrors));
+                    final Optional<Long> id = TinderPacketUtil.getLongAttribute(siteElement, "id", true, DESCRIPTION, parseErrors);
                     id.ifPresent(siteBuilder::setId);
-                    final Optional<Boolean> isDefaultSite = Optional.ofNullable(TinderPacketUtil.getBooleanAttribute(siteElement, "default", false, DESCRIPTION, parseErrors));
+                    final Optional<Boolean> isDefaultSite = TinderPacketUtil.getBooleanAttribute(siteElement, "default", false, DESCRIPTION, parseErrors);
                     isDefaultSite.ifPresent(siteBuilder::setDefault);
-                    final Optional<Site.Type> type = Site.Type.from(TinderPacketUtil.getStringAttribute(siteElement, "type", true, DESCRIPTION, parseErrors));
+                    final Optional<Site.Type> type = Site.Type.from(TinderPacketUtil.getStringAttribute(siteElement, "type", true, DESCRIPTION, parseErrors).orElse(null));
                     type.ifPresent(siteBuilder::setType);
                     profileBuilder.setSite(siteBuilder.build(parseErrors));
                 }
@@ -94,7 +94,7 @@ public class GetProfilesResult extends OpenlinkIQ {
                 if (actionsElement != null) {
                     final List<Element> actionElements = actionsElement.elements("action");
                     for (final Element actionElement : actionElements) {
-                        final Optional<RequestAction> requestAction = RequestAction.from(TinderPacketUtil.getStringAttribute(actionElement, "id", true, DESCRIPTION, parseErrors));
+                        final Optional<RequestAction> requestAction = RequestAction.from(TinderPacketUtil.getStringAttribute(actionElement, "id", true, DESCRIPTION, parseErrors).orElse(null));
                         requestAction.ifPresent(profileBuilder::addAction);
                     }
                 }

@@ -1,6 +1,7 @@
 package com.bt.openlink.type;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Optional;
 
 public final class ProfileId extends AbstractType<String> {
@@ -10,9 +11,8 @@ public final class ProfileId extends AbstractType<String> {
     }
 
     @Nonnull
-    public static Optional<ProfileId> from(final String value) {
-        final String normalisedValue = value == null ? "" : value.trim();
-        return normalisedValue.isEmpty() ? Optional.empty() : Optional.of(new ProfileId(normalisedValue));
+    public static Optional<ProfileId> from(@Nullable final String value) {
+        return value == null || value.isEmpty() ? Optional.empty() : Optional.of(new ProfileId(value));
     }
 
 }

@@ -12,8 +12,7 @@ public final class InterestId extends AbstractType<String> {
 
     @Nonnull
     public static Optional<InterestId> from(final String value) {
-        final String normalisedValue = value == null ? "" : value.trim();
-        return normalisedValue.isEmpty() ? Optional.empty() : Optional.of(new InterestId(normalisedValue));
+        return value == null || value.isEmpty() ? Optional.empty() : Optional.of(new InterestId(value));
     }
 
 }

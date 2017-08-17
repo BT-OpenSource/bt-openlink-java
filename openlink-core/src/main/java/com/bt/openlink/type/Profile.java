@@ -3,6 +3,7 @@ package com.bt.openlink.type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import javax.annotation.Nonnull;
@@ -71,6 +72,40 @@ public final class Profile {
     @Nonnull
     public List<RequestAction> getActions() {
         return actions;
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Profile)) {
+            return false;
+        }
+        final Profile that = (Profile) o;
+        return Objects.equals(this.profileId, that.profileId) &&
+                Objects.equals(this.isDefault, that.isDefault) &&
+                Objects.equals(this.device, that.device) &&
+                Objects.equals(this.label, that.label) &&
+                Objects.equals(this.online, that.online) &&
+                Objects.equals(this.site, that.site);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(profileId, isDefault, device, label, online, site);
+    }
+
+    @Override
+    public String toString() {
+        return "Profile[" +
+                "profileId=" + profileId +
+                ", isDefault=" + isDefault +
+                ", device='" + device + '\'' +
+                ", label='" + label + '\'' +
+                ", online=" + online +
+                ", site=" + site +
+                ']';
     }
 
     public static final class Builder {

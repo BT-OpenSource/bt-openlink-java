@@ -26,9 +26,8 @@ public class GetInterestsResultTest {
             "    <iodata xmlns=\"urn:xmpp:tmp:io-data\" type=\"output\">\n" +
             "      <out>\n" +
             "        <interests xmlns=\"http://xmpp.org/protocol/openlink:01:00:00/interests\">\n" +
-            "          <interest id=\"" + Fixtures.INTEREST_ID + "\" type=\"DirectoryNumber\" label=\"6001/1\" default=\"true\"/>\n" +
-            "          <interest id=\"sip:6001@uta.bt.com-DirectDial-2trader1@btsm11\" type=\"DirectoryNumber\" label=\"6001/2\" default=\"true\"/>\n" +
-            "          <interest id=\"sip:6002@uta.bt.com-DirectDial-1trader1@btsm11\" type=\"DirectoryNumber\" label=\"6002/1\" default=\"false\"/>\n" +
+            "          <interest id=\"" + Fixtures.INTEREST_ID + "\" type=\"test-interest-type\" label=\"test-default-interest\" default=\"true\"/>\n" +
+            "          <interest id=\"sip:6001@uta.bt.com-DirectDial-1trader1@btsm11\" type=\"DirectoryNumber\" label=\"6001/1\" default=\"false\"/>\n" +
             "        </interests>\n" +
             "      </out>\n" +
             "    </iodata>\n" +
@@ -51,12 +50,14 @@ public class GetInterestsResultTest {
                 .setID(Fixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
+                .addInterest(Fixtures.INTEREST)
                 .build();
 
         assertThat(result.getType(), is(IQ.Type.result));
         assertThat(result.getID(), is(Fixtures.STANZA_ID));
         assertThat(result.getTo(), is(Fixtures.TO_JID));
         assertThat(result.getFrom(), is(Fixtures.FROM_JID));
+        assertThat(result.getInterests().get(0), is(Fixtures.INTEREST));
     }
 
     @Test
@@ -71,31 +72,18 @@ public class GetInterestsResultTest {
     @Test
     public void willGenerateAnXmppStanza() throws Exception {
 
-        final Interest interest1 = Interest.Builder.start()
-                .setId(Fixtures.INTEREST_ID)
+        final Interest interest2 = Interest.Builder.start()
+                .setId(InterestId.from("sip:6001@uta.bt.com-DirectDial-1trader1@btsm11").get())
                 .setType(InterestType.from("DirectoryNumber").get())
                 .setLabel("6001/1")
-                .setDefault(true)
-                .build();
-        final Interest interest2 = Interest.Builder.start()
-                .setId(InterestId.from("sip:6001@uta.bt.com-DirectDial-2trader1@btsm11").get())
-                .setType(InterestType.from("DirectoryNumber").get())
-                .setLabel("6001/2")
-                .setDefault(true)
-                .build();
-        final Interest interest3 = Interest.Builder.start()
-                .setId(InterestId.from("sip:6002@uta.bt.com-DirectDial-1trader1@btsm11").get())
-                .setType(InterestType.from("DirectoryNumber").get())
-                .setLabel("6002/1")
                 .setDefault(false)
                 .build();
         final GetInterestsResult result = GetInterestsResult.Builder.start()
                 .setID(Fixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
-                .addInterest(interest1)
+                .addInterest(Fixtures.INTEREST)
                 .addInterest(interest2)
-                .addInterest(interest3)
                 .build();
 
         assertThat(result.toXML(), isIdenticalTo(GET_INTERESTS_RESULT).ignoreWhitespace());
@@ -130,21 +118,12 @@ public class GetInterestsResultTest {
 
         int i = 0;
         Interest interest = interests.get(i++);
-        assertThat(interest.getId().get(), is(Fixtures.INTEREST_ID));
+        assertThat(interest,is(Fixtures.INTEREST));
+
+        interest = interests.get(i++);
+        assertThat(interest.getId(), is(InterestId.from("sip:6001@uta.bt.com-DirectDial-1trader1@btsm11")));
         assertThat(interest.getType(), is(InterestType.from("DirectoryNumber")));
         assertThat(interest.getLabel().get(), is("6001/1"));
-        assertThat(interest.isDefault().get(), is(true));
-
-        interest = interests.get(i++);
-        assertThat(interest.getId(), is(InterestId.from("sip:6001@uta.bt.com-DirectDial-2trader1@btsm11")));
-        assertThat(interest.getType(), is(InterestType.from("DirectoryNumber")));
-        assertThat(interest.getLabel().get(), is("6001/2"));
-        assertThat(interest.isDefault().get(), is(true));
-
-        interest = interests.get(i++);
-        assertThat(interest.getId(), is(InterestId.from("sip:6002@uta.bt.com-DirectDial-1trader1@btsm11")));
-        assertThat(interest.getType(), is(InterestType.from("DirectoryNumber")));
-        assertThat(interest.getLabel().get(), is("6002/1"));
         assertThat(interest.isDefault().get(), is(false));
 
         assertThat(interests.size(), is(i));

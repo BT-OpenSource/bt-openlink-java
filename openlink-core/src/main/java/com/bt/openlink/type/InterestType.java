@@ -12,8 +12,7 @@ public final class InterestType extends AbstractType<String> {
 
     @Nonnull
     public static Optional<InterestType> from(final String value) {
-        final String normalisedValue = value == null ? "" : value.trim();
-        return normalisedValue.isEmpty() ? Optional.empty() : Optional.of(new InterestType(normalisedValue));
+        return value == null || value.isEmpty() ? Optional.empty() : Optional.of(new InterestType(value));
     }
 
 }

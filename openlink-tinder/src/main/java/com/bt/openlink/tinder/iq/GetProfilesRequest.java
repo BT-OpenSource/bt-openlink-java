@@ -38,13 +38,13 @@ public class GetProfilesRequest extends OpenlinkIQ {
                 .setTo(iq.getTo())
                 .setFrom(iq.getFrom())
                 .setID(iq.getID())
-                .setType(iq.getType())
-                .setJID(TinderPacketUtil.getChildElementString(inElement,
-                        "jid",
-                        true,
-                        "get-profiles request",
-                        parseErrors));
-
+                .setType(iq.getType());
+        final Optional<JID> jid = TinderPacketUtil.getJID(TinderPacketUtil.getChildElementString(inElement,
+                "jid",
+                true,
+                "get-profiles request",
+                parseErrors));
+        jid.ifPresent(builder::setJID);
         final GetProfilesRequest request = builder.build(parseErrors);
         request.setID(iq.getID());
         return request;
@@ -78,13 +78,8 @@ public class GetProfilesRequest extends OpenlinkIQ {
         }
 
         @Nonnull
-        private GetProfilesRequest build(final List<String> parseErrors) {
+        private GetProfilesRequest build(@Nonnull final List<String> parseErrors) {
             return new GetProfilesRequest(this, parseErrors);
-        }
-
-        private Builder setJID(@Nullable String jid) {
-            this.jid = TinderPacketUtil.getTinderJID(jid).orElse(null);
-            return this;
         }
 
         @Nonnull
