@@ -5,7 +5,8 @@ public enum OpenlinkXmppNamespace {
 
     XMPP_PUBSUB("http://jabber.org/protocol/pubsub", "Publish-Subscribe"),
     XMPP_PUBSUB_EVENT("http://jabber.org/protocol/pubsub#event", "Publish-Subscribe event"),
-    XMPP_DISCO_INFO("http://jabber.org/protocol/disco#info", "Service Discovery information"),
+    XMPP_DISCO_INFO("http://jabber.org/protocol/disco#info", "Service Discovery basic information"),
+    XMPP_DISCO_ITEMS("http://jabber.org/protocol/disco#items", "Service Discovery node information"),
     XMPP_COMMANDS("http://jabber.org/protocol/commands", "Ad-Hoc Command"),
     XMPP_IO_DATA("urn:xmpp:tmp:io-data", "IO data"),
     OPENLINK_GET_PROFILES("http://xmpp.org/protocol/openlink:01:00:00#get-profiles", "Get profiles"),
