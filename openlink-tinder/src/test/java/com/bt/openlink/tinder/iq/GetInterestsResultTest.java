@@ -167,4 +167,22 @@ public class GetInterestsResultTest {
         assertThat(parseErrors.size(), is(errorCount));
     }
 
+    @Test
+    public void willBuildAResultFromARequest() throws Exception {
+
+        final GetInterestsRequest request = GetInterestsRequest.Builder.start()
+                .setTo(Fixtures.TO_JID)
+                .setFrom(Fixtures.FROM_JID)
+                .setID(Fixtures.STANZA_ID)
+                .setProfileId(Fixtures.PROFILE_ID)
+                .build();
+
+        final GetInterestsResult result = GetInterestsResult.Builder.start(request)
+                .build();
+
+        assertThat(result.getID(), is(request.getID()));
+        assertThat(result.getTo(), is(request.getFrom()));
+        assertThat(result.getFrom(), is(request.getTo()));
+    }
+
 }

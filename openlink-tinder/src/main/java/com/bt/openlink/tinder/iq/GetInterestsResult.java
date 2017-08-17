@@ -93,6 +93,14 @@ public class GetInterestsResult extends OpenlinkIQ {
         }
 
         @Nonnull
+        public static GetInterestsResult.Builder start(@Nonnull final GetInterestsRequest request) {
+            return new GetInterestsResult.Builder()
+                    .setID(request.getID())
+                    .setFrom(request.getTo())
+                    .setTo(request.getFrom());
+        }
+
+        @Nonnull
         public GetInterestsResult build() {
             validateBuilder();
             return new GetInterestsResult(this, Collections.emptyList());
