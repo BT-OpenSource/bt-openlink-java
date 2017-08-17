@@ -102,7 +102,7 @@ public class GetInterestsResultTest {
     }
 
     @Test
-    public void willNotBuildAPacketWithDuplicateFeatureIds() throws Exception {
+    public void willNotBuildAPacketWithDuplicateInterestIds() throws Exception {
 
         expectedException.expect(IllegalArgumentException.class);
         expectedException.expectMessage("The interest id must be unique");

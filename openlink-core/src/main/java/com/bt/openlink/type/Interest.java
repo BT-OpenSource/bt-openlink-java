@@ -3,6 +3,7 @@ package com.bt.openlink.type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import javax.annotation.Nonnull;
@@ -50,6 +51,26 @@ public final class Interest {
     @Nonnull
     public Optional<Boolean> isDefault() {
         return Optional.ofNullable(isDefault);
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Interest)) {
+            return false;
+        }
+        final Interest that = (Interest) o;
+        return Objects.equals(this.interestId, that.interestId) &&
+                Objects.equals(this.interestType, that.interestType) &&
+                Objects.equals(this.label, that.label) &&
+                Objects.equals(this.isDefault, that.isDefault);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(interestId, interestType, label, isDefault);
     }
 
     public static final class Builder {
