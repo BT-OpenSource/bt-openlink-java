@@ -168,7 +168,7 @@ public class GetProfilesResultTest {
 
         Profile profile = profiles.get(i++);
         Site site = profile.getSite().get();
-        assertThat(profile.getProfileId().get(), is(Fixtures.PROFILE_ID));
+        assertThat(profile.getId().get(), is(Fixtures.PROFILE_ID));
         assertThat(profile.isDefault().get(), is(true));
         assertThat(profile.getDevice().get(), is("uta"));
         assertThat(profile.getLabel().get(), is("7001"));
@@ -181,7 +181,7 @@ public class GetProfilesResultTest {
 
         profile = profiles.get(i++);
         site = profile.getSite().get();
-        assertThat(profile.getProfileId().get(), is(PROFILE_ID_2));
+        assertThat(profile.getId().get(), is(PROFILE_ID_2));
         assertThat(profile.isDefault().get(), is(true));
         assertThat(profile.getDevice().get(), is("uta"));
         assertThat(profile.getLabel().get(), is("7001"));

@@ -29,7 +29,7 @@ public class GetProfilesResult extends OpenlinkIQ {
         final Element profilesElement = outElement.addElement(OpenlinkXmppNamespace.TAG_PROFILES, OpenlinkXmppNamespace.OPENLINK_PROFILES.uri());
         getProfiles().forEach(profile -> {
             final Element profileElement = profilesElement.addElement(OpenlinkXmppNamespace.TAG_PROFILE);
-            profile.getProfileId().ifPresent(profileId -> profileElement.addAttribute("id", profileId.value()));
+            profile.getId().ifPresent(profileId -> profileElement.addAttribute("id", profileId.value()));
             profile.isDefault().ifPresent(isDefault -> profileElement.addAttribute("default", String.valueOf(isDefault)));
             profile.getDevice().ifPresent(device -> profileElement.addAttribute("device", device));
             profile.getLabel().ifPresent(label -> profileElement.addAttribute("label", label));
@@ -157,7 +157,7 @@ public class GetProfilesResult extends OpenlinkIQ {
         @Nonnull
         public Builder addProfile(@Nonnull final Profile profile) {
             this.profiles.forEach(existingProfile -> {
-                if (existingProfile.getProfileId().equals(profile.getProfileId())) {
+                if (existingProfile.getId().equals(profile.getId())) {
                     throw new IllegalArgumentException("The profile id must be unique");
                 }
             });

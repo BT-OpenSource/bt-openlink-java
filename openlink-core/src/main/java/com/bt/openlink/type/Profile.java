@@ -39,7 +39,7 @@ public final class Profile {
     }
 
     @Nonnull
-    public Optional<ProfileId> getProfileId() {
+    public Optional<ProfileId> getId() {
         return Optional.ofNullable(profileId);
     }
 

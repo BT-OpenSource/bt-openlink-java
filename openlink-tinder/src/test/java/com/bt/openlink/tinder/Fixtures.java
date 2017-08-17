@@ -1,15 +1,17 @@
 package com.bt.openlink.tinder;
 
-import com.bt.openlink.type.ProfileId;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 import org.xmpp.packet.IQ;
 import org.xmpp.packet.JID;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
+import com.bt.openlink.type.InterestId;
+import com.bt.openlink.type.ProfileId;
 
 @SuppressWarnings("ConstantConditions")
 public final class Fixtures {
@@ -22,7 +24,7 @@ public final class Fixtures {
     public static final JID FROM_JID = new JID("test-from@test-domain/test-resource");
     public static final JID USER_JID = new JID("test-user@test-domain/test-resource");
     public static final ProfileId PROFILE_ID = ProfileId.from("test-profile-id").get();
-//    public static final     InterestId INTEREST_ID = InterestId.from("test-interest-id");
+    public static final InterestId INTEREST_ID = InterestId.from("test-interest-id").get();
 //    public static final PubSubNodeId NODE_ID = PubSubNodeId.from("test-node-id");
 //    public static final FeatureId FEATURE_ID = FeatureId.from("test-feature-id");
 //    public static final CallId CALL_ID = CallId.from("test-call-id");

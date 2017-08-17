@@ -41,7 +41,8 @@ public final class OpenlinkIQParser {
     private static final List<IQMatcher> STANZA_TYPE_MATCHER_LIST = Arrays.asList(
             new IQMatcher(OpenlinkXmppNamespace.OPENLINK_GET_PROFILES, IQ.Type.set, GetProfilesRequest::from),
             new IQMatcher(OpenlinkXmppNamespace.OPENLINK_GET_PROFILES, IQ.Type.result, GetProfilesResult::from),
-            new IQMatcher(OpenlinkXmppNamespace.OPENLINK_GET_INTERESTS, IQ.Type.set, GetInterestsRequest::from)
+            new IQMatcher(OpenlinkXmppNamespace.OPENLINK_GET_INTERESTS, IQ.Type.set, GetInterestsRequest::from),
+            new IQMatcher(OpenlinkXmppNamespace.OPENLINK_GET_INTERESTS, IQ.Type.result, GetInterestsResult::from)
     );
 
     @Nonnull

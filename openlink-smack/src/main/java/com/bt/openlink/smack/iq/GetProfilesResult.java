@@ -62,7 +62,7 @@ public class GetProfilesResult extends OpenlinkIQ {
         xml.halfOpenElement(OpenlinkXmppNamespace.TAG_PROFILES).attribute("xmlns", "http://xmpp.org/protocol/openlink:01:00:00/profiles").rightAngleBracket();
         for (final Profile profile : profiles) {
             xml.halfOpenElement(OpenlinkXmppNamespace.TAG_PROFILE);
-            profile.getProfileId().ifPresent(profileId -> xml.attribute("id", profileId.value()));
+            profile.getId().ifPresent(profileId -> xml.attribute("id", profileId.value()));
             xml.rightAngleBracket();
             final Optional<Site> optionalSite = profile.getSite();
             if (optionalSite.isPresent()) {
@@ -129,7 +129,7 @@ public class GetProfilesResult extends OpenlinkIQ {
         @Nonnull
         public Builder addProfile(@Nonnull final Profile profile) {
             this.profiles.forEach(existingProfile -> {
-                if (existingProfile.getProfileId().equals(profile.getProfileId())) {
+                if (existingProfile.getId().equals(profile.getId())) {
                     throw new IllegalArgumentException("The profile id must be unique");
                 }
             });

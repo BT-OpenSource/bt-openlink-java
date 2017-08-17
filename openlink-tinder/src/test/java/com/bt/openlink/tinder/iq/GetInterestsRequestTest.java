@@ -8,7 +8,6 @@ import static org.hamcrest.Matchers.empty;
 import static org.junit.Assert.assertThat;
 import static org.xmlunit.matchers.CompareMatcher.isIdenticalTo;
 
-import org.hamcrest.core.Is;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -104,12 +103,12 @@ public class GetInterestsRequestTest {
     public void willParseAnXmppStanza() throws Exception {
 
         final GetInterestsRequest request = (GetInterestsRequest) OpenlinkIQParser.parse(Fixtures.iqFrom(GET_INTERESTS_REQUEST));
-        assertThat(request.getID(), Is.is(Fixtures.STANZA_ID));
-        assertThat(request.getTo(), Is.is(Fixtures.TO_JID));
-        assertThat(request.getFrom(), Is.is(Fixtures.FROM_JID));
-        assertThat(request.getType(), Is.is(IQ.Type.set));
-        assertThat(request.getProfileId().get(), Is.is(Fixtures.PROFILE_ID));
-        assertThat(request.getParseErrors(), Is.is(empty()));
+        assertThat(request.getID(), is(Fixtures.STANZA_ID));
+        assertThat(request.getTo(), is(Fixtures.TO_JID));
+        assertThat(request.getFrom(), is(Fixtures.FROM_JID));
+        assertThat(request.getType(), is(IQ.Type.set));
+        assertThat(request.getProfileId().get(), is(Fixtures.PROFILE_ID));
+        assertThat(request.getParseErrors(), is(empty()));
     }
 
     @Test

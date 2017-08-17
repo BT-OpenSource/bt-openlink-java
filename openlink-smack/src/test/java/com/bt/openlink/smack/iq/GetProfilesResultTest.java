@@ -197,8 +197,8 @@ public class GetProfilesResultTest {
         assertThat(result.getType(), is(IQ.Type.result));
         final List<Profile> profiles = result.getProfiles();
         assertThat(profiles.size(), is(2));
-        assertThat(profiles.get(0).getProfileId().get().value(), is("UCTrader1-trader1@btsm1"));
-        assertThat(profiles.get(1).getProfileId().get().value(), is("UCTrader1-trader1@btsm11"));
+        assertThat(profiles.get(0).getId().get().value(), is("UCTrader1-trader1@btsm1"));
+        assertThat(profiles.get(1).getId().get().value(), is("UCTrader1-trader1@btsm11"));
 
         assertThat(result.getParseErrors(), is(empty()));
     }
