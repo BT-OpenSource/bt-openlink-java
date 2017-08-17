@@ -1,20 +1,22 @@
 package com.bt.openlink.tinder.iq;
 
-import com.bt.openlink.OpenlinkXmppNamespace;
-import com.bt.openlink.tinder.internal.TinderPacketUtil;
-import org.dom4j.Element;
-import org.xmpp.packet.IQ;
-import org.xmpp.packet.JID;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
+import org.dom4j.Element;
+import org.xmpp.packet.IQ;
+import org.xmpp.packet.JID;
+
+import com.bt.openlink.OpenlinkXmppNamespace;
+import com.bt.openlink.tinder.internal.TinderPacketUtil;
+
 public class GetProfilesRequest extends OpenlinkIQ {
-    @Nullable private final String jid;
+    @Nullable private final JID jid;
 
     private GetProfilesRequest(@Nonnull Builder builder, @Nonnull List<String> parseErrors) {
         super(builder, parseErrors);
@@ -26,7 +28,7 @@ public class GetProfilesRequest extends OpenlinkIQ {
 
     @Nonnull
     public Optional<JID> getJID() {
-        return TinderPacketUtil.getTinderJID(jid);
+        return Optional.ofNullable(jid);
     }
 
     @Nonnull
@@ -51,7 +53,7 @@ public class GetProfilesRequest extends OpenlinkIQ {
 
     public static final class Builder extends IQBuilder<Builder> {
 
-        @Nullable String jid;
+        @Nullable JID jid;
 
         private Builder() {
         }
@@ -62,14 +64,6 @@ public class GetProfilesRequest extends OpenlinkIQ {
             return Type.set;
         }
 
-        @Override
-        void validateBuilder() {
-            super.validateBuilder();
-            if (jid == null) {
-                throw new IllegalStateException("The stanza 'jid' has not been set");
-            }
-        }
-
         @Nonnull
         public static Builder start() {
             return new Builder();
@@ -77,7 +71,10 @@ public class GetProfilesRequest extends OpenlinkIQ {
 
         @Nonnull
         public GetProfilesRequest build() {
-            validateBuilder();
+            super.validateBuilder();
+            if (jid == null) {
+                throw new IllegalStateException("The stanza 'jid' has not been set");
+            }
             return new GetProfilesRequest(this, Collections.emptyList());
         }
 
@@ -86,14 +83,15 @@ public class GetProfilesRequest extends OpenlinkIQ {
             return new GetProfilesRequest(this, parseErrors);
         }
 
-        public Builder setJID(@Nullable String jid) {
-            this.jid = jid;
+        private Builder setJID(@Nullable String jid) {
+            this.jid = TinderPacketUtil.getTinderJID(jid).orElse(null);
             return this;
         }
 
         @Nonnull
-        public Builder setJID(@Nullable final JID jid) {
-            return setJID(jid == null ? null : jid.toString());
+        public Builder setJID(@Nonnull final JID jid) {
+            this.jid = jid;
+            return this;
         }
 
     }

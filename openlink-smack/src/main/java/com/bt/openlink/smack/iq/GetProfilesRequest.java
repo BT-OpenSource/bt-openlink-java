@@ -1,19 +1,21 @@
 package com.bt.openlink.smack.iq;
 
-import com.bt.openlink.OpenlinkXmppNamespace;
-import com.bt.openlink.smack.internal.SmackPacketUtil;
-import org.jivesoftware.smack.packet.IQ;
-import org.jxmpp.jid.Jid;
-import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserException;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
+import org.jivesoftware.smack.packet.IQ;
+import org.jxmpp.jid.Jid;
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
+
+import com.bt.openlink.OpenlinkXmppNamespace;
+import com.bt.openlink.smack.internal.SmackPacketUtil;
 
 public class GetProfilesRequest extends OpenlinkIQ {
     @Nullable private final String jid;
@@ -74,14 +76,6 @@ public class GetProfilesRequest extends OpenlinkIQ {
             return Type.set;
         }
 
-        @Override
-        void validateBuilder() {
-            super.validateBuilder();
-            if (jid == null) {
-                throw new IllegalStateException("The stanza 'jid' has not been set");
-            }
-        }
-
         @Nonnull
         public static Builder start() {
             return new Builder();
@@ -89,7 +83,10 @@ public class GetProfilesRequest extends OpenlinkIQ {
 
         @Nonnull
         public GetProfilesRequest build() {
-            validateBuilder();
+            super.validateBuilder();
+            if (jid == null) {
+                throw new IllegalStateException("The stanza 'jid' has not been set");
+            }
             return new GetProfilesRequest(this, Collections.emptyList());
         }
 
