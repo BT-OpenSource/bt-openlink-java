@@ -1,21 +1,24 @@
 plugins {
     id "org.sonarqube" version "2.5"
+    id "com.jfrog.bintray" version "1.7.3"
 }
 
-allprojects {
+subprojects {
+    apply plugin: 'maven-publish'
     apply plugin: 'maven'
+    apply plugin: 'java'
+    apply plugin: 'jacoco'
+    apply plugin: 'com.jfrog.bintray'
+
     repositories {
         jcenter()
     }
+
     group = 'com.bt.openlink'
     version = '0.0.1-SNAPSHOT'
-}
 
-
-configure(subprojects) {
-
-    apply plugin: 'java'
-    apply plugin: 'jacoco'
+    def snapshotBuild = project.version.toUpperCase().contains('SNAPSHOT')
+    def releaseBuild = !snapshotBuild
 
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
@@ -26,4 +29,67 @@ configure(subprojects) {
         test.runtimeClasspath += configurations.compileOnly
     }
 
+    javadoc {
+        source = sourceSets.main.allSource
+        classpath = configurations.compile + configurations.compileOnly
+    }
+
+    task sourcesJar(type: Jar) {
+        classifier = 'sources'
+        from sourceSets.main.allSource
+    }
+
+    task javadocJar(type: Jar, dependsOn: javadoc) {
+        classifier = 'javadoc'
+        from javadoc.destinationDir
+    }
+
+    bintray {
+        user = System.getenv('BINTRAY_USER')
+        key = System.getenv('BINTRAY_KEY')
+        publications = ['Maven']
+        dryRun = false
+        publish = false
+        override = false
+        pkg {
+            repo = 'bt-openlink'
+            name = 'bt-openlink-java'
+//        userOrg = 'myorg' //An optional organization name when the repo belongs to one of the user's orgs
+//        desc = 'what a fantastic package indeed!'
+            websiteUrl = 'https://github.com/BT-OpenSource/bt-openlink-java'
+            issueTrackerUrl = 'https://github.com/BT-OpenSource/bt-openlink-java/issues'
+            vcsUrl = 'https://github.com/BT-OpenSource/bt-openlink-java.git'
+            licenses = ['MIT']
+            labels = ['Openlink']
+            publicDownloadNumbers = true
+//        attributes= ['a': ['ay1', 'ay2'], 'b': ['bee'], c: 'cee'] //Optional package-level attributes
+
+            githubRepo = 'BT-OpenSource/bt-openlink-java' //Optional Github repository
+            githubReleaseNotesFile = 'README.md' //Optional Github readme file
+
+
+//        version {
+//            name = '1.0-Final'
+//        }
+        }
+    }
+
+    publishing {
+        publications {
+            Maven(MavenPublication) {
+                from components.java
+                artifact sourcesJar
+                artifact javadocJar
+                pom.withXml {
+                    def root = asNode()
+                    root.appendNode('name', project.name)
+                    root.appendNode('description', project.ext.description)
+                    root.appendNode('url', 'https://github.com/BT-OpenSource/bt-openlink-java')
+                }
+            }
+        }
+    }
+
+    bintrayUpload.onlyIf { releaseBuild }
 }
+

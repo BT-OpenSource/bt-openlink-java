@@ -12,3 +12,5 @@ dependencies {
     testCompile 'org.mockito:mockito-core:2.8.47'
     testCompile 'org.xmlunit:xmlunit-matchers:2.4.0'
 }
+
+ext.description = 'BT Openlink library for the Smack XMPP API'
