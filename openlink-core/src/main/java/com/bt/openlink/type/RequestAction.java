@@ -33,8 +33,8 @@ public enum RequestAction {
     private final int minValueCount;
     private final int maxValueCount;
 
-    RequestAction(@Nonnull final String action, @Nonnull final String label, final int valueCount) {
-        this(action, label, valueCount, valueCount);
+    RequestAction(@Nonnull final String id, @Nonnull final String label, final int valueCount) {
+        this(id, label, valueCount, valueCount);
     }
 
     RequestAction(@Nonnull final String id, @Nonnull final String label, final int minValueCount, final int maxValueCount) {
