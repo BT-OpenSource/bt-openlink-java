@@ -15,7 +15,7 @@ subprojects {
     }
 
     group = 'com.bt.openlink'
-    version = '0.0.1-SNAPSHOT'
+    version = '0.0.2-SNAPSHOT'
 
     def snapshotBuild = project.version.toUpperCase().contains('SNAPSHOT')
     def releaseBuild = !snapshotBuild
@@ -90,6 +90,6 @@ subprojects {
         }
     }
 
-    bintrayUpload.onlyIf { releaseBuild }
+    //bintrayUpload.onlyIf { releaseBuild }
 }
 
