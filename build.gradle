@@ -3,6 +3,11 @@ plugins {
     id "com.jfrog.bintray" version "1.7.3"
 }
 
+allprojects {
+    group = 'com.bt.openlink'
+    version = '0.0.2-SNAPSHOT'
+}
+
 subprojects {
     apply plugin: 'maven-publish'
     apply plugin: 'maven'
@@ -13,9 +18,6 @@ subprojects {
     repositories {
         jcenter()
     }
-
-    group = 'com.bt.openlink'
-    version = '0.0.2-SNAPSHOT'
 
     def snapshotBuild = project.version.toUpperCase().contains('SNAPSHOT')
     def releaseBuild = !snapshotBuild
