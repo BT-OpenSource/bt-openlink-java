@@ -77,22 +77,22 @@ public class GetFeaturesResultTest {
 
         final Feature hs1Feature = Feature.Builder.start()
                 .setId(FeatureId.from("hs_1").get())
-                .setType(FeatureType.Handset)
+                .setType(FeatureType.HANDSET)
                 .setLabel("Handset 1")
                 .build();
         final Feature hs2Feature = Feature.Builder.start()
                 .setId(FeatureId.from("hs_2").get())
-                .setType(FeatureType.Handset)
+                .setType(FeatureType.HANDSET)
                 .setLabel("Handset 2")
                 .build();
         final Feature privFeature = Feature.Builder.start()
                 .setId(FeatureId.from("priv_1").get())
-                .setType(FeatureType.Privacy)
+                .setType(FeatureType.PRIVACY)
                 .setLabel("Privacy")
                 .build();
         final Feature fwdFeature = Feature.Builder.start()
                 .setId(FeatureId.from("fwd_1").get())
-                .setType(FeatureType.CallForward)
+                .setType(FeatureType.CALL_FORWARD)
                 .setLabel("Call Forward")
                 .build();
         final GetFeaturesResult result = GetFeaturesResult.Builder.start()
@@ -118,7 +118,7 @@ public class GetFeaturesResultTest {
         expectedException.expectMessage("The feature id must be unique");
         final Feature hs1Feature = Feature.Builder.start()
                 .setId(FeatureId.from("hs_1").get())
-                .setType(FeatureType.Handset)
+                .setType(FeatureType.HANDSET)
                 .setLabel("Handset 1")
                 .build();
         GetFeaturesResult.Builder.start()
@@ -137,7 +137,7 @@ public class GetFeaturesResultTest {
         expectedException.expectMessage("The profileId has not been set");
         final Feature hs1Feature = Feature.Builder.start()
                 .setId(FeatureId.from("hs_1").get())
-                .setType(FeatureType.Handset)
+                .setType(FeatureType.HANDSET)
                 .setLabel("Handset 1")
                 .build();
         GetFeaturesResult.Builder.start()
@@ -160,7 +160,7 @@ public class GetFeaturesResultTest {
         final List<Feature> features = result.getFeatures();
         assertThat(features.size(), is(4));
         assertThat(features.get(0).getId(), is(FeatureId.from("hs_1")));
-        assertThat(features.get(0).getType().get(), is(FeatureType.Handset));
+        assertThat(features.get(0).getType().get(), is(FeatureType.HANDSET));
         assertThat(features.get(0).getLabel().get(), is("Handset 1"));
 
         assertThat(result.getParseErrors().size(), is(0));

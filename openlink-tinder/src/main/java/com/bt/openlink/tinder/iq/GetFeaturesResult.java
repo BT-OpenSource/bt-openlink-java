@@ -34,10 +34,9 @@ public class GetFeaturesResult extends OpenlinkIQ {
         for (final Feature feature : features) {
             final Element featureElement = featuresElement.addElement("feature");
             feature.getId().ifPresent(id -> featureElement.addAttribute("id", id.value()));
-            feature.getType().ifPresent(type -> featureElement.addAttribute("type", type.name()));
+            feature.getType().ifPresent(type -> featureElement.addAttribute("type", type.getId()));
             feature.getLabel().ifPresent(label -> featureElement.addAttribute("label", label));
         }
-
     }
 
     @Nonnull
