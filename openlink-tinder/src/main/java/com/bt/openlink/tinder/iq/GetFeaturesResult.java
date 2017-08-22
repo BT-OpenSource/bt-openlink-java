@@ -138,6 +138,14 @@ public class GetFeaturesResult extends OpenlinkIQ {
             return this;
         }
 
+        public static Builder start(final GetFeaturesRequest request) {
+            final Builder builder = new Builder()
+                    .setID(request.getID())
+                    .setFrom(request.getTo())
+                    .setTo(request.getFrom());
+            request.getProfileId().ifPresent(builder::setProfileId);
+            return builder;
+        }
     }
 
 }
