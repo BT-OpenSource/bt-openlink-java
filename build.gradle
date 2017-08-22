@@ -90,6 +90,6 @@ subprojects {
         }
     }
 
-    //bintrayUpload.onlyIf { releaseBuild }
+    bintrayUpload.onlyIf { releaseBuild }
 }
 
