@@ -39,13 +39,13 @@ public class GetInterestsRequest extends OpenlinkIQ {
                 .setTo(iq.getTo())
                 .setFrom(iq.getFrom())
                 .setID(iq.getID())
-                .setType(iq.getType())
-                .setProfileId(TinderPacketUtil.getChildElementString(inElement,
-                        "profile",
-                        true,
-                        "get-interests request",
-                        parseErrors));
-
+                .setType(iq.getType());
+        final Optional<ProfileId> profile = ProfileId.from(TinderPacketUtil.getChildElementString(inElement,
+                "profile",
+                true,
+                "get-interests request",
+                parseErrors));
+        profile.ifPresent(builder::setProfileId);
         final GetInterestsRequest request = builder.build(parseErrors);
         request.setID(iq.getID());
         return request;
@@ -81,11 +81,6 @@ public class GetInterestsRequest extends OpenlinkIQ {
         @Nonnull
         private GetInterestsRequest build(final List<String> parseErrors) {
             return new GetInterestsRequest(this, parseErrors);
-        }
-
-        private Builder setProfileId(@Nullable String profileId) {
-            this.profileId = ProfileId.from(profileId).orElse(null);
-            return this;
         }
 
         public Builder setProfileId(@Nonnull ProfileId profileId) {
