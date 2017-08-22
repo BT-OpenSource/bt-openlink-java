@@ -80,11 +80,11 @@ public class GetInterestsRequest extends OpenlinkIQ {
             if (profileId == null) {
                 throw new IllegalStateException("The profileId has not been set");
             }
-            return new GetInterestsRequest(this, Collections.emptyList());
+            return build( Collections.emptyList());
         }
 
         @Nonnull
-        private GetInterestsRequest build(final List<String> parseErrors) {
+        private GetInterestsRequest build(@Nonnull final List<String> parseErrors) {
             return new GetInterestsRequest(this, parseErrors);
         }
 

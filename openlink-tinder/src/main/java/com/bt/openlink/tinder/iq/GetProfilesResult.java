@@ -148,11 +148,11 @@ public class GetProfilesResult extends OpenlinkIQ {
         @Nonnull
         public GetProfilesResult build() {
             validateBuilder();
-            return new GetProfilesResult(this, null);
+            return build(Collections.emptyList());
         }
 
         @Nonnull
-        private GetProfilesResult build(final List<String> parseErrors) {
+        private GetProfilesResult build(@Nonnull final List<String> parseErrors) {
             return new GetProfilesResult(this, parseErrors);
         }
 

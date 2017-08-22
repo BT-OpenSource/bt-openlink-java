@@ -83,7 +83,7 @@ public class GetInterestRequest extends OpenlinkIQ {
             if (interestId == null) {
                 throw new IllegalStateException("The stanza 'interestId' has not been set");
             }
-            return new GetInterestRequest(this, Collections.emptyList());
+            return build( Collections.emptyList());
         }
 
         @Nonnull

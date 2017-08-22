@@ -79,7 +79,7 @@ public class GetProfilesRequest extends OpenlinkIQ {
             if (jid == null) {
                 throw new IllegalStateException("The stanza 'jid' has not been set");
             }
-            return new GetProfilesRequest(this, Collections.emptyList());
+            return build(Collections.emptyList());
         }
 
         @Nonnull

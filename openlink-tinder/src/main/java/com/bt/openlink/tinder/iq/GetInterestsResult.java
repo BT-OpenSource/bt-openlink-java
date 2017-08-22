@@ -106,11 +106,11 @@ public class GetInterestsResult extends OpenlinkIQ {
         @Nonnull
         public GetInterestsResult build() {
             validateBuilder();
-            return new GetInterestsResult(this, Collections.emptyList());
+            return build( Collections.emptyList());
         }
 
         @Nonnull
-        private GetInterestsResult build(final List<String> parseErrors) {
+        private GetInterestsResult build(@Nonnull final List<String> parseErrors) {
             return new GetInterestsResult(this, parseErrors);
         }
 

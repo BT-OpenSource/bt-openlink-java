@@ -80,11 +80,11 @@ public class GetFeaturesRequest extends OpenlinkIQ {
             if (profileId == null) {
                 throw new IllegalStateException("The profileId has not been set");
             }
-            return new GetFeaturesRequest(this, Collections.emptyList());
+            return build( Collections.emptyList());
         }
 
         @Nonnull
-        private GetFeaturesRequest build(final List<String> parseErrors) {
+        private GetFeaturesRequest build(@Nonnull final List<String> parseErrors) {
             return new GetFeaturesRequest(this, parseErrors);
         }
 
