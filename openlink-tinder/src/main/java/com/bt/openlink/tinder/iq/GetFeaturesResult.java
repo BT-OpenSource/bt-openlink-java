@@ -141,11 +141,13 @@ public class GetFeaturesResult extends OpenlinkIQ {
 
         @Nonnull
         public Builder addFeature(@Nonnull final Feature feature) {
-            this.features.forEach(existingFeature -> {
-                if (existingFeature.getId().equals(feature.getId())) {
-                    throw new IllegalArgumentException("The feature id must be unique");
-                }
-            });
+            if(feature.getId().isPresent()) {
+                this.features.forEach(existingFeature -> {
+                    if (existingFeature.getId().equals(feature.getId())) {
+                        throw new IllegalArgumentException("The feature id must be unique");
+                    }
+                });
+            }
             this.features.add(feature);
             return this;
         }
