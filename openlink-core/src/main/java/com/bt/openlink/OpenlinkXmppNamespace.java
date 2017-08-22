@@ -16,6 +16,7 @@ public enum OpenlinkXmppNamespace {
     OPENLINK_GET_INTEREST("http://xmpp.org/protocol/openlink:01:00:00#get-interest", "Get interest"),
     OPENLINK_INTERESTS("http://xmpp.org/protocol/openlink:01:00:00/interests", "Interests"),
     OPENLINK_GET_FEATURES("http://xmpp.org/protocol/openlink:01:00:00#get-features", "Get features"),
+    OPENLINK_FEATURES("http://xmpp.org/protocol/openlink:01:00:00/features", "Features"),
     OPENLINK_MAKE_CALL("http://xmpp.org/protocol/openlink:01:00:00#make-call", "Make call"),
     OPENLINK_REQUEST_ACTION("http://xmpp.org/protocol/openlink:01:00:00#request-action", "Request action"),
     OPENLINK_MAKE_INTERCOM_CALL("http://xmpp.org/protocol/openlink:01:00:00#make-intercom-call", "Make intercom call"),
