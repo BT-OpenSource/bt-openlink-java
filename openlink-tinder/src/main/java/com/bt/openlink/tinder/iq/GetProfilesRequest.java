@@ -34,11 +34,7 @@ public class GetProfilesRequest extends OpenlinkIQ {
     public static GetProfilesRequest from(@Nonnull IQ iq) {
         final List<String> parseErrors = new ArrayList<>();
         final Element inElement = TinderPacketUtil.getIOInElement(iq);
-        final Builder builder = Builder.start()
-                .setTo(iq.getTo())
-                .setFrom(iq.getFrom())
-                .setID(iq.getID())
-                .setType(iq.getType());
+        final Builder builder = Builder.start(iq);
         final Optional<JID> jid = TinderPacketUtil.getJID(TinderPacketUtil.getChildElementString(inElement,
                 "jid",
                 true,
@@ -52,20 +48,29 @@ public class GetProfilesRequest extends OpenlinkIQ {
 
     public static final class Builder extends IQBuilder<Builder> {
 
+        @Nonnull
+        public static Builder start() {
+            return new Builder();
+        }
+
+        @Nonnull
+        private static Builder start(@Nonnull final IQ iq) {
+            return new Builder(iq);
+        }
+
         @Nullable JID jid;
 
         private Builder() {
+        }
+
+        public Builder(@Nonnull final IQ iq) {
+            super(iq);
         }
 
         @Override
         @Nonnull
         protected Type getExpectedType() {
             return Type.set;
-        }
-
-        @Nonnull
-        public static Builder start() {
-            return new Builder();
         }
 
         @Nonnull

@@ -1,17 +1,19 @@
 package com.bt.openlink.tinder.iq;
 
-import com.bt.openlink.OpenlinkXmppNamespace;
-import com.bt.openlink.tinder.internal.TinderPacketUtil;
-import com.bt.openlink.type.InterestId;
-import org.dom4j.Element;
-import org.xmpp.packet.IQ;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
+import org.dom4j.Element;
+import org.xmpp.packet.IQ;
+
+import com.bt.openlink.OpenlinkXmppNamespace;
+import com.bt.openlink.tinder.internal.TinderPacketUtil;
+import com.bt.openlink.type.InterestId;
 
 public class GetInterestRequest extends OpenlinkIQ {
     @Nullable private final InterestId interestId;
@@ -33,12 +35,7 @@ public class GetInterestRequest extends OpenlinkIQ {
     public static GetInterestRequest from(@Nonnull IQ iq) {
         final List<String> parseErrors = new ArrayList<>();
         final Element inElement = TinderPacketUtil.getIOInElement(iq);
-        final Builder builder = Builder.start()
-                .setTo(iq.getTo())
-                .setFrom(iq.getFrom())
-                .setID(iq.getID())
-                .setType(iq.getType());
-
+        final Builder builder = Builder.start(iq);
         final Optional<InterestId> interestId = InterestId.from(TinderPacketUtil.getChildElementString(inElement,
                 "interest",
                 true,
@@ -55,20 +52,29 @@ public class GetInterestRequest extends OpenlinkIQ {
 
     public static final class Builder extends IQBuilder<Builder> {
 
+        @Nonnull
+        public static Builder start() {
+            return new Builder();
+        }
+
+        @Nonnull
+        private static Builder start(@Nonnull final IQ iq) {
+            return new Builder(iq);
+        }
+
         @Nullable InterestId interestId;
 
         private Builder() {
+        }
+
+        private Builder(@Nonnull final IQ iq) {
+            super(iq);
         }
 
         @Override
         @Nonnull
         protected Type getExpectedType() {
             return Type.set;
-        }
-
-        @Nonnull
-        public static Builder start() {
-            return new Builder();
         }
 
         @Nonnull

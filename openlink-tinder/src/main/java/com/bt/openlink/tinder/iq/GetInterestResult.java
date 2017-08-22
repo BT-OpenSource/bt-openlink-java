@@ -45,11 +45,7 @@ public class GetInterestResult extends OpenlinkIQ {
     @Nonnull
     public static GetInterestResult from(@Nonnull IQ iq) {
         final List<String> parseErrors = new ArrayList<>();
-        final Builder builder = Builder.start()
-                .setTo(iq.getTo())
-                .setFrom(iq.getFrom())
-                .setID(iq.getID())
-                .setType(iq.getType());
+        final Builder builder = Builder.start(iq);
         final Element outElement = TinderPacketUtil.getIOOutElement(iq);
         final Element interestElement = TinderPacketUtil.getChildElement(outElement, "interests", "interest");
         if (interestElement == null) {
@@ -74,28 +70,34 @@ public class GetInterestResult extends OpenlinkIQ {
 
     public static final class Builder extends IQBuilder<Builder> {
 
-        @Nullable private Interest interest;
-
-        private Builder() {
-        }
-
-        @Override
-        @Nonnull
-        protected Type getExpectedType() {
-            return Type.result;
-        }
-
         @Nonnull
         public static Builder start() {
             return new Builder();
         }
 
         @Nonnull
-        public static GetInterestResult.Builder start(@Nonnull final GetInterestRequest request) {
-            return new GetInterestResult.Builder()
-                    .setID(request.getID())
-                    .setFrom(request.getTo())
-                    .setTo(request.getFrom());
+        private static Builder start(@Nonnull final IQ iq) {
+            return new Builder(iq);
+        }
+
+        @Nonnull
+        public static Builder start(@Nonnull final GetInterestRequest request) {
+            return new Builder(IQ.createResultIQ(request));
+        }
+
+        @Nullable private Interest interest;
+
+        private Builder() {
+        }
+
+        private Builder(@Nonnull final IQ iq) {
+            super(iq);
+        }
+
+        @Override
+        @Nonnull
+        protected Type getExpectedType() {
+            return Type.result;
         }
 
         @Nonnull

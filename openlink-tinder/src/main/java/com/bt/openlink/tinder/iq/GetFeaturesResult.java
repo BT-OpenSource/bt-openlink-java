@@ -53,11 +53,7 @@ public class GetFeaturesResult extends OpenlinkIQ {
     @Nonnull
     public static GetFeaturesResult from(@Nonnull IQ iq) {
         final List<String> parseErrors = new ArrayList<>();
-        final GetFeaturesResult.Builder builder = GetFeaturesResult.Builder.start()
-                .setTo(iq.getTo())
-                .setFrom(iq.getFrom())
-                .setID(iq.getID())
-                .setType(iq.getType());
+        final GetFeaturesResult.Builder builder = GetFeaturesResult.Builder.start(iq);
         final Element outElement = TinderPacketUtil.getIOOutElement(iq);
         final Element profileElement = TinderPacketUtil.getChildElement(outElement, "profile");
         if (profileElement == null) {
@@ -91,21 +87,37 @@ public class GetFeaturesResult extends OpenlinkIQ {
 
     public static final class Builder extends IQBuilder<Builder> {
 
+        @Nonnull
+        public static Builder start() {
+            return new Builder();
+        }
+
+        @Nonnull
+        private static Builder start(@Nonnull final IQ iq) {
+            return new Builder(iq);
+        }
+
+        @Nonnull
+        public static Builder start(@Nonnull final GetFeaturesRequest request) {
+            final Builder builder = new Builder(IQ.createResultIQ(request));
+            request.getProfileId().ifPresent(builder::setProfileId);
+            return builder;
+        }
+
         @Nullable ProfileId profileId;
         @Nonnull private List<Feature> features = new ArrayList<>();
 
         private Builder() {
         }
 
+        private Builder(@Nonnull final IQ iq) {
+            super(iq);
+        }
+
         @Override
         @Nonnull
         protected Type getExpectedType() {
             return Type.result;
-        }
-
-        @Nonnull
-        public static Builder start() {
-            return new Builder();
         }
 
         @Nonnull
@@ -138,14 +150,6 @@ public class GetFeaturesResult extends OpenlinkIQ {
             return this;
         }
 
-        public static Builder start(final GetFeaturesRequest request) {
-            final Builder builder = new Builder()
-                    .setID(request.getID())
-                    .setFrom(request.getTo())
-                    .setTo(request.getFrom());
-            request.getProfileId().ifPresent(builder::setProfileId);
-            return builder;
-        }
     }
 
 }

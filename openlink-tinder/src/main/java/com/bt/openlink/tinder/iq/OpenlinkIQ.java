@@ -1,13 +1,14 @@
 package com.bt.openlink.tinder.iq;
 
-import org.xmpp.packet.IQ;
-import org.xmpp.packet.JID;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
+import org.xmpp.packet.IQ;
+import org.xmpp.packet.JID;
 
 abstract class OpenlinkIQ extends IQ {
 
@@ -49,6 +50,16 @@ abstract class OpenlinkIQ extends IQ {
         @Nullable JID from;
         @Nullable String id;
         @Nullable IQ.Type type = getExpectedType();
+
+        public IQBuilder() {
+        }
+
+        IQBuilder(@Nonnull final IQ iq) {
+            this.to = iq.getTo();
+            this.from = iq.getFrom();
+            this.id = iq.getID();
+            this.type = iq.getType();
+        }
 
         @Nonnull
         protected abstract Type getExpectedType();

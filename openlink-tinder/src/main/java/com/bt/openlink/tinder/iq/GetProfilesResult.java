@@ -55,11 +55,7 @@ public class GetProfilesResult extends OpenlinkIQ {
     @SuppressWarnings("unchecked")
     @Nonnull
     public static GetProfilesResult from(@Nonnull IQ iq) {
-        final Builder builder = Builder.start()
-                .setTo(iq.getTo())
-                .setFrom(iq.getFrom())
-                .setID(iq.getID())
-                .setType(iq.getType());
+        final Builder builder = Builder.start(iq);
         final Element profilesElement = TinderPacketUtil.getChildElement(TinderPacketUtil.getIOOutElement(iq), OpenlinkXmppNamespace.TAG_PROFILES);
         final List<String> parseErrors = new ArrayList<>();
         if (profilesElement == null) {
@@ -119,28 +115,34 @@ public class GetProfilesResult extends OpenlinkIQ {
 
     public static final class Builder extends IQBuilder<Builder> {
 
-        @Nonnull private List<Profile> profiles = new ArrayList<>();
-
-        private Builder() {
-        }
-
-        @Override
-        @Nonnull
-        protected Type getExpectedType() {
-            return Type.result;
-        }
-
         @Nonnull
         public static Builder start() {
             return new Builder();
         }
 
         @Nonnull
+        private static Builder start(@Nonnull final IQ iq) {
+            return new Builder(iq);
+        }
+
+        @Nonnull
         public static Builder start(@Nonnull final GetProfilesRequest request) {
-            return new Builder()
-                    .setID(request.getID())
-                    .setFrom(request.getTo())
-                    .setTo(request.getFrom());
+            return new Builder(IQ.createResultIQ(request));
+        }
+
+        @Nonnull private List<Profile> profiles = new ArrayList<>();
+
+        private Builder() {
+        }
+
+        public Builder(@Nonnull final IQ iq) {
+            super(iq);
+        }
+
+        @Override
+        @Nonnull
+        protected Type getExpectedType() {
+            return Type.result;
         }
 
         @Nonnull

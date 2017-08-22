@@ -44,11 +44,7 @@ public class GetInterestsResult extends OpenlinkIQ {
     @Nonnull
     public static GetInterestsResult from(@Nonnull IQ iq) {
         final List<String> parseErrors = new ArrayList<>();
-        final Builder builder = Builder.start()
-                .setTo(iq.getTo())
-                .setFrom(iq.getFrom())
-                .setID(iq.getID())
-                .setType(iq.getType());
+        final Builder builder = Builder.start(iq);
         final Element outElement = TinderPacketUtil.getIOOutElement(iq);
         final Element interestsElement = TinderPacketUtil.getChildElement(outElement, "interests");
         if (interestsElement == null) {
@@ -76,28 +72,35 @@ public class GetInterestsResult extends OpenlinkIQ {
 
     public static final class Builder extends IQBuilder<Builder> {
 
-        @Nonnull private final List<Interest> interests = new ArrayList<>();
-
-        private Builder() {
-        }
-
-        @Override
-        @Nonnull
-        protected Type getExpectedType() {
-            return Type.result;
-        }
-
         @Nonnull
         public static Builder start() {
             return new Builder();
         }
 
         @Nonnull
+        private static Builder start(@Nonnull final IQ iq) {
+            return new Builder(iq);
+        }
+
+        @Nonnull
         public static GetInterestsResult.Builder start(@Nonnull final GetInterestsRequest request) {
-            return new GetInterestsResult.Builder()
-                    .setID(request.getID())
-                    .setFrom(request.getTo())
-                    .setTo(request.getFrom());
+            return new Builder(IQ.createResultIQ(request));
+        }
+
+
+        @Nonnull private final List<Interest> interests = new ArrayList<>();
+
+        private Builder() {
+        }
+
+        public Builder(@Nonnull final IQ iq) {
+            super(iq);
+        }
+
+        @Override
+        @Nonnull
+        protected Type getExpectedType() {
+            return Type.result;
         }
 
         @Nonnull
