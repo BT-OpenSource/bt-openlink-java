@@ -10,7 +10,7 @@ addons:
 
 script:
   - ./gradlew sonarqube
-  - ./gradlew bintrayUpload artifactoryPublish
+  - ./gradlew bintrayUpload
 
 cache:
   directories:
