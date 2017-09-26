@@ -53,6 +53,19 @@ public final class OpenlinkIQParser {
 
     @Nonnull
     public static IQ parse(@Nonnull final IQ iq) {
+        final String namespace = iq.getChildElement().getNamespaceURI();
+        switch (namespace) {
+        case "http://jabber.org/protocol/commands":
+            return parseCommand(iq);
+        case "http://jabber.org/protocol/pubsub":
+            return parsePubSub(iq);
+        default:
+            return iq;
+
+        }
+    }
+
+    private static IQ parseCommand(@Nonnull final IQ iq) {
         final Element commandElement = iq.getChildElement();
         final Optional<String> node = TinderPacketUtil.getStringAttribute(commandElement, "node");
         if (!node.isPresent()) {
@@ -65,6 +78,20 @@ public final class OpenlinkIQParser {
             }
         }
         return iq;
+    }
+
+    private static IQ parsePubSub(@Nonnull final IQ iq) {
+
+        final Element pubSubElement = iq.getChildElement();
+        final Element childElement = (Element) pubSubElement.elements().get(0);
+        switch (childElement.getName()) {
+        case "subscribe":
+            return PubSubSubscribeRequest.from(iq);
+        case "unsubscribe":
+            return PubSubUnsubscribeRequest.from(iq);
+        default:
+            return iq;
+        }
     }
 
 }

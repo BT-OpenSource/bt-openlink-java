@@ -4,16 +4,17 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
-import com.bt.openlink.type.Interest;
-import com.bt.openlink.type.InterestType;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 import org.xmpp.packet.IQ;
 import org.xmpp.packet.JID;
 
+import com.bt.openlink.type.Interest;
 import com.bt.openlink.type.InterestId;
+import com.bt.openlink.type.InterestType;
 import com.bt.openlink.type.ProfileId;
+import com.bt.openlink.type.PubSubNodeId;
 
 @SuppressWarnings("ConstantConditions")
 public final class Fixtures {
@@ -34,7 +35,7 @@ public final class Fixtures {
             .setLabel("test-default-interest")
             .setType(InterestType.from("test-interest-type").get())
             .build();
-//    public static final PubSubNodeId NODE_ID = PubSubNodeId.from("test-node-id");
+    public static final PubSubNodeId NODE_ID = INTEREST_ID.toPubSubNodeId();
 //    public static final FeatureId FEATURE_ID = FeatureId.from("test-feature-id");
 //    public static final CallId CALL_ID = CallId.from("test-call-id");
 
