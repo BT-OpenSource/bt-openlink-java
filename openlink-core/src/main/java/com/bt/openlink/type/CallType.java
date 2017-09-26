@@ -11,9 +11,9 @@ import javax.annotation.Nullable;
  */
 public enum CallType {
 
-    Inbound("in"),
-    Outbound("out"),
-    Missed("missed");
+    INBOUND("in"),
+    OUTBOUND("out"),
+    MISSED("missed");
 
     @Nonnull private final String label;
 

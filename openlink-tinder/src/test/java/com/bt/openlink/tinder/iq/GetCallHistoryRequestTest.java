@@ -138,7 +138,7 @@ public class GetCallHistoryRequestTest {
                 .setJID(Fixtures.USER_JID)
                 .setCaller("from-caller")
                 .setCalled("to-destination")
-                .setCallType(CallType.Missed)
+                .setCallType(CallType.MISSED)
                 .setFromDate(LocalDate.of(2016, 6, 1))
                 .setUpToDate(LocalDate.of(2016, 6, 29))
                 .setStart(1)
@@ -154,10 +154,10 @@ public class GetCallHistoryRequestTest {
         final GetCallHistoryRequest request = GetCallHistoryRequest.Builder.start()
                 .setTo(Fixtures.TO_JID)
                 .setJID(Fixtures.USER_JID)
-                .setCallType(CallType.Inbound)
+                .setCallType(CallType.INBOUND)
                 .build();
 
-        assertThat(request.getCallType().get(), is(CallType.Inbound));
+        assertThat(request.getCallType().get(), is(CallType.INBOUND));
     }
 
     @Test
@@ -166,10 +166,10 @@ public class GetCallHistoryRequestTest {
         final GetCallHistoryRequest request = GetCallHistoryRequest.Builder.start()
                 .setTo(Fixtures.TO_JID)
                 .setJID(Fixtures.USER_JID)
-                .setCallType(CallType.Outbound)
+                .setCallType(CallType.OUTBOUND)
                 .build();
 
-        assertThat(request.getCallType().get(), is(CallType.Outbound));
+        assertThat(request.getCallType().get(), is(CallType.OUTBOUND));
     }
 
     @Test
@@ -178,10 +178,10 @@ public class GetCallHistoryRequestTest {
         final GetCallHistoryRequest request = GetCallHistoryRequest.Builder.start()
                 .setTo(Fixtures.TO_JID)
                 .setJID(Fixtures.USER_JID)
-                .setCallType(CallType.Missed)
+                .setCallType(CallType.MISSED)
                 .build();
 
-        assertThat(request.getCallType().get(), is(CallType.Missed));
+        assertThat(request.getCallType().get(), is(CallType.MISSED));
     }
 
     @Test
@@ -234,7 +234,7 @@ public class GetCallHistoryRequestTest {
         assertThat(request.getJID().get(), is(Fixtures.USER_JID));
         assertThat(request.getCaller().get(), is("from-caller"));
         assertThat(request.getCalled().get(), is("to-destination"));
-        assertThat(request.getCallType().get(), is(CallType.Missed));
+        assertThat(request.getCallType().get(), is(CallType.MISSED));
         assertThat(request.getFromDate().get(), is(LocalDate.of(2016, 6, 1)));
         assertThat(request.getUpToDate().get(), is(LocalDate.of(2016, 6, 29)));
         assertThat(request.getStart().get(), is(1));
