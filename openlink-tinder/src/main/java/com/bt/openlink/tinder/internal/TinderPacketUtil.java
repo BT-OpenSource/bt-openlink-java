@@ -1,15 +1,20 @@
 package com.bt.openlink.tinder.internal;
 
-import com.bt.openlink.OpenlinkXmppNamespace;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import org.dom4j.Element;
 import org.xmpp.packet.IQ;
 import org.xmpp.packet.JID;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import com.bt.openlink.OpenlinkXmppNamespace;
 
 /**
  * This class is for internal use by the library only; users of the API should not access this class directly.
@@ -41,17 +46,24 @@ public final class TinderPacketUtil {
         return childElement;
     }
 
-    @Nullable
-    public static Element addElementWithTextIfNotNull(
+    public static void addElementWithTextIfNotNull(
             @Nonnull final Element elementToAddTo,
             @Nonnull final String elementName,
             @Nullable final Object elementValue) {
         if (elementValue != null) {
             final Element callerElement = elementToAddTo.addElement(elementName);
             callerElement.setText(elementValue.toString());
-            return callerElement;
-        } else {
-            return null;
+        }
+    }
+
+    public static void addElementWithTextIfNotNull(
+            @Nonnull final Element elementToAddTo,
+            @Nonnull final String elementName,
+            @Nullable final LocalDate localDate,
+            @Nonnull final DateTimeFormatter dateFormatter) {
+        if (localDate != null) {
+            final String stringValue = dateFormatter.format(localDate);
+            addElementWithTextIfNotNull(elementToAddTo, elementName, stringValue);
         }
     }
 
@@ -71,6 +83,45 @@ public final class TinderPacketUtil {
         }
         if (isRequired) {
             parseErrors.add(String.format("Invalid %s; missing '%s' field is mandatory", stanzaDescription, childElementName));
+        }
+        return null;
+    }
+
+    @Nullable
+    public static LocalDate getChildElementLocalDate(
+            @Nullable final Element parentElement,
+            @Nonnull final String childElementName,
+            @Nonnull final DateTimeFormatter dateTimeFormatter,
+            final boolean isRequired,
+            final String stanzaDescription,
+            @Nonnull final String dateFormat,
+            final List<String> parseErrors) {
+        final String dateText = getChildElementString(parentElement, childElementName, isRequired, stanzaDescription, parseErrors);
+        if (dateText != null) {
+            try {
+                return LocalDate.parse(dateText, dateTimeFormatter);
+            } catch (final DateTimeParseException e) {
+                parseErrors.add(String.format("Invalid %s; invalid %s '%s'; date format is '%s'", stanzaDescription, childElementName, dateText, dateFormat));
+            }
+        }
+        return null;
+    }
+
+    @Nullable
+    public static Integer getChildElementInteger(
+            @Nullable final Element parentElement,
+            @Nonnull final String childElementName,
+            final boolean isRequired,
+            @Nonnull final String stanzaDescription,
+            @Nonnull final List<String> parseErrors) {
+        final String childElementText = getChildElementString(parentElement, childElementName, isRequired, stanzaDescription, parseErrors);
+        if (childElementText != null) {
+            try {
+                return Integer.parseInt(childElementText);
+            } catch (final NumberFormatException ignored) {
+                parseErrors.add(String.format("Invalid %s; invalid %s '%s'; please supply an integer", stanzaDescription, childElementName, childElementText));
+                return null;
+            }
         }
         return null;
     }

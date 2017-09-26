@@ -47,7 +47,8 @@ public final class OpenlinkIQParser {
             new IQMatcher(OpenlinkXmppNamespace.OPENLINK_GET_INTEREST, IQ.Type.set, GetInterestRequest::from),
             new IQMatcher(OpenlinkXmppNamespace.OPENLINK_GET_INTEREST, IQ.Type.result, GetInterestResult::from),
             new IQMatcher(OpenlinkXmppNamespace.OPENLINK_GET_FEATURES, IQ.Type.set, GetFeaturesRequest::from),
-            new IQMatcher(OpenlinkXmppNamespace.OPENLINK_GET_FEATURES, IQ.Type.result, GetFeaturesResult::from)
+            new IQMatcher(OpenlinkXmppNamespace.OPENLINK_GET_FEATURES, IQ.Type.result, GetFeaturesResult::from),
+            new IQMatcher(OpenlinkXmppNamespace.OPENLINK_GET_CALL_HISTORY, IQ.Type.set, GetCallHistoryRequest::from)
             );
 
     @Nonnull
