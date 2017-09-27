@@ -24,15 +24,15 @@ public class CallTest {
                 .setId(Fixtures.CALL_ID)
                 .setProfileId(Fixtures.PROFILE_ID)
                 .setInterestId(Fixtures.INTEREST_ID)
-                .setState(CallState.CallOriginated)
-                .setDirection(CallDirection.Incoming)
+                .setState(CallState.CALL_ORIGINATED)
+                .setDirection(CallDirection.INCOMING)
                 .build();
 
         assertThat(call.getId().get(), is(Fixtures.CALL_ID));
         assertThat(call.getProfileId().get(), is(Fixtures.PROFILE_ID));
         assertThat(call.getInterestId().get(), is(Fixtures.INTEREST_ID));
-        assertThat(call.getState().get(), is(CallState.CallOriginated));
-        assertThat(call.getDirection().get(), is(CallDirection.Incoming));
+        assertThat(call.getState().get(), is(CallState.CALL_ORIGINATED));
+        assertThat(call.getDirection().get(), is(CallDirection.INCOMING));
         assertThat(call.isParticipating(), is(false));
     }
 
@@ -45,8 +45,8 @@ public class CallTest {
         Call.Builder.start()
                 .setProfileId(Fixtures.PROFILE_ID)
                 .setInterestId(Fixtures.INTEREST_ID)
-                .setState(CallState.CallOriginated)
-                .setDirection(CallDirection.Incoming)
+                .setState(CallState.CALL_ORIGINATED)
+                .setDirection(CallDirection.INCOMING)
                 .build();
     }
 
@@ -59,8 +59,8 @@ public class CallTest {
         Call.Builder.start()
                 .setId(Fixtures.CALL_ID)
                 .setInterestId(Fixtures.INTEREST_ID)
-                .setState(CallState.CallOriginated)
-                .setDirection(CallDirection.Incoming)
+                .setState(CallState.CALL_ORIGINATED)
+                .setDirection(CallDirection.INCOMING)
                 .build();
     }
 
@@ -73,8 +73,8 @@ public class CallTest {
         Call.Builder.start()
                 .setId(Fixtures.CALL_ID)
                 .setProfileId(Fixtures.PROFILE_ID)
-                .setState(CallState.CallOriginated)
-                .setDirection(CallDirection.Incoming)
+                .setState(CallState.CALL_ORIGINATED)
+                .setDirection(CallDirection.INCOMING)
                 .build();
 
     }
@@ -89,7 +89,7 @@ public class CallTest {
                 .setId(Fixtures.CALL_ID)
                 .setProfileId(Fixtures.PROFILE_ID)
                 .setInterestId(Fixtures.INTEREST_ID)
-                .setDirection(CallDirection.Incoming)
+                .setDirection(CallDirection.INCOMING)
                 .build();
     }
 
@@ -103,7 +103,7 @@ public class CallTest {
                 .setId(Fixtures.CALL_ID)
                 .setProfileId(Fixtures.PROFILE_ID)
                 .setInterestId(Fixtures.INTEREST_ID)
-                .setState(CallState.CallOriginated)
+                .setState(CallState.CALL_ORIGINATED)
                 .build();
     }
 

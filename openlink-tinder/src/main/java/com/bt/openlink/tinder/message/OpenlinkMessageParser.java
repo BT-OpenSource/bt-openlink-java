@@ -23,10 +23,9 @@ public final class OpenlinkMessageParser {
         }
         final Element childElement = (Element) elements.get(0);
         final String namespace = childElement.getNamespaceURI();
-        switch (namespace) {
-        case "http://jabber.org/protocol/pubsub#event":
+        if (namespace.equals("http://jabber.org/protocol/pubsub#event")) {
             return parsePubSubEvent(message);
-        default:
+        } else {
             return message;
         }
     }

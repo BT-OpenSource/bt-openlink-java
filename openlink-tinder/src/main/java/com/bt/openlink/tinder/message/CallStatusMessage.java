@@ -55,8 +55,8 @@ public class CallStatusMessage extends Message {
             call.getId().ifPresent(callId -> callElement.addElement("id").setText(callId.value()));
             call.getProfileId().ifPresent(profileId -> callElement.addElement("profile").setText(profileId.value()));
             call.getInterestId().ifPresent(interestId -> callElement.addElement("interest").setText(interestId.value()));
-            call.getState().ifPresent(state -> callElement.addElement("state").setText(state.name()));
-            call.getDirection().ifPresent(direction -> callElement.addElement("direction").setText(direction.name()));
+            call.getState().ifPresent(state -> callElement.addElement("state").setText(state.getLabel()));
+            call.getDirection().ifPresent(direction -> callElement.addElement("direction").setText(direction.getLabel()));
         });
     }
 

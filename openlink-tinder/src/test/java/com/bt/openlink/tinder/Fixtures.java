@@ -44,8 +44,8 @@ public final class Fixtures {
             .setId(CALL_ID)
             .setProfileId(PROFILE_ID)
             .setInterestId(INTEREST_ID)
-            .setState(CallState.CallOriginated)
-            .setDirection(CallDirection.Incoming)
+            .setState(CallState.CALL_ORIGINATED)
+            .setDirection(CallDirection.INCOMING)
             .build();
 
     public static final PubSubNodeId NODE_ID = INTEREST_ID.toPubSubNodeId();

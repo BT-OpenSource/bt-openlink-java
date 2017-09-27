@@ -227,8 +227,8 @@ public class CallStatusMessageTest {
         assertThat(theOnlyCall.getId().get(), is(Fixtures.CALL_ID));
         assertThat(theOnlyCall.getProfileId().get(), is(Fixtures.PROFILE_ID));
         assertThat(theOnlyCall.getInterestId().get(), is(Fixtures.INTEREST_ID));
-        assertThat(theOnlyCall.getState().get(), is(CallState.CallOriginated));
-        assertThat(theOnlyCall.getDirection().get(), is(CallDirection.Outgoing));
+        assertThat(theOnlyCall.getState().get(), is(CallState.CALL_ORIGINATED));
+        assertThat(theOnlyCall.getDirection().get(), is(CallDirection.OUTGOING));
         assertThat(calls.size(), is(1));
         assertThat(message.getParseErrors().size(), is(0));
     }
