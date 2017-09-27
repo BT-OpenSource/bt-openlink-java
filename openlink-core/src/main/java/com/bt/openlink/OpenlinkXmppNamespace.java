@@ -26,7 +26,8 @@ public enum OpenlinkXmppNamespace {
     OPENLINK_MANAGE_INTERESTS("http://xmpp.org/protocol/openlink:01:00:00#manage-interests", "Manage interests"),
     OPENLINK_SET_FEATURES("http://xmpp.org/protocol/openlink:01:00:00#set-features", "Set features"),
     OPENLINK_QUERY_FEATURES("http://xmpp.org/protocol/openlink:01:00:00#query-features", "Query features"),
-    OPENLINK_GET_CALL_HISTORY("http://xmpp.org/protocol/openlink:01:00:00#get-call-history", "Get call history");
+    OPENLINK_GET_CALL_HISTORY("http://xmpp.org/protocol/openlink:01:00:00#get-call-history", "Get call history"),
+    OPENLINK_CALL_STATUS("http://xmpp.org/protocol/openlink:01:00:00#call-status", "Call status message");
 
     public static final String TAG_IODATA = "iodata";
     public static final String TAG_IN = "in";

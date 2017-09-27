@@ -14,7 +14,7 @@ public class Site {
 
         public static Optional<Type> from(@Nullable final String value) {
             for (final Type type : Type.values()) {
-                if(type.name().equals(value)) {
+                if (type.name().equals(value)) {
                     return Optional.of(type);
                 }
             }

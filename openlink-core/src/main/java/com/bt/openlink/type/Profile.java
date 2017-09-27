@@ -129,7 +129,7 @@ public final class Profile {
         @Nonnull
         public Profile build() {
             if (profileId == null) {
-                throw new IllegalStateException("The profileId has not been set");
+                throw new IllegalStateException("The profile id has not been set");
             }
             if (site == null) {
                 throw new IllegalStateException("The site has not been set");

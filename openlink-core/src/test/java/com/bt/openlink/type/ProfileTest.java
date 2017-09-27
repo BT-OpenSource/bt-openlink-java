@@ -3,6 +3,9 @@ package com.bt.openlink.type;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
+import java.util.ArrayList;
+import java.util.Optional;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -54,7 +57,7 @@ public class ProfileTest {
     public void willNotCreateAProfileWithoutAProfileId() throws Exception {
 
         expectedException.expect(IllegalStateException.class);
-        expectedException.expectMessage("The profileId has not been set");
+        expectedException.expectMessage("The profile id has not been set");
 
         Profile.Builder.start()
                 .setSite(SITE)
@@ -99,4 +102,18 @@ public class ProfileTest {
                 .setLabel("test-label")
                 .build();
     }
+
+    @Test
+    public void willCreateAProfileWithoutMandatoryFields() throws Exception {
+        final Profile profile = Profile.Builder.start()
+                .build(new ArrayList<>());
+
+        assertThat(profile.getSite(), is(Optional.empty()));
+        assertThat(profile.getId(), is(Optional.empty()));
+        assertThat(profile.isDefault(), is(Optional.empty()));
+        assertThat(profile.getDevice(), is(Optional.empty()));
+        assertThat(profile.getLabel(), is(Optional.empty()));
+        assertThat(profile.isOnline(), is(Optional.empty()));
+    }
+
 }

@@ -16,4 +16,9 @@ public final class PubSubNodeId extends AbstractType<String> {
         return value == null || value.isEmpty() ? Optional.empty() : Optional.of(new PubSubNodeId(value));
     }
 
+    @Nonnull
+    public InterestId toPubSubNodeId() {
+        return InterestId.from(value()).orElseThrow(() -> new IllegalStateException("Unable to convert PubSubNodeId to InterestId"));
+    }
+
 }

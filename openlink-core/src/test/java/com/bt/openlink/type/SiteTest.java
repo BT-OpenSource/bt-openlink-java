@@ -1,11 +1,14 @@
 package com.bt.openlink.type;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+
+import java.util.ArrayList;
+import java.util.Optional;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
 
 @SuppressWarnings("ConstantConditions")
 public class SiteTest {
@@ -39,7 +42,6 @@ public class SiteTest {
                 .setId(42)
                 .setDefault(true)
                 .build();
-
     }
 
     @Test
@@ -53,7 +55,6 @@ public class SiteTest {
                 .setId(42)
                 .setDefault(true)
                 .build();
-
     }
 
     @Test
@@ -67,6 +68,18 @@ public class SiteTest {
                 .setType(Site.Type.CISCO)
                 .setDefault(true)
                 .build();
-
     }
+
+    @Test
+    public void willBuildASiteWithoutMandatoryFields() throws Exception {
+
+        final Site site = Site.Builder.start()
+                .build(new ArrayList<>());
+
+        assertThat(site.getName(), is(Optional.empty()));
+        assertThat(site.getId(), is(Optional.empty()));
+        assertThat(site.isDefault(), is(Optional.empty()));
+        assertThat(site.getType(), is(Optional.empty()));
+    }
+
 }
