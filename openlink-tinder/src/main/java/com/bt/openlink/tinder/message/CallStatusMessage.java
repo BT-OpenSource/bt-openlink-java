@@ -1,5 +1,7 @@
 package com.bt.openlink.tinder.message;
 
+import java.time.Instant;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -26,6 +28,7 @@ public class CallStatusMessage extends Message {
 
     private static final String STANZA_DESCRIPTION = "Call status message";
 
+    @Nullable private final Instant delay;
     @Nullable private final PubSubNodeId pubSubNodeId;
     @Nonnull private final List<Call> calls;
     @Nonnull private final List<String> parseErrors;
@@ -36,6 +39,7 @@ public class CallStatusMessage extends Message {
         if (builder.id != null) {
             setID(builder.id);
         }
+        this.delay = builder.delay;
         this.pubSubNodeId = builder.pubSubNodeId;
         this.calls = Collections.unmodifiableList(builder.calls);
         if (parseErrors == null) {
@@ -43,7 +47,8 @@ public class CallStatusMessage extends Message {
         } else {
             this.parseErrors = Collections.unmodifiableList(parseErrors);
         }
-        final Element eventElement = getElement().addElement("event", OpenlinkXmppNamespace.XMPP_PUBSUB_EVENT.uri());
+        final Element messageElement = getElement();
+        final Element eventElement = messageElement.addElement("event", OpenlinkXmppNamespace.XMPP_PUBSUB_EVENT.uri());
         final Element itemsElement = eventElement.addElement("items");
         if (pubSubNodeId != null) {
             itemsElement.addAttribute("node", pubSubNodeId.value());
@@ -58,11 +63,19 @@ public class CallStatusMessage extends Message {
             call.getState().ifPresent(state -> callElement.addElement("state").setText(state.getLabel()));
             call.getDirection().ifPresent(direction -> callElement.addElement("direction").setText(direction.getLabel()));
         });
+        if (delay != null) {
+            messageElement.addElement("delay", "urn:xmpp:delay").addAttribute("stamp", delay.toString());
+        }
     }
 
     @Nonnull
     public List<String> getParseErrors() {
         return parseErrors;
+    }
+
+    @Nonnull
+    public Optional<Instant> getDelay() {
+        return Optional.ofNullable(delay);
     }
 
     @Nonnull
@@ -77,7 +90,7 @@ public class CallStatusMessage extends Message {
 
     @SuppressWarnings("unchecked")
     @Nonnull
-    public static CallStatusMessage from( @Nonnull final Message message) {
+    public static CallStatusMessage from(@Nonnull final Message message) {
         final List<String> parseErrors = new ArrayList<>();
         final Element itemsElement = message.getChildElement("event", "http://jabber.org/protocol/pubsub#event").element("items");
         final Element callStatusElement = itemsElement.element("item").element("callstatus");
@@ -102,6 +115,16 @@ public class CallStatusMessage extends Message {
             direction.ifPresent(callBuilder::setDirection);
             builder.addCall(callBuilder.build(parseErrors));
         }
+        final Element delayElement = message.getChildElement("delay", "urn:xmpp:delay");
+        final Optional<String> stampOptional = TinderPacketUtil.getStringAttribute(delayElement, "stamp");
+        if (stampOptional.isPresent()) {
+            final String stamp = stampOptional.get();
+            try {
+                builder.setDelay(Instant.parse(stamp));
+            } catch (final DateTimeParseException e) {
+                parseErrors.add(String.format("Invalid %s; invalid timestamp '%s'; format should be compliant with XEP-0082", STANZA_DESCRIPTION, stamp));
+            }
+        }
         return builder.build(parseErrors);
     }
 
@@ -110,6 +133,7 @@ public class CallStatusMessage extends Message {
         @Nullable JID to;
         @Nullable JID from;
         @Nullable String id;
+        @Nullable private Instant delay;
         @Nullable private PubSubNodeId pubSubNodeId;
         @Nonnull private List<Call> calls = new ArrayList<>();
 
@@ -154,6 +178,12 @@ public class CallStatusMessage extends Message {
 
         public Builder setID(@Nullable String id) {
             this.id = id;
+            return this;
+        }
+
+        @Nonnull
+        public Builder setDelay(@Nonnull Instant delay) {
+            this.delay = delay;
             return this;
         }
 

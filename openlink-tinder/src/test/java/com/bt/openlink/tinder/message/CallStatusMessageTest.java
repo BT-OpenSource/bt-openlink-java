@@ -7,8 +7,10 @@ import static org.hamcrest.Matchers.empty;
 import static org.junit.Assert.assertThat;
 import static org.xmlunit.matchers.CompareMatcher.isIdenticalTo;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -23,14 +25,14 @@ import com.bt.openlink.type.PubSubNodeId;
 
 @SuppressWarnings("ConstantConditions")
 public class CallStatusMessageTest {
-    private static final String CALL_STATUS_MESSAGE = "<message from=\"" + Fixtures.FROM_JID + "\" to=\"" + Fixtures.TO_JID + "\" id=\"" + Fixtures.STANZA_ID + "\">\n" +
-            "  <event xmlns=\"http://jabber.org/protocol/pubsub#event\">\n" +
-            "    <items node=\"" + Fixtures.NODE_ID + "\">\n" +
-            "      <item id=\"sip:6001@uta.bt.com-DirectDial-1sales1@btsm11\">\n" +
-            "        <callstatus xmlns=\"http://xmpp.org/protocol/openlink:01:00:00#call-status\" busy=\"true\">\n" +
+    private static final String CALL_STATUS_MESSAGE = "<message from='" + Fixtures.FROM_JID + "' to='" + Fixtures.TO_JID + "' id='" + Fixtures.STANZA_ID + "'>\n" +
+            "  <event xmlns='http://jabber.org/protocol/pubsub#event'>\n" +
+            "    <items node='" + Fixtures.NODE_ID + "'>\n" +
+            "      <item id='sip:6001@uta.bt.com-DirectDial-1sales1@btsm11'>\n" +
+            "        <callstatus xmlns='http://xmpp.org/protocol/openlink:01:00:00#call-status' busy='true'>\n" +
             "          <call>\n" +
             "            <id>" + Fixtures.CALL_ID + "</id>\n" +
-            "            <site type=\"BTSESSIONMANAGER\">itrader-dev-sm-5</site>\n" +
+            "            <site type='BTSESSIONMANAGER'>itrader-dev-sm-5</site>\n" +
             "            <profile>" + Fixtures.PROFILE_ID + "</profile>\n" +
             "            <eventTimestamps>\n" +
             "              <switch>1470739100996</switch>\n" +
@@ -52,11 +54,11 @@ public class CallStatusMessageTest {
             "            <duration>0</duration>\n" +
             "            <actions/>\n" +
             "            <features>\n" +
-            "              <feature id=\"hs_1\" type=\"HANDSET\" label=\"Handset 1\">false</feature>\n" +
-            "              <feature id=\"hs_2\" type=\"HANDSET\" label=\"Handset 2\">false</feature>\n" +
-            "              <feature id=\"priv_1\" type=\"PRIVACY\" label=\"Privacy\">false</feature>\n" +
-            "              <feature id=\"NetrixHiTouch_sales1\" type=\"DEVICEKEYS\" label=\"NetrixHiTouch\">\n" +
-            "                <devicekeys xmlns=\"http://xmpp.org/protocol/openlink:01:00:00/features#device-keys\">\n" +
+            "              <feature id='hs_1' type='HANDSET' label='Handset 1'>false</feature>\n" +
+            "              <feature id='hs_2' type='HANDSET' label='Handset 2'>false</feature>\n" +
+            "              <feature id='priv_1' type='PRIVACY' label='Privacy'>false</feature>\n" +
+            "              <feature id='NetrixHiTouch_sales1' type='DEVICEKEYS' label='NetrixHiTouch'>\n" +
+            "                <devicekeys xmlns='http://xmpp.org/protocol/openlink:01:00:00/features#device-keys'>\n" +
             "                  <key>key_1:1:1</key>\n" +
             "                </devicekeys>\n" +
             "              </feature>\n" +
@@ -154,17 +156,18 @@ public class CallStatusMessageTest {
         assertThat(message.getTo(), is(nullValue()));
         assertThat(message.getFrom(), is(nullValue()));
         assertThat(message.getCalls(), is(empty()));
+        assertThat(message.getDelay(), is(Optional.empty()));
     }
 
     @Test
     public void willGenerateAnXmppStanza() throws Exception {
 
         //    TODO: (Greg 2017-09-27) Replace this with CALL_STATUS_EVENT when fully implemented
-        final String expectedXML = "<message from=\"" + Fixtures.FROM_JID + "\" to=\"" + Fixtures.TO_JID + "\" id=\"" + Fixtures.STANZA_ID + "\">\n" +
-                "  <event xmlns=\"http://jabber.org/protocol/pubsub#event\">\n" +
-                "    <items node=\"" + Fixtures.INTEREST_ID + "\">\n" +
+        final String expectedXML = "<message from='" + Fixtures.FROM_JID + "' to='" + Fixtures.TO_JID + "' id='" + Fixtures.STANZA_ID + "'>\n" +
+                "  <event xmlns='http://jabber.org/protocol/pubsub#event'>\n" +
+                "    <items node='" + Fixtures.INTEREST_ID + "'>\n" +
                 "      <item>\n" +
-                "        <callstatus xmlns=\"http://xmpp.org/protocol/openlink:01:00:00#call-status\">\n" +
+                "        <callstatus xmlns='http://xmpp.org/protocol/openlink:01:00:00#call-status'>\n" +
                 "          <call>\n" +
                 "            <id>" + Fixtures.CALL_ID + "</id>\n" +
                 "            <profile>" + Fixtures.PROFILE_ID + "</profile>\n" +
@@ -194,10 +197,10 @@ public class CallStatusMessageTest {
     public void willCreateAStanzaWithoutMandatoryFields() throws Exception {
 
         final String expectedXML = "<message>\n" +
-                "  <event xmlns=\"http://jabber.org/protocol/pubsub#event\">\n" +
+                "  <event xmlns='http://jabber.org/protocol/pubsub#event'>\n" +
                 "    <items>\n" +
                 "      <item>\n" +
-                "        <callstatus xmlns=\"http://xmpp.org/protocol/openlink:01:00:00#call-status\">\n" +
+                "        <callstatus xmlns='http://xmpp.org/protocol/openlink:01:00:00#call-status'>\n" +
                 "        </callstatus>\n" +
                 "      </item>\n" +
                 "    </items>\n" +
@@ -236,22 +239,115 @@ public class CallStatusMessageTest {
     @Test
     public void willReturnOriginalMessageForADeviceStatusEvent() throws Exception {
 
-        final Message stanza = Fixtures.messageFrom(
-                "<message from=\"pubsub.btp194094\" to=\"ucwa.btp194094\" id=\"Sma0SFtv\">\n" +
-                        "  <event xmlns=\"http://jabber.org/protocol/pubsub#event\">\n" +
-                        "    <items node=\"sip:6004@uta.bt.com-DirectDial-1sales1@btsm2\">\n" +
-                        "      <item id=\"sip:6004@uta.bt.com-DirectDial-1sales1@btsm2\">\n" +
-                        "        <devicestatus xmlns=\"http://xmpp.org/protocol/openlink:01:00:00#device-status\">\n" +
-                        "          <profile online=\"true\">/netrix/Cluster1|/uta/enterprises/bt/users/Sales1/denormalised-profiles/UCSales1/versions/72?build=70&amp;location=global.uk.Ipswich&amp;device=NetrixHiTouch</profile>\n" +
-                        "          <interest id=\"sip:6004@uta.bt.com-DirectDial-1sales1@btsm2\" online=\"true\"/>\n" +
+        final Message stanza = Fixtures
+                .messageFrom(
+                "<message from='pubsub.btp194094' to='ucwa.btp194094' id='Sma0SFtv'>\n"
+                        +
+                        "  <event xmlns='http://jabber.org/protocol/pubsub#event'>\n"
+                        +
+                        "    <items node='sip:6004@uta.bt.com-DirectDial-1sales1@btsm2'>\n"
+                        +
+                        "      <item id='sip:6004@uta.bt.com-DirectDial-1sales1@btsm2'>\n"
+                        +
+                        "        <devicestatus xmlns='http://xmpp.org/protocol/openlink:01:00:00#device-status'>\n"
+                        +
+                        "          <profile online='true'>/netrix/Cluster1|/uta/enterprises/bt/users/Sales1/denormalised-profiles/UCSales1/versions/72?build=70&amp;location=global.uk.Ipswich&amp;device=NetrixHiTouch</profile>\n"
+                        +
+                        "          <interest id='sip:6004@uta.bt.com-DirectDial-1sales1@btsm2' online='true'/>\n" +
                         "        </devicestatus>\n" +
                         "      </item>\n" +
                         "    </items>\n" +
                         "  </event>\n" +
-                        "  <delay xmlns=\"urn:xmpp:delay\" stamp=\"2016-09-01T15:18:53.999Z\"/>\n" +
                         "</message>");
 
         assertThat(OpenlinkMessageParser.parse(stanza), is(sameInstance(stanza)));
     }
 
+    @Test
+    public void willBuildAMessageWithADelay() throws Exception {
+        final String expectedXML = "<message from='" + Fixtures.FROM_JID + "' to='" + Fixtures.TO_JID + "' id='" + Fixtures.STANZA_ID + "'>\n" +
+                "  <event xmlns='http://jabber.org/protocol/pubsub#event'>\n" +
+                "    <items node='" + Fixtures.INTEREST_ID + "'>\n" +
+                "      <item>\n" +
+                "        <callstatus xmlns='http://xmpp.org/protocol/openlink:01:00:00#call-status'>\n" +
+                "          <call>\n" +
+                "            <id>" + Fixtures.CALL_ID + "</id>\n" +
+                "            <profile>" + Fixtures.PROFILE_ID + "</profile>\n" +
+                "            <interest>" + Fixtures.INTEREST_ID + "</interest>\n" +
+                "            <state>CallOriginated</state>\n" +
+                "            <direction>Incoming</direction>\n" +
+                "          </call>\n" +
+                "        </callstatus>\n" +
+                "      </item>\n" +
+                "    </items>\n" +
+                "  </event>\n" +
+                "  <delay xmlns='urn:xmpp:delay' stamp='2016-09-01T15:18:53.999Z'/>\n" +
+                "</message>";
+
+        final CallStatusMessage message = CallStatusMessage.Builder.start()
+                .setID(Fixtures.STANZA_ID)
+                .setTo(Fixtures.TO_JID)
+                .setFrom(Fixtures.FROM_JID)
+                .setPubSubNodeId(Fixtures.CALL.getInterestId().get())
+                .addCall(Fixtures.CALL)
+                .setDelay(Instant.parse("2016-09-01T15:18:53.999Z"))
+                .build();
+
+        assertThat(message.toXML(), isIdenticalTo(expectedXML).ignoreWhitespace());
+    }
+
+    @Test
+    public void willParseAMessageWithADelay() throws Exception {
+        final Message stanza = Fixtures.messageFrom(
+                "<message from='" + Fixtures.FROM_JID + "' to='" + Fixtures.TO_JID + "' id='" + Fixtures.STANZA_ID + "'>\n" +
+                        "  <event xmlns='http://jabber.org/protocol/pubsub#event'>\n" +
+                        "    <items node='" + Fixtures.INTEREST_ID + "'>\n" +
+                        "      <item>\n" +
+                        "        <callstatus xmlns='http://xmpp.org/protocol/openlink:01:00:00#call-status'>\n" +
+                        "          <call>\n" +
+                        "            <id>" + Fixtures.CALL_ID + "</id>\n" +
+                        "            <profile>" + Fixtures.PROFILE_ID + "</profile>\n" +
+                        "            <interest>" + Fixtures.INTEREST_ID + "</interest>\n" +
+                        "            <state>CallOriginated</state>\n" +
+                        "            <direction>Incoming</direction>\n" +
+                        "          </call>\n" +
+                        "        </callstatus>\n" +
+                        "      </item>\n" +
+                        "    </items>\n" +
+                        "  </event>\n" +
+                        "  <delay xmlns='urn:xmpp:delay' stamp='2016-09-01T15:18:53.999Z'/>\n" +
+                        "</message>");
+
+        final CallStatusMessage message = (CallStatusMessage) OpenlinkMessageParser.parse(stanza);
+        assertThat(message.getDelay().get(), is(Instant.parse("2016-09-01T15:18:53.999Z")));
+    }
+
+    @Test
+    public void willParseAMessageWithABadDelay() throws Exception {
+        final Message stanza = Fixtures.messageFrom(
+                "<message from='" + Fixtures.FROM_JID + "' to='" + Fixtures.TO_JID + "' id='" + Fixtures.STANZA_ID + "'>\n" +
+                        "  <event xmlns='http://jabber.org/protocol/pubsub#event'>\n" +
+                        "    <items node='" + Fixtures.INTEREST_ID + "'>\n" +
+                        "      <item>\n" +
+                        "        <callstatus xmlns='http://xmpp.org/protocol/openlink:01:00:00#call-status'>\n" +
+                        "          <call>\n" +
+                        "            <id>" + Fixtures.CALL_ID + "</id>\n" +
+                        "            <profile>" + Fixtures.PROFILE_ID + "</profile>\n" +
+                        "            <interest>" + Fixtures.INTEREST_ID + "</interest>\n" +
+                        "            <state>CallOriginated</state>\n" +
+                        "            <direction>Incoming</direction>\n" +
+                        "          </call>\n" +
+                        "        </callstatus>\n" +
+                        "      </item>\n" +
+                        "    </items>\n" +
+                        "  </event>\n" +
+                        "  <delay xmlns='urn:xmpp:delay' stamp='not-a-timestamp'/>\n" +
+                        "</message>");
+
+        final CallStatusMessage message = (CallStatusMessage) OpenlinkMessageParser.parse(stanza);
+        assertThat(message.getDelay(), is(Optional.empty()));
+        final List<String> parseErrors = message.getParseErrors();
+        assertThat(parseErrors.get(0), is("Invalid Call status message; invalid timestamp 'not-a-timestamp'; format should be compliant with XEP-0082"));
+        assertThat(parseErrors.size(),is(1));
+    }
 }
