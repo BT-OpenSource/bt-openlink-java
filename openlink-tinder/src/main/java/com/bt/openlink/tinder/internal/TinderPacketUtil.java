@@ -278,7 +278,7 @@ public final class TinderPacketUtil {
         final Element itemElement = parentElement.element("item");
         final Element callStatusElement = itemElement.element("callstatus");
         final List<Element> callElements = callStatusElement.elements("call");
-        for (final Element callElement : callElements) {
+        for (@Nonnull final Element callElement : callElements) {
             final Call.Builder callBuilder = Call.Builder.start();
             final Optional<CallId> callId = CallId.from(getChildElementString(callElement, "id", true, description, parseErrors));
             callId.ifPresent(callBuilder::setId);
