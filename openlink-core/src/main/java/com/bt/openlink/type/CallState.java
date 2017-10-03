@@ -70,9 +70,8 @@ public enum CallState {
                 return inboundCallParticipant;
             case OUTGOING:
                 return outboundCallParticipant;
-            default:
-                return false;
         }
+        throw new IllegalStateException("Unable to determine the participation state for call direction " + callDirection);
     }
 
 

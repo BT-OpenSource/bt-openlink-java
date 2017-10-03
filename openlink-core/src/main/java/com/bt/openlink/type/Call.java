@@ -12,7 +12,6 @@ import javax.annotation.Nullable;
 // TODO: (Greg 2017-09-27) Add all call related fields to this class
 public class Call {
 
-    @Nonnull private final List<String> parseErrors;
     @Nullable private final CallId callId;
     @Nullable private final Site site;
     @Nullable private final ProfileId profileId;
@@ -22,7 +21,7 @@ public class Call {
     @Nullable private final Long duration;
     @Nonnull private final Collection<RequestAction> actions;
 
-    private Call(@Nonnull final Builder builder, @Nullable final List<String> parseErrors) {
+    private Call(@Nonnull final Builder builder) {
         this.callId = builder.callId;
         this.site = builder.site;
         this.profileId = builder.profileId;
@@ -31,16 +30,6 @@ public class Call {
         this.direction = builder.direction;
         this.duration = builder.duration;
         this.actions = Collections.unmodifiableCollection(builder.actions);
-        if (parseErrors == null) {
-            this.parseErrors = Collections.emptyList();
-        } else {
-            this.parseErrors = parseErrors;
-        }
-    }
-
-    @Nonnull
-    public List<String> parseErrors() {
-        return new ArrayList<>(parseErrors);
     }
 
     @Nonnull
@@ -129,12 +118,12 @@ public class Call {
                 throw new IllegalStateException("The call duration has not been set");
             }
 
-            return build(null);
+            return buildWithoutValidating();
         }
 
         @Nonnull
-        public Call build(@Nullable final List<String> parseErrors) {
-            return new Call(this, parseErrors);
+        public Call buildWithoutValidating() {
+            return new Call(this);
         }
 
         @Nonnull

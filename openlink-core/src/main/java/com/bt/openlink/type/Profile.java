@@ -1,7 +1,6 @@
 package com.bt.openlink.type;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -10,7 +9,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public final class Profile {
-    @Nonnull private final List<String> parseErrors;
     @Nullable private final ProfileId profileId;
     @Nullable private final Boolean isDefault;
     @Nullable private final String device;
@@ -19,7 +17,7 @@ public final class Profile {
     @Nullable private final Site site;
     @Nonnull final List<RequestAction> actions;
 
-    private Profile(@Nonnull final Builder builder, @Nullable final List<String> parseErrors) {
+    private Profile(@Nonnull final Builder builder) {
         this.profileId = builder.profileId;
         this.isDefault = builder.isDefault;
         this.device = builder.device;
@@ -27,16 +25,6 @@ public final class Profile {
         this.online = builder.online;
         this.site = builder.site;
         this.actions = builder.actions;
-        if (parseErrors == null) {
-            this.parseErrors = Collections.emptyList();
-        } else {
-            this.parseErrors = parseErrors;
-        }
-    }
-
-    @Nonnull
-    public List<String> getParseErrors() {
-        return new ArrayList<>(parseErrors);
     }
 
     @Nonnull
@@ -143,12 +131,12 @@ public final class Profile {
             if (online == null) {
                 throw new IllegalStateException("The online indicator has not been set");
             }
-            return new Profile(this, null);
+            return buildWithoutValidating();
         }
 
         @Nonnull
-        public Profile build(final List<String> parseErrors) {
-            return new Profile(this, parseErrors);
+        public Profile buildWithoutValidating() {
+            return new Profile(this);
         }
 
         public Builder setId(@Nonnull final ProfileId profileId) {

@@ -1,7 +1,5 @@
 package com.bt.openlink.type;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 
 import javax.annotation.Nonnull;
@@ -26,18 +24,12 @@ public class Site {
     @Nullable private final Boolean isDefault;
     @Nullable private final Type type;
     @Nullable private final String name;
-    @Nonnull private final List<String> parseErrors;
 
-    private Site(@Nonnull final Builder builder, @Nullable final List<String> parseErrors) {
+    private Site(@Nonnull final Builder builder) {
         this.id = builder.id;
         this.isDefault = builder.isDefault;
         this.type = builder.type;
         this.name = builder.name;
-        if (parseErrors == null) {
-            this.parseErrors = Collections.emptyList();
-        } else {
-            this.parseErrors = parseErrors;
-        }
     }
 
     @Nonnull
@@ -58,11 +50,6 @@ public class Site {
     @Nonnull
     public Optional<String> getName() {
         return Optional.ofNullable(name);
-    }
-
-    @Nonnull
-    public List<String> getParseErrors() {
-        return parseErrors;
     }
 
     public static final class Builder {
@@ -89,12 +76,12 @@ public class Site {
             if (name == null) {
                 throw new IllegalStateException("The site name has not been set");
             }
-            return new Site(this, null);
+            return buildWithoutValidating();
         }
 
         @Nonnull
-        public Site build(final List<String> parseErrors) {
-            return new Site(this, parseErrors);
+        public Site buildWithoutValidating() {
+            return new Site(this);
         }
 
         public Builder setId(final long id) {

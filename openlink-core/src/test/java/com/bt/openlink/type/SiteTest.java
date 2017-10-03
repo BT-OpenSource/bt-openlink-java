@@ -3,7 +3,6 @@ package com.bt.openlink.type;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
-import java.util.ArrayList;
 import java.util.Optional;
 
 import org.junit.Rule;
@@ -74,7 +73,7 @@ public class SiteTest {
     public void willBuildASiteWithoutMandatoryFields() throws Exception {
 
         final Site site = Site.Builder.start()
-                .build(new ArrayList<>());
+                .buildWithoutValidating();
 
         assertThat(site.getName(), is(Optional.empty()));
         assertThat(site.getId(), is(Optional.empty()));
@@ -82,4 +81,10 @@ public class SiteTest {
         assertThat(site.getType(), is(Optional.empty()));
     }
 
+    @Test
+    public void willParseSiteTypes() throws Exception {
+
+        assertThat(Site.Type.from("BTSM").get(), is(Site.Type.BTSM));
+        assertThat(Site.Type.from(null), is(Optional.empty()));
+    }
 }

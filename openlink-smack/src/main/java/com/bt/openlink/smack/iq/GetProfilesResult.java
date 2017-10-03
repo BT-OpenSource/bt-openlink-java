@@ -35,8 +35,7 @@ public class GetProfilesResult extends OpenlinkIQ {
             final Profile.Builder profileBuilder = Profile.Builder.start();
             profileId.ifPresent(profileBuilder::setId);
             final Profile profile = profileBuilder
-                    .build(parseErrors);
-            parseErrors.addAll(profile.getParseErrors());
+                    .buildWithoutValidating();
             builder.addProfile(profile);
             ParserUtils.forwardToEndTagOfDepth(parser, parser.getDepth());
             parser.nextTag();

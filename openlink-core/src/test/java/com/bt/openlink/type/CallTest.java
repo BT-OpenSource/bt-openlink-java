@@ -1,9 +1,9 @@
 package com.bt.openlink.type;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.empty;
 import static org.junit.Assert.assertThat;
 
-import java.util.ArrayList;
 import java.util.Optional;
 
 import org.junit.Rule;
@@ -28,6 +28,7 @@ public class CallTest {
                 .setState(CallState.CALL_ORIGINATED)
                 .setDirection(CallDirection.INCOMING)
                 .setDuration(1)
+                .addAction(RequestAction.ANSWER_CALL)
                 .build();
 
         assertThat(call.getId().get(), is(Fixtures.CALL_ID));
@@ -37,6 +38,8 @@ public class CallTest {
         assertThat(call.getState().get(), is(CallState.CALL_ORIGINATED));
         assertThat(call.getDirection().get(), is(CallDirection.INCOMING));
         assertThat(call.isParticipating(), is(false));
+        assertThat(call.getActions().size(),is(1));
+        assertThat(call.getActions().iterator().next(),is(RequestAction.ANSWER_CALL));
     }
 
     @Test
@@ -52,6 +55,7 @@ public class CallTest {
                 .setState(CallState.CALL_ORIGINATED)
                 .setDirection(CallDirection.INCOMING)
                 .setDuration(1)
+                .addAction(RequestAction.ANSWER_CALL)
                 .build();
     }
 
@@ -68,6 +72,7 @@ public class CallTest {
                 .setState(CallState.CALL_ORIGINATED)
                 .setDirection(CallDirection.INCOMING)
                 .setDuration(1)
+                .addAction(RequestAction.ANSWER_CALL)
                 .build();
     }
 
@@ -84,6 +89,7 @@ public class CallTest {
                 .setState(CallState.CALL_ORIGINATED)
                 .setDirection(CallDirection.INCOMING)
                 .setDuration(1)
+                .addAction(RequestAction.ANSWER_CALL)
                 .build();
     }
 
@@ -100,6 +106,7 @@ public class CallTest {
                 .setState(CallState.CALL_ORIGINATED)
                 .setDirection(CallDirection.INCOMING)
                 .setDuration(1)
+                .addAction(RequestAction.ANSWER_CALL)
                 .build();
 
     }
@@ -117,6 +124,7 @@ public class CallTest {
                 .setInterestId(Fixtures.INTEREST_ID)
                 .setDirection(CallDirection.INCOMING)
                 .setDuration(1)
+                .addAction(RequestAction.ANSWER_CALL)
                 .build();
     }
 
@@ -133,6 +141,7 @@ public class CallTest {
                 .setInterestId(Fixtures.INTEREST_ID)
                 .setState(CallState.CALL_ORIGINATED)
                 .setDuration(1)
+                .addAction(RequestAction.ANSWER_CALL)
                 .build();
     }
 
@@ -149,13 +158,14 @@ public class CallTest {
                 .setInterestId(Fixtures.INTEREST_ID)
                 .setState(CallState.CALL_ORIGINATED)
                 .setDirection(CallDirection.INCOMING)
+                .addAction(RequestAction.ANSWER_CALL)
                 .build();
     }
 
     @Test
     public void willCreateACallWithoutMandatoryFields() throws Exception {
         final Call call = Call.Builder.start()
-                .build(new ArrayList<>());
+                .buildWithoutValidating();
 
         assertThat(call.getId(), is(Optional.empty()));
         assertThat(call.getSite(), is(Optional.empty()));
@@ -165,5 +175,6 @@ public class CallTest {
         assertThat(call.getDirection(), is(Optional.empty()));
         assertThat(call.getDuration(), is(Optional.empty()));
         assertThat(call.isParticipating(), is(false));
+        assertThat(call.getActions(), is(empty()));
     }
 }

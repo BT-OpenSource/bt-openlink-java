@@ -3,7 +3,6 @@ package com.bt.openlink.type;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
-import java.util.ArrayList;
 import java.util.Optional;
 
 import org.junit.Rule;
@@ -106,7 +105,7 @@ public class ProfileTest {
     @Test
     public void willCreateAProfileWithoutMandatoryFields() throws Exception {
         final Profile profile = Profile.Builder.start()
-                .build(new ArrayList<>());
+                .buildWithoutValidating();
 
         assertThat(profile.getSite(), is(Optional.empty()));
         assertThat(profile.getId(), is(Optional.empty()));

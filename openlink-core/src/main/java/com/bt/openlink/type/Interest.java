@@ -1,8 +1,5 @@
 package com.bt.openlink.type;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -10,27 +7,16 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public final class Interest {
-    @Nonnull private final List<String> parseErrors;
     @Nullable private final InterestId interestId;
     @Nullable private final InterestType interestType;
     @Nullable private final String label;
     @Nullable private final Boolean isDefault;
 
-    private Interest(@Nonnull final Builder builder, @Nullable final List<String> parseErrors) {
+    private Interest(@Nonnull final Builder builder) {
         this.interestId = builder.interestId;
         this.interestType = builder.interestType;
         this.label = builder.label;
         this.isDefault = builder.isDefault;
-        if (parseErrors == null) {
-            this.parseErrors = Collections.emptyList();
-        } else {
-            this.parseErrors = parseErrors;
-        }
-    }
-
-    @Nonnull
-    public List<String> getParseErrors() {
-        return new ArrayList<>(parseErrors);
     }
 
     @Nonnull
@@ -100,12 +86,12 @@ public final class Interest {
 
         @Nonnull
         public Interest build() {
-            return new Interest(this, null);
+            return buildWithoutValidating();
         }
 
         @Nonnull
-        private Interest build(final List<String> parseErrors) {
-            return new Interest(this, parseErrors);
+        private Interest buildWithoutValidating() {
+            return new Interest(this);
         }
 
         public Builder setId(@Nonnull final InterestId interestId) {

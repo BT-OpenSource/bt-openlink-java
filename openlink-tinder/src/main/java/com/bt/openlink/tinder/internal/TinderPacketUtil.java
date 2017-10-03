@@ -269,7 +269,7 @@ public final class TinderPacketUtil {
         isDefaultSite.ifPresent(siteBuilder::setDefault);
         final Optional<Site.Type> type = Site.Type.from(getStringAttribute(siteElement, "type", true, description, parseErrors).orElse(null));
         type.ifPresent(siteBuilder::setType);
-        return Optional.of(siteBuilder.build(parseErrors));
+        return Optional.of(siteBuilder.buildWithoutValidating());
     }
 
     @SuppressWarnings("unchecked")
@@ -278,7 +278,7 @@ public final class TinderPacketUtil {
         final Element itemElement = parentElement.element("item");
         final Element callStatusElement = itemElement.element("callstatus");
         final List<Element> callElements = callStatusElement.elements("call");
-        for (@Nonnull final Element callElement : callElements) {
+        for (final Element callElement : callElements) {
             final Call.Builder callBuilder = Call.Builder.start();
             final Optional<CallId> callId = CallId.from(getChildElementString(callElement, "id", true, description, parseErrors));
             callId.ifPresent(callBuilder::setId);
@@ -302,7 +302,7 @@ public final class TinderPacketUtil {
                     action.ifPresent(callBuilder::addAction);
                 }
             }
-            calls.add(callBuilder.build(parseErrors));
+            calls.add(callBuilder.buildWithoutValidating());
         }
         return calls;
     }
