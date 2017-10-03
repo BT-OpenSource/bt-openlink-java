@@ -1,18 +1,20 @@
 package com.bt.openlink.tinder.iq;
 
-import com.bt.openlink.tinder.Fixtures;
-import com.bt.openlink.type.Interest;
-import com.bt.openlink.type.InterestType;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+import static org.xmlunit.matchers.CompareMatcher.isIdenticalTo;
+
+import java.util.List;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.xmpp.packet.IQ;
 
-import java.util.List;
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-import static org.xmlunit.matchers.CompareMatcher.isIdenticalTo;
+import com.bt.openlink.tinder.Fixtures;
+import com.bt.openlink.type.Interest;
+import com.bt.openlink.type.InterestId;
+import com.bt.openlink.type.InterestType;
 
 @SuppressWarnings({ "OptionalGetWithoutIsPresent", "ConstantConditions" })
 public class GetInterestResultTest {
@@ -96,7 +98,11 @@ public class GetInterestResultTest {
         assertThat(result.getTo(), is(Fixtures.TO_JID));
         assertThat(result.getFrom(), is(Fixtures.FROM_JID));
         assertThat(result.getType(), is(IQ.Type.result));
-        assertThat(result.getInterest().get(), is(INTEREST));
+        final Interest interest = result.getInterest().get();
+        assertThat(interest.getId(), is(InterestId.from("test-interest-id")));
+        assertThat(interest.getType(), is(InterestType.from("DirectoryNumber")));
+        assertThat(interest.getLabel().get(), is("6001/1"));
+        assertThat(interest.isDefaultInterest().get(), is(true));
     }
 
     @Test

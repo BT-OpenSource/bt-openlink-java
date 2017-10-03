@@ -118,13 +118,15 @@ public class GetInterestsResultTest {
 
         int i = 0;
         Interest interest = interests.get(i++);
-        assertThat(interest,is(Fixtures.INTEREST));
+        assertThat(interest.getId().get(),is(Fixtures.INTEREST_ID));
+        assertThat(interest.getLabel().get(),is("test-default-interest"));
+        assertThat(interest.getType(),is(InterestType.from("test-interest-type")));
 
         interest = interests.get(i++);
         assertThat(interest.getId(), is(InterestId.from("sip:6001@uta.bt.com-DirectDial-1trader1@btsm11")));
         assertThat(interest.getType(), is(InterestType.from("DirectoryNumber")));
         assertThat(interest.getLabel().get(), is("6001/1"));
-        assertThat(interest.isDefault().get(), is(false));
+        assertThat(interest.isDefaultInterest().get(), is(false));
 
         assertThat(interests.size(), is(i));
 

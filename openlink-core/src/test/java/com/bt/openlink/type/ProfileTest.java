@@ -30,15 +30,18 @@ public class ProfileTest {
                 .setDefault(true)
                 .setDevice("test-device")
                 .setLabel("test-label")
+                .addAction(RequestAction.ANSWER_CALL)
                 .setOnline(true)
                 .build();
 
         assertThat(profile.getSite().get(), is(SITE));
         assertThat(profile.getId().get(), is(profileId));
-        assertThat(profile.isDefault().get(), is(true));
+        assertThat(profile.isDefaultProfile().get(), is(true));
         assertThat(profile.getDevice().get(), is("test-device"));
         assertThat(profile.getLabel().get(), is("test-label"));
         assertThat(profile.isOnline().get(), is(true));
+        assertThat(profile.getActions().size(), is(1));
+        assertThat(profile.getActions().get(0), is(RequestAction.ANSWER_CALL));
     }
 
     @Test
@@ -109,7 +112,7 @@ public class ProfileTest {
 
         assertThat(profile.getSite(), is(Optional.empty()));
         assertThat(profile.getId(), is(Optional.empty()));
-        assertThat(profile.isDefault(), is(Optional.empty()));
+        assertThat(profile.isDefaultProfile(), is(Optional.empty()));
         assertThat(profile.getDevice(), is(Optional.empty()));
         assertThat(profile.getLabel(), is(Optional.empty()));
         assertThat(profile.isOnline(), is(Optional.empty()));

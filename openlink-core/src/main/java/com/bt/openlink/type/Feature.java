@@ -1,8 +1,5 @@
 package com.bt.openlink.type;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 
 import javax.annotation.Nonnull;
@@ -12,22 +9,11 @@ public final class Feature {
     @Nullable private final FeatureId featureId;
     @Nullable private final FeatureType featureType;
     @Nullable private final String label;
-    @Nonnull private final List<String> parseErrors;
 
-    private Feature(@Nonnull final Builder builder, @Nullable final List<String> parseErrors) {
+    private Feature(@Nonnull final Builder builder) {
         this.featureId = builder.featureId;
         this.featureType = builder.featureType;
         this.label = builder.label;
-        if (parseErrors == null) {
-            this.parseErrors = Collections.emptyList();
-        } else {
-            this.parseErrors = parseErrors;
-        }
-    }
-
-    @Nonnull
-    public List<String> parseErrors() {
-        return new ArrayList<>(parseErrors);
     }
 
     @Nonnull
@@ -70,12 +56,12 @@ public final class Feature {
             if (label == null) {
                 throw new IllegalStateException("The feature label has not been set");
             }
-            return new Feature(this, null);
+            return buildWithoutValidating();
         }
 
         @Nonnull
-        private Feature build(final List<String> parseErrors) {
-            return new Feature(this, parseErrors);
+        private Feature buildWithoutValidating() {
+            return new Feature(this);
         }
 
         public Builder setId(@Nonnull final FeatureId featureId) {

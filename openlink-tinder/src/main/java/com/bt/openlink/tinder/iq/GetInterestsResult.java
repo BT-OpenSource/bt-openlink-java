@@ -31,7 +31,7 @@ public class GetInterestsResult extends OpenlinkIQ {
             interest.getId().ifPresent(interestId -> interestElement.addAttribute("id", interestId.value()));
             interest.getType().ifPresent(interestType -> interestElement.addAttribute("type", interestType.value()));
             interest.getLabel().ifPresent(label -> interestElement.addAttribute("label", label));
-            interest.isDefault().ifPresent(isDefault -> interestElement.addAttribute("default", String.valueOf(isDefault)));
+            interest.isDefaultInterest().ifPresent(isDefault -> interestElement.addAttribute("default", String.valueOf(isDefault)));
         }
     }
 

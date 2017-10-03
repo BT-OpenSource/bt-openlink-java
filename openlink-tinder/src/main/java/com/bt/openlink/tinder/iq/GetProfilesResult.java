@@ -32,7 +32,7 @@ public class GetProfilesResult extends OpenlinkIQ {
         getProfiles().forEach(profile -> {
             final Element profileElement = profilesElement.addElement(OpenlinkXmppNamespace.TAG_PROFILE);
             profile.getId().ifPresent(profileId -> profileElement.addAttribute("id", profileId.value()));
-            profile.isDefault().ifPresent(isDefault -> profileElement.addAttribute(ATTRIBUTE_DEFAULT, String.valueOf(isDefault)));
+            profile.isDefaultProfile().ifPresent(isDefault -> profileElement.addAttribute(ATTRIBUTE_DEFAULT, String.valueOf(isDefault)));
             profile.getDevice().ifPresent(device -> profileElement.addAttribute("device", device));
             profile.getLabel().ifPresent(label -> profileElement.addAttribute(ATTRIBUTE_LABEL, label));
             profile.isOnline().ifPresent(online -> profileElement.addAttribute("online", String.valueOf(online)));
