@@ -9,6 +9,7 @@ import static org.xmlunit.matchers.CompareMatcher.isIdenticalTo;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,7 +33,7 @@ public class CallStatusMessageTest {
             "        <callstatus xmlns='http://xmpp.org/protocol/openlink:01:00:00#call-status' busy='true'>\n" +
             "          <call>\n" +
             "            <id>" + Fixtures.CALL_ID + "</id>\n" +
-            "            <site type='BTSESSIONMANAGER'>itrader-dev-sm-5</site>\n" +
+            "            <site id='42' type='BTSESSIONMANAGER'>itrader-dev-sm-5</site>\n" +
             "            <profile>" + Fixtures.PROFILE_ID + "</profile>\n" +
             "            <eventTimestamps>\n" +
             "              <switch>1470739100996</switch>\n" +
@@ -100,7 +101,7 @@ public class CallStatusMessageTest {
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
                 .setPubSubNodeId(Fixtures.CALL.getInterestId().get())
-                .addCall(Fixtures.CALL)
+                .addCalls(Collections.singletonList(Fixtures.CALL))
                 .build();
 
         assertThat(message.getID(), is(nullValue()));
@@ -170,10 +171,15 @@ public class CallStatusMessageTest {
                 "        <callstatus xmlns='http://xmpp.org/protocol/openlink:01:00:00#call-status'>\n" +
                 "          <call>\n" +
                 "            <id>" + Fixtures.CALL_ID + "</id>\n" +
+                "            <site default=\"true\" id=\"42\" type=\"BTSM\">test-site-name</site>" +
                 "            <profile>" + Fixtures.PROFILE_ID + "</profile>\n" +
                 "            <interest>" + Fixtures.INTEREST_ID + "</interest>\n" +
                 "            <state>CallOriginated</state>\n" +
                 "            <direction>Incoming</direction>\n" +
+                "            <duration>0</duration>\n" +
+                "            <actions>\n" +
+                "              <AnswerCall/>\n" +
+                "            </actions>\n" +
                 "          </call>\n" +
                 "        </callstatus>\n" +
                 "      </item>\n" +
@@ -241,18 +247,12 @@ public class CallStatusMessageTest {
 
         final Message stanza = Fixtures
                 .messageFrom(
-                "<message from='pubsub.btp194094' to='ucwa.btp194094' id='Sma0SFtv'>\n"
-                        +
-                        "  <event xmlns='http://jabber.org/protocol/pubsub#event'>\n"
-                        +
-                        "    <items node='sip:6004@uta.bt.com-DirectDial-1sales1@btsm2'>\n"
-                        +
-                        "      <item id='sip:6004@uta.bt.com-DirectDial-1sales1@btsm2'>\n"
-                        +
-                        "        <devicestatus xmlns='http://xmpp.org/protocol/openlink:01:00:00#device-status'>\n"
-                        +
-                        "          <profile online='true'>/netrix/Cluster1|/uta/enterprises/bt/users/Sales1/denormalised-profiles/UCSales1/versions/72?build=70&amp;location=global.uk.Ipswich&amp;device=NetrixHiTouch</profile>\n"
-                        +
+                "<message from='pubsub.btp194094' to='ucwa.btp194094' id='Sma0SFtv'>\n" +
+                        "  <event xmlns='http://jabber.org/protocol/pubsub#event'>\n" +
+                        "    <items node='sip:6004@uta.bt.com-DirectDial-1sales1@btsm2'>\n" +
+                        "      <item id='sip:6004@uta.bt.com-DirectDial-1sales1@btsm2'>\n" +
+                        "        <devicestatus xmlns='http://xmpp.org/protocol/openlink:01:00:00#device-status'>\n" +
+                        "          <profile online='true'>/netrix/Cluster1|/uta/enterprises/bt/users/Sales1/denormalised-profiles/UCSales1/versions/72?build=70&amp;location=global.uk.Ipswich&amp;device=NetrixHiTouch</profile>\n" +
                         "          <interest id='sip:6004@uta.bt.com-DirectDial-1sales1@btsm2' online='true'/>\n" +
                         "        </devicestatus>\n" +
                         "      </item>\n" +
@@ -272,10 +272,15 @@ public class CallStatusMessageTest {
                 "        <callstatus xmlns='http://xmpp.org/protocol/openlink:01:00:00#call-status'>\n" +
                 "          <call>\n" +
                 "            <id>" + Fixtures.CALL_ID + "</id>\n" +
+                "           <site default=\"true\" id=\"42\" type=\"BTSM\">test-site-name</site>" +
                 "            <profile>" + Fixtures.PROFILE_ID + "</profile>\n" +
                 "            <interest>" + Fixtures.INTEREST_ID + "</interest>\n" +
                 "            <state>CallOriginated</state>\n" +
                 "            <direction>Incoming</direction>\n" +
+                "            <duration>0</duration>\n" +
+                "            <actions>\n" +
+                "              <AnswerCall/>\n" +
+                "            </actions>\n" +
                 "          </call>\n" +
                 "        </callstatus>\n" +
                 "      </item>\n" +
@@ -336,6 +341,7 @@ public class CallStatusMessageTest {
                         "            <interest>" + Fixtures.INTEREST_ID + "</interest>\n" +
                         "            <state>CallOriginated</state>\n" +
                         "            <direction>Incoming</direction>\n" +
+                        "            <duration>0</duration>\n" +
                         "          </call>\n" +
                         "        </callstatus>\n" +
                         "      </item>\n" +

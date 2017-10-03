@@ -17,7 +17,7 @@ public final class PubSubNodeId extends AbstractType<String> {
     }
 
     @Nonnull
-    public InterestId toPubSubNodeId() {
+    public InterestId toInterestId() {
         return InterestId.from(value()).orElseThrow(() -> new IllegalStateException("Unable to convert PubSubNodeId to InterestId"));
     }
 

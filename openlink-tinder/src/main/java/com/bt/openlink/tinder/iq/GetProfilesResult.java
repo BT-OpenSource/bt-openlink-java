@@ -36,15 +36,7 @@ public class GetProfilesResult extends OpenlinkIQ {
             profile.getDevice().ifPresent(device -> profileElement.addAttribute("device", device));
             profile.getLabel().ifPresent(label -> profileElement.addAttribute(ATTRIBUTE_LABEL, label));
             profile.isOnline().ifPresent(online -> profileElement.addAttribute("online", String.valueOf(online)));
-            final Optional<Site> optionalSite = profile.getSite();
-            if (optionalSite.isPresent()) {
-                final Site site = optionalSite.get();
-                final Element siteElement = profileElement.addElement("site");
-                site.getId().ifPresent(id -> siteElement.addAttribute("id", String.valueOf(id)));
-                site.isDefault().ifPresent(isDefault -> siteElement.addAttribute(ATTRIBUTE_DEFAULT, String.valueOf(isDefault)));
-                site.getType().ifPresent(type -> siteElement.addAttribute("type", type.name()));
-                site.getName().ifPresent(siteElement::setText);
-            }
+            profile.getSite().ifPresent(site -> TinderPacketUtil.addSite(profileElement, site));
             final Element actionsElement = profileElement.addElement("actions");
             for (final RequestAction requestAction : profile.getActions()) {
                 final Element actionElement = actionsElement.addElement("action");
@@ -76,18 +68,8 @@ public class GetProfilesResult extends OpenlinkIQ {
                 label.ifPresent(profileBuilder::setLabel);
                 final Optional<Boolean> online = TinderPacketUtil.getBooleanAttribute(profileElement, "online", true, DESCRIPTION, parseErrors);
                 online.ifPresent(profileBuilder::setOnline);
-                final Element siteElement = profileElement.element("site");
-                if (siteElement != null) {
-                    final Site.Builder siteBuilder = Site.Builder.start()
-                            .setName(siteElement.getText());
-                    final Optional<Long> id = TinderPacketUtil.getLongAttribute(siteElement, "id", true, DESCRIPTION, parseErrors);
-                    id.ifPresent(siteBuilder::setId);
-                    final Optional<Boolean> isDefaultSite = TinderPacketUtil.getBooleanAttribute(siteElement, ATTRIBUTE_DEFAULT, false, DESCRIPTION, parseErrors);
-                    isDefaultSite.ifPresent(siteBuilder::setDefault);
-                    final Optional<Site.Type> type = Site.Type.from(TinderPacketUtil.getStringAttribute(siteElement, "type", true, DESCRIPTION, parseErrors).orElse(null));
-                    type.ifPresent(siteBuilder::setType);
-                    profileBuilder.setSite(siteBuilder.build(parseErrors));
-                }
+                final Optional<Site> site = TinderPacketUtil.getSite(profileElement, DESCRIPTION, parseErrors);
+                site.ifPresent(profileBuilder::setSite);
                 final Element actionsElement = TinderPacketUtil.getChildElement(profileElement, "actions");
                 if (actionsElement != null) {
                     final List<Element> actionElements = actionsElement.elements("action");

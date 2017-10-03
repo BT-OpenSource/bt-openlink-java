@@ -17,11 +17,7 @@ import org.xmpp.packet.Message;
 import com.bt.openlink.OpenlinkXmppNamespace;
 import com.bt.openlink.tinder.internal.TinderPacketUtil;
 import com.bt.openlink.type.Call;
-import com.bt.openlink.type.CallDirection;
-import com.bt.openlink.type.CallId;
-import com.bt.openlink.type.CallState;
 import com.bt.openlink.type.InterestId;
-import com.bt.openlink.type.ProfileId;
 import com.bt.openlink.type.PubSubNodeId;
 
 public class CallStatusMessage extends Message {
@@ -53,16 +49,7 @@ public class CallStatusMessage extends Message {
         if (pubSubNodeId != null) {
             itemsElement.addAttribute("node", pubSubNodeId.value());
         }
-        final Element itemElement = itemsElement.addElement("item");
-        final Element callStatusElement = itemElement.addElement("callstatus", OpenlinkXmppNamespace.OPENLINK_CALL_STATUS.uri());
-        calls.forEach(call -> {
-            final Element callElement = callStatusElement.addElement("call");
-            call.getId().ifPresent(callId -> callElement.addElement("id").setText(callId.value()));
-            call.getProfileId().ifPresent(profileId -> callElement.addElement("profile").setText(profileId.value()));
-            call.getInterestId().ifPresent(interestId -> callElement.addElement("interest").setText(interestId.value()));
-            call.getState().ifPresent(state -> callElement.addElement("state").setText(state.getLabel()));
-            call.getDirection().ifPresent(direction -> callElement.addElement("direction").setText(direction.getLabel()));
-        });
+        TinderPacketUtil.addItemCallStatusCalls(itemsElement, calls);
         if (delay != null) {
             messageElement.addElement("delay", "urn:xmpp:delay").addAttribute("stamp", delay.toString());
         }
@@ -88,33 +75,17 @@ public class CallStatusMessage extends Message {
         return calls;
     }
 
-    @SuppressWarnings("unchecked")
     @Nonnull
     public static CallStatusMessage from(@Nonnull final Message message) {
-        final List<String> parseErrors = new ArrayList<>();
-        final Element itemsElement = message.getChildElement("event", "http://jabber.org/protocol/pubsub#event").element("items");
-        final Element callStatusElement = itemsElement.element("item").element("callstatus");
         final Builder builder = Builder.start()
                 .setID(message.getID())
                 .setFrom(message.getFrom())
                 .setTo(message.getTo());
+        final List<String> parseErrors = new ArrayList<>();
+        final Element itemsElement = message.getChildElement("event", "http://jabber.org/protocol/pubsub#event").element("items");
         final Optional<PubSubNodeId> node = PubSubNodeId.from(itemsElement.attributeValue("node"));
         node.ifPresent(builder::setPubSubNodeId);
-        final List<Element> callElements = callStatusElement.elements("call");
-        for (final Element callElement : callElements) {
-            final Call.Builder callBuilder = Call.Builder.start();
-            final Optional<CallId> callId = CallId.from(TinderPacketUtil.getChildElementString(callElement, "id", true, STANZA_DESCRIPTION, parseErrors));
-            callId.ifPresent(callBuilder::setId);
-            final Optional<ProfileId> profileId = ProfileId.from(TinderPacketUtil.getChildElementString(callElement, "profile", true, STANZA_DESCRIPTION, parseErrors));
-            profileId.ifPresent(callBuilder::setProfileId);
-            final Optional<InterestId> interestId = InterestId.from(TinderPacketUtil.getChildElementString(callElement, "interest", true, STANZA_DESCRIPTION, parseErrors));
-            interestId.ifPresent(callBuilder::setInterestId);
-            final Optional<CallState> state = CallState.from(TinderPacketUtil.getChildElementString(callElement, "state", true, STANZA_DESCRIPTION, parseErrors));
-            state.ifPresent(callBuilder::setState);
-            final Optional<CallDirection> direction = CallDirection.from(TinderPacketUtil.getChildElementString(callElement, "direction", true, STANZA_DESCRIPTION, parseErrors));
-            direction.ifPresent(callBuilder::setDirection);
-            builder.addCall(callBuilder.build(parseErrors));
-        }
+        builder.addCalls(TinderPacketUtil.getCalls(itemsElement, STANZA_DESCRIPTION, parseErrors));
         final Element delayElement = message.getChildElement("delay", "urn:xmpp:delay");
         final Optional<String> stampOptional = TinderPacketUtil.getStringAttribute(delayElement, "stamp");
         if (stampOptional.isPresent()) {
@@ -201,6 +172,11 @@ public class CallStatusMessage extends Message {
         @Nonnull
         public Builder addCall(@Nonnull final Call call) {
             calls.add(call);
+            return this;
+        }
+
+        public Builder addCalls(final List<Call> calls) {
+            this.calls.addAll(calls);
             return this;
         }
     }

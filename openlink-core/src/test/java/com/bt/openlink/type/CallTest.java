@@ -22,13 +22,16 @@ public class CallTest {
 
         final Call call = Call.Builder.start()
                 .setId(Fixtures.CALL_ID)
+                .setSite(Fixtures.SITE)
                 .setProfileId(Fixtures.PROFILE_ID)
                 .setInterestId(Fixtures.INTEREST_ID)
                 .setState(CallState.CALL_ORIGINATED)
                 .setDirection(CallDirection.INCOMING)
+                .setDuration(1)
                 .build();
 
         assertThat(call.getId().get(), is(Fixtures.CALL_ID));
+        assertThat(call.getSite().get(), is(Fixtures.SITE));
         assertThat(call.getProfileId().get(), is(Fixtures.PROFILE_ID));
         assertThat(call.getInterestId().get(), is(Fixtures.INTEREST_ID));
         assertThat(call.getState().get(), is(CallState.CALL_ORIGINATED));
@@ -43,10 +46,28 @@ public class CallTest {
         expectedException.expectMessage("The call id has not been set");
 
         Call.Builder.start()
+                .setSite(Fixtures.SITE)
                 .setProfileId(Fixtures.PROFILE_ID)
                 .setInterestId(Fixtures.INTEREST_ID)
                 .setState(CallState.CALL_ORIGINATED)
                 .setDirection(CallDirection.INCOMING)
+                .setDuration(1)
+                .build();
+    }
+
+    @Test
+    public void willNotCreateACallWithoutASite() throws Exception {
+
+        expectedException.expect(IllegalStateException.class);
+        expectedException.expectMessage("The call site has not been set");
+
+        Call.Builder.start()
+                .setId(Fixtures.CALL_ID)
+                .setProfileId(Fixtures.PROFILE_ID)
+                .setInterestId(Fixtures.INTEREST_ID)
+                .setState(CallState.CALL_ORIGINATED)
+                .setDirection(CallDirection.INCOMING)
+                .setDuration(1)
                 .build();
     }
 
@@ -58,9 +79,11 @@ public class CallTest {
 
         Call.Builder.start()
                 .setId(Fixtures.CALL_ID)
+                .setSite(Fixtures.SITE)
                 .setInterestId(Fixtures.INTEREST_ID)
                 .setState(CallState.CALL_ORIGINATED)
                 .setDirection(CallDirection.INCOMING)
+                .setDuration(1)
                 .build();
     }
 
@@ -72,9 +95,11 @@ public class CallTest {
 
         Call.Builder.start()
                 .setId(Fixtures.CALL_ID)
+                .setSite(Fixtures.SITE)
                 .setProfileId(Fixtures.PROFILE_ID)
                 .setState(CallState.CALL_ORIGINATED)
                 .setDirection(CallDirection.INCOMING)
+                .setDuration(1)
                 .build();
 
     }
@@ -87,9 +112,11 @@ public class CallTest {
 
         Call.Builder.start()
                 .setId(Fixtures.CALL_ID)
+                .setSite(Fixtures.SITE)
                 .setProfileId(Fixtures.PROFILE_ID)
                 .setInterestId(Fixtures.INTEREST_ID)
                 .setDirection(CallDirection.INCOMING)
+                .setDuration(1)
                 .build();
     }
 
@@ -101,9 +128,27 @@ public class CallTest {
 
         Call.Builder.start()
                 .setId(Fixtures.CALL_ID)
+                .setSite(Fixtures.SITE)
                 .setProfileId(Fixtures.PROFILE_ID)
                 .setInterestId(Fixtures.INTEREST_ID)
                 .setState(CallState.CALL_ORIGINATED)
+                .setDuration(1)
+                .build();
+    }
+
+    @Test
+    public void willNotCreateACallWithoutADuration() throws Exception {
+
+        expectedException.expect(IllegalStateException.class);
+        expectedException.expectMessage("The call duration has not been set");
+
+        Call.Builder.start()
+                .setId(Fixtures.CALL_ID)
+                .setSite(Fixtures.SITE)
+                .setProfileId(Fixtures.PROFILE_ID)
+                .setInterestId(Fixtures.INTEREST_ID)
+                .setState(CallState.CALL_ORIGINATED)
+                .setDirection(CallDirection.INCOMING)
                 .build();
     }
 
@@ -113,10 +158,12 @@ public class CallTest {
                 .build(new ArrayList<>());
 
         assertThat(call.getId(), is(Optional.empty()));
+        assertThat(call.getSite(), is(Optional.empty()));
         assertThat(call.getProfileId(), is(Optional.empty()));
         assertThat(call.getInterestId(), is(Optional.empty()));
         assertThat(call.getState(), is(Optional.empty()));
         assertThat(call.getDirection(), is(Optional.empty()));
+        assertThat(call.getDuration(), is(Optional.empty()));
         assertThat(call.isParticipating(), is(false));
     }
 }

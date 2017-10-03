@@ -1,6 +1,7 @@
 package com.bt.openlink.type;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -13,17 +14,23 @@ public class Call {
 
     @Nonnull private final List<String> parseErrors;
     @Nullable private final CallId callId;
+    @Nullable private final Site site;
     @Nullable private final ProfileId profileId;
     @Nullable private final InterestId interestId;
     @Nullable private final CallState state;
     @Nullable private final CallDirection direction;
+    @Nullable private final Long duration;
+    @Nonnull private final Collection<RequestAction> actions;
 
     private Call(@Nonnull final Builder builder, @Nullable final List<String> parseErrors) {
         this.callId = builder.callId;
+        this.site = builder.site;
         this.profileId = builder.profileId;
         this.interestId = builder.interestId;
         this.state = builder.state;
         this.direction = builder.direction;
+        this.duration = builder.duration;
+        this.actions = Collections.unmodifiableCollection(builder.actions);
         if (parseErrors == null) {
             this.parseErrors = Collections.emptyList();
         } else {
@@ -39,6 +46,11 @@ public class Call {
     @Nonnull
     public Optional<CallId> getId() {
         return Optional.ofNullable(callId);
+    }
+
+    @Nonnull
+    public Optional<Site> getSite() {
+        return Optional.ofNullable(site);
     }
 
     @Nonnull
@@ -61,16 +73,29 @@ public class Call {
         return Optional.ofNullable(direction);
     }
 
+    @Nonnull
+    public Optional<Long> getDuration() {
+        return Optional.ofNullable(duration);
+    }
+
+    @Nonnull
+    public Collection<RequestAction> getActions() {
+        return actions;
+    }
+
     public boolean isParticipating() {
         return state != null && direction != null && state.isParticipating(direction);
     }
 
     public static final class Builder {
         @Nullable private CallId callId;
+        @Nullable private Site site;
         @Nullable private ProfileId profileId;
         @Nullable private InterestId interestId;
         @Nullable private CallState state;
         @Nullable private CallDirection direction;
+        @Nullable private Long duration;
+        @Nonnull private final List<RequestAction> actions = new ArrayList<>();
 
         private Builder() {
         }
@@ -85,6 +110,9 @@ public class Call {
             if (callId == null) {
                 throw new IllegalStateException("The call id has not been set");
             }
+            if (site == null) {
+                throw new IllegalStateException("The call site has not been set");
+            }
             if (profileId == null) {
                 throw new IllegalStateException("The profile id has not been set");
             }
@@ -96,6 +124,9 @@ public class Call {
             }
             if (direction == null) {
                 throw new IllegalStateException("The call direction has not been set");
+            }
+            if (duration == null) {
+                throw new IllegalStateException("The call duration has not been set");
             }
 
             return build(null);
@@ -109,6 +140,12 @@ public class Call {
         @Nonnull
         public Builder setId(@Nonnull final CallId callId) {
             this.callId = callId;
+            return this;
+        }
+
+        @Nonnull
+        public Builder setSite(@Nonnull final Site site) {
+            this.site = site;
             return this;
         }
 
@@ -133,6 +170,18 @@ public class Call {
         @Nonnull
         public Builder setDirection(@Nonnull final CallDirection direction) {
             this.direction = direction;
+            return this;
+        }
+
+        @Nonnull
+        public Builder setDuration(final long duration) {
+            this.duration = duration;
+            return this;
+        }
+
+        @Nonnull
+        public Builder addAction(@Nonnull final RequestAction action) {
+            actions.add(action);
             return this;
         }
 

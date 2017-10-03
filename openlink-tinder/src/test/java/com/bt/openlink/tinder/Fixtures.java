@@ -20,6 +20,8 @@ import com.bt.openlink.type.InterestId;
 import com.bt.openlink.type.InterestType;
 import com.bt.openlink.type.ProfileId;
 import com.bt.openlink.type.PubSubNodeId;
+import com.bt.openlink.type.RequestAction;
+import com.bt.openlink.type.Site;
 
 @SuppressWarnings("ConstantConditions")
 public final class Fixtures {
@@ -40,12 +42,21 @@ public final class Fixtures {
             .setLabel("test-default-interest")
             .setType(InterestType.from("test-interest-type").get())
             .build();
+    public static Site SITE = Site.Builder.start()
+            .setId(42)
+            .setType(Site.Type.BTSM)
+            .setName("test-site-name")
+            .setDefault(true)
+            .build();
     public static final Call CALL = Call.Builder.start()
             .setId(CALL_ID)
+            .setSite(SITE)
             .setProfileId(PROFILE_ID)
             .setInterestId(INTEREST_ID)
             .setState(CallState.CALL_ORIGINATED)
             .setDirection(CallDirection.INCOMING)
+            .setDuration(0)
+            .addAction(RequestAction.ANSWER_CALL)
             .build();
 
     public static final PubSubNodeId NODE_ID = INTEREST_ID.toPubSubNodeId();

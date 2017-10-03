@@ -89,6 +89,8 @@ public final class OpenlinkIQParser {
             return PubSubSubscribeRequest.from(iq);
         case "unsubscribe":
             return PubSubUnsubscribeRequest.from(iq);
+        case "publish":
+            return PubSubPublishRequest.from(iq);
         default:
             return iq;
         }
