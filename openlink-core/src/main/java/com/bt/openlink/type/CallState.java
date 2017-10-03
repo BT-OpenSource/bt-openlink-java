@@ -30,8 +30,7 @@ public enum CallState {
     CONNECTION_CLEARED("ConnectionCleared", false, false),
     CALL_MISSED("CallMissed", false, false);
 
-    @Nonnull
-    private final String label;
+    @Nonnull private final String label;
     private final boolean inboundCallParticipant;
     private final boolean outboundCallParticipant;
 
@@ -40,7 +39,6 @@ public enum CallState {
         this.inboundCallParticipant = inboundCallParticipant;
         this.outboundCallParticipant = outboundCallParticipant;
     }
-
 
     @Nonnull
     public String getLabel() {
@@ -65,14 +63,13 @@ public enum CallState {
      * @return true if the user is participating in that call
      */
     public boolean isParticipating(@Nonnull final CallDirection callDirection) {
-        switch (callDirection) {
-            case INCOMING:
-                return inboundCallParticipant;
-            case OUTGOING:
-                return outboundCallParticipant;
+        if (callDirection == CallDirection.INCOMING) {
+            return inboundCallParticipant;
+        } else if (callDirection == CallDirection.OUTGOING) {
+            return outboundCallParticipant;
+        } else {
+            throw new IllegalStateException("Unable to determine the participation state for call direction " + callDirection);
         }
-        throw new IllegalStateException("Unable to determine the participation state for call direction " + callDirection);
     }
-
 
 }
