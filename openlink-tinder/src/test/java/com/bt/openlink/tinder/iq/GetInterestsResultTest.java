@@ -96,7 +96,7 @@ public class GetInterestsResultTest {
         expectedException.expectMessage("The interest id must be unique");
         final Interest interest = Interest.Builder.start()
                 .setId(Fixtures.INTEREST_ID)
-                .build();
+                .buildWithoutValidating();
         GetInterestsResult.Builder.start()
                 .setID(Fixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)

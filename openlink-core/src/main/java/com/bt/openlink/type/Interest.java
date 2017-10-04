@@ -38,26 +38,6 @@ public final class Interest {
         return Optional.ofNullable(isDefault);
     }
 
-//    @Override
-//    public boolean equals(final Object o) {
-//        if (this == o) {
-//            return true;
-//        }
-//        if (!(o instanceof Interest)) {
-//            return false;
-//        }
-//        final Interest that = (Interest) o;
-//        return Objects.equals(this.interestId, that.interestId) &&
-//                Objects.equals(this.interestType, that.interestType) &&
-//                Objects.equals(this.label, that.label) &&
-//                Objects.equals(this.isDefault, that.isDefault);
-//    }
-//
-//    @Override
-//    public int hashCode() {
-//        return Objects.hash(interestId, interestType, label, isDefault);
-//    }
-//
     @Override
     public String toString() {
         return "Interest[" +
@@ -85,11 +65,24 @@ public final class Interest {
 
         @Nonnull
         public Interest build() {
+            if (interestId == null) {
+                throw new IllegalStateException("The interest id has not been set");
+            }
+            if (interestType == null) {
+                throw new IllegalStateException("The interest type has not been set");
+            }
+            if (label == null) {
+                throw new IllegalStateException("The interest label has not been set");
+            }
+            if (isDefault == null) {
+                throw new IllegalStateException("The interest default indicator has not been set");
+            }
+
             return buildWithoutValidating();
         }
 
         @Nonnull
-        private Interest buildWithoutValidating() {
+        public Interest buildWithoutValidating() {
             return new Interest(this);
         }
 

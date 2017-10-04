@@ -60,7 +60,7 @@ public final class Feature {
         }
 
         @Nonnull
-        private Feature buildWithoutValidating() {
+        public Feature buildWithoutValidating() {
             return new Feature(this);
         }
 
