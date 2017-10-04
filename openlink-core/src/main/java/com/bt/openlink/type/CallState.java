@@ -65,10 +65,8 @@ public enum CallState {
     public boolean isParticipating(@Nonnull final CallDirection callDirection) {
         if (callDirection == CallDirection.INCOMING) {
             return inboundCallParticipant;
-        } else if (callDirection == CallDirection.OUTGOING) {
-            return outboundCallParticipant;
         } else {
-            throw new IllegalStateException("Unable to determine the participation state for call direction " + callDirection);
+            return outboundCallParticipant;
         }
     }
 
