@@ -76,7 +76,7 @@ public class GetFeaturesResult extends OpenlinkIQ {
                 featureType.ifPresent(featureBuilder::setType);
                 final Optional<String> label = Optional.ofNullable(TinderPacketUtil.getStringAttribute(featureElement, "label", true, DESCRIPTION, parseErrors).orElse(null));
                 label.ifPresent(featureBuilder::setLabel);
-                builder.addFeature(featureBuilder.build());
+                builder.addFeature(featureBuilder.buildWithoutValidating());
             }
         }
 
