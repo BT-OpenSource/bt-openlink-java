@@ -282,17 +282,23 @@ public final class TinderPacketUtil {
             call.getDirection().ifPresent(direction -> callElement.addElement("direction").setText(direction.getLabel()));
             call.getStartTime().ifPresent(startTime -> callElement.addElement("starttime").setText(ISO_8601_FORMATTER.format(startTime.atZone(ZoneOffset.UTC))));
             call.getDuration().ifPresent(duration -> callElement.addElement("duration").setText(String.valueOf(duration.toMillis())));
-            final Element actionsElement = callElement.addElement("actions");
-            call.getActions().forEach(action -> actionsElement.addElement(action.getId()));
-            final Element participantsElement = callElement.addElement("participants");
-            call.getParticipants().forEach(participant -> {
-                final Element participantElement = participantsElement.addElement("participant");
-                participant.getJID().ifPresent(jid -> participantElement.addAttribute("jid", jid));
-                participant.getType().ifPresent(type -> participantElement.addAttribute("type", type.getId()));
-                participant.getDirection().ifPresent(direction -> participantElement.addAttribute("direction", direction.getLabel()));
-                participant.getStartTime().ifPresent(startTime -> participantElement.addAttribute("starttime", ISO_8601_FORMATTER.format(startTime.atZone(ZoneOffset.UTC))));
-                participant.getDuration().ifPresent(duration -> participantElement.addAttribute("duration", String.valueOf(duration.toMillis())));
-            });
+            final Collection<RequestAction> actions = call.getActions();
+            if (!actions.isEmpty()) {
+                final Element actionsElement = callElement.addElement("actions");
+                actions.forEach(action -> actionsElement.addElement(action.getId()));
+            }
+            final List<Participant> participants = call.getParticipants();
+            if (!participants.isEmpty()) {
+                final Element participantsElement = callElement.addElement("participants");
+                participants.forEach(participant -> {
+                    final Element participantElement = participantsElement.addElement("participant");
+                    participant.getJID().ifPresent(jid -> participantElement.addAttribute("jid", jid));
+                    participant.getType().ifPresent(type -> participantElement.addAttribute("type", type.getId()));
+                    participant.getDirection().ifPresent(direction -> participantElement.addAttribute("direction", direction.getLabel()));
+                    participant.getStartTime().ifPresent(startTime -> participantElement.addAttribute("starttime", ISO_8601_FORMATTER.format(startTime.atZone(ZoneOffset.UTC))));
+                    participant.getDuration().ifPresent(duration -> participantElement.addAttribute("duration", String.valueOf(duration.toMillis())));
+                });
+            }
         });
     }
 
