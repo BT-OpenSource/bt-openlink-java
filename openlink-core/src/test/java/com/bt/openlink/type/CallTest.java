@@ -1,6 +1,7 @@
 package com.bt.openlink.type;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.empty;
 import static org.junit.Assert.assertThat;
 
@@ -25,7 +26,6 @@ public class CallTest {
     @Test
     public void willCreateACall() throws Exception {
 
-
         final Call call = Call.Builder.start()
                 .setId(Fixtures.CALL_ID)
                 .setSite(Fixtures.SITE)
@@ -36,6 +36,7 @@ public class CallTest {
                 .setStartTime(startTime)
                 .setDuration(duration)
                 .addAction(RequestAction.ANSWER_CALL)
+                .addParticipant(Fixtures.PARTICIPANT)
                 .build();
 
         assertThat(call.getId().get(), is(Fixtures.CALL_ID));
@@ -47,8 +48,8 @@ public class CallTest {
         assertThat(call.getStartTime().get(), is(startTime));
         assertThat(call.getDuration().get(), is(duration));
         assertThat(call.isParticipating(), is(false));
-        assertThat(call.getActions().size(),is(1));
-        assertThat(call.getActions().iterator().next(),is(RequestAction.ANSWER_CALL));
+        assertThat(call.getActions(), contains(RequestAction.ANSWER_CALL));
+        assertThat(call.getParticipants(), contains(Fixtures.PARTICIPANT));
     }
 
     @Test
@@ -211,5 +212,6 @@ public class CallTest {
         assertThat(call.getDuration(), is(Optional.empty()));
         assertThat(call.isParticipating(), is(false));
         assertThat(call.getActions(), is(empty()));
+        assertThat(call.getParticipants(), is(empty()));
     }
 }

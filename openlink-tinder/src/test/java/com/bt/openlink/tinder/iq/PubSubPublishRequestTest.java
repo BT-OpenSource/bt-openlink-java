@@ -145,6 +145,9 @@ public class PubSubPublishRequestTest {
                 "            <actions>\n" +
                 "              <AnswerCall/>\n" +
                 "            </actions>\n" +
+                "            <participants>\n" +
+                "              <participant direction='Incoming' jid='test-user@test-domain' starttime='2017-10-09T08:07:00.000Z' duration='60000' type='Active'/>\n" +
+                "            </participants>\n" +
                 "          </call>\n" +
                 "        </callstatus>\n" +
                 "      </item>\n" +
@@ -199,6 +202,9 @@ public class PubSubPublishRequestTest {
                 "            <actions>\n" +
                 "              <AnswerCall/>\n" +
                 "            </actions>\n" +
+                "            <participants>\n" +
+                "              <participant direction='Incoming' jid='test-user@test-domain' starttime='2017-10-09T08:07:00.000Z' duration='60000' type='Active'/>\n" +
+                "            </participants>\n" +
                 "          </call>\n" +
                 "        </callstatus>\n" +
                 "      </item>\n" +

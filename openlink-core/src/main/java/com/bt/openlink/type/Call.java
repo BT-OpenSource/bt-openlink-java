@@ -23,6 +23,7 @@ public class Call {
     @Nullable private final Instant startTime;
     @Nullable private final Duration duration;
     @Nonnull private final Collection<RequestAction> actions;
+    @Nonnull private final List<Participant> participants;
 
     private Call(@Nonnull final Builder builder) {
         this.callId = builder.callId;
@@ -34,6 +35,7 @@ public class Call {
         this.startTime = builder.startTime;
         this.duration = builder.duration;
         this.actions = Collections.unmodifiableCollection(builder.actions);
+        this.participants = Collections.unmodifiableList(builder.participants);
     }
 
     @Nonnull
@@ -81,6 +83,11 @@ public class Call {
         return actions;
     }
 
+    @Nonnull
+    public List<Participant> getParticipants() {
+        return participants;
+    }
+
     public boolean isParticipating() {
         return state != null && direction != null && state.isParticipating(direction);
     }
@@ -95,6 +102,7 @@ public class Call {
         @Nullable private Instant startTime;
         @Nullable private Duration duration;
         @Nonnull private final List<RequestAction> actions = new ArrayList<>();
+        @Nonnull private final List<Participant> participants = new ArrayList<>();
 
         private Builder() {
         }
@@ -124,7 +132,7 @@ public class Call {
             if (direction == null) {
                 throw new IllegalStateException("The call direction has not been set");
             }
-            if(startTime == null ) {
+            if (startTime == null) {
                 throw new IllegalStateException("The call start time has not been set");
             }
             if (duration == null) {
@@ -190,6 +198,12 @@ public class Call {
         @Nonnull
         public Builder addAction(@Nonnull final RequestAction action) {
             actions.add(action);
+            return this;
+        }
+
+        @Nonnull
+        public Builder addParticipant(@Nonnull final Participant participant) {
+            participants.add(participant);
             return this;
         }
 

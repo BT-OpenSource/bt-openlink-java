@@ -173,7 +173,7 @@ public class CallStatusMessageTest {
                 "        <callstatus xmlns='http://xmpp.org/protocol/openlink:01:00:00#call-status'>\n" +
                 "          <call>\n" +
                 "            <id>" + Fixtures.CALL_ID + "</id>\n" +
-                "            <site default=\"true\" id=\"42\" type=\"BTSM\">test-site-name</site>" +
+                "            <site default='true' id='42' type='BTSM'>test-site-name</site>" +
                 "            <profile>" + Fixtures.PROFILE_ID + "</profile>\n" +
                 "            <interest>" + Fixtures.INTEREST_ID + "</interest>\n" +
                 "            <state>CallOriginated</state>\n" +
@@ -183,6 +183,9 @@ public class CallStatusMessageTest {
                 "            <actions>\n" +
                 "              <AnswerCall/>\n" +
                 "            </actions>\n" +
+                "            <participants>\n" +
+                "              <participant direction='Incoming' jid='test-user@test-domain' starttime='2017-10-09T08:07:00.000Z' duration='60000' type='Active'/>\n" +
+                "            </participants>\n" +
                 "          </call>\n" +
                 "        </callstatus>\n" +
                 "      </item>\n" +
@@ -277,7 +280,7 @@ public class CallStatusMessageTest {
                 "        <callstatus xmlns='http://xmpp.org/protocol/openlink:01:00:00#call-status'>\n" +
                 "          <call>\n" +
                 "            <id>" + Fixtures.CALL_ID + "</id>\n" +
-                "           <site default=\"true\" id=\"42\" type=\"BTSM\">test-site-name</site>" +
+                "           <site default='true' id='42' type='BTSM'>test-site-name</site>" +
                 "            <profile>" + Fixtures.PROFILE_ID + "</profile>\n" +
                 "            <interest>" + Fixtures.INTEREST_ID + "</interest>\n" +
                 "            <state>CallOriginated</state>\n" +
@@ -287,6 +290,9 @@ public class CallStatusMessageTest {
                 "            <actions>\n" +
                 "              <AnswerCall/>\n" +
                 "            </actions>\n" +
+                "            <participants>\n" +
+                "              <participant direction='Incoming' jid='test-user@test-domain' starttime='2017-10-09T08:07:00.000Z' duration='60000' type='Active'/>\n" +
+                "            </participants>\n" +
                 "          </call>\n" +
                 "        </callstatus>\n" +
                 "      </item>\n" +
@@ -366,7 +372,7 @@ public class CallStatusMessageTest {
         assertThat(parseErrors.get(i++), is("Invalid Call status message; missing 'interest' field is mandatory"));
         assertThat(parseErrors.get(i++), is("Invalid Call status message; missing 'state' field is mandatory"));
         assertThat(parseErrors.get(i++), is("Invalid Call status message; missing 'direction' field is mandatory"));
-        assertThat(parseErrors.get(i++), is("Invalid Call status message; Unable to parse starttime 'yesterday'"));
+        assertThat(parseErrors.get(i++), is("Invalid Call status message; invalid starttime 'yesterday'; format should be compliant with XEP-0082"));
         assertThat(parseErrors.get(i++), is("Invalid Call status message; invalid duration 'a while'; please supply an integer"));
         assertThat(parseErrors.get(i++), is("Invalid Call status message; invalid timestamp 'not-a-timestamp'; format should be compliant with XEP-0082"));
         assertThat(parseErrors.size(),is(i));

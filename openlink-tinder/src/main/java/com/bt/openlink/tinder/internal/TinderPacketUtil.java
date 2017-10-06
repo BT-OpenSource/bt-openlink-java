@@ -25,6 +25,8 @@ import com.bt.openlink.type.CallDirection;
 import com.bt.openlink.type.CallId;
 import com.bt.openlink.type.CallState;
 import com.bt.openlink.type.InterestId;
+import com.bt.openlink.type.Participant;
+import com.bt.openlink.type.ParticipantType;
 import com.bt.openlink.type.ProfileId;
 import com.bt.openlink.type.RequestAction;
 import com.bt.openlink.type.Site;
@@ -149,11 +151,11 @@ public final class TinderPacketUtil {
             @Nonnull final String stanzaDescription,
             @Nonnull final List<String> parseErrors) {
         final String childElementText = getChildElementString(parentElement, childElementName, isRequired, stanzaDescription, parseErrors);
-        if(childElementText != null) {
-            try{
+        if (childElementText != null) {
+            try {
                 return Optional.of(Instant.parse(childElementText));
-            } catch(final DateTimeParseException ignored) {
-                parseErrors.add(String.format("Invalid %s; Unable to parse %s '%s'", stanzaDescription, childElementName, childElementText));
+            } catch (final DateTimeParseException ignored) {
+                parseErrors.add(String.format("Invalid %s; invalid %s '%s'; format should be compliant with XEP-0082", stanzaDescription, childElementName, childElementText));
             }
         }
         return Optional.empty();
@@ -204,13 +206,26 @@ public final class TinderPacketUtil {
     }
 
     @Nonnull
-    public static Optional<Long> getLongAttribute(final Element siteElement, final String id, final boolean isRequired, final String description, final List<String> parseErrors) {
-        final Optional<String> stringValue = getStringAttribute(siteElement, id, isRequired, description, parseErrors);
+    public static Optional<Long> getLongAttribute(final Element parentElement, final String attributeName, final boolean isRequired, final String description, final List<String> parseErrors) {
+        final Optional<String> stringValue = getStringAttribute(parentElement, attributeName, isRequired, description, parseErrors);
         try {
             return stringValue.map(Long::valueOf);
         } catch (final NumberFormatException e) {
+            parseErrors.add(String.format("Invalid %s; Unable to parse number attribute %s: '%s'", description, attributeName, stringValue));
             return Optional.empty();
         }
+    }
+
+    private static Optional<Instant> getISO8601Attribute(final Element parentElement, final String attributeName, final boolean isRequired, final String description, final List<String> parseErrors) {
+        final Optional<String> stringValue = getStringAttribute(parentElement, attributeName, isRequired, description, parseErrors);
+        try {
+            if (stringValue.isPresent()) {
+                return Optional.ofNullable(Instant.parse(stringValue.get()));
+            }
+        } catch (final DateTimeParseException ignored) {
+            parseErrors.add(String.format("Invalid %s; invalid %s '%s'; format should be compliant with XEP-0082", description, attributeName, stringValue));
+        }
+        return Optional.empty();
     }
 
     @Nonnull
@@ -269,6 +284,15 @@ public final class TinderPacketUtil {
             call.getDuration().ifPresent(duration -> callElement.addElement("duration").setText(String.valueOf(duration.toMillis())));
             final Element actionsElement = callElement.addElement("actions");
             call.getActions().forEach(action -> actionsElement.addElement(action.getId()));
+            final Element participantsElement = callElement.addElement("participants");
+            call.getParticipants().forEach(participant -> {
+                final Element participantElement = participantsElement.addElement("participant");
+                participant.getJID().ifPresent(jid -> participantElement.addAttribute("jid", jid));
+                participant.getType().ifPresent(type -> participantElement.addAttribute("type", type.getId()));
+                participant.getDirection().ifPresent(direction -> participantElement.addAttribute("direction", direction.getLabel()));
+                participant.getStartTime().ifPresent(startTime -> participantElement.addAttribute("starttime", ISO_8601_FORMATTER.format(startTime.atZone(ZoneOffset.UTC))));
+                participant.getDuration().ifPresent(duration -> participantElement.addAttribute("duration", String.valueOf(duration.toMillis())));
+            });
         });
     }
 
@@ -328,8 +352,28 @@ public final class TinderPacketUtil {
                     action.ifPresent(callBuilder::addAction);
                 }
             }
+            final Element participantsElement = callElement.element("participants");
+            if (participantsElement != null) {
+                final List<Element> participantElements = participantsElement.elements("participant");
+                for (final Element participantElement : participantElements) {
+                    final Participant.Builder participantBuilder = Participant.Builder.start();
+                    final Optional<String> jid = getStringAttribute(participantElement, "jid", true, description, parseErrors);
+                    jid.ifPresent(participantBuilder::setJID);
+                    final Optional<ParticipantType> participantType = ParticipantType.from(getStringAttribute(participantElement, "type", true, description, parseErrors).orElse(null));
+                    participantType.ifPresent(participantBuilder::setType);
+                    final Optional<CallDirection> callDirection = CallDirection.from(getStringAttribute(participantElement, "direction", true, description, parseErrors).orElse(null));
+                    callDirection.ifPresent(participantBuilder::setDirection);
+                    final Optional<Instant> participantStart = getISO8601Attribute(participantElement, "starttime", true, description, parseErrors);
+                    participantStart.ifPresent(participantBuilder::setStartTime);
+                    final Optional<Long> participantDuration = getLongAttribute(participantElement, "duration", true, description, parseErrors);
+                    participantDuration.ifPresent(millis -> participantBuilder.setDuration(Duration.ofMillis(millis)));
+                    callBuilder.addParticipant(participantBuilder.buildWithoutValidating());
+                }
+
+            }
             calls.add(callBuilder.buildWithoutValidating());
         }
         return calls;
     }
+
 }

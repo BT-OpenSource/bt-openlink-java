@@ -22,6 +22,8 @@ import com.bt.openlink.type.CallState;
 import com.bt.openlink.type.Interest;
 import com.bt.openlink.type.InterestId;
 import com.bt.openlink.type.InterestType;
+import com.bt.openlink.type.Participant;
+import com.bt.openlink.type.ParticipantType;
 import com.bt.openlink.type.ProfileId;
 import com.bt.openlink.type.PubSubNodeId;
 import com.bt.openlink.type.RequestAction;
@@ -39,9 +41,17 @@ public final class Fixtures {
     public static final JID TO_JID = new JID("test-to@test-domain/test-resource");
     public static final JID FROM_JID = new JID("test-from@test-domain/test-resource");
     public static final JID USER_JID = new JID("test-user@test-domain/test-resource");
+    public static final String BARE_JID = USER_JID.toBareJID();
     public static final ProfileId PROFILE_ID = ProfileId.from("test-profile-id").get();
     public static final InterestId INTEREST_ID = InterestId.from("test-interest-id").get();
     public static final CallId CALL_ID = CallId.from("test-call-id").get();
+    public static final Participant PARTICIPANT = Participant.Builder.start()
+            .setJID(BARE_JID)
+            .setType(ParticipantType.ACTIVE)
+            .setDirection(CallDirection.INCOMING)
+            .setStartTime(START_TIME)
+            .setDuration(DURATION)
+            .build();
     public static final Interest INTEREST = Interest.Builder.start()
             .setId(INTEREST_ID)
             .setDefault(true)
@@ -64,6 +74,7 @@ public final class Fixtures {
             .setStartTime(START_TIME)
             .setDuration(DURATION)
             .addAction(RequestAction.ANSWER_CALL)
+            .addParticipant(PARTICIPANT)
             .build();
 
     public static final PubSubNodeId NODE_ID = INTEREST_ID.toPubSubNodeId();
