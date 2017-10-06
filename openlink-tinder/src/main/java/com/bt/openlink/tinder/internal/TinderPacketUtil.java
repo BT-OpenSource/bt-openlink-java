@@ -37,6 +37,9 @@ import com.bt.openlink.type.Site;
 public final class TinderPacketUtil {
 
     private static final DateTimeFormatter ISO_8601_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+    private static final String ATTRIBUTE_DIRECTION = "direction";
+    private static final String ATTRIBUTE_START_TIME = "starttime";
+    private static final String ATTRIBUTE_DURATION = "duration";
 
     private TinderPacketUtil() {
     }
@@ -279,9 +282,9 @@ public final class TinderPacketUtil {
             call.getProfileId().ifPresent(profileId -> callElement.addElement("profile").setText(profileId.value()));
             call.getInterestId().ifPresent(interestId -> callElement.addElement("interest").setText(interestId.value()));
             call.getState().ifPresent(state -> callElement.addElement("state").setText(state.getLabel()));
-            call.getDirection().ifPresent(direction -> callElement.addElement("direction").setText(direction.getLabel()));
-            call.getStartTime().ifPresent(startTime -> callElement.addElement("starttime").setText(ISO_8601_FORMATTER.format(startTime.atZone(ZoneOffset.UTC))));
-            call.getDuration().ifPresent(duration -> callElement.addElement("duration").setText(String.valueOf(duration.toMillis())));
+            call.getDirection().ifPresent(direction -> callElement.addElement(ATTRIBUTE_DIRECTION).setText(direction.getLabel()));
+            call.getStartTime().ifPresent(startTime -> callElement.addElement(ATTRIBUTE_START_TIME).setText(ISO_8601_FORMATTER.format(startTime.atZone(ZoneOffset.UTC))));
+            call.getDuration().ifPresent(duration -> callElement.addElement(ATTRIBUTE_DURATION).setText(String.valueOf(duration.toMillis())));
             final Collection<RequestAction> actions = call.getActions();
             if (!actions.isEmpty()) {
                 final Element actionsElement = callElement.addElement("actions");
@@ -294,9 +297,9 @@ public final class TinderPacketUtil {
                     final Element participantElement = participantsElement.addElement("participant");
                     participant.getJID().ifPresent(jid -> participantElement.addAttribute("jid", jid));
                     participant.getType().ifPresent(type -> participantElement.addAttribute("type", type.getId()));
-                    participant.getDirection().ifPresent(direction -> participantElement.addAttribute("direction", direction.getLabel()));
-                    participant.getStartTime().ifPresent(startTime -> participantElement.addAttribute("starttime", ISO_8601_FORMATTER.format(startTime.atZone(ZoneOffset.UTC))));
-                    participant.getDuration().ifPresent(duration -> participantElement.addAttribute("duration", String.valueOf(duration.toMillis())));
+                    participant.getDirection().ifPresent(direction -> participantElement.addAttribute(ATTRIBUTE_DIRECTION, direction.getLabel()));
+                    participant.getStartTime().ifPresent(startTime -> participantElement.addAttribute(ATTRIBUTE_START_TIME, ISO_8601_FORMATTER.format(startTime.atZone(ZoneOffset.UTC))));
+                    participant.getDuration().ifPresent(duration -> participantElement.addAttribute(ATTRIBUTE_DURATION, String.valueOf(duration.toMillis())));
                 });
             }
         });
@@ -344,11 +347,11 @@ public final class TinderPacketUtil {
             interestId.ifPresent(callBuilder::setInterestId);
             final Optional<CallState> state = CallState.from(getChildElementString(callElement, "state", true, description, parseErrors));
             state.ifPresent(callBuilder::setState);
-            final Optional<CallDirection> direction = CallDirection.from(getChildElementString(callElement, "direction", true, description, parseErrors));
+            final Optional<CallDirection> direction = CallDirection.from(getChildElementString(callElement, ATTRIBUTE_DIRECTION, true, description, parseErrors));
             direction.ifPresent(callBuilder::setDirection);
-            final Optional<Instant> startTime = getChildElementISO8601(callElement, "starttime", true, description, parseErrors);
+            final Optional<Instant> startTime = getChildElementISO8601(callElement, ATTRIBUTE_START_TIME, true, description, parseErrors);
             startTime.ifPresent(callBuilder::setStartTime);
-            final Optional<Long> duration = Optional.ofNullable(getChildElementLong(callElement, "duration", true, description, parseErrors));
+            final Optional<Long> duration = Optional.ofNullable(getChildElementLong(callElement, ATTRIBUTE_DURATION, true, description, parseErrors));
             duration.ifPresent(millis -> callBuilder.setDuration(Duration.ofMillis(millis)));
             final Element actionsElement = callElement.element("actions");
             if (actionsElement != null) {
@@ -367,11 +370,11 @@ public final class TinderPacketUtil {
                     jid.ifPresent(participantBuilder::setJID);
                     final Optional<ParticipantType> participantType = ParticipantType.from(getStringAttribute(participantElement, "type", true, description, parseErrors).orElse(null));
                     participantType.ifPresent(participantBuilder::setType);
-                    final Optional<CallDirection> callDirection = CallDirection.from(getStringAttribute(participantElement, "direction", true, description, parseErrors).orElse(null));
+                    final Optional<CallDirection> callDirection = CallDirection.from(getStringAttribute(participantElement, ATTRIBUTE_DIRECTION, true, description, parseErrors).orElse(null));
                     callDirection.ifPresent(participantBuilder::setDirection);
-                    final Optional<Instant> participantStart = getISO8601Attribute(participantElement, "starttime", true, description, parseErrors);
+                    final Optional<Instant> participantStart = getISO8601Attribute(participantElement, ATTRIBUTE_START_TIME, true, description, parseErrors);
                     participantStart.ifPresent(participantBuilder::setStartTime);
-                    final Optional<Long> participantDuration = getLongAttribute(participantElement, "duration", true, description, parseErrors);
+                    final Optional<Long> participantDuration = getLongAttribute(participantElement, ATTRIBUTE_DURATION, true, description, parseErrors);
                     participantDuration.ifPresent(millis -> participantBuilder.setDuration(Duration.ofMillis(millis)));
                     callBuilder.addParticipant(participantBuilder.buildWithoutValidating());
                 }
