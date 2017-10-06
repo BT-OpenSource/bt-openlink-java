@@ -1,5 +1,7 @@
 package com.bt.openlink.type;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -18,7 +20,8 @@ public class Call {
     @Nullable private final InterestId interestId;
     @Nullable private final CallState state;
     @Nullable private final CallDirection direction;
-    @Nullable private final Long duration;
+    @Nullable private final Instant startTime;
+    @Nullable private final Duration duration;
     @Nonnull private final Collection<RequestAction> actions;
 
     private Call(@Nonnull final Builder builder) {
@@ -28,6 +31,7 @@ public class Call {
         this.interestId = builder.interestId;
         this.state = builder.state;
         this.direction = builder.direction;
+        this.startTime = builder.startTime;
         this.duration = builder.duration;
         this.actions = Collections.unmodifiableCollection(builder.actions);
     }
@@ -63,7 +67,12 @@ public class Call {
     }
 
     @Nonnull
-    public Optional<Long> getDuration() {
+    public Optional<Instant> getStartTime() {
+        return Optional.ofNullable(startTime);
+    }
+
+    @Nonnull
+    public Optional<Duration> getDuration() {
         return Optional.ofNullable(duration);
     }
 
@@ -83,7 +92,8 @@ public class Call {
         @Nullable private InterestId interestId;
         @Nullable private CallState state;
         @Nullable private CallDirection direction;
-        @Nullable private Long duration;
+        @Nullable private Instant startTime;
+        @Nullable private Duration duration;
         @Nonnull private final List<RequestAction> actions = new ArrayList<>();
 
         private Builder() {
@@ -113,6 +123,9 @@ public class Call {
             }
             if (direction == null) {
                 throw new IllegalStateException("The call direction has not been set");
+            }
+            if(startTime == null ) {
+                throw new IllegalStateException("The call start time has not been set");
             }
             if (duration == null) {
                 throw new IllegalStateException("The call duration has not been set");
@@ -163,7 +176,13 @@ public class Call {
         }
 
         @Nonnull
-        public Builder setDuration(final long duration) {
+        public Builder setStartTime(final Instant startTime) {
+            this.startTime = startTime;
+            return this;
+        }
+
+        @Nonnull
+        public Builder setDuration(final Duration duration) {
             this.duration = duration;
             return this;
         }

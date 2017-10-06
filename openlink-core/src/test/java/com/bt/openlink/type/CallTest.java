@@ -4,6 +4,8 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.empty;
 import static org.junit.Assert.assertThat;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Optional;
 
 import org.junit.Rule;
@@ -15,10 +17,14 @@ import com.bt.openlink.Fixtures;
 @SuppressWarnings("ConstantConditions")
 public class CallTest {
 
+    private final Instant startTime = Instant.now();
+    private final Duration duration = Duration.ofMinutes(1);
+
     @Rule public final ExpectedException expectedException = ExpectedException.none();
 
     @Test
     public void willCreateACall() throws Exception {
+
 
         final Call call = Call.Builder.start()
                 .setId(Fixtures.CALL_ID)
@@ -27,7 +33,8 @@ public class CallTest {
                 .setInterestId(Fixtures.INTEREST_ID)
                 .setState(CallState.CALL_ORIGINATED)
                 .setDirection(CallDirection.INCOMING)
-                .setDuration(1)
+                .setStartTime(startTime)
+                .setDuration(duration)
                 .addAction(RequestAction.ANSWER_CALL)
                 .build();
 
@@ -37,6 +44,8 @@ public class CallTest {
         assertThat(call.getInterestId().get(), is(Fixtures.INTEREST_ID));
         assertThat(call.getState().get(), is(CallState.CALL_ORIGINATED));
         assertThat(call.getDirection().get(), is(CallDirection.INCOMING));
+        assertThat(call.getStartTime().get(), is(startTime));
+        assertThat(call.getDuration().get(), is(duration));
         assertThat(call.isParticipating(), is(false));
         assertThat(call.getActions().size(),is(1));
         assertThat(call.getActions().iterator().next(),is(RequestAction.ANSWER_CALL));
@@ -54,7 +63,8 @@ public class CallTest {
                 .setInterestId(Fixtures.INTEREST_ID)
                 .setState(CallState.CALL_ORIGINATED)
                 .setDirection(CallDirection.INCOMING)
-                .setDuration(1)
+                .setStartTime(startTime)
+                .setDuration(duration)
                 .addAction(RequestAction.ANSWER_CALL)
                 .build();
     }
@@ -71,7 +81,8 @@ public class CallTest {
                 .setInterestId(Fixtures.INTEREST_ID)
                 .setState(CallState.CALL_ORIGINATED)
                 .setDirection(CallDirection.INCOMING)
-                .setDuration(1)
+                .setStartTime(startTime)
+                .setDuration(duration)
                 .addAction(RequestAction.ANSWER_CALL)
                 .build();
     }
@@ -88,7 +99,8 @@ public class CallTest {
                 .setInterestId(Fixtures.INTEREST_ID)
                 .setState(CallState.CALL_ORIGINATED)
                 .setDirection(CallDirection.INCOMING)
-                .setDuration(1)
+                .setStartTime(startTime)
+                .setDuration(duration)
                 .addAction(RequestAction.ANSWER_CALL)
                 .build();
     }
@@ -105,7 +117,8 @@ public class CallTest {
                 .setProfileId(Fixtures.PROFILE_ID)
                 .setState(CallState.CALL_ORIGINATED)
                 .setDirection(CallDirection.INCOMING)
-                .setDuration(1)
+                .setStartTime(startTime)
+                .setDuration(duration)
                 .addAction(RequestAction.ANSWER_CALL)
                 .build();
 
@@ -123,7 +136,8 @@ public class CallTest {
                 .setProfileId(Fixtures.PROFILE_ID)
                 .setInterestId(Fixtures.INTEREST_ID)
                 .setDirection(CallDirection.INCOMING)
-                .setDuration(1)
+                .setStartTime(startTime)
+                .setDuration(duration)
                 .addAction(RequestAction.ANSWER_CALL)
                 .build();
     }
@@ -140,7 +154,26 @@ public class CallTest {
                 .setProfileId(Fixtures.PROFILE_ID)
                 .setInterestId(Fixtures.INTEREST_ID)
                 .setState(CallState.CALL_ORIGINATED)
-                .setDuration(1)
+                .setStartTime(startTime)
+                .setDuration(duration)
+                .addAction(RequestAction.ANSWER_CALL)
+                .build();
+    }
+
+    @Test
+    public void willNotCreateACallWithoutAStartTime() throws Exception {
+
+        expectedException.expect(IllegalStateException.class);
+        expectedException.expectMessage("The call start time has not been set");
+
+        Call.Builder.start()
+                .setId(Fixtures.CALL_ID)
+                .setSite(Fixtures.SITE)
+                .setProfileId(Fixtures.PROFILE_ID)
+                .setInterestId(Fixtures.INTEREST_ID)
+                .setState(CallState.CALL_ORIGINATED)
+                .setDirection(CallDirection.INCOMING)
+                .setDuration(duration)
                 .addAction(RequestAction.ANSWER_CALL)
                 .build();
     }
@@ -158,6 +191,7 @@ public class CallTest {
                 .setInterestId(Fixtures.INTEREST_ID)
                 .setState(CallState.CALL_ORIGINATED)
                 .setDirection(CallDirection.INCOMING)
+                .setStartTime(startTime)
                 .addAction(RequestAction.ANSWER_CALL)
                 .build();
     }
@@ -173,6 +207,7 @@ public class CallTest {
         assertThat(call.getInterestId(), is(Optional.empty()));
         assertThat(call.getState(), is(Optional.empty()));
         assertThat(call.getDirection(), is(Optional.empty()));
+        assertThat(call.getStartTime(), is(Optional.empty()));
         assertThat(call.getDuration(), is(Optional.empty()));
         assertThat(call.isParticipating(), is(false));
         assertThat(call.getActions(), is(empty()));

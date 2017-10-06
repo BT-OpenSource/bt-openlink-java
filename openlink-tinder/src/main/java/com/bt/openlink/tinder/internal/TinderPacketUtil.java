@@ -1,6 +1,9 @@
 package com.bt.openlink.tinder.internal;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
@@ -30,6 +33,8 @@ import com.bt.openlink.type.Site;
  * This class is for internal use by the library only; users of the API should not access this class directly.
  */
 public final class TinderPacketUtil {
+
+    private static final DateTimeFormatter ISO_8601_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 
     private TinderPacketUtil() {
     }
@@ -134,6 +139,24 @@ public final class TinderPacketUtil {
             }
         }
         return null;
+    }
+
+    @Nonnull
+    private static Optional<Instant> getChildElementISO8601(
+            @Nullable final Element parentElement,
+            @Nonnull final String childElementName,
+            final boolean isRequired,
+            @Nonnull final String stanzaDescription,
+            @Nonnull final List<String> parseErrors) {
+        final String childElementText = getChildElementString(parentElement, childElementName, isRequired, stanzaDescription, parseErrors);
+        if(childElementText != null) {
+            try{
+                return Optional.of(Instant.parse(childElementText));
+            } catch(final DateTimeParseException ignored) {
+                parseErrors.add(String.format("Invalid %s; Unable to parse %s '%s'", stanzaDescription, childElementName, childElementText));
+            }
+        }
+        return Optional.empty();
     }
 
     @Nullable
@@ -242,7 +265,8 @@ public final class TinderPacketUtil {
             call.getInterestId().ifPresent(interestId -> callElement.addElement("interest").setText(interestId.value()));
             call.getState().ifPresent(state -> callElement.addElement("state").setText(state.getLabel()));
             call.getDirection().ifPresent(direction -> callElement.addElement("direction").setText(direction.getLabel()));
-            call.getDuration().ifPresent(duration -> callElement.addElement("duration").setText(String.valueOf(duration)));
+            call.getStartTime().ifPresent(startTime -> callElement.addElement("starttime").setText(ISO_8601_FORMATTER.format(startTime.atZone(ZoneOffset.UTC))));
+            call.getDuration().ifPresent(duration -> callElement.addElement("duration").setText(String.valueOf(duration.toMillis())));
             final Element actionsElement = callElement.addElement("actions");
             call.getActions().forEach(action -> actionsElement.addElement(action.getId()));
         });
@@ -292,8 +316,10 @@ public final class TinderPacketUtil {
             state.ifPresent(callBuilder::setState);
             final Optional<CallDirection> direction = CallDirection.from(getChildElementString(callElement, "direction", true, description, parseErrors));
             direction.ifPresent(callBuilder::setDirection);
+            final Optional<Instant> startTime = getChildElementISO8601(callElement, "starttime", true, description, parseErrors);
+            startTime.ifPresent(callBuilder::setStartTime);
             final Optional<Long> duration = Optional.ofNullable(getChildElementLong(callElement, "duration", true, description, parseErrors));
-            duration.ifPresent(callBuilder::setDuration);
+            duration.ifPresent(millis -> callBuilder.setDuration(Duration.ofMillis(millis)));
             final Element actionsElement = callElement.element("actions");
             if (actionsElement != null) {
                 final List<Element> actionElements = actionsElement.elements();

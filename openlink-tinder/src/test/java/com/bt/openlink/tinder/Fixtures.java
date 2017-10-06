@@ -3,6 +3,10 @@ package com.bt.openlink.tinder;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 import org.dom4j.Document;
 import org.dom4j.Element;
@@ -29,6 +33,8 @@ public final class Fixtures {
     private Fixtures() {
     }
 
+    public static final Instant START_TIME = LocalDateTime.parse("2017-10-09T08:07:00").atZone(ZoneId.of("UTC")).toInstant();
+    public static final Duration DURATION = Duration.ofMinutes(1);
     public static final String STANZA_ID = "test-stanza-id";
     public static final JID TO_JID = new JID("test-to@test-domain/test-resource");
     public static final JID FROM_JID = new JID("test-from@test-domain/test-resource");
@@ -55,7 +61,8 @@ public final class Fixtures {
             .setInterestId(INTEREST_ID)
             .setState(CallState.CALL_ORIGINATED)
             .setDirection(CallDirection.INCOMING)
-            .setDuration(0)
+            .setStartTime(START_TIME)
+            .setDuration(DURATION)
             .addAction(RequestAction.ANSWER_CALL)
             .build();
 

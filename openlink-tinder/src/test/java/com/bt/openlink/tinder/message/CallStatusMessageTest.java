@@ -7,6 +7,7 @@ import static org.hamcrest.Matchers.empty;
 import static org.junit.Assert.assertThat;
 import static org.xmlunit.matchers.CompareMatcher.isIdenticalTo;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -52,6 +53,7 @@ public class CallStatusMessageTest {
             "              <number></number>\n" +
             "              <name></name>\n" +
             "            </called>\n" +
+            "            <starttime>2017-10-09T08:07:00.000Z</starttime>\n" +
             "            <duration>0</duration>\n" +
             "            <actions/>\n" +
             "            <features>\n" +
@@ -176,7 +178,8 @@ public class CallStatusMessageTest {
                 "            <interest>" + Fixtures.INTEREST_ID + "</interest>\n" +
                 "            <state>CallOriginated</state>\n" +
                 "            <direction>Incoming</direction>\n" +
-                "            <duration>0</duration>\n" +
+                "            <starttime>2017-10-09T08:07:00.000Z</starttime>\n" +
+                "            <duration>60000</duration>\n" +
                 "            <actions>\n" +
                 "              <AnswerCall/>\n" +
                 "            </actions>\n" +
@@ -238,6 +241,8 @@ public class CallStatusMessageTest {
         assertThat(theOnlyCall.getInterestId().get(), is(Fixtures.INTEREST_ID));
         assertThat(theOnlyCall.getState().get(), is(CallState.CALL_ORIGINATED));
         assertThat(theOnlyCall.getDirection().get(), is(CallDirection.OUTGOING));
+        assertThat(theOnlyCall.getStartTime().get(), is(Fixtures.START_TIME));
+        assertThat(theOnlyCall.getDuration().get(), is(Duration.ZERO));
         assertThat(calls.size(), is(1));
         assertThat(message.getParseErrors().size(), is(0));
     }
@@ -277,7 +282,8 @@ public class CallStatusMessageTest {
                 "            <interest>" + Fixtures.INTEREST_ID + "</interest>\n" +
                 "            <state>CallOriginated</state>\n" +
                 "            <direction>Incoming</direction>\n" +
-                "            <duration>0</duration>\n" +
+                "            <starttime>2017-10-09T08:07:00.000Z</starttime>\n" +
+                "            <duration>60000</duration>\n" +
                 "            <actions>\n" +
                 "              <AnswerCall/>\n" +
                 "            </actions>\n" +
@@ -328,7 +334,7 @@ public class CallStatusMessageTest {
     }
 
     @Test
-    public void willParseAMessageWithABadDelay() throws Exception {
+    public void willParseAMessageWithBadFields() throws Exception {
         final Message stanza = Fixtures.messageFrom(
                 "<message from='" + Fixtures.FROM_JID + "' to='" + Fixtures.TO_JID + "' id='" + Fixtures.STANZA_ID + "'>\n" +
                         "  <event xmlns='http://jabber.org/protocol/pubsub#event'>\n" +
@@ -336,12 +342,13 @@ public class CallStatusMessageTest {
                         "      <item>\n" +
                         "        <callstatus xmlns='http://xmpp.org/protocol/openlink:01:00:00#call-status'>\n" +
                         "          <call>\n" +
-                        "            <id>" + Fixtures.CALL_ID + "</id>\n" +
-                        "            <profile>" + Fixtures.PROFILE_ID + "</profile>\n" +
-                        "            <interest>" + Fixtures.INTEREST_ID + "</interest>\n" +
-                        "            <state>CallOriginated</state>\n" +
-                        "            <direction>Incoming</direction>\n" +
-                        "            <duration>0</duration>\n" +
+                        "            <id></id>\n" +
+                        "            <profile></profile>\n" +
+                        "            <interest></interest>\n" +
+                        "            <state></state>\n" +
+                        "            <direction></direction>\n" +
+                        "            <starttime>yesterday</starttime>\n" +
+                        "            <duration>a while</duration>\n" +
                         "          </call>\n" +
                         "        </callstatus>\n" +
                         "      </item>\n" +
@@ -353,7 +360,15 @@ public class CallStatusMessageTest {
         final CallStatusMessage message = (CallStatusMessage) OpenlinkMessageParser.parse(stanza);
         assertThat(message.getDelay(), is(Optional.empty()));
         final List<String> parseErrors = message.getParseErrors();
-        assertThat(parseErrors.get(0), is("Invalid Call status message; invalid timestamp 'not-a-timestamp'; format should be compliant with XEP-0082"));
-        assertThat(parseErrors.size(),is(1));
+        int i = 0;
+        assertThat(parseErrors.get(i++), is("Invalid Call status message; missing 'id' field is mandatory"));
+        assertThat(parseErrors.get(i++), is("Invalid Call status message; missing 'profile' field is mandatory"));
+        assertThat(parseErrors.get(i++), is("Invalid Call status message; missing 'interest' field is mandatory"));
+        assertThat(parseErrors.get(i++), is("Invalid Call status message; missing 'state' field is mandatory"));
+        assertThat(parseErrors.get(i++), is("Invalid Call status message; missing 'direction' field is mandatory"));
+        assertThat(parseErrors.get(i++), is("Invalid Call status message; Unable to parse starttime 'yesterday'"));
+        assertThat(parseErrors.get(i++), is("Invalid Call status message; invalid duration 'a while'; please supply an integer"));
+        assertThat(parseErrors.get(i++), is("Invalid Call status message; invalid timestamp 'not-a-timestamp'; format should be compliant with XEP-0082"));
+        assertThat(parseErrors.size(),is(i));
     }
 }

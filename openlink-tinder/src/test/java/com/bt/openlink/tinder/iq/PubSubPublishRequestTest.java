@@ -41,7 +41,7 @@ public class PubSubPublishRequestTest {
             "              <number destination='888970008'>888970008</number>\n" +
             "              <name>888970008</name>\n" +
             "            </called>\n" +
-            "            <duration>0</duration>\n" +
+            "            <duration>6000</duration>\n" +
             "            <actions>\n" +
             "              <ClearConnection/>\n" +
             "              <HoldCall/>\n" +
@@ -140,7 +140,8 @@ public class PubSubPublishRequestTest {
                 "            <interest>" + Fixtures.INTEREST_ID + "</interest>\n" +
                 "            <state>CallOriginated</state>\n" +
                 "            <direction>Incoming</direction>\n" +
-                "            <duration>0</duration>\n" +
+                "            <starttime>2017-10-09T08:07:00.000Z</starttime>\n" +
+                "            <duration>60000</duration>\n" +
                 "            <actions>\n" +
                 "              <AnswerCall/>\n" +
                 "            </actions>\n" +
