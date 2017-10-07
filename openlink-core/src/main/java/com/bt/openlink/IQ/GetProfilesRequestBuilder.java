@@ -46,7 +46,7 @@ public abstract class GetProfilesRequestBuilder<B extends IQBuilder, J, T> exten
     }
 
     protected void validate(List<String> errors, boolean checkIQFields) {
-        if(checkIQFields) {
+        if (checkIQFields) {
             super.validate(errors);
         }
         if (jid == null) {

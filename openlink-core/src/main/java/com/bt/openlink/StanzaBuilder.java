@@ -65,7 +65,7 @@ public abstract class StanzaBuilder<B extends StanzaBuilder, J> {
     }
 
     protected void validate(final List<String> errors) {
-        if( to == null ) {
+        if (to == null) {
             errors.add("Invalid stanza; missing 'to' attribute is mandatory");
         }
     }
