@@ -7,13 +7,16 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.util.ParserUtils;
+import org.jxmpp.jid.Jid;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
 import com.bt.openlink.OpenlinkXmppNamespace;
+import com.bt.openlink.IQ.GetProfilesResultBuilder;
 import com.bt.openlink.type.Profile;
 import com.bt.openlink.type.ProfileId;
 import com.bt.openlink.type.Site;
@@ -43,9 +46,9 @@ public class GetProfilesResult extends OpenlinkIQ {
         return builder.build(parseErrors);
     }
 
-    private GetProfilesResult(@Nonnull Builder builder, @Nonnull List<String> parseErrors) {
+    private GetProfilesResult(@Nonnull Builder builder, @Nullable List<String> parseErrors) {
         super("command", OpenlinkXmppNamespace.XMPP_COMMANDS.uri(), builder, parseErrors);
-        this.profiles = Collections.unmodifiableList(builder.profiles);
+        this.profiles = Collections.unmodifiableList(builder.getProfiles());
     }
 
     @Override
@@ -88,16 +91,14 @@ public class GetProfilesResult extends OpenlinkIQ {
         return profiles;
     }
 
-    public static final class Builder extends IQBuilder<Builder> {
-
-        @Nonnull private List<Profile> profiles = new ArrayList<>();
+    public static final class Builder extends GetProfilesResultBuilder<Builder, Jid, IQ.Type> {
 
         private Builder() {
         }
 
         @Nonnull
         @Override
-        protected Type getExpectedType() {
+        public IQ.Type getExpectedIQType() {
             return Type.result;
         }
 
@@ -108,7 +109,7 @@ public class GetProfilesResult extends OpenlinkIQ {
 
         @Nonnull
         public static Builder start(@Nonnull final GetProfilesRequest request) {
-            return new Builder()
+            return start()
                     .setStanzaId(request.getStanzaId())
                     .setFrom(request.getTo())
                     .setTo(request.getFrom());
@@ -116,24 +117,14 @@ public class GetProfilesResult extends OpenlinkIQ {
 
         @Nonnull
         public GetProfilesResult build() {
-            validateBuilder();
-            return new GetProfilesResult(this, Collections.emptyList());
+            super.validate();
+            return new GetProfilesResult(this, null);
         }
 
         @Nonnull
-        private GetProfilesResult build(final List<String> parseErrors) {
-            return new GetProfilesResult(this, parseErrors);
-        }
-
-        @Nonnull
-        public Builder addProfile(@Nonnull final Profile profile) {
-            this.profiles.forEach(existingProfile -> {
-                if (existingProfile.getId().equals(profile.getId())) {
-                    throw new IllegalArgumentException("The profile id must be unique");
-                }
-            });
-            this.profiles.add(profile);
-            return this;
+        private GetProfilesResult build(@Nonnull final List<String> errors) {
+            super.validate(errors, false);
+            return new GetProfilesResult(this, errors);
         }
 
     }

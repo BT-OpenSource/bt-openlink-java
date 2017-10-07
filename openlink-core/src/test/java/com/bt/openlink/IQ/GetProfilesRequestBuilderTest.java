@@ -51,7 +51,7 @@ public class GetProfilesRequestBuilderTest {
     }
 
     @Test
-    public void willCheckTheJIDIsSet() throws Exception {
+    public void willValidateTheJidIsSet() throws Exception {
 
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("The stanza 'jid' has not been set");

@@ -136,15 +136,6 @@ public class GetProfilesResultTest {
     }
 
     @Test
-    public void cannotCreateAStanzaWithoutAToField() throws Exception {
-
-        expectedException.expect(IllegalStateException.class);
-        expectedException.expectMessage("The stanza 'to' has not been set");
-        GetProfilesResult.Builder.start()
-                .build();
-    }
-
-    @Test
     public void willGenerateAnXmppStanza() throws Exception {
 
         // TODO: (Greg 2016-08-08) Replace this with GET_PROFILES_RESULT_WITH_NO_NOTES when fully implemented
@@ -170,20 +161,6 @@ public class GetProfilesResultTest {
                 .build();
 
         assertThat(result.toXML().toString(), isIdenticalTo(expectedXML).ignoreWhitespace());
-    }
-
-    @Test
-    public void willNotBuildAPacketWithDuplicateProfileIds() throws Exception {
-
-        expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("The profile id must be unique");
-        GetProfilesResult.Builder.start()
-                .setStanzaId(Fixtures.STANZA_ID)
-                .setTo(Fixtures.TO_JID)
-                .setFrom(Fixtures.FROM_JID)
-                .addProfile(PROFILE)
-                .addProfile(PROFILE)
-                .build();
     }
 
     @Test

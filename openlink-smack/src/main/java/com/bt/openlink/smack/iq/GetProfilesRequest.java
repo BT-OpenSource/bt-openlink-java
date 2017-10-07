@@ -17,7 +17,7 @@ import com.bt.openlink.OpenlinkXmppNamespace;
 import com.bt.openlink.IQ.GetProfilesRequestBuilder;
 import com.bt.openlink.smack.internal.SmackPacketUtil;
 
-public class GetProfilesRequest extends OpenlinkIQ2 {
+public class GetProfilesRequest extends OpenlinkIQ {
     @Nullable private final Jid jid;
 
     @Nonnull
@@ -62,7 +62,7 @@ public class GetProfilesRequest extends OpenlinkIQ2 {
         return Optional.ofNullable(jid);
     }
 
-    public static final class Builder extends GetProfilesRequestBuilder<Builder, Jid ,Type> {
+    public static final class Builder extends GetProfilesRequestBuilder<Builder, Jid, IQ.Type> {
 
         private Builder() {
         }
