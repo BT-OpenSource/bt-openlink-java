@@ -119,15 +119,6 @@ public class GetProfilesResultTest {
     }
 
     @Test
-    public void cannotCreateAStanzaWithoutAToField() throws Exception {
-
-        expectedException.expect(IllegalStateException.class);
-        expectedException.expectMessage("The stanza 'to' has not been set");
-        GetProfilesResult.Builder.start()
-                .build();
-    }
-
-    @Test
     public void willConvertToXML() throws Exception {
 
         final GetProfilesResult result = GetProfilesResult.Builder.start()
@@ -139,20 +130,6 @@ public class GetProfilesResultTest {
                 .build();
 
         assertThat(result.toXML(), isIdenticalTo(GET_PROFILES_RESULT_WITH_NO_NOTES).ignoreWhitespace());
-    }
-
-    @Test
-    public void willNotBuildAPacketWithDuplicateProfileIds() throws Exception {
-
-        expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("The profile id must be unique");
-        GetProfilesResult.Builder.start()
-                .setID(Fixtures.STANZA_ID)
-                .setTo(Fixtures.TO_JID)
-                .setFrom(Fixtures.FROM_JID)
-                .addProfile(PROFILE_1)
-                .addProfile(PROFILE_1)
-                .build();
     }
 
     @Test
@@ -205,11 +182,12 @@ public class GetProfilesResultTest {
         final GetProfilesResult result = GetProfilesResult.from(iq);
 
         assertThat(result.getParseErrors(), contains(
-                "Invalid stanza; missing or incorrect 'type' attribute",
+                "Invalid stanza; missing 'id' attribute is mandatory",
+                "Invalid get-profiles result; missing 'profiles' element is mandatory",
                 "Invalid stanza; missing 'to' attribute is mandatory",
                 "Invalid stanza; missing 'from' attribute is mandatory",
-                "Invalid stanza; missing 'id' attribute is mandatory",
-                "Invalid get-profiles result; missing 'profiles' element is mandatory"));
+                "Invalid stanza; missing or incorrect 'type' attribute"
+        ));
     }
 
     @Test

@@ -10,15 +10,17 @@ import javax.annotation.Nullable;
 
 import org.dom4j.Element;
 import org.xmpp.packet.IQ;
+import org.xmpp.packet.JID;
 
 import com.bt.openlink.OpenlinkXmppNamespace;
+import com.bt.openlink.IQ.GetProfilesResultBuilder;
 import com.bt.openlink.tinder.internal.TinderPacketUtil;
 import com.bt.openlink.type.Profile;
 import com.bt.openlink.type.ProfileId;
 import com.bt.openlink.type.RequestAction;
 import com.bt.openlink.type.Site;
 
-public class GetProfilesResult extends OpenlinkIQ {
+public class GetProfilesResult extends OpenlinkIQ2 {
     private static final String DESCRIPTION = "get-profiles result";
     private static final String ATTRIBUTE_DEFAULT = "default";
     private static final String ATTRIBUTE_LABEL = "label";
@@ -26,7 +28,7 @@ public class GetProfilesResult extends OpenlinkIQ {
 
     private GetProfilesResult(@Nonnull Builder builder, @Nullable List<String> parseErrors) {
         super(builder, parseErrors);
-        this.profiles = Collections.unmodifiableList(builder.profiles);
+        this.profiles = Collections.unmodifiableList(builder.getProfiles());
         final Element outElement = TinderPacketUtil.addCommandIOOutputElement(this, OpenlinkXmppNamespace.OPENLINK_GET_PROFILES);
         final Element profilesElement = outElement.addElement(OpenlinkXmppNamespace.TAG_PROFILES, OpenlinkXmppNamespace.OPENLINK_PROFILES.uri());
         getProfiles().forEach(profile -> {
@@ -96,7 +98,7 @@ public class GetProfilesResult extends OpenlinkIQ {
         return profiles;
     }
 
-    public static final class Builder extends IQBuilder<Builder> {
+    public static final class Builder extends GetProfilesResultBuilder<Builder, JID, IQ.Type> {
 
         @Nonnull
         public static Builder start() {
@@ -105,51 +107,35 @@ public class GetProfilesResult extends OpenlinkIQ {
 
         @Nonnull
         private static Builder start(@Nonnull final IQ iq) {
-            return new Builder(iq);
+            final Builder builder = start();
+            TinderIQBuilder.setIQBuilder(builder, iq);
+            return builder;
         }
 
         @Nonnull
         public static Builder start(@Nonnull final GetProfilesRequest request) {
-            return new Builder(IQ.createResultIQ(request));
+            return start(IQ.createResultIQ(request));
         }
-
-        @Nonnull private List<Profile> profiles = new ArrayList<>();
 
         private Builder() {
         }
 
-        public Builder(@Nonnull final IQ iq) {
-            super(iq);
-        }
-
-        @Override
         @Nonnull
-        protected Type getExpectedType() {
+        @Override
+        public IQ.Type getExpectedIQType() {
             return Type.result;
         }
 
         @Nonnull
         public GetProfilesResult build() {
-            validateBuilder();
-            return build(Collections.emptyList());
+            super.validate();
+            return new GetProfilesResult(this, null);
         }
 
         @Nonnull
-        private GetProfilesResult build(@Nonnull final List<String> parseErrors) {
-            return new GetProfilesResult(this, parseErrors);
+        private GetProfilesResult build(@Nonnull final List<String> errors) {
+            super.validate(errors, true);
+            return new GetProfilesResult(this, errors);
         }
-
-        @Nonnull
-        public Builder addProfile(@Nonnull final Profile profile) {
-            this.profiles.forEach(existingProfile -> {
-                if (existingProfile.getId().equals(profile.getId())) {
-                    throw new IllegalArgumentException("The profile id must be unique");
-                }
-            });
-            this.profiles.add(profile);
-            return this;
-        }
-
     }
-
 }
