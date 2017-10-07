@@ -1,9 +1,13 @@
 package com.bt.openlink.smack.iq;
 
-import com.bt.openlink.OpenlinkXmppNamespace;
-import com.bt.openlink.smack.Fixtures;
-import com.bt.openlink.smack.iq.GetProfilesRequest;
-import com.bt.openlink.smack.iq.OpenlinkIQProvider;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
+import static org.xmlunit.matchers.CompareMatcher.isIdenticalTo;
+
 import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.provider.ProviderManager;
 import org.jivesoftware.smack.util.PacketParserUtils;
@@ -13,13 +17,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
-import static org.xmlunit.matchers.CompareMatcher.isIdenticalTo;
+import com.bt.openlink.OpenlinkXmppNamespace;
+import com.bt.openlink.smack.Fixtures;
 
 @SuppressWarnings("ConstantConditions")
 public class GetProfilesRequestTest {
@@ -87,7 +86,6 @@ public class GetProfilesRequestTest {
         expectedException.expectMessage("The stanza 'jid' has not been set");
         GetProfilesRequest.Builder.start()
                 .setTo(Fixtures.TO_JID)
-                .setJid((String) null)
                 .build();
     }
 
@@ -135,7 +133,16 @@ public class GetProfilesRequestTest {
 
         final GetProfilesRequest request = PacketParserUtils.parseStanza(GET_PROFILES_REQUEST_WITH_BAD_VALUES);
 
-        assertThat(request.getParseErrors(), contains("Invalid get-profiles request; missing 'jid' field is mandatory"));
+        // Note; it's not possible to validate the core elements of Smack packets as the to/from/id/type are not
+        // set until after the parsing is complete.
+
+        assertThat(request.getParseErrors(), contains(
+//                "Invalid stanza; missing 'id' attribute is mandatory",
+//                "Invalid stanza; missing 'to' attribute is mandatory",
+//                "Invalid stanza; missing 'from' attribute is mandatory",
+//                "Invalid stanza; missing or incorrect 'type' attribute",
+                "Invalid get-profiles request stanza; missing or invalid 'jid'"
+        ));
     }
 
     @Test

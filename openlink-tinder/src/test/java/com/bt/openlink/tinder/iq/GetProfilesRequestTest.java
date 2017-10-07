@@ -118,11 +118,12 @@ public class GetProfilesRequestTest {
         final GetProfilesRequest request = GetProfilesRequest.from(iq);
 
         assertThat(request.getParseErrors(), contains(
-                "Invalid stanza; missing or incorrect 'type' attribute",
+                "Invalid stanza; missing 'id' attribute is mandatory",
                 "Invalid stanza; missing 'to' attribute is mandatory",
                 "Invalid stanza; missing 'from' attribute is mandatory",
-                "Invalid stanza; missing 'id' attribute is mandatory",
-                "Invalid get-profiles request; missing 'jid' field is mandatory"));
+                "Invalid stanza; missing or incorrect 'type' attribute",
+                "Invalid get-profiles request stanza; missing or invalid 'jid'"
+        ));
     }
 
     @Test

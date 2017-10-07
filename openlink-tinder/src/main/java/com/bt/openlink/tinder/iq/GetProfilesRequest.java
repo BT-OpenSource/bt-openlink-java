@@ -1,7 +1,6 @@
 package com.bt.openlink.tinder.iq;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,14 +12,15 @@ import org.xmpp.packet.IQ;
 import org.xmpp.packet.JID;
 
 import com.bt.openlink.OpenlinkXmppNamespace;
+import com.bt.openlink.IQ.GetProfilesRequestBuilder;
 import com.bt.openlink.tinder.internal.TinderPacketUtil;
 
-public class GetProfilesRequest extends OpenlinkIQ {
+public class GetProfilesRequest extends OpenlinkIQ2 {
     @Nullable private final JID jid;
 
-    private GetProfilesRequest(@Nonnull Builder builder, @Nonnull List<String> parseErrors) {
+    private GetProfilesRequest(@Nonnull Builder builder, @Nullable List<String> parseErrors) {
         super(builder, parseErrors);
-        this.jid = builder.jid;
+        this.jid = builder.getJid().orElse(null);
         final Element inElement = TinderPacketUtil.addCommandIOInputElement(this, OpenlinkXmppNamespace.OPENLINK_GET_PROFILES);
         TinderPacketUtil.addElementWithTextIfNotNull(inElement, "jid", jid);
     }
@@ -31,13 +31,18 @@ public class GetProfilesRequest extends OpenlinkIQ {
     }
 
     @Nonnull
+    public Optional<JID> getJid() {
+        return getJID();
+    }
+
+    @Nonnull
     public static GetProfilesRequest from(@Nonnull IQ iq) {
         final List<String> parseErrors = new ArrayList<>();
         final Element inElement = TinderPacketUtil.getIOInElement(iq);
         final Builder builder = Builder.start(iq);
         final Optional<JID> jid = TinderPacketUtil.getJID(TinderPacketUtil.getChildElementString(inElement,
                 "jid",
-                true,
+                false,
                 "get-profiles request",
                 parseErrors));
         jid.ifPresent(builder::setJID);
@@ -46,7 +51,7 @@ public class GetProfilesRequest extends OpenlinkIQ {
         return request;
     }
 
-    public static final class Builder extends IQBuilder<Builder> {
+    public static final class Builder extends GetProfilesRequestBuilder<Builder, JID ,IQ.Type> {
 
         @Nonnull
         public static Builder start() {
@@ -55,36 +60,30 @@ public class GetProfilesRequest extends OpenlinkIQ {
 
         @Nonnull
         private static Builder start(@Nonnull final IQ iq) {
-            return new Builder(iq);
+            final Builder builder = start();
+            TinderIQBuilder.setIQBuilder(builder, iq);
+            return builder;
         }
-
-        @Nullable JID jid;
 
         private Builder() {
         }
 
-        public Builder(@Nonnull final IQ iq) {
-            super(iq);
-        }
-
         @Override
         @Nonnull
-        protected Type getExpectedType() {
+        public Type getExpectedIQType() {
             return Type.set;
         }
 
         @Nonnull
         public GetProfilesRequest build() {
-            super.validateBuilder();
-            if (jid == null) {
-                throw new IllegalStateException("The stanza 'jid' has not been set");
-            }
-            return build(Collections.emptyList());
+            super.validate();
+            return new GetProfilesRequest(this, null);
         }
 
         @Nonnull
-        private GetProfilesRequest build(@Nonnull final List<String> parseErrors) {
-            return new GetProfilesRequest(this, parseErrors);
+        private GetProfilesRequest build(@Nonnull final List<String> errors) {
+            super.validate(errors);
+            return new GetProfilesRequest(this, errors);
         }
 
         @Nonnull
