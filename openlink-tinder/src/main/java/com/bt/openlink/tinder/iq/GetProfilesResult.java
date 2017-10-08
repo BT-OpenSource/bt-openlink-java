@@ -81,7 +81,7 @@ public class GetProfilesResult extends OpenlinkIQ2 {
                     }
                 }
                 final Profile profile = profileBuilder
-                        .buildWithoutValidating();
+                        .build(parseErrors);
                 builder.addProfile(profile);
             });
             if (profileElements.isEmpty()) {

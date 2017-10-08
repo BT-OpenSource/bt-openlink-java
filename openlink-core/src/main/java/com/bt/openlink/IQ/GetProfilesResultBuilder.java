@@ -34,12 +34,12 @@ public abstract class GetProfilesResultBuilder<B extends IQBuilder, J, T> extend
         });
     }
 
-    private void validateUniqueness(final Consumer<Optional<ProfileId>> errorConsumer) {
+    private void validateUniqueness(final Consumer<ProfileId> errorConsumer) {
         for (int i = 0; i < profiles.size(); i++) {
-            final Optional<ProfileId> profileId = profiles.get(i).getId();
+            final Optional<ProfileId> profileIdOptional = profiles.get(i).getId();
             for (int j = i + 1; j < profiles.size(); j++) {
-                if (profileId.equals(profiles.get(j).getId())) {
-                    errorConsumer.accept(profileId);
+                if (profileIdOptional.isPresent() && profileIdOptional.equals(profiles.get(j).getId())) {
+                    errorConsumer.accept(profileIdOptional.get());
                 }
             }
         }

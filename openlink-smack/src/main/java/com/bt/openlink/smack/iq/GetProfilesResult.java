@@ -17,8 +17,10 @@ import org.xmlpull.v1.XmlPullParserException;
 
 import com.bt.openlink.OpenlinkXmppNamespace;
 import com.bt.openlink.IQ.GetProfilesResultBuilder;
+import com.bt.openlink.smack.internal.SmackPacketUtil;
 import com.bt.openlink.type.Profile;
 import com.bt.openlink.type.ProfileId;
+import com.bt.openlink.type.RequestAction;
 import com.bt.openlink.type.Site;
 
 public class GetProfilesResult extends OpenlinkIQ {
@@ -34,13 +36,50 @@ public class GetProfilesResult extends OpenlinkIQ {
         final List<String> parseErrors = new ArrayList<>();
         while (OpenlinkXmppNamespace.TAG_PROFILE.equals(parser.getName())) {
 
-            final Optional<ProfileId> profileId = ProfileId.from(parser.getAttributeValue("", "id"));
+            final int currentDepth = parser.getDepth();
+
             final Profile.Builder profileBuilder = Profile.Builder.start();
+            final Optional<ProfileId> profileId = ProfileId.from(parser.getAttributeValue("", "id"));
             profileId.ifPresent(profileBuilder::setId);
-            final Profile profile = profileBuilder
-                    .buildWithoutValidating();
-            builder.addProfile(profile);
-            ParserUtils.forwardToEndTagOfDepth(parser, parser.getDepth());
+            final Optional<Boolean> isDefaultProfile = SmackPacketUtil.getBooleanAttribute(parser, "default");
+            isDefaultProfile.ifPresent(profileBuilder::setDefault);
+            final Optional<String> label = SmackPacketUtil.getStringAttribute(parser, "label");
+            label.ifPresent(profileBuilder::setLabel);
+            final Optional<Boolean> online = SmackPacketUtil.getBooleanAttribute(parser, "online");
+            online.ifPresent(profileBuilder::setOnline);
+            final Optional<String> device = SmackPacketUtil.getStringAttribute(parser, "device");
+            device.ifPresent(profileBuilder::setDevice);
+            parser.nextTag();
+            if (parser.getName().equals("site")) {
+                final Site.Builder siteBuilder = Site.Builder.start();
+                final Optional<Long> siteId = SmackPacketUtil.getLongAttribute(parser, "id");
+                siteId.ifPresent(siteBuilder::setId);
+                final Optional<Boolean> isDefaultSite = SmackPacketUtil.getBooleanAttribute(parser, "default");
+                isDefaultSite.ifPresent(siteBuilder::setDefault);
+                final Optional<Site.Type> siteType = Site.Type.from(SmackPacketUtil.getStringAttribute(parser, "type").orElse(null));
+                siteType.ifPresent(siteBuilder::setType);
+                parser.next();
+                final Optional<String> siteName = Optional.ofNullable(parser.getText());
+                siteName.ifPresent(siteBuilder::setName);
+                profileBuilder.setSite(siteBuilder.buildWithoutValidating());
+                ParserUtils.forwardToEndTagOfDepth(parser, parser.getDepth());
+                parser.nextTag();
+            }
+            if (parser.getName().equals("actions") && !parser.isEmptyElementTag()) {
+                do {
+                    parser.nextTag();
+                    if (parser.getName().equals("action")) {
+                        final Optional<RequestAction> requestAction = RequestAction.from(SmackPacketUtil.getStringAttribute(parser, "id").orElse(null));
+                        requestAction.ifPresent(profileBuilder::addAction);
+                    }
+                    ParserUtils.forwardToEndTagOfDepth(parser, parser.getDepth());
+                } while (parser.getName().equals("action"));
+                ParserUtils.forwardToEndTagOfDepth(parser, parser.getDepth());
+                parser.nextTag();
+            }
+
+            builder.addProfile(profileBuilder.build(parseErrors));
+            ParserUtils.forwardToEndTagOfDepth(parser, currentDepth);
             parser.nextTag();
         }
         return builder.build(parseErrors);

@@ -52,7 +52,7 @@ public class GetProfilesResultBuilderTest {
     public void willValidateProfileUniqueness() throws Exception {
 
         expectedException.expect(IllegalStateException.class);
-        expectedException.expectMessage("Each profile id must be unique - Optional[test-profile-id] appears more than once");
+        expectedException.expectMessage("Each profile id must be unique - test-profile-id appears more than once");
 
         builder.addProfile(Fixtures.PROFILE);
         builder.addProfile(Fixtures.PROFILE);
@@ -70,6 +70,6 @@ public class GetProfilesResultBuilderTest {
 
         builder.validate(errors);
 
-        assertThat(errors, contains("Invalid get-profiles request stanza; each profile id must be unique - Optional[test-profile-id] appears more than once"));
+        assertThat(errors, contains("Invalid get-profiles request stanza; each profile id must be unique - test-profile-id appears more than once"));
     }
 }

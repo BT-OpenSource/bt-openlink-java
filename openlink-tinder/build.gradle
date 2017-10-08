@@ -3,7 +3,6 @@ dependencies {
     compileOnly 'org.slf4j:slf4j-api:1.7.25'
 
     compile project(':openlink-core')
-    compile 'org.apache.logging.log4j:log4j-api:2.8.2'
 
     testCompile 'org.apache.logging.log4j:log4j-core:2.8.2'
     testCompile 'org.apache.logging.log4j:log4j-slf4j-impl:2.8.2'
