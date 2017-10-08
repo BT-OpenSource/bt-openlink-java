@@ -56,8 +56,7 @@ public class GetProfilesRequestTest {
     @Test
     public void canCreateAStanza() throws Exception {
 
-        final GetProfilesRequest request = GetProfilesRequest.Builder.start()
-                .setStanzaId(Fixtures.STANZA_ID)
+        final GetProfilesRequest request = GetProfilesRequest.Builder.start().setId(Fixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
                 .setJid(Fixtures.USER_JID)
@@ -86,14 +85,14 @@ public class GetProfilesRequestTest {
         expectedException.expectMessage("The stanza 'jid' has not been set");
         GetProfilesRequest.Builder.start()
                 .setTo(Fixtures.TO_JID)
+                .setFrom(Fixtures.FROM_JID)
                 .build();
     }
 
     @Test
     public void willGenerateAnXmppStanza() throws Exception {
 
-        final GetProfilesRequest request = GetProfilesRequest.Builder.start()
-                .setStanzaId(Fixtures.STANZA_ID)
+        final GetProfilesRequest request = GetProfilesRequest.Builder.start().setId(Fixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
                 .setJid(Fixtures.USER_JID)

@@ -34,7 +34,7 @@ public class GetProfilesResultBuilderTest {
 
         builder.setTo("to");
         builder.setFrom("from");
-        builder.setStanzaId("id");
+        builder.setId("id");
         builder.setIQType("result");
     }
 

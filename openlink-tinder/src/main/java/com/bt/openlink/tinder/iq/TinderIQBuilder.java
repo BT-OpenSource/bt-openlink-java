@@ -13,7 +13,7 @@ final class TinderIQBuilder {
 
     static void setIQBuilder(final IQBuilder<?, JID, IQ.Type> builder, final IQ iq) {
         TinderStanzaBuilder.setStanzaBuilder(builder, iq);
-        builder.setID(iq.getID());
-        builder.setIQType(iq.getType());
+        builder.setIQType(iq.getType())
+                .setId(iq.getID());
     }
 }

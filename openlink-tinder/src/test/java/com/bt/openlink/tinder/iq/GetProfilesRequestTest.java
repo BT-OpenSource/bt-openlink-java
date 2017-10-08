@@ -42,7 +42,7 @@ public class GetProfilesRequestTest {
     public void canCreateAStanza() throws Exception {
 
         final GetProfilesRequest request = GetProfilesRequest.Builder.start()
-                .setID(Fixtures.STANZA_ID)
+                .setId(Fixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
                 .setJID(Fixtures.USER_JID)
@@ -70,6 +70,7 @@ public class GetProfilesRequestTest {
         expectedException.expectMessage("The stanza 'jid' has not been set");
         GetProfilesRequest.Builder.start()
                 .setTo(Fixtures.TO_JID)
+                .setFrom(Fixtures.FROM_JID)
                 .build();
     }
 
@@ -77,7 +78,7 @@ public class GetProfilesRequestTest {
     public void willGenerateAnXmppStanza() throws Exception {
 
         final GetProfilesRequest request = GetProfilesRequest.Builder.start()
-                .setID(Fixtures.STANZA_ID)
+                .setId(Fixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
                 .setJID(Fixtures.USER_JID)
@@ -118,9 +119,9 @@ public class GetProfilesRequestTest {
         final GetProfilesRequest request = GetProfilesRequest.from(iq);
 
         assertThat(request.getParseErrors(), contains(
-                "Invalid stanza; missing 'id' attribute is mandatory",
                 "Invalid stanza; missing 'to' attribute is mandatory",
                 "Invalid stanza; missing 'from' attribute is mandatory",
+                "Invalid stanza; missing 'id' attribute is mandatory",
                 "Invalid stanza; missing or incorrect 'type' attribute",
                 "Invalid get-profiles request stanza; missing or invalid 'jid'"
         ));

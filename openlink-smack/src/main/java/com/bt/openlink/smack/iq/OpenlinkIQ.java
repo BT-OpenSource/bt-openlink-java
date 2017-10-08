@@ -32,7 +32,7 @@ abstract class OpenlinkIQ extends IQ {
         super(command, uri);
         builder.getTo().ifPresent(this::setTo);
         builder.getFrom().ifPresent(this::setFrom);
-        builder.getStanzaId().ifPresent(this::setStanzaId);
+        builder.getId().ifPresent(this::setStanzaId);
         builder.getIqType().ifPresent(this::setType);
         if (parseErrors == null) {
             this.parseErrors = Collections.emptyList();
@@ -40,26 +40,6 @@ abstract class OpenlinkIQ extends IQ {
             this.parseErrors = new ArrayList<>(parseErrors);
             builder.validate(parseErrors);
         }
-    }
-
-    /**
-     * Sets the unique ID of the packet. To indicate that a stanza(/packet) has no id pass <code>null</code> as the packet's
-     * id value.
-     *
-     * @param id
-     *            the unique ID for the packet.
-     */
-    public void setID(String id) {
-        setStanzaId(id);
-    }
-
-    /**
-     * Returns the unique ID of the stanza. The returned value could be <code>null</code>.
-     *
-     * @return the packet's unique ID or <code>null</code> if the id is not available.
-     */
-    public String getID() {
-        return getStanzaId();
     }
 
     @Nonnull

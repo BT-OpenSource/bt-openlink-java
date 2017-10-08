@@ -36,17 +36,20 @@ public class GetProfilesRequestBuilderTest {
 
         builder.setTo("to");
         builder.setFrom("from");
-        builder.setStanzaId("id");
+        builder.setId("id");
         builder.setIQType("set");
     }
 
     @Test
     public void willValidateAPopulatedBuilder() throws Exception {
 
+        final List<String> errors = new ArrayList<>();
         builder.setJid("jid");
 
         builder.validate();
+        builder.validate(errors);
 
+        assertThat(errors,is(empty()));
         assertThat(builder.getJid().get(), is("jid"));
     }
 
@@ -70,15 +73,4 @@ public class GetProfilesRequestBuilderTest {
         assertThat(builder.getJid(), is(Optional.empty()));
     }
 
-    @Test
-    public void willNotCheckThatIdIsSet() throws Exception {
-
-        final List<String> errors = new ArrayList<>();
-        builder.setStanzaId(null);
-        builder.setJid("jid");
-
-        builder.validate(errors, false);
-
-        assertThat(errors, is(empty()));
-    }
 }

@@ -29,11 +29,19 @@ public class GetProfilesResult extends OpenlinkIQ {
     @Nonnull
     static IQ from(XmlPullParser parser) throws IOException, XmlPullParserException {
 
-        moveToStartOfTag(parser, OpenlinkXmppNamespace.TAG_IODATA, OpenlinkXmppNamespace.TAG_OUT, OpenlinkXmppNamespace.TAG_PROFILES, OpenlinkXmppNamespace.TAG_PROFILE);
+        moveToStartOfTag(parser, OpenlinkXmppNamespace.TAG_IODATA, OpenlinkXmppNamespace.TAG_OUT, OpenlinkXmppNamespace.TAG_PROFILES);
 
         final Builder builder = Builder.start();
 
         final List<String> parseErrors = new ArrayList<>();
+        if (parser.getEventType() != XmlPullParser.START_TAG) {
+            parseErrors.add("Invalid get-profiles result; missing 'profiles' element is mandatory");
+        } else {
+            moveToStartOfTag(parser, OpenlinkXmppNamespace.TAG_PROFILE);
+            if (parser.getEventType() != XmlPullParser.START_TAG) {
+                parseErrors.add("Invalid get-profiles result; no 'profile' elements present");
+            }
+        }
         while (OpenlinkXmppNamespace.TAG_PROFILE.equals(parser.getName())) {
 
             final int currentDepth = parser.getDepth();
@@ -104,10 +112,12 @@ public class GetProfilesResult extends OpenlinkIQ {
         for (final Profile profile : profiles) {
             xml.halfOpenElement(OpenlinkXmppNamespace.TAG_PROFILE);
             profile.getId().ifPresent(profileId -> xml.attribute("id", profileId.value()));
+            profile.isDefaultProfile().ifPresent(isDefault -> xml.attribute("default", isDefault));
+            profile.getDevice().ifPresent(device -> xml.attribute("device", device));
+            profile.getLabel().ifPresent(label -> xml.attribute("label", label));
+            profile.isOnline().ifPresent(online -> xml.attribute("online", online));
             xml.rightAngleBracket();
-            final Optional<Site> optionalSite = profile.getSite();
-            if (optionalSite.isPresent()) {
-                final Site site = optionalSite.get();
+            profile.getSite().ifPresent(site -> {
                 xml.halfOpenElement("site");
                 site.getId().ifPresent(id -> xml.attribute("id", String.valueOf(id)));
                 site.isDefault().ifPresent(isDefault -> xml.attribute("default", String.valueOf(isDefault)));
@@ -115,8 +125,19 @@ public class GetProfilesResult extends OpenlinkIQ {
                 xml.rightAngleBracket();
                 site.getName().ifPresent(xml::escape);
                 xml.closeElement("site");
-            }
 
+            });
+            final List<RequestAction> actions = profile.getActions();
+            if (!actions.isEmpty()) {
+                xml.openElement("actions");
+                actions.forEach(action -> {
+                    xml.halfOpenElement("action");
+                    xml.attribute("id", action.getId());
+                    xml.attribute("label", action.getLabel());
+                    xml.closeEmptyElement();
+                });
+                xml.closeElement("actions");
+            }
             xml.closeElement(OpenlinkXmppNamespace.TAG_PROFILE);
         }
         xml.closeElement(OpenlinkXmppNamespace.TAG_PROFILES);
@@ -148,8 +169,7 @@ public class GetProfilesResult extends OpenlinkIQ {
 
         @Nonnull
         public static Builder start(@Nonnull final GetProfilesRequest request) {
-            return start()
-                    .setStanzaId(request.getStanzaId())
+            return start().setId(request.getStanzaId())
                     .setFrom(request.getTo())
                     .setTo(request.getFrom());
         }

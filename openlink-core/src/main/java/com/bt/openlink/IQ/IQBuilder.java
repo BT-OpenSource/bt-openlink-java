@@ -29,16 +29,24 @@ public abstract class IQBuilder<B extends IQBuilder, J, T> extends StanzaBuilder
     }
 
     protected void validate() {
-        super.validate();
+        if (!getTo().isPresent()) {
+            throw new IllegalStateException("The stanza 'to' has not been set");
+        }
+        if (!getFrom().isPresent()) {
+            throw new IllegalStateException("The stanza 'from' has not been set");
+        }
+        // Note; not neccesary to validate id/type as these can be automatically set
     }
 
     public void validate(final List<String> errors) {
-        super.validate(errors);
+        if (!getTo().isPresent()) {
+            errors.add("Invalid stanza; missing 'to' attribute is mandatory");
+        }
         if (!getFrom().isPresent()) {
             errors.add("Invalid stanza; missing 'from' attribute is mandatory");
         }
         if (!getId().isPresent()) {
-            errors.add(0, "Invalid stanza; missing 'id' attribute is mandatory");
+            errors.add("Invalid stanza; missing 'id' attribute is mandatory");
         }
         if (getExpectedIQType() != iqType) {
             errors.add("Invalid stanza; missing or incorrect 'type' attribute");

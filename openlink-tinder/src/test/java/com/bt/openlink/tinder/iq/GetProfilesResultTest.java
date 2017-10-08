@@ -44,7 +44,7 @@ public class GetProfilesResultTest {
             .setType(Site.Type.ITS)
             .setName("another-test-site-name")
             .build();
-    public static final ProfileId PROFILE_ID_2 = ProfileId.from("test-profile-id-2").get();
+    private static final ProfileId PROFILE_ID_2 = ProfileId.from("test-profile-id-2").get();
     private static final Profile PROFILE_2 = Profile.Builder.start()
             .setId(PROFILE_ID_2)
             .setDefault(true)
@@ -107,7 +107,7 @@ public class GetProfilesResultTest {
     public void canCreateAStanza() throws Exception {
 
         final GetProfilesResult result = GetProfilesResult.Builder.start()
-                .setID(Fixtures.STANZA_ID)
+                .setId(Fixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
                 .build();
@@ -119,10 +119,10 @@ public class GetProfilesResultTest {
     }
 
     @Test
-    public void willConvertToXML() throws Exception {
+    public void willGenerateAnXmppStanza() throws Exception {
 
         final GetProfilesResult result = GetProfilesResult.Builder.start()
-                .setID(Fixtures.STANZA_ID)
+                .setId(Fixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
                 .addProfile(PROFILE_1)
@@ -182,10 +182,10 @@ public class GetProfilesResultTest {
         final GetProfilesResult result = GetProfilesResult.from(iq);
 
         assertThat(result.getParseErrors(), contains(
-                "Invalid stanza; missing 'id' attribute is mandatory",
                 "Invalid get-profiles result; missing 'profiles' element is mandatory",
                 "Invalid stanza; missing 'to' attribute is mandatory",
                 "Invalid stanza; missing 'from' attribute is mandatory",
+                "Invalid stanza; missing 'id' attribute is mandatory",
                 "Invalid stanza; missing or incorrect 'type' attribute"
         ));
     }
@@ -207,7 +207,7 @@ public class GetProfilesResultTest {
         final GetProfilesRequest request = GetProfilesRequest.Builder.start()
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
-                .setID(Fixtures.STANZA_ID)
+                .setId(Fixtures.STANZA_ID)
                 .setJID(Fixtures.USER_JID)
                 .build();
 
