@@ -10,9 +10,19 @@ import javax.annotation.Nonnull;
 import com.bt.openlink.type.Profile;
 import com.bt.openlink.type.ProfileId;
 
-public abstract class GetProfilesResultBuilder<B extends IQBuilder, J, T> extends IQBuilder<B, J, T> {
+public abstract class GetProfilesResultBuilder<B extends IQBuilder, J, T extends Enum<T>> extends IQBuilder<B, J, T> {
 
     @Nonnull private List<Profile> profiles = new ArrayList<>();
+
+    protected GetProfilesResultBuilder(final Class<T> typeClass) {
+        super(typeClass);
+    }
+
+    @Nonnull
+    @Override
+    public String getExpectedIQType() {
+        return "result";
+    }
 
     @SuppressWarnings("unchecked")
     @Nonnull

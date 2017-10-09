@@ -61,12 +61,7 @@ public class GetProfilesRequest extends OpenlinkIQ2 {
         }
 
         private Builder() {
-        }
-
-        @Override
-        @Nonnull
-        public Type getExpectedIQType() {
-            return Type.set;
+            super(IQ.Type.class);
         }
 
         @Nonnull

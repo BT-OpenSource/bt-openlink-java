@@ -9,35 +9,33 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import javax.annotation.Nonnull;
-
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import com.bt.openlink.Fixtures;
+
 public class GetCallHistoryRequestBuilderTest {
 
-    @Rule
-    public final ExpectedException expectedException = ExpectedException.none();
+    private static class ConcreteGetCallHistoryRequestBuilder extends GetCallHistoryRequestBuilder<GetProfilesResultBuilder, String, Fixtures.typeEnum> {
+        protected ConcreteGetCallHistoryRequestBuilder() {
+            super(Fixtures.typeEnum.class);
+        }
+    }
 
-    private GetCallHistoryRequestBuilder<GetCallHistoryRequestBuilder, String, String> builder;
+    @Rule public final ExpectedException expectedException = ExpectedException.none();
+
+    private ConcreteGetCallHistoryRequestBuilder builder;
 
     @Before
     public void setUp() throws Exception {
 
-        builder = new GetCallHistoryRequestBuilder<GetCallHistoryRequestBuilder, String, String>() {
-            @Nonnull
-            @Override
-            public String getExpectedIQType() {
-                return "set";
-            }
-        };
+        builder = new ConcreteGetCallHistoryRequestBuilder();
 
         builder.setTo("to");
         builder.setFrom("from");
         builder.setId("id");
-        builder.setIQType("set");
     }
 
     @Test
@@ -48,7 +46,7 @@ public class GetCallHistoryRequestBuilderTest {
         builder.validate();
         builder.validate(errors);
 
-        assertThat(errors,is(empty()));
+        assertThat(errors, is(empty()));
 
         assertThat(builder.getJID(), is(Optional.empty()));
         assertThat(builder.getCaller(), is(Optional.empty()));

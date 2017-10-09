@@ -6,8 +6,6 @@ import static org.hamcrest.Matchers.contains;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.Nonnull;
-
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -16,26 +14,25 @@ import org.junit.rules.ExpectedException;
 import com.bt.openlink.Fixtures;
 
 public class GetProfilesResultBuilderTest {
-    @Rule
-    public final ExpectedException expectedException = ExpectedException.none();
 
-    private GetProfilesResultBuilder<GetProfilesResultBuilder, String, String> builder;
+    private static class ConcreteGetProfilesResultBuilder extends GetProfilesResultBuilder<GetProfilesResultBuilder, String, Fixtures.typeEnum> {
+        protected ConcreteGetProfilesResultBuilder() {
+            super(Fixtures.typeEnum.class);
+        }
+    }
+
+    @Rule public final ExpectedException expectedException = ExpectedException.none();
+
+    private ConcreteGetProfilesResultBuilder builder;
 
     @Before
     public void setUp() throws Exception {
 
-        builder = new GetProfilesResultBuilder<GetProfilesResultBuilder, String, String>() {
-            @Nonnull
-            @Override
-            public String getExpectedIQType() {
-                return "result";
-            }
-        };
+        builder = new ConcreteGetProfilesResultBuilder();
 
         builder.setTo("to");
         builder.setFrom("from");
         builder.setId("id");
-        builder.setIQType("result");
     }
 
     @Test

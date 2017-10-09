@@ -9,7 +9,7 @@ import javax.annotation.Nullable;
 
 import com.bt.openlink.type.CallType;
 
-public abstract class GetCallHistoryRequestBuilder<B extends IQBuilder, J, T> extends IQBuilder<B, J, T> {
+public abstract class GetCallHistoryRequestBuilder<B extends IQBuilder, J, T extends Enum<T>> extends IQBuilder<B, J, T> {
 
     @Nullable J jid;
     @Nullable private String caller;
@@ -19,6 +19,16 @@ public abstract class GetCallHistoryRequestBuilder<B extends IQBuilder, J, T> ex
     @Nullable private LocalDate upToDate;
     @Nullable private Long start;
     @Nullable private Long count;
+
+    protected GetCallHistoryRequestBuilder(final Class<T> typeClass) {
+        super(typeClass);
+    }
+
+    @Nonnull
+    @Override
+    public String getExpectedIQType() {
+        return "set";
+    }
 
     @Override
     protected void validate() {

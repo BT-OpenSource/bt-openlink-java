@@ -9,35 +9,34 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import javax.annotation.Nonnull;
-
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import com.bt.openlink.Fixtures;
+
 @SuppressWarnings("ConstantConditions")
 public class GetProfilesRequestBuilderTest {
 
+    private static class ConcreteGetProfilesRequestBuilder extends GetProfilesRequestBuilder<GetProfilesResultBuilder, String, Fixtures.typeEnum> {
+        protected ConcreteGetProfilesRequestBuilder() {
+            super(Fixtures.typeEnum.class);
+        }
+    }
+
     @Rule public final ExpectedException expectedException = ExpectedException.none();
 
-    private GetProfilesRequestBuilder<GetProfilesRequestBuilder, String, String> builder;
+    private ConcreteGetProfilesRequestBuilder builder;
 
     @Before
     public void setUp() throws Exception {
 
-        builder = new GetProfilesRequestBuilder<GetProfilesRequestBuilder, String, String>() {
-            @Nonnull
-            @Override
-            public String getExpectedIQType() {
-                return "set";
-            }
-        };
+        builder = new ConcreteGetProfilesRequestBuilder();
 
         builder.setTo("to");
         builder.setFrom("from");
         builder.setId("id");
-        builder.setIQType("set");
     }
 
     @Test
@@ -49,7 +48,7 @@ public class GetProfilesRequestBuilderTest {
         builder.validate();
         builder.validate(errors);
 
-        assertThat(errors,is(empty()));
+        assertThat(errors, is(empty()));
         assertThat(builder.getJID().get(), is("jid"));
     }
 

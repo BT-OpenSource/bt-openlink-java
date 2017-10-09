@@ -6,9 +6,19 @@ import java.util.Optional;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public abstract class GetProfilesRequestBuilder<B extends IQBuilder, J, T> extends IQBuilder<B, J, T> {
+public abstract class GetProfilesRequestBuilder<B extends IQBuilder, J, T extends Enum<T>> extends IQBuilder<B, J, T> {
 
     @Nullable protected J jid;
+
+    protected GetProfilesRequestBuilder(final Class<T> typeClass) {
+        super(typeClass);
+    }
+
+    @Nonnull
+    @Override
+    public String getExpectedIQType() {
+        return "set";
+    }
 
     @Nonnull
     @SuppressWarnings("unchecked")

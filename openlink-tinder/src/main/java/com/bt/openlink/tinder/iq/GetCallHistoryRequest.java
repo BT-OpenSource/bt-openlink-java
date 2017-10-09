@@ -146,12 +146,7 @@ public class GetCallHistoryRequest extends OpenlinkIQ2 {
         }
 
         private Builder() {
-        }
-
-        @Nonnull
-        @Override
-        public Type getExpectedIQType() {
-            return Type.set;
+            super(IQ.Type.class);
         }
 
         @Nonnull

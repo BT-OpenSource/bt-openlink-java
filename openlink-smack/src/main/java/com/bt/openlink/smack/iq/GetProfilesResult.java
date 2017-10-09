@@ -136,12 +136,7 @@ public class GetProfilesResult extends OpenlinkIQ {
     public static final class Builder extends GetProfilesResultBuilder<Builder, Jid, IQ.Type> {
 
         private Builder() {
-        }
-
-        @Nonnull
-        @Override
-        public IQ.Type getExpectedIQType() {
-            return Type.result;
+            super(IQ.Type.class);
         }
 
         @Nonnull

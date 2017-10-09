@@ -16,83 +16,90 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import com.bt.openlink.Fixtures;
+
 @SuppressWarnings("ConstantConditions")
 public class IQBuilderTest {
 
+    private static class ConcreteIQBuilder extends IQBuilder<ConcreteIQBuilder, String, Fixtures.typeEnum> {
+        protected ConcreteIQBuilder() {
+            super(Fixtures.typeEnum.class);
+        }
+
+        @Nonnull
+        @Override
+        public String getExpectedIQType() {
+            return Fixtures.typeEnum.set.name();
+        }
+    }
+
     @Rule public final ExpectedException expectedException = ExpectedException.none();
 
-    private IQBuilder<IQBuilder, String, String> iqBuilder;
+    private ConcreteIQBuilder builder;
 
     @Before
     public void setUp() throws Exception {
-
-        iqBuilder = new IQBuilder<IQBuilder, String, String>() {
-            @Nonnull
-            @Override
-            public String getExpectedIQType() {
-                return "type";
-            }
-        };
+        builder = new ConcreteIQBuilder();
     }
 
     @Test
     public void willValidateAPopulatedBuilder() throws Exception {
 
         final List<String> errors = new ArrayList<>();
-        iqBuilder.setTo("to");
-        iqBuilder.setFrom("from");
-        iqBuilder.setId("id");
-        iqBuilder.setIQType("type");
+        builder.setTo("to");
+        builder.setFrom("from");
+        builder.setId("id");
+        builder.setIQType(Fixtures.typeEnum.set);
 
-        iqBuilder.validate();
-        iqBuilder.validate(errors);
+        builder.validate();
+        builder.validate(errors);
 
         assertThat(errors, is(empty()));
-        assertThat(iqBuilder.getTo().get(), is("to"));
-        assertThat(iqBuilder.getFrom().get(), is("from"));
-        assertThat(iqBuilder.getId().get(), is("id"));
-        assertThat(iqBuilder.getIqType().get(), is("type"));
+        assertThat(builder.getTo().get(), is("to"));
+        assertThat(builder.getFrom().get(), is("from"));
+        assertThat(builder.getId().get(), is("id"));
+        assertThat(builder.getIqType().get(), is(Fixtures.typeEnum.set));
     }
 
     @Test
     public void willValidateThatToIsSet() throws Exception {
-        iqBuilder.setFrom("from");
-        iqBuilder.setId("id");
-        iqBuilder.setIQType("type");
+        builder.setFrom("from");
+        builder.setId("id");
+        builder.setIQType(Fixtures.typeEnum.set);
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("The stanza 'to' has not been set");
 
-        iqBuilder.validate();
+        builder.validate();
     }
 
     @Test
     public void willValidateThatFromIsSet() throws Exception {
-        iqBuilder.setTo("to");
-        iqBuilder.setId("id");
-        iqBuilder.setIQType("type");
+        builder.setTo("to");
+        builder.setId("id");
+        builder.setIQType(Fixtures.typeEnum.set);
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("The stanza 'from' has not been set");
 
-        iqBuilder.validate();
+        builder.validate();
     }
 
     @Test
     public void willCheckThatIdAndFromAndTypeAreSet() throws Exception {
 
         final List<String> errors = new ArrayList<>();
-        iqBuilder.setIQType("not-type");
+        builder.setIQType(Fixtures.typeEnum.MY_UNEXPECTED_TYPE);
 
-        iqBuilder.validate(errors);
+        builder.validate(errors);
 
         assertThat(errors, contains(
                 "Invalid stanza; missing 'to' attribute is mandatory",
                 "Invalid stanza; missing 'from' attribute is mandatory",
                 "Invalid stanza; missing 'id' attribute is mandatory",
                 "Invalid stanza; missing or incorrect 'type' attribute"));
-        assertThat(iqBuilder.getTo(), is(Optional.empty()));
-        assertThat(iqBuilder.getFrom(), is(Optional.empty()));
-        assertThat(iqBuilder.getId(), is(Optional.empty()));
-        assertThat(iqBuilder.getIqType().get(), is("not-type"));
+        assertThat(builder.getTo(), is(Optional.empty()));
+        assertThat(builder.getFrom(), is(Optional.empty()));
+        assertThat(builder.getId(), is(Optional.empty()));
+        assertThat(builder.getIqType().get(), is(Fixtures.typeEnum.MY_UNEXPECTED_TYPE));
     }
 
 }

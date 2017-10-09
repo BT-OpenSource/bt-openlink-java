@@ -18,6 +18,12 @@ import com.bt.openlink.type.Site;
 
 @SuppressWarnings("ConstantConditions")
 public class Fixtures {
+    public enum typeEnum {
+        set,
+        result,
+        MY_UNEXPECTED_TYPE
+    }
+
     public static final String JID = "test-user";
     public static final Instant START_TIME = LocalDateTime.parse("2017-10-09T08:07:00").atZone(ZoneId.of("UTC")).toInstant();
     public static final Duration DURATION = Duration.ofMinutes(1);

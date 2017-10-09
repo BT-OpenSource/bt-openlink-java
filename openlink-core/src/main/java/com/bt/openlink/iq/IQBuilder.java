@@ -9,12 +9,16 @@ import javax.annotation.Nullable;
 import com.bt.openlink.StanzaBuilder;
 
 @SuppressWarnings("unchecked")
-public abstract class IQBuilder<B extends IQBuilder, J, T> extends StanzaBuilder<B, J> {
+public abstract class IQBuilder<B extends IQBuilder, J, T extends Enum<T>> extends StanzaBuilder<B, J> {
 
-    @Nullable private T iqType = getExpectedIQType();
+    @Nullable private T iqType;
+
+    protected IQBuilder(final Class<T> typeClass) {
+        iqType = Enum.valueOf(typeClass, getExpectedIQType());
+    }
 
     @Nonnull
-    public abstract T getExpectedIQType();
+    public abstract String getExpectedIQType();
 
     @SuppressWarnings("unchecked")
     @Nonnull
@@ -48,7 +52,7 @@ public abstract class IQBuilder<B extends IQBuilder, J, T> extends StanzaBuilder
         if (!getId().isPresent()) {
             errors.add("Invalid stanza; missing 'id' attribute is mandatory");
         }
-        if (getExpectedIQType() != iqType) {
+        if (iqType == null || !iqType.name().equals(getExpectedIQType())) {
             errors.add("Invalid stanza; missing or incorrect 'type' attribute");
         }
     }
