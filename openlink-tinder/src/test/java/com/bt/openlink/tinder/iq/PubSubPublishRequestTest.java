@@ -83,7 +83,7 @@ public class PubSubPublishRequestTest {
     public void canCreateAStanza() throws Exception {
 
         final PubSubPublishRequest request = PubSubPublishRequest.Builder.start()
-                .setID(Fixtures.STANZA_ID)
+                .setId(Fixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
                 .setPubSubNodeId(Fixtures.NODE_ID)
@@ -102,7 +102,7 @@ public class PubSubPublishRequestTest {
     public void cannotCreateAStanzaWithoutAPubSubNodeId() throws Exception {
 
         expectedException.expect(IllegalStateException.class);
-        expectedException.expectMessage("The stanza 'pubSubNodeId' has not been set");
+        expectedException.expectMessage("The stanza 'pubSubNodeId'/'interestId' has not been set");
         PubSubPublishRequest.Builder.start()
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
@@ -114,9 +114,9 @@ public class PubSubPublishRequestTest {
     public void cannotCreateAStanzaWithACallOnADifferentInterestFromTheNode() throws Exception {
 
         expectedException.expect(IllegalStateException.class);
-        expectedException.expectMessage("A call on interest id 'test-interest-id' cannot be published on PubSub nodeId 'another-node'");
+        expectedException.expectMessage("The call with id test-call-id is on interest test-interest-id which differs from the pub-sub node id another-node");
         PubSubPublishRequest.Builder.start()
-                .setID(Fixtures.STANZA_ID)
+                .setId(Fixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
                 .setPubSubNodeId(PubSubNodeId.from("another-node").get())
@@ -156,7 +156,7 @@ public class PubSubPublishRequestTest {
                 "</iq>\n";
 
         final PubSubPublishRequest request = PubSubPublishRequest.Builder.start()
-                .setID(Fixtures.STANZA_ID)
+                .setId(Fixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
                 .addCall(Fixtures.CALL)

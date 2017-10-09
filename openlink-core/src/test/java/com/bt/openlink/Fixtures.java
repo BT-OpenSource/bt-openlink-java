@@ -5,8 +5,10 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 
+import com.bt.openlink.type.Call;
 import com.bt.openlink.type.CallDirection;
 import com.bt.openlink.type.CallId;
+import com.bt.openlink.type.CallState;
 import com.bt.openlink.type.Feature;
 import com.bt.openlink.type.FeatureId;
 import com.bt.openlink.type.FeatureType;
@@ -17,6 +19,7 @@ import com.bt.openlink.type.Participant;
 import com.bt.openlink.type.ParticipantType;
 import com.bt.openlink.type.Profile;
 import com.bt.openlink.type.ProfileId;
+import com.bt.openlink.type.RequestAction;
 import com.bt.openlink.type.Site;
 
 @SuppressWarnings("ConstantConditions")
@@ -65,5 +68,17 @@ public class Fixtures {
             .setDefault(true)
             .setId(INTEREST_ID)
             .setLabel("test interest label")
+            .build();
+    public static final Call CALL = Call.Builder.start()
+            .setId(CALL_ID)
+            .setSite(SITE)
+            .setProfileId(PROFILE_ID)
+            .setInterestId(INTEREST_ID)
+            .setState(CallState.CALL_ORIGINATED)
+            .setDirection(CallDirection.INCOMING)
+            .setStartTime(START_TIME)
+            .setDuration(DURATION)
+            .addAction(RequestAction.ANSWER_CALL)
+            .addParticipant(PARTICIPANT)
             .build();
 }

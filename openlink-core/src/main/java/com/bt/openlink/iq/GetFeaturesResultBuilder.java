@@ -64,9 +64,11 @@ public abstract class GetFeaturesResultBuilder<B extends GetFeaturesResultBuilde
     private void validateUniqueness(final Consumer<FeatureId> errorConsumer) {
         for (int i = 0; i < features.size(); i++) {
             final Optional<FeatureId> featureIdOptional = features.get(i).getId();
-            for (int j = i + 1; j < features.size(); j++) {
-                if (featureIdOptional.isPresent() && featureIdOptional.equals(features.get(j).getId())) {
-                    errorConsumer.accept(featureIdOptional.get());
+            if (featureIdOptional.isPresent()) {
+                for (int j = i + 1; j < features.size(); j++) {
+                    if (featureIdOptional.equals(features.get(j).getId())) {
+                        errorConsumer.accept(featureIdOptional.get());
+                    }
                 }
             }
         }

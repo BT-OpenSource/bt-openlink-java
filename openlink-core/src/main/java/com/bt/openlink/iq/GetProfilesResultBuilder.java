@@ -47,9 +47,11 @@ public abstract class GetProfilesResultBuilder<B extends GetProfilesResultBuilde
     private void validateUniqueness(final Consumer<ProfileId> errorConsumer) {
         for (int i = 0; i < profiles.size(); i++) {
             final Optional<ProfileId> profileIdOptional = profiles.get(i).getId();
-            for (int j = i + 1; j < profiles.size(); j++) {
-                if (profileIdOptional.isPresent() && profileIdOptional.equals(profiles.get(j).getId())) {
-                    errorConsumer.accept(profileIdOptional.get());
+            if (profileIdOptional.isPresent()) {
+                for (int j = i + 1; j < profiles.size(); j++) {
+                    if (profileIdOptional.equals(profiles.get(j).getId())) {
+                        errorConsumer.accept(profileIdOptional.get());
+                    }
                 }
             }
         }
