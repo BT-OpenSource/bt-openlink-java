@@ -1,6 +1,7 @@
 package com.bt.openlink.smack.internal;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 import javax.annotation.Nonnull;
@@ -60,7 +61,7 @@ public final class SmackPacketUtil {
         }
     }
 
-    public static Optional<Site> getSite(final XmlPullParser parser) throws IOException, XmlPullParserException {
+    public static Optional<Site> getSite(final XmlPullParser parser, final List<String> errors) throws IOException, XmlPullParserException {
         if (parser.getName().equals("site")) {
             final Site.Builder siteBuilder = Site.Builder.start();
             final Optional<Long> siteId = SmackPacketUtil.getLongAttribute(parser, "id");
@@ -74,7 +75,7 @@ public final class SmackPacketUtil {
             siteName.ifPresent(siteBuilder::setName);
             ParserUtils.forwardToEndTagOfDepth(parser, parser.getDepth());
             parser.nextTag();
-            return Optional.of(siteBuilder.buildWithoutValidating());
+            return Optional.of(siteBuilder.build(errors));
         } else {
             return Optional.empty();
         }

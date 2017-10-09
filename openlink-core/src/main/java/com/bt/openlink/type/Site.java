@@ -1,5 +1,6 @@
 package com.bt.openlink.type;
 
+import java.util.List;
 import java.util.Optional;
 
 import javax.annotation.Nonnull;
@@ -76,11 +77,20 @@ public class Site {
             if (name == null) {
                 throw new IllegalStateException("The site name has not been set");
             }
-            return buildWithoutValidating();
+            return new Site(this);
         }
 
         @Nonnull
-        public Site buildWithoutValidating() {
+        public Site build(@Nonnull final List<String> errors) {
+            if (id == null) {
+                errors.add("The site id has not been set");
+            }
+            if (type == null) {
+                errors.add("The site type has not been set");
+            }
+            if (name == null) {
+                errors.add("The site name has not been set");
+            }
             return new Site(this);
         }
 

@@ -53,7 +53,7 @@ public class GetProfilesResult extends OpenlinkIQ {
             final Optional<String> device = SmackPacketUtil.getStringAttribute(parser, "device");
             device.ifPresent(profileBuilder::setDevice);
             parser.nextTag();
-            final Optional<Site> site = SmackPacketUtil.getSite(parser);
+            final Optional<Site> site = SmackPacketUtil.getSite(parser, parseErrors);
             site.ifPresent(profileBuilder::setSite);
             if (parser.getName().equals(OpenlinkXmppNamespace.TAG_ACTIONS) && !parser.isEmptyElementTag()) {
                 do {

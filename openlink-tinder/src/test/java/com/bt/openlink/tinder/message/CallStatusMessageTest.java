@@ -34,7 +34,7 @@ public class CallStatusMessageTest {
             "        <callstatus xmlns='http://xmpp.org/protocol/openlink:01:00:00#call-status' busy='true'>\n" +
             "          <call>\n" +
             "            <id>" + Fixtures.CALL_ID + "</id>\n" +
-            "            <site id='42' type='BTSESSIONMANAGER'>itrader-dev-sm-5</site>\n" +
+            "            <site id='42' type='BTSM'>itrader-dev-sm-5</site>\n" +
             "            <profile>" + Fixtures.PROFILE_ID + "</profile>\n" +
             "            <eventTimestamps>\n" +
             "              <switch>1470739100996</switch>\n" +

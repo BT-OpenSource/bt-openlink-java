@@ -1,8 +1,11 @@
 package com.bt.openlink.type;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.contains;
 import static org.junit.Assert.assertThat;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.Rule;
@@ -70,11 +73,18 @@ public class SiteTest {
     }
 
     @Test
-    public void willBuildASiteWithoutMandatoryFields() throws Exception {
+    public void willCheckMandatoryFieldsArePresent() throws Exception {
+
+        final List<String> errors = new ArrayList<>();
 
         final Site site = Site.Builder.start()
-                .buildWithoutValidating();
+                .build(errors);
 
+        assertThat(errors, contains(
+                "The site id has not been set",
+                "The site type has not been set",
+                "The site name has not been set"
+        ));
         assertThat(site.getName(), is(Optional.empty()));
         assertThat(site.getId(), is(Optional.empty()));
         assertThat(site.isDefault(), is(Optional.empty()));

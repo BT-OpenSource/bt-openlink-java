@@ -127,25 +127,6 @@ public final class TinderPacketUtil {
         return null;
     }
 
-    @Nullable
-    public static Integer getChildElementInteger(
-            @Nullable final Element parentElement,
-            @Nonnull final String childElementName,
-            final boolean isRequired,
-            @Nonnull final String stanzaDescription,
-            @Nonnull final List<String> parseErrors) {
-        final String childElementText = getChildElementString(parentElement, childElementName, isRequired, stanzaDescription, parseErrors);
-        if (childElementText != null) {
-            try {
-                return Integer.parseInt(childElementText);
-            } catch (final NumberFormatException ignored) {
-                parseErrors.add(String.format("Invalid %s; invalid %s '%s'; please supply an integer", stanzaDescription, childElementName, childElementText));
-                return null;
-            }
-        }
-        return null;
-    }
-
     @Nonnull
     private static Optional<Instant> getChildElementISO8601(
             @Nullable final Element parentElement,
@@ -324,9 +305,9 @@ public final class TinderPacketUtil {
         id.ifPresent(siteBuilder::setId);
         final Optional<Boolean> isDefaultSite = getBooleanAttribute(siteElement, OpenlinkXmppNamespace.TAG_DEFAULT, false, description, parseErrors);
         isDefaultSite.ifPresent(siteBuilder::setDefault);
-        final Optional<Site.Type> type = Site.Type.from(getStringAttribute(siteElement, "type", true, description, parseErrors).orElse(null));
+        final Optional<Site.Type> type = Site.Type.from(getStringAttribute(siteElement, "type", false, description, parseErrors).orElse(null));
         type.ifPresent(siteBuilder::setType);
-        return Optional.of(siteBuilder.buildWithoutValidating());
+        return Optional.of(siteBuilder.build(parseErrors));
     }
 
     @SuppressWarnings("unchecked")
