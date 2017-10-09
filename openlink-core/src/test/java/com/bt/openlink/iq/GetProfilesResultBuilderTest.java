@@ -1,4 +1,4 @@
-package com.bt.openlink.IQ;
+package com.bt.openlink.iq;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;

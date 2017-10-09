@@ -10,7 +10,7 @@ import javax.annotation.Nullable;
 import org.xmpp.packet.IQ;
 import org.xmpp.packet.JID;
 
-import com.bt.openlink.IQ.IQBuilder;
+import com.bt.openlink.iq.IQBuilder;
 
 abstract class OpenlinkIQ2 extends IQ {
 
@@ -27,26 +27,6 @@ abstract class OpenlinkIQ2 extends IQ {
             this.parseErrors = new ArrayList<>(parseErrors);
             builder.validate(parseErrors);
         }
-    }
-
-    /**
-     * Sets the packet ID. Packet ID's are optional, except for IQ packets.
-     *
-     * @param ID
-     *            the packet ID.
-     */
-    public void setStanzaId(String ID) {
-        setID(ID);
-    }
-
-    /**
-     * Returns the packet ID, or <tt>null</tt> if the packet does not have an ID. Packet ID's are optional, except for IQ
-     * packets.
-     *
-     * @return the packet ID.
-     */
-    public String getStanzaId() {
-        return getID();
     }
 
     @Nonnull

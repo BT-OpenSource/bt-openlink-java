@@ -1,4 +1,4 @@
-package com.bt.openlink.IQ;
+package com.bt.openlink.iq;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -3,7 +3,7 @@ package com.bt.openlink.tinder.iq;
 import org.xmpp.packet.IQ;
 import org.xmpp.packet.JID;
 
-import com.bt.openlink.IQ.IQBuilder;
+import com.bt.openlink.iq.IQBuilder;
 import com.bt.openlink.tinder.TinderStanzaBuilder;
 
 final class TinderIQBuilder {

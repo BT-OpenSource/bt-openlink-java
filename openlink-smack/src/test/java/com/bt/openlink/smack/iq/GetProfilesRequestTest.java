@@ -59,13 +59,13 @@ public class GetProfilesRequestTest {
         final GetProfilesRequest request = GetProfilesRequest.Builder.start().setId(Fixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
-                .setJid(Fixtures.USER_JID)
+                .setJID(Fixtures.USER_JID)
                 .build();
 
         assertThat(request.getStanzaId(), is(Fixtures.STANZA_ID));
         assertThat(request.getTo(), is(Fixtures.TO_JID));
         assertThat(request.getFrom(), is(Fixtures.FROM_JID));
-        assertThat(request.getJid().get(), is(Fixtures.USER_JID));
+        assertThat(request.getJID().get(), is(Fixtures.USER_JID));
     }
 
     @Test
@@ -74,7 +74,7 @@ public class GetProfilesRequestTest {
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("The stanza 'to' has not been set");
         GetProfilesRequest.Builder.start()
-                .setJid(Fixtures.USER_JID)
+                .setJID(Fixtures.USER_JID)
                 .build();
     }
 
@@ -95,7 +95,7 @@ public class GetProfilesRequestTest {
         final GetProfilesRequest request = GetProfilesRequest.Builder.start().setId(Fixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
-                .setJid(Fixtures.USER_JID)
+                .setJID(Fixtures.USER_JID)
                 .build();
 
         assertThat(request.toXML().toString(), isIdenticalTo(GET_PROFILES_REQUEST).ignoreWhitespace());
@@ -107,7 +107,7 @@ public class GetProfilesRequestTest {
         final GetProfilesRequest request = GetProfilesRequest.Builder.start()
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
-                .setJid(Fixtures.USER_JID)
+                .setJID(Fixtures.USER_JID)
                 .build();
 
         assertThat(request.getStanzaId(), is(not(nullValue())));
@@ -123,7 +123,7 @@ public class GetProfilesRequestTest {
         assertThat(request.getTo(), is(Fixtures.TO_JID));
         assertThat(request.getFrom(), is(Fixtures.FROM_JID));
         assertThat(request.getType(), is(IQ.Type.set));
-        assertThat(request.getJid().get(), is(Fixtures.USER_JID));
+        assertThat(request.getJID().get(), is(Fixtures.USER_JID));
         assertThat(request.getParseErrors(), is(empty()));
     }
 

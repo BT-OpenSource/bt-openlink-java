@@ -1,14 +1,20 @@
 package com.bt.openlink.smack.internal;
 
+import java.io.IOException;
 import java.util.Optional;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import org.jivesoftware.smack.util.ParserUtils;
 import org.jxmpp.jid.Jid;
 import org.jxmpp.jid.impl.JidCreate;
 import org.jxmpp.stringprep.XmppStringprepException;
 import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
+
+import com.bt.openlink.OpenlinkXmppNamespace;
+import com.bt.openlink.type.Site;
 
 public final class SmackPacketUtil {
 
@@ -54,4 +60,23 @@ public final class SmackPacketUtil {
         }
     }
 
+    public static Optional<Site> getSite(final XmlPullParser parser) throws IOException, XmlPullParserException {
+        if (parser.getName().equals("site")) {
+            final Site.Builder siteBuilder = Site.Builder.start();
+            final Optional<Long> siteId = SmackPacketUtil.getLongAttribute(parser, "id");
+            siteId.ifPresent(siteBuilder::setId);
+            final Optional<Boolean> isDefaultSite = SmackPacketUtil.getBooleanAttribute(parser, OpenlinkXmppNamespace.TAG_DEFAULT);
+            isDefaultSite.ifPresent(siteBuilder::setDefault);
+            final Optional<Site.Type> siteType = Site.Type.from(SmackPacketUtil.getStringAttribute(parser, "type").orElse(null));
+            siteType.ifPresent(siteBuilder::setType);
+            parser.next();
+            final Optional<String> siteName = Optional.ofNullable(parser.getText());
+            siteName.ifPresent(siteBuilder::setName);
+            ParserUtils.forwardToEndTagOfDepth(parser, parser.getDepth());
+            parser.nextTag();
+            return Optional.of(siteBuilder.buildWithoutValidating());
+        } else {
+            return Optional.empty();
+        }
+    }
 }

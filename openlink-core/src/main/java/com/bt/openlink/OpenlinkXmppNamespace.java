@@ -34,6 +34,10 @@ public enum OpenlinkXmppNamespace {
     public static final String TAG_OUT = "out";
     public static final String TAG_PROFILES = "profiles";
     public static final String TAG_PROFILE = "profile";
+    public static final String TAG_DEFAULT = "default";
+    public static final String TAG_LABEL = "label";
+    public static final String TAG_ACTIONS = "actions";
+    public static final String TAG_ACTION = "action";
 
     private final String uri;
     private final String label;

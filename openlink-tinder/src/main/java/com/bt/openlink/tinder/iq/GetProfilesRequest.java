@@ -12,7 +12,7 @@ import org.xmpp.packet.IQ;
 import org.xmpp.packet.JID;
 
 import com.bt.openlink.OpenlinkXmppNamespace;
-import com.bt.openlink.IQ.GetProfilesRequestBuilder;
+import com.bt.openlink.iq.GetProfilesRequestBuilder;
 import com.bt.openlink.tinder.internal.TinderPacketUtil;
 
 public class GetProfilesRequest extends OpenlinkIQ2 {
@@ -20,7 +20,7 @@ public class GetProfilesRequest extends OpenlinkIQ2 {
 
     private GetProfilesRequest(@Nonnull Builder builder, @Nullable List<String> parseErrors) {
         super(builder, parseErrors);
-        this.jid = builder.getJid().orElse(null);
+        this.jid = builder.getJID().orElse(null);
         final Element inElement = TinderPacketUtil.addCommandIOInputElement(this, OpenlinkXmppNamespace.OPENLINK_GET_PROFILES);
         TinderPacketUtil.addElementWithTextIfNotNull(inElement, "jid", jid);
     }
@@ -28,11 +28,6 @@ public class GetProfilesRequest extends OpenlinkIQ2 {
     @Nonnull
     public Optional<JID> getJID() {
         return Optional.ofNullable(jid);
-    }
-
-    @Nonnull
-    public Optional<JID> getJid() {
-        return getJID();
     }
 
     @Nonnull

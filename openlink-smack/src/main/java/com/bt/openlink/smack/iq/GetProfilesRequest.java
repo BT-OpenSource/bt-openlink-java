@@ -14,7 +14,7 @@ import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
 import com.bt.openlink.OpenlinkXmppNamespace;
-import com.bt.openlink.IQ.GetProfilesRequestBuilder;
+import com.bt.openlink.iq.GetProfilesRequestBuilder;
 import com.bt.openlink.smack.internal.SmackPacketUtil;
 
 public class GetProfilesRequest extends OpenlinkIQ {
@@ -32,13 +32,13 @@ public class GetProfilesRequest extends OpenlinkIQ {
         }
         final Optional<Jid> jidOptional = SmackPacketUtil.getSmackJid(jidString);
         final Builder builder = Builder.start();
-        jidOptional.ifPresent(builder::setJid);
+        jidOptional.ifPresent(builder::setJID);
         return builder.build(new ArrayList<>());
     }
 
     private GetProfilesRequest(@Nonnull Builder builder, @Nullable List<String> parseErrors) {
         super("command", OpenlinkXmppNamespace.XMPP_COMMANDS.uri(), builder, parseErrors);
-        this.jid = builder.getJid().orElse(null);
+        this.jid = builder.getJID().orElse(null);
     }
 
     @Override
@@ -58,7 +58,7 @@ public class GetProfilesRequest extends OpenlinkIQ {
     }
 
     @Nonnull
-    public Optional<Jid> getJid() {
+    public Optional<Jid> getJID() {
         return Optional.ofNullable(jid);
     }
 

@@ -1,4 +1,4 @@
-package com.bt.openlink.IQ;
+package com.bt.openlink.iq;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -44,13 +44,13 @@ public class GetProfilesRequestBuilderTest {
     public void willValidateAPopulatedBuilder() throws Exception {
 
         final List<String> errors = new ArrayList<>();
-        builder.setJid("jid");
+        builder.setJID("jid");
 
         builder.validate();
         builder.validate(errors);
 
         assertThat(errors,is(empty()));
-        assertThat(builder.getJid().get(), is("jid"));
+        assertThat(builder.getJID().get(), is("jid"));
     }
 
     @Test
@@ -70,7 +70,7 @@ public class GetProfilesRequestBuilderTest {
         builder.validate(errors);
 
         assertThat(errors, contains("Invalid get-profiles request stanza; missing or invalid 'jid'"));
-        assertThat(builder.getJid(), is(Optional.empty()));
+        assertThat(builder.getJID(), is(Optional.empty()));
     }
 
 }

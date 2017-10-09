@@ -14,7 +14,7 @@ import org.xmpp.packet.IQ;
 import org.xmpp.packet.JID;
 
 import com.bt.openlink.OpenlinkXmppNamespace;
-import com.bt.openlink.IQ.GetProfilesResultBuilder;
+import com.bt.openlink.iq.GetProfilesResultBuilder;
 import com.bt.openlink.tinder.internal.TinderPacketUtil;
 import com.bt.openlink.type.Profile;
 import com.bt.openlink.type.ProfileId;

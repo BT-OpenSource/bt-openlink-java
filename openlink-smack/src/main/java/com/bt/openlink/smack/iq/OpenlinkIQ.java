@@ -13,7 +13,7 @@ import org.jxmpp.jid.Jid;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
-import com.bt.openlink.IQ.IQBuilder;
+import com.bt.openlink.iq.IQBuilder;
 
 abstract class OpenlinkIQ extends IQ {
 

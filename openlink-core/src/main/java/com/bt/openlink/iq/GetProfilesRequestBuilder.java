@@ -1,4 +1,4 @@
-package com.bt.openlink.IQ;
+package com.bt.openlink.iq;
 
 import java.util.List;
 import java.util.Optional;
@@ -18,18 +18,8 @@ public abstract class GetProfilesRequestBuilder<B extends IQBuilder, J, T> exten
     }
 
     @Nonnull
-    public B setJid(@Nonnull final J jid) {
-        return setJID(jid);
-    }
-
-    @Nonnull
     public Optional<J> getJID() {
         return Optional.ofNullable(jid);
-    }
-
-    @Nonnull
-    public Optional<J> getJid() {
-        return getJID();
     }
 
     @Override

@@ -16,7 +16,7 @@ import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
 import com.bt.openlink.OpenlinkXmppNamespace;
-import com.bt.openlink.IQ.GetProfilesResultBuilder;
+import com.bt.openlink.iq.GetProfilesResultBuilder;
 import com.bt.openlink.smack.internal.SmackPacketUtil;
 import com.bt.openlink.type.Profile;
 import com.bt.openlink.type.ProfileId;
@@ -44,39 +44,26 @@ public class GetProfilesResult extends OpenlinkIQ {
             final Profile.Builder profileBuilder = Profile.Builder.start();
             final Optional<ProfileId> profileId = ProfileId.from(parser.getAttributeValue("", "id"));
             profileId.ifPresent(profileBuilder::setId);
-            final Optional<Boolean> isDefaultProfile = SmackPacketUtil.getBooleanAttribute(parser, "default");
+            final Optional<Boolean> isDefaultProfile = SmackPacketUtil.getBooleanAttribute(parser, OpenlinkXmppNamespace.TAG_DEFAULT);
             isDefaultProfile.ifPresent(profileBuilder::setDefault);
-            final Optional<String> label = SmackPacketUtil.getStringAttribute(parser, "label");
+            final Optional<String> label = SmackPacketUtil.getStringAttribute(parser, OpenlinkXmppNamespace.TAG_LABEL);
             label.ifPresent(profileBuilder::setLabel);
             final Optional<Boolean> online = SmackPacketUtil.getBooleanAttribute(parser, "online");
             online.ifPresent(profileBuilder::setOnline);
             final Optional<String> device = SmackPacketUtil.getStringAttribute(parser, "device");
             device.ifPresent(profileBuilder::setDevice);
             parser.nextTag();
-            if (parser.getName().equals("site")) {
-                final Site.Builder siteBuilder = Site.Builder.start();
-                final Optional<Long> siteId = SmackPacketUtil.getLongAttribute(parser, "id");
-                siteId.ifPresent(siteBuilder::setId);
-                final Optional<Boolean> isDefaultSite = SmackPacketUtil.getBooleanAttribute(parser, "default");
-                isDefaultSite.ifPresent(siteBuilder::setDefault);
-                final Optional<Site.Type> siteType = Site.Type.from(SmackPacketUtil.getStringAttribute(parser, "type").orElse(null));
-                siteType.ifPresent(siteBuilder::setType);
-                parser.next();
-                final Optional<String> siteName = Optional.ofNullable(parser.getText());
-                siteName.ifPresent(siteBuilder::setName);
-                profileBuilder.setSite(siteBuilder.buildWithoutValidating());
-                ParserUtils.forwardToEndTagOfDepth(parser, parser.getDepth());
-                parser.nextTag();
-            }
-            if (parser.getName().equals("actions") && !parser.isEmptyElementTag()) {
+            final Optional<Site> site = SmackPacketUtil.getSite(parser);
+            site.ifPresent(profileBuilder::setSite);
+            if (parser.getName().equals(OpenlinkXmppNamespace.TAG_ACTIONS) && !parser.isEmptyElementTag()) {
                 do {
                     parser.nextTag();
-                    if (parser.getName().equals("action")) {
+                    if (parser.getName().equals(OpenlinkXmppNamespace.TAG_ACTION)) {
                         final Optional<RequestAction> requestAction = RequestAction.from(SmackPacketUtil.getStringAttribute(parser, "id").orElse(null));
                         requestAction.ifPresent(profileBuilder::addAction);
                     }
                     ParserUtils.forwardToEndTagOfDepth(parser, parser.getDepth());
-                } while (parser.getName().equals("action"));
+                } while (parser.getName().equals(OpenlinkXmppNamespace.TAG_ACTION));
                 ParserUtils.forwardToEndTagOfDepth(parser, parser.getDepth());
                 parser.nextTag();
             }
@@ -107,15 +94,15 @@ public class GetProfilesResult extends OpenlinkIQ {
         for (final Profile profile : profiles) {
             xml.halfOpenElement(OpenlinkXmppNamespace.TAG_PROFILE);
             profile.getId().ifPresent(profileId -> xml.attribute("id", profileId.value()));
-            profile.isDefaultProfile().ifPresent(isDefault -> xml.attribute("default", isDefault));
+            profile.isDefaultProfile().ifPresent(isDefault -> xml.attribute(OpenlinkXmppNamespace.TAG_DEFAULT, isDefault));
             profile.getDevice().ifPresent(device -> xml.attribute("device", device));
-            profile.getLabel().ifPresent(label -> xml.attribute("label", label));
+            profile.getLabel().ifPresent(label -> xml.attribute(OpenlinkXmppNamespace.TAG_LABEL, label));
             profile.isOnline().ifPresent(online -> xml.attribute("online", online));
             xml.rightAngleBracket();
             profile.getSite().ifPresent(site -> {
                 xml.halfOpenElement("site");
                 site.getId().ifPresent(id -> xml.attribute("id", String.valueOf(id)));
-                site.isDefault().ifPresent(isDefault -> xml.attribute("default", String.valueOf(isDefault)));
+                site.isDefault().ifPresent(isDefault -> xml.attribute(OpenlinkXmppNamespace.TAG_DEFAULT, String.valueOf(isDefault)));
                 site.getType().ifPresent(type -> xml.attribute("type", type.name()));
                 xml.rightAngleBracket();
                 site.getName().ifPresent(xml::escape);
@@ -124,14 +111,14 @@ public class GetProfilesResult extends OpenlinkIQ {
             });
             final List<RequestAction> actions = profile.getActions();
             if (!actions.isEmpty()) {
-                xml.openElement("actions");
+                xml.openElement(OpenlinkXmppNamespace.TAG_ACTIONS);
                 actions.forEach(action -> {
-                    xml.halfOpenElement("action");
+                    xml.halfOpenElement(OpenlinkXmppNamespace.TAG_ACTION);
                     xml.attribute("id", action.getId());
-                    xml.attribute("label", action.getLabel());
+                    xml.attribute(OpenlinkXmppNamespace.TAG_LABEL, action.getLabel());
                     xml.closeEmptyElement();
                 });
-                xml.closeElement("actions");
+                xml.closeElement(OpenlinkXmppNamespace.TAG_ACTIONS);
             }
             xml.closeElement(OpenlinkXmppNamespace.TAG_PROFILE);
         }
