@@ -2,7 +2,6 @@ package com.bt.openlink.smack.iq;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,31 +14,31 @@ import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
 import com.bt.openlink.OpenlinkXmppNamespace;
+import com.bt.openlink.IQ.GetProfilesRequestBuilder;
 import com.bt.openlink.smack.internal.SmackPacketUtil;
 
 public class GetProfilesRequest extends OpenlinkIQ {
-    @Nullable private final String jid;
+    @Nullable private final Jid jid;
 
     @Nonnull
     static IQ from(XmlPullParser parser) throws IOException, XmlPullParserException {
 
         moveToStartOfTag(parser, OpenlinkXmppNamespace.TAG_IODATA, OpenlinkXmppNamespace.TAG_IN, "jid");
-        final String jid;
+        final String jidString;
         if ("jid".equals(parser.getName())) {
-            jid = parser.nextText();
+            jidString = parser.nextText();
         } else {
-            jid = null;
+            jidString = null;
         }
-        final List<String> parseErrors = new ArrayList<>();
-        if (jid == null) {
-            parseErrors.add("Invalid get-profiles request; missing 'jid' field is mandatory");
-        }
-        return Builder.start().setJid(jid == null || jid.isEmpty() ? null : jid).build(parseErrors);
+        final Optional<Jid> jidOptional = SmackPacketUtil.getSmackJid(jidString);
+        final Builder builder = Builder.start();
+        jidOptional.ifPresent(builder::setJid);
+        return builder.build(new ArrayList<>());
     }
 
-    private GetProfilesRequest(@Nonnull Builder builder, @Nonnull List<String> parseErrors) {
+    private GetProfilesRequest(@Nonnull Builder builder, @Nullable List<String> parseErrors) {
         super("command", OpenlinkXmppNamespace.XMPP_COMMANDS.uri(), builder, parseErrors);
-        this.jid = builder.jid;
+        this.jid = builder.getJid().orElse(null);
     }
 
     @Override
@@ -60,19 +59,17 @@ public class GetProfilesRequest extends OpenlinkIQ {
 
     @Nonnull
     public Optional<Jid> getJid() {
-        return SmackPacketUtil.getSmackJid(jid);
+        return Optional.ofNullable(jid);
     }
 
-    public static final class Builder extends IQBuilder<Builder> {
-
-        @Nullable String jid;
+    public static final class Builder extends GetProfilesRequestBuilder<Builder, Jid, IQ.Type> {
 
         private Builder() {
         }
 
         @Nonnull
         @Override
-        protected Type getExpectedType() {
+        public Type getExpectedIQType() {
             return Type.set;
         }
 
@@ -83,26 +80,14 @@ public class GetProfilesRequest extends OpenlinkIQ {
 
         @Nonnull
         public GetProfilesRequest build() {
-            super.validateBuilder();
-            if (jid == null) {
-                throw new IllegalStateException("The stanza 'jid' has not been set");
-            }
-            return new GetProfilesRequest(this, Collections.emptyList());
+            super.validate();
+            return new GetProfilesRequest(this, null);
         }
 
         @Nonnull
-        private GetProfilesRequest build(final List<String> parseErrors) {
-            return new GetProfilesRequest(this, parseErrors);
-        }
-
-        public Builder setJid(@Nullable String jid) {
-            this.jid = jid;
-            return this;
-        }
-
-        @Nonnull
-        public Builder setJid(@Nullable final Jid jid) {
-            return setJid(jid == null ? null : jid.toString());
+        private GetProfilesRequest build(@Nonnull final List<String> errors) {
+            super.validate(errors, false);
+            return new GetProfilesRequest(this, errors);
         }
 
     }

@@ -12,6 +12,7 @@ import com.bt.openlink.type.InterestId;
 import com.bt.openlink.type.InterestType;
 import com.bt.openlink.type.Participant;
 import com.bt.openlink.type.ParticipantType;
+import com.bt.openlink.type.Profile;
 import com.bt.openlink.type.ProfileId;
 import com.bt.openlink.type.Site;
 
@@ -37,5 +38,12 @@ public class Fixtures {
             .setType(Site.Type.BTSM)
             .setName("test-site-name")
             .setDefault(true)
+            .build();
+    public static final Profile PROFILE = Profile.Builder.start()
+            .setId(PROFILE_ID)
+            .setLabel("test-profile")
+            .setOnline(true)
+            .setDefault(true)
+            .setSite(SITE)
             .build();
 }

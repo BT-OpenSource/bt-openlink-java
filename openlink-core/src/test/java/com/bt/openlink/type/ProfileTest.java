@@ -1,8 +1,11 @@
 package com.bt.openlink.type;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.contains;
 import static org.junit.Assert.assertThat;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.Rule;
@@ -107,8 +110,11 @@ public class ProfileTest {
 
     @Test
     public void willCreateAProfileWithoutMandatoryFields() throws Exception {
+
+        final List<String> errors = new ArrayList<>();
+
         final Profile profile = Profile.Builder.start()
-                .buildWithoutValidating();
+                .build(errors);
 
         assertThat(profile.getSite(), is(Optional.empty()));
         assertThat(profile.getId(), is(Optional.empty()));
@@ -116,6 +122,11 @@ public class ProfileTest {
         assertThat(profile.getDevice(), is(Optional.empty()));
         assertThat(profile.getLabel(), is(Optional.empty()));
         assertThat(profile.isOnline(), is(Optional.empty()));
+        assertThat(errors, contains(
+                "The profile id has not been set",
+                "The site has not been set",
+                "The default indicator has not been set",
+                "The label has not been set",
+                "The online indicator has not been set"));
     }
-
 }

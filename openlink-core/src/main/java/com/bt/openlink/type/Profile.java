@@ -108,11 +108,26 @@ public final class Profile {
             if (online == null) {
                 throw new IllegalStateException("The online indicator has not been set");
             }
-            return buildWithoutValidating();
+            return new Profile(this);
         }
 
         @Nonnull
-        public Profile buildWithoutValidating() {
+        public Profile build(@Nonnull final List<String> errors) {
+            if (profileId == null) {
+                errors.add("The profile id has not been set");
+            }
+            if (site == null) {
+                errors.add("The site has not been set");
+            }
+            if (isDefault == null) {
+                errors.add("The default indicator has not been set");
+            }
+            if (label == null) {
+                errors.add("The label has not been set");
+            }
+            if (online == null) {
+                errors.add("The online indicator has not been set");
+            }
             return new Profile(this);
         }
 
