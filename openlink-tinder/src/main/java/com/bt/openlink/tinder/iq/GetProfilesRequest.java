@@ -86,12 +86,6 @@ public class GetProfilesRequest extends OpenlinkIQ2 {
             return new GetProfilesRequest(this, errors);
         }
 
-        @Nonnull
-        public Builder setJID(@Nonnull final JID jid) {
-            this.jid = jid;
-            return this;
-        }
-
     }
 
 }

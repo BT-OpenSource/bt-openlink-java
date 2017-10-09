@@ -29,18 +29,13 @@ public class GetProfilesResult extends OpenlinkIQ {
     @Nonnull
     static IQ from(XmlPullParser parser) throws IOException, XmlPullParserException {
 
-        moveToStartOfTag(parser, OpenlinkXmppNamespace.TAG_IODATA, OpenlinkXmppNamespace.TAG_OUT, OpenlinkXmppNamespace.TAG_PROFILES);
+        moveToStartOfTag(parser, OpenlinkXmppNamespace.TAG_IODATA, OpenlinkXmppNamespace.TAG_OUT, OpenlinkXmppNamespace.TAG_PROFILES, OpenlinkXmppNamespace.TAG_PROFILE);
 
         final Builder builder = Builder.start();
 
         final List<String> parseErrors = new ArrayList<>();
         if (parser.getEventType() != XmlPullParser.START_TAG) {
-            parseErrors.add("Invalid get-profiles result; missing 'profiles' element is mandatory");
-        } else {
-            moveToStartOfTag(parser, OpenlinkXmppNamespace.TAG_PROFILE);
-            if (parser.getEventType() != XmlPullParser.START_TAG) {
-                parseErrors.add("Invalid get-profiles result; no 'profile' elements present");
-            }
+            parseErrors.add("Invalid get-profiles result; no profiles present");
         }
         while (OpenlinkXmppNamespace.TAG_PROFILE.equals(parser.getName())) {
 

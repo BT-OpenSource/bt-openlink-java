@@ -196,7 +196,7 @@ public class GetProfilesResultTest {
 
         System.out.println(result.getParseErrors());
 
-        assertThat(result.getParseErrors(), contains("Invalid get-profiles result; missing 'profiles' element is mandatory"));
+        assertThat(result.getParseErrors(), contains("Invalid get-profiles result; no profiles present"));
     }
 
     @Test
@@ -204,8 +204,7 @@ public class GetProfilesResultTest {
 
         final GetProfilesResult result = PacketParserUtils.parseStanza(GET_PROFILES_RESULT_WITH_NO_PROFILES);
 
-        assertThat(result.getParseErrors(), contains(
-                "Invalid get-profiles result; no 'profile' elements present"));
+        assertThat(result.getParseErrors(), contains("Invalid get-profiles result; no profiles present"));
     }
 
     @Test

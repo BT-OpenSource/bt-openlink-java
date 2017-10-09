@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -54,9 +55,8 @@ public class GetProfilesResult extends OpenlinkIQ2 {
         final Builder builder = Builder.start(iq);
         final Element profilesElement = TinderPacketUtil.getChildElement(TinderPacketUtil.getIOOutElement(iq), OpenlinkXmppNamespace.TAG_PROFILES);
         final List<String> parseErrors = new ArrayList<>();
-        if (profilesElement == null) {
-            parseErrors.add(String.format("Invalid %s; missing 'profiles' element is mandatory", DESCRIPTION));
-        } else {
+        final AtomicBoolean profileFound = new AtomicBoolean(false);
+        if (profilesElement != null) {
             final List<Element> profileElements = profilesElement.elements(OpenlinkXmppNamespace.TAG_PROFILE);
             profileElements.forEach(profileElement -> {
                 final Profile.Builder profileBuilder = Profile.Builder.start();
@@ -80,13 +80,12 @@ public class GetProfilesResult extends OpenlinkIQ2 {
                         requestAction.ifPresent(profileBuilder::addAction);
                     }
                 }
-                final Profile profile = profileBuilder
-                        .build(parseErrors);
-                builder.addProfile(profile);
+                builder.addProfile(profileBuilder.build(parseErrors));
+                profileFound.set(true);
             });
-            if (profileElements.isEmpty()) {
-                parseErrors.add(String.format("Invalid %s; no 'profile' elements present", DESCRIPTION));
-            }
+        }
+        if (!profileFound.get()) {
+            parseErrors.add("Invalid get-profiles result; no profiles present");
         }
         final GetProfilesResult result = builder.build(parseErrors);
         result.setID(iq.getID());

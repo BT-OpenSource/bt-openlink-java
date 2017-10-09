@@ -182,12 +182,12 @@ public class GetProfilesResultTest {
         final GetProfilesResult result = GetProfilesResult.from(iq);
 
         assertThat(result.getParseErrors(), contains(
-                "Invalid get-profiles result; missing 'profiles' element is mandatory",
+                "Invalid get-profiles result; no profiles present",
                 "Invalid stanza; missing 'to' attribute is mandatory",
                 "Invalid stanza; missing 'from' attribute is mandatory",
                 "Invalid stanza; missing 'id' attribute is mandatory",
                 "Invalid stanza; missing or incorrect 'type' attribute"
-        ));
+                ));
     }
 
     @Test
@@ -197,8 +197,7 @@ public class GetProfilesResultTest {
 
         final GetProfilesResult result = GetProfilesResult.from(iq);
 
-        assertThat(result.getParseErrors(), contains(
-                "Invalid get-profiles result; no 'profile' elements present"));
+        assertThat(result.getParseErrors(), contains("Invalid get-profiles result; no profiles present"));
     }
 
     @Test
