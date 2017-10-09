@@ -67,7 +67,7 @@ public class GetProfilesRequestTest {
     public void cannotCreateAStanzaWithoutAJID() throws Exception {
 
         expectedException.expect(IllegalStateException.class);
-        expectedException.expectMessage("The stanza 'jid' has not been set");
+        expectedException.expectMessage("The get-profiles request 'jid' has not been set");
         GetProfilesRequest.Builder.start()
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)

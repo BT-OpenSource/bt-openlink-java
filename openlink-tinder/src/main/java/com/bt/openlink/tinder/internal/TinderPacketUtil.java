@@ -76,6 +76,14 @@ public final class TinderPacketUtil {
         }
     }
 
+    public static void addElementWithText(
+            @Nonnull final Element elementToAddTo,
+            @Nonnull final String elementName,
+            @Nonnull final Object elementValue) {
+        final Element callerElement = elementToAddTo.addElement(elementName);
+        callerElement.setText(elementValue.toString());
+    }
+
     public static void addElementWithTextIfNotNull(
             @Nonnull final Element elementToAddTo,
             @Nonnull final String elementName,
@@ -322,7 +330,7 @@ public final class TinderPacketUtil {
                 .setName(siteElement.getText());
         final Optional<Long> id = getLongAttribute(siteElement, "id", true, description, parseErrors);
         id.ifPresent(siteBuilder::setId);
-        final Optional<Boolean> isDefaultSite = getBooleanAttribute(siteElement, "default", false, description, parseErrors);
+        final Optional<Boolean> isDefaultSite = getBooleanAttribute(siteElement, OpenlinkXmppNamespace.TAG_DEFAULT, false, description, parseErrors);
         isDefaultSite.ifPresent(siteBuilder::setDefault);
         final Optional<Site.Type> type = Site.Type.from(getStringAttribute(siteElement, "type", true, description, parseErrors).orElse(null));
         type.ifPresent(siteBuilder::setType);

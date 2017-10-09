@@ -26,7 +26,7 @@ public abstract class GetProfilesRequestBuilder<B extends IQBuilder, J, T> exten
     protected void validate() {
         super.validate();
         if (jid == null) {
-            throw new IllegalStateException("The stanza 'jid' has not been set");
+            throw new IllegalStateException("The get-profiles request 'jid' has not been set");
         }
     }
 

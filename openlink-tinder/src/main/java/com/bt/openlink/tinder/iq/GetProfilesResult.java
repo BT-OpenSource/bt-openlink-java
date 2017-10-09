@@ -72,9 +72,9 @@ public class GetProfilesResult extends OpenlinkIQ2 {
                 online.ifPresent(profileBuilder::setOnline);
                 final Optional<Site> site = TinderPacketUtil.getSite(profileElement, DESCRIPTION, parseErrors);
                 site.ifPresent(profileBuilder::setSite);
-                final Element actionsElement = TinderPacketUtil.getChildElement(profileElement, "actions");
+                final Element actionsElement = TinderPacketUtil.getChildElement(profileElement, OpenlinkXmppNamespace.TAG_ACTIONS);
                 if (actionsElement != null) {
-                    final List<Element> actionElements = actionsElement.elements("action");
+                    final List<Element> actionElements = actionsElement.elements(OpenlinkXmppNamespace.TAG_ACTION);
                     for (final Element actionElement : actionElements) {
                         final Optional<RequestAction> requestAction = RequestAction.from(TinderPacketUtil.getStringAttribute(actionElement, "id", true, DESCRIPTION, parseErrors).orElse(null));
                         requestAction.ifPresent(profileBuilder::addAction);
