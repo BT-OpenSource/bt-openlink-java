@@ -76,14 +76,6 @@ public final class TinderPacketUtil {
         }
     }
 
-    public static void addElementWithText(
-            @Nonnull final Element elementToAddTo,
-            @Nonnull final String elementName,
-            @Nonnull final Object elementValue) {
-        final Element callerElement = elementToAddTo.addElement(elementName);
-        callerElement.setText(elementValue.toString());
-    }
-
     public static void addElementWithTextIfNotNull(
             @Nonnull final Element elementToAddTo,
             @Nonnull final String elementName,

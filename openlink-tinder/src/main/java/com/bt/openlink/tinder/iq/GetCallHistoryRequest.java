@@ -43,14 +43,14 @@ public class GetCallHistoryRequest extends OpenlinkIQ2 {
         this.start = builder.getStart().orElse(null);
         this.count = builder.getCount().orElse(null);
         final Element inElement = TinderPacketUtil.addCommandIOInputElement(this, OpenlinkXmppNamespace.OPENLINK_GET_CALL_HISTORY);
-        getJID().ifPresent(jid -> TinderPacketUtil.addElementWithText(inElement, "jid", jid));
-        getCaller().ifPresent(caller -> TinderPacketUtil.addElementWithText(inElement, "caller", caller));
-        getCalled().ifPresent(caller -> TinderPacketUtil.addElementWithText(inElement, "called", caller));
-        getCallType().ifPresent(callType -> TinderPacketUtil.addElementWithText(inElement, "calltype", callType.getLabel()));
-        getFromDate().ifPresent(fromDate -> TinderPacketUtil.addElementWithText(inElement, "fromdate", DATE_FORMATTER.format(fromDate)));
-        getUpToDate().ifPresent(fromDate -> TinderPacketUtil.addElementWithText(inElement, "uptodate", DATE_FORMATTER.format(fromDate)));
-        getStart().ifPresent(start -> TinderPacketUtil.addElementWithText(inElement, "start", start));
-        getCount().ifPresent(count -> TinderPacketUtil.addElementWithText(inElement, "count", count));
+        TinderPacketUtil.addElementWithTextIfNotNull(inElement, "jid", jid);
+        TinderPacketUtil.addElementWithTextIfNotNull(inElement, "caller", caller);
+        TinderPacketUtil.addElementWithTextIfNotNull(inElement, "called", called);
+        TinderPacketUtil.addElementWithTextIfNotNull(inElement, "calltype", callType == null ? null : callType.getLabel());
+        TinderPacketUtil.addElementWithTextIfNotNull(inElement, "fromdate", fromDate, DATE_FORMATTER);
+        TinderPacketUtil.addElementWithTextIfNotNull(inElement, "uptodate", upToDate, DATE_FORMATTER);
+        TinderPacketUtil.addElementWithTextIfNotNull(inElement, "start", start);
+        TinderPacketUtil.addElementWithTextIfNotNull(inElement, "count", count);
     }
 
     @Nonnull
