@@ -1,7 +1,6 @@
 package com.bt.openlink.tinder.iq;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -10,17 +9,19 @@ import javax.annotation.Nullable;
 
 import org.dom4j.Element;
 import org.xmpp.packet.IQ;
+import org.xmpp.packet.JID;
 
 import com.bt.openlink.OpenlinkXmppNamespace;
+import com.bt.openlink.iq.GetInterestsRequestBuilder;
 import com.bt.openlink.tinder.internal.TinderPacketUtil;
 import com.bt.openlink.type.ProfileId;
 
-public class GetInterestsRequest extends OpenlinkIQ {
+public class GetInterestsRequest extends OpenlinkIQ2 {
     @Nullable private final ProfileId profileId;
 
-    private GetInterestsRequest(@Nonnull Builder builder, @Nonnull List<String> parseErrors) {
+    private GetInterestsRequest(@Nonnull Builder builder, @Nullable List<String> parseErrors) {
         super(builder, parseErrors);
-        this.profileId = builder.profileId;
+        this.profileId = builder.getProfileId().orElse(null);
         final Element inElement = TinderPacketUtil.addCommandIOInputElement(this, OpenlinkXmppNamespace.OPENLINK_GET_INTERESTS);
         TinderPacketUtil.addElementWithTextIfNotNull(inElement, "profile", profileId);
 
@@ -38,7 +39,7 @@ public class GetInterestsRequest extends OpenlinkIQ {
         final Builder builder = Builder.start(iq);
         final Optional<ProfileId> profile = ProfileId.from(TinderPacketUtil.getChildElementString(inElement,
                 "profile",
-                true,
+                false,
                 "get-interests request",
                 parseErrors));
         profile.ifPresent(builder::setProfileId);
@@ -47,7 +48,7 @@ public class GetInterestsRequest extends OpenlinkIQ {
         return request;
     }
 
-    public static final class Builder extends IQBuilder<Builder> {
+    public static final class Builder extends GetInterestsRequestBuilder<Builder, JID, Type> {
 
         @Nonnull
         public static Builder start() {
@@ -56,43 +57,26 @@ public class GetInterestsRequest extends OpenlinkIQ {
 
         @Nonnull
         private static Builder start(@Nonnull final IQ iq) {
-            return new Builder(iq);
+            final Builder builder = start();
+            TinderIQBuilder.setIQBuilder(builder, iq);
+            return builder;
         }
-
-        @Nullable ProfileId profileId;
 
         private Builder() {
-        }
-
-        private Builder(@Nonnull final IQ iq) {
-            super(iq);
-        }
-
-        @Override
-        @Nonnull
-        protected Type getExpectedType() {
-            return Type.set;
+            super(IQ.Type.class);
         }
 
         @Nonnull
         public GetInterestsRequest build() {
-            validateBuilder();
-            if (profileId == null) {
-                throw new IllegalStateException("The profileId has not been set");
-            }
-            return build( Collections.emptyList());
+            validate();
+            return new GetInterestsRequest(this, null);
         }
 
         @Nonnull
         private GetInterestsRequest build(@Nonnull final List<String> parseErrors) {
+            validate(parseErrors);
             return new GetInterestsRequest(this, parseErrors);
         }
-
-        public Builder setProfileId(@Nonnull ProfileId profileId) {
-            this.profileId = profileId;
-            return this;
-        }
-
     }
 
 }

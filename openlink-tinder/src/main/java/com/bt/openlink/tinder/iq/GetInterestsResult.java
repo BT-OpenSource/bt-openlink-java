@@ -6,24 +6,27 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import org.dom4j.Element;
 import org.xmpp.packet.IQ;
+import org.xmpp.packet.JID;
 
 import com.bt.openlink.OpenlinkXmppNamespace;
+import com.bt.openlink.iq.GetInterestsResultBuilder;
 import com.bt.openlink.tinder.internal.TinderPacketUtil;
 import com.bt.openlink.type.Interest;
 import com.bt.openlink.type.InterestId;
 import com.bt.openlink.type.InterestType;
 
-public class GetInterestsResult extends OpenlinkIQ {
+public class GetInterestsResult extends OpenlinkIQ2 {
     private static final String DESCRIPTION = "get-interests result";
 
     @Nonnull private final List<Interest> interests;
 
-    private GetInterestsResult(@Nonnull Builder builder, @Nonnull List<String> parseErrors) {
+    private GetInterestsResult(@Nonnull Builder builder, @Nullable List<String> parseErrors) {
         super(builder, parseErrors);
-        this.interests = Collections.unmodifiableList(builder.interests);
+        this.interests = Collections.unmodifiableList(builder.getInterests());
         final Element outElement = TinderPacketUtil.addCommandIOOutputElement(this, OpenlinkXmppNamespace.OPENLINK_GET_INTERESTS);
         final Element interestsElement = outElement.addElement("interests", OpenlinkXmppNamespace.OPENLINK_INTERESTS.uri());
         for (final Interest interest : interests) {
@@ -47,19 +50,17 @@ public class GetInterestsResult extends OpenlinkIQ {
         final Builder builder = Builder.start(iq);
         final Element outElement = TinderPacketUtil.getIOOutElement(iq);
         final Element interestsElement = TinderPacketUtil.getChildElement(outElement, "interests");
-        if (interestsElement == null) {
-            parseErrors.add("Invalid get-interests result; missing 'interests' element is mandatory");
-        } else {
+        if (interestsElement != null) {
             final List<Element> interestElements = interestsElement.elements("interest");
             for (final Element interestElement : interestElements) {
                 final Interest.Builder interestBuilder = Interest.Builder.start();
-                final Optional<InterestId> interestId = InterestId.from(TinderPacketUtil.getStringAttribute(interestElement, "id", true, DESCRIPTION, parseErrors).orElse(null));
+                final Optional<InterestId> interestId = InterestId.from(TinderPacketUtil.getStringAttribute(interestElement, "id", false, DESCRIPTION, parseErrors).orElse(null));
                 interestId.ifPresent(interestBuilder::setId);
-                final Optional<InterestType> interestType = InterestType.from(TinderPacketUtil.getStringAttribute(interestElement, "type", true, DESCRIPTION, parseErrors).orElse(null));
+                final Optional<InterestType> interestType = InterestType.from(TinderPacketUtil.getStringAttribute(interestElement, "type", false, DESCRIPTION, parseErrors).orElse(null));
                 interestType.ifPresent(interestBuilder::setType);
-                final Optional<String> label = Optional.ofNullable(TinderPacketUtil.getStringAttribute(interestElement, "label", true, DESCRIPTION, parseErrors).orElse(null));
+                final Optional<String> label = Optional.ofNullable(TinderPacketUtil.getStringAttribute(interestElement, "label", false, DESCRIPTION, parseErrors).orElse(null));
                 label.ifPresent(interestBuilder::setLabel);
-                final Optional<Boolean> isDefault = TinderPacketUtil.getBooleanAttribute(interestElement, "default", true, DESCRIPTION, parseErrors);
+                final Optional<Boolean> isDefault = TinderPacketUtil.getBooleanAttribute(interestElement, "default", false, DESCRIPTION, parseErrors);
                 isDefault.ifPresent(interestBuilder::setDefault);
                 builder.addInterest(interestBuilder.build(parseErrors));
             }
@@ -70,7 +71,7 @@ public class GetInterestsResult extends OpenlinkIQ {
         return request;
     }
 
-    public static final class Builder extends IQBuilder<Builder> {
+    public static final class Builder extends GetInterestsResultBuilder<Builder, JID, Type> {
 
         @Nonnull
         public static Builder start() {
@@ -79,53 +80,31 @@ public class GetInterestsResult extends OpenlinkIQ {
 
         @Nonnull
         private static Builder start(@Nonnull final IQ iq) {
-            return new Builder(iq);
+            final Builder builder = start();
+            TinderIQBuilder.setIQBuilder(builder, iq);
+            return builder;
         }
 
         @Nonnull
-        public static GetInterestsResult.Builder start(@Nonnull final GetInterestsRequest request) {
-            return new Builder(IQ.createResultIQ(request));
+        public static Builder start(@Nonnull final GetInterestsRequest request) {
+            return start(IQ.createResultIQ(request));
         }
-
-
-        @Nonnull private final List<Interest> interests = new ArrayList<>();
 
         private Builder() {
-        }
-
-        public Builder(@Nonnull final IQ iq) {
-            super(iq);
-        }
-
-        @Override
-        @Nonnull
-        protected Type getExpectedType() {
-            return Type.result;
+            super(IQ.Type.class);
         }
 
         @Nonnull
         public GetInterestsResult build() {
-            validateBuilder();
-            return build( Collections.emptyList());
+            validate();
+            return new GetInterestsResult(this, null);
         }
 
         @Nonnull
         private GetInterestsResult build(@Nonnull final List<String> parseErrors) {
+            validate(parseErrors);
             return new GetInterestsResult(this, parseErrors);
         }
-
-        public Builder addInterest(@Nonnull Interest interest) {
-            if (interest.getId().isPresent()) {
-                this.interests.forEach(existingInterest -> {
-                    if (existingInterest.getId().equals(interest.getId())) {
-                        throw new IllegalArgumentException("The interest id must be unique");
-                    }
-                });
-            }
-            this.interests.add(interest);
-            return this;
-        }
-
     }
 
 }

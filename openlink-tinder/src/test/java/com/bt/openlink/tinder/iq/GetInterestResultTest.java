@@ -5,8 +5,6 @@ import static org.hamcrest.Matchers.contains;
 import static org.junit.Assert.assertThat;
 import static org.xmlunit.matchers.CompareMatcher.isIdenticalTo;
 
-import java.util.List;
-
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -27,8 +25,7 @@ public class GetInterestResultTest {
             .setDefault(true)
             .build();
 
-    @Rule
-    public final ExpectedException expectedException = ExpectedException.none();
+    @Rule public final ExpectedException expectedException = ExpectedException.none();
 
     private static final String GET_INTEREST_RESULT = "<iq type=\"result\" id=\"" + Fixtures.STANZA_ID + "\" to=\"" + Fixtures.TO_JID + "\" from=\"" + Fixtures.FROM_JID + "\">\n" +
             "  <command xmlns=\"http://jabber.org/protocol/commands\" node=\"http://xmpp.org/protocol/openlink:01:00:00#get-interest\" status=\"completed\">\n" +
@@ -110,7 +107,6 @@ public class GetInterestResultTest {
 
         final GetInterestResult result = GetInterestResult.from(Fixtures.iqFrom(GET_INTEREST_RESULT_WITH_BAD_VALUES));
 
-        final List<String> parseErrors = result.getParseErrors();
         assertThat(result.getParseErrors(), contains(
                 "Invalid stanza; missing 'to' attribute is mandatory",
                 "Invalid stanza; missing 'from' attribute is mandatory",

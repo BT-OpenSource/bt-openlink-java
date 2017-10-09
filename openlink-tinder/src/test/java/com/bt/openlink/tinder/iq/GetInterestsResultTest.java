@@ -1,6 +1,7 @@
 package com.bt.openlink.tinder.iq;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.contains;
 import static org.junit.Assert.assertThat;
 import static org.xmlunit.matchers.CompareMatcher.isIdenticalTo;
 
@@ -47,7 +48,7 @@ public class GetInterestsResultTest {
     public void canCreateAStanza() throws Exception {
 
         final GetInterestsResult result = GetInterestsResult.Builder.start()
-                .setID(Fixtures.STANZA_ID)
+                .setId(Fixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
                 .addInterest(Fixtures.INTEREST)
@@ -61,15 +62,6 @@ public class GetInterestsResultTest {
     }
 
     @Test
-    public void cannotCreateAStanzaWithoutAToField() throws Exception {
-
-        expectedException.expect(IllegalStateException.class);
-        expectedException.expectMessage("The stanza 'to' has not been set");
-        GetInterestsResult.Builder.start()
-                .build();
-    }
-
-    @Test
     public void willGenerateAnXmppStanza() throws Exception {
 
         final Interest interest2 = Interest.Builder.start()
@@ -79,7 +71,7 @@ public class GetInterestsResultTest {
                 .setDefault(false)
                 .build();
         final GetInterestsResult result = GetInterestsResult.Builder.start()
-                .setID(Fixtures.STANZA_ID)
+                .setId(Fixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
                 .addInterest(Fixtures.INTEREST)
@@ -92,10 +84,10 @@ public class GetInterestsResultTest {
     @Test
     public void willNotBuildAPacketWithDuplicateInterestIds() throws Exception {
 
-        expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("The interest id must be unique");
+        expectedException.expect(IllegalStateException.class);
+        expectedException.expectMessage("Each interest id must be unique - test-interest-id appears more than once");
         GetInterestsResult.Builder.start()
-                .setID(Fixtures.STANZA_ID)
+                .setId(Fixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
                 .addInterest(Fixtures.INTEREST)
@@ -135,14 +127,12 @@ public class GetInterestsResultTest {
 
         final GetInterestsResult result = GetInterestsResult.from(Fixtures.iqFrom(GET_INTERESTS_RESULT_WITH_BAD_VALUES));
 
-        final List<String> parseErrors = result.getParseErrors();
-        int errorCount = 0;
-        assertThat(parseErrors.get(errorCount++), is("Invalid stanza; missing or incorrect 'type' attribute"));
-        assertThat(parseErrors.get(errorCount++), is("Invalid stanza; missing 'to' attribute is mandatory"));
-        assertThat(parseErrors.get(errorCount++), is("Invalid stanza; missing 'from' attribute is mandatory"));
-        assertThat(parseErrors.get(errorCount++), is("Invalid stanza; missing 'id' attribute is mandatory"));
-        assertThat(parseErrors.get(errorCount++), is("Invalid get-interests result; missing 'interests' element is mandatory"));
-        assertThat(parseErrors.size(), is(errorCount));
+        assertThat(result.getParseErrors(), contains(
+                "Invalid stanza; missing 'to' attribute is mandatory",
+                "Invalid stanza; missing 'from' attribute is mandatory",
+                "Invalid stanza; missing 'id' attribute is mandatory",
+                "Invalid stanza; missing or incorrect 'type' attribute"
+        ));
     }
 
     @Test
@@ -151,7 +141,7 @@ public class GetInterestsResultTest {
         final GetInterestsRequest request = GetInterestsRequest.Builder.start()
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
-                .setID(Fixtures.STANZA_ID)
+                .setId(Fixtures.STANZA_ID)
                 .setProfileId(Fixtures.PROFILE_ID)
                 .build();
 
