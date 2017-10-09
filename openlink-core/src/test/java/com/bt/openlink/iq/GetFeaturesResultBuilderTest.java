@@ -15,9 +15,9 @@ import org.junit.rules.ExpectedException;
 
 import com.bt.openlink.Fixtures;
 
-public class GetProfilesResultBuilderTest {
+public class GetFeaturesResultBuilderTest {
 
-    private static class Builder extends GetProfilesResultBuilder<Builder, String, Fixtures.typeEnum> {
+    private static class Builder extends GetFeaturesResultBuilder<Builder, String, Fixtures.typeEnum> {
         protected Builder() {
             super(Fixtures.typeEnum.class);
         }
@@ -41,37 +41,51 @@ public class GetProfilesResultBuilderTest {
     public void willValidateAPopulatedBuilder() throws Exception {
 
         final List<String> errors = new ArrayList<>();
-        builder.addProfile(Fixtures.PROFILE);
+        builder.setProfileId(Fixtures.PROFILE_ID)
+                .addFeature(Fixtures.FEATURE);
 
         builder.validate();
         builder.validate(errors);
 
         assertThat(errors, is(empty()));
-        assertThat(builder.getProfiles(), contains(Fixtures.PROFILE));
+        assertThat(builder.getFeatures(), contains(Fixtures.FEATURE));
+    }
+
+    @Test
+    public void willValidateProfileIsSet() throws Exception {
+
+        expectedException.expect(IllegalStateException.class);
+        expectedException.expectMessage("The get-features result profile has not been set");
+
+        builder.validate();
     }
 
     @Test
     public void willValidateProfileUniqueness() throws Exception {
 
         expectedException.expect(IllegalStateException.class);
-        expectedException.expectMessage("Each profile id must be unique - test-profile-id appears more than once");
+        expectedException.expectMessage("Each feature id must be unique - test-feature-id appears more than once");
 
-        builder.addProfile(Fixtures.PROFILE);
-        builder.addProfile(Fixtures.PROFILE);
+        builder.setProfileId(Fixtures.PROFILE_ID)
+                .addFeature(Fixtures.FEATURE)
+                .addFeature(Fixtures.FEATURE);
 
         builder.validate();
     }
 
     @Test
-    public void willCheckProfileUniqueness() throws Exception {
+    public void willCheckProfileAndUniqueness() throws Exception {
 
         final List<String> errors = new ArrayList<>();
 
-        builder.addProfile(Fixtures.PROFILE);
-        builder.addProfile(Fixtures.PROFILE);
+        builder.addFeature(Fixtures.FEATURE);
+        builder.addFeature(Fixtures.FEATURE);
 
         builder.validate(errors);
 
-        assertThat(errors, contains("Invalid get-profiles result stanza; each profile id must be unique - test-profile-id appears more than once"));
+        assertThat(errors, contains(
+                "Invalid get-features result stanza; missing profile",
+                "Invalid get-features result stanza; each feature id must be unique - test-feature-id appears more than once"
+        ));
     }
 }

@@ -10,7 +10,7 @@ import com.bt.openlink.type.ProfileId;
 
 public abstract class GetFeaturesRequestBuilder<B extends GetFeaturesRequestBuilder, J, T extends Enum<T>> extends IQBuilder<B, J, T> {
 
-    @Nullable protected ProfileId profileId;
+    @Nullable private ProfileId profileId;
 
     protected GetFeaturesRequestBuilder(final Class<T> typeClass) {
         super(typeClass);

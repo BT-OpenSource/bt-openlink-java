@@ -47,7 +47,6 @@ public class GetCallHistoryRequestBuilderTest {
         builder.validate(errors);
 
         assertThat(errors, is(empty()));
-
         assertThat(builder.getJID(), is(Optional.empty()));
         assertThat(builder.getCaller(), is(Optional.empty()));
         assertThat(builder.getCalled(), is(Optional.empty()));

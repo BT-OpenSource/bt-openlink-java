@@ -64,6 +64,6 @@ public abstract class GetProfilesResultBuilder<B extends GetProfilesResultBuilde
         if (checkIQFields) {
             super.validate(errors);
         }
-        validateUniqueness(profileId -> errors.add("Invalid get-profiles request stanza; each profile id must be unique - " + profileId + " appears more than once"));
+        validateUniqueness(profileId -> errors.add("Invalid get-profiles result stanza; each profile id must be unique - " + profileId + " appears more than once"));
     }
 }

@@ -8,7 +8,7 @@ import javax.annotation.Nullable;
 
 public abstract class GetProfilesRequestBuilder<B extends GetProfilesRequestBuilder, J, T extends Enum<T>> extends IQBuilder<B, J, T> {
 
-    @Nullable protected J jid;
+    @Nullable private J jid;
 
     protected GetProfilesRequestBuilder(final Class<T> typeClass) {
         super(typeClass);

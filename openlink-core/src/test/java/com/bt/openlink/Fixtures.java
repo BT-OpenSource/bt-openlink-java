@@ -7,7 +7,9 @@ import java.time.ZoneId;
 
 import com.bt.openlink.type.CallDirection;
 import com.bt.openlink.type.CallId;
+import com.bt.openlink.type.Feature;
 import com.bt.openlink.type.FeatureId;
+import com.bt.openlink.type.FeatureType;
 import com.bt.openlink.type.InterestId;
 import com.bt.openlink.type.InterestType;
 import com.bt.openlink.type.Participant;
@@ -51,5 +53,10 @@ public class Fixtures {
             .setOnline(true)
             .setDefault(true)
             .setSite(SITE)
+            .build();
+    public static final Feature FEATURE = Feature.Builder.start()
+            .setType(FeatureType.PRIVACY)
+            .setId(FEATURE_ID)
+            .setLabel("Privact")
             .build();
 }

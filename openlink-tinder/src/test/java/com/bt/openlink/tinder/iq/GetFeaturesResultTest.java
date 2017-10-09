@@ -1,6 +1,7 @@
 package com.bt.openlink.tinder.iq;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.contains;
 import static org.junit.Assert.assertThat;
 import static org.xmlunit.matchers.CompareMatcher.isIdenticalTo;
 
@@ -50,7 +51,7 @@ public class GetFeaturesResultTest {
     public void canCreateAStanza() throws Exception {
 
         final GetFeaturesResult result = GetFeaturesResult.Builder.start()
-                .setID(Fixtures.STANZA_ID)
+                .setId(Fixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
                 .setProfileId(Fixtures.PROFILE_ID)
@@ -96,7 +97,7 @@ public class GetFeaturesResultTest {
                 .setLabel("Call Forward")
                 .build();
         final GetFeaturesResult result = GetFeaturesResult.Builder.start()
-                .setID(Fixtures.STANZA_ID)
+                .setId(Fixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
                 .setProfileId(Fixtures.PROFILE_ID)
@@ -112,19 +113,20 @@ public class GetFeaturesResultTest {
     }
 
     @Test
-    public void willNotBuildAPacketWithDuplicateInterestIds() throws Exception {
+    public void willNotBuildAPacketWithDuplicateFeatureIds() throws Exception {
 
-        expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("The feature id must be unique");
+        expectedException.expect(IllegalStateException.class);
+        expectedException.expectMessage("Each feature id must be unique - hs_1 appears more than once");
         final Feature hs1Feature = Feature.Builder.start()
                 .setId(FeatureId.from("hs_1").get())
                 .setType(FeatureType.HANDSET)
                 .setLabel("Handset 1")
                 .build();
         GetFeaturesResult.Builder.start()
-                .setID(Fixtures.STANZA_ID)
+                .setId(Fixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
+                .setProfileId(Fixtures.PROFILE_ID)
                 .addFeature(hs1Feature)
                 .addFeature(hs1Feature)
                 .build();
@@ -134,14 +136,14 @@ public class GetFeaturesResultTest {
     public void willNotBuildAPacketWithoutAProfileId() throws Exception {
 
         expectedException.expect(IllegalStateException.class);
-        expectedException.expectMessage("The profileId has not been set");
+        expectedException.expectMessage("The get-features result profile has not been set");
         final Feature hs1Feature = Feature.Builder.start()
                 .setId(FeatureId.from("hs_1").get())
                 .setType(FeatureType.HANDSET)
                 .setLabel("Handset 1")
                 .build();
         GetFeaturesResult.Builder.start()
-                .setID(Fixtures.STANZA_ID)
+                .setId(Fixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
                 .addFeature(hs1Feature)
@@ -171,15 +173,15 @@ public class GetFeaturesResultTest {
 
         final GetFeaturesResult result = GetFeaturesResult.from(Fixtures.iqFrom(GET_FEATURES_RESULT_WITH_BAD_VALUES));
 
-        final List<String> parseErrors = result.getParseErrors();
-        int errorCount = 0;
-        assertThat(parseErrors.get(errorCount++), is("Invalid stanza; missing or incorrect 'type' attribute"));
-        assertThat(parseErrors.get(errorCount++), is("Invalid stanza; missing 'to' attribute is mandatory"));
-        assertThat(parseErrors.get(errorCount++), is("Invalid stanza; missing 'from' attribute is mandatory"));
-        assertThat(parseErrors.get(errorCount++), is("Invalid stanza; missing 'id' attribute is mandatory"));
-        assertThat(parseErrors.get(errorCount++), is("Invalid get-features result; missing 'profile' element is mandatory"));
-        assertThat(parseErrors.get(errorCount++), is("Invalid get-features result; missing 'features' element is mandatory"));
-        assertThat(parseErrors.size(), is(errorCount));
+        System.out.println(result.getParseErrors());
+
+        assertThat(result.getParseErrors(), contains(
+                "Invalid get-features result; missing 'features' element is mandatory",
+                "Invalid stanza; missing 'to' attribute is mandatory",
+                "Invalid stanza; missing 'from' attribute is mandatory",
+                "Invalid stanza; missing 'id' attribute is mandatory",
+                "Invalid stanza; missing or incorrect 'type' attribute",
+                "Invalid get-features result stanza; missing profile"));
     }
 
     @Test
@@ -199,6 +201,5 @@ public class GetFeaturesResultTest {
         assertThat(result.getTo(), is(request.getFrom()));
         assertThat(result.getFrom(), is(request.getTo()));
     }
-
 
 }

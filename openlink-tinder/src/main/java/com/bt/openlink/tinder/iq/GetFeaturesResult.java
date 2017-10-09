@@ -10,23 +10,25 @@ import javax.annotation.Nullable;
 
 import org.dom4j.Element;
 import org.xmpp.packet.IQ;
+import org.xmpp.packet.JID;
 
 import com.bt.openlink.OpenlinkXmppNamespace;
+import com.bt.openlink.iq.GetFeaturesResultBuilder;
 import com.bt.openlink.tinder.internal.TinderPacketUtil;
 import com.bt.openlink.type.Feature;
 import com.bt.openlink.type.FeatureId;
 import com.bt.openlink.type.FeatureType;
 import com.bt.openlink.type.ProfileId;
 
-public class GetFeaturesResult extends OpenlinkIQ {
+public class GetFeaturesResult extends OpenlinkIQ2 {
     private static final String DESCRIPTION = "get-features result";
     @Nullable private final ProfileId profileId;
     @Nonnull private final List<Feature> features;
 
-    private GetFeaturesResult(@Nonnull Builder builder, @Nonnull List<String> parseErrors) {
+    private GetFeaturesResult(@Nonnull Builder builder, @Nullable List<String> parseErrors) {
         super(builder, parseErrors);
-        this.profileId = builder.profileId;
-        this.features = Collections.unmodifiableList(builder.features);
+        this.profileId = builder.getProfileId().orElse(null);
+        this.features = Collections.unmodifiableList(builder.getFeatures());
         final Element outElement = TinderPacketUtil.addCommandIOOutputElement(this, OpenlinkXmppNamespace.OPENLINK_GET_FEATURES);
         final Element profileElement = outElement.addElement("profile");
         getProfileId().ifPresent(id -> profileElement.addAttribute("id", id.value()));
@@ -56,9 +58,7 @@ public class GetFeaturesResult extends OpenlinkIQ {
         final GetFeaturesResult.Builder builder = GetFeaturesResult.Builder.start(iq);
         final Element outElement = TinderPacketUtil.getIOOutElement(iq);
         final Element profileElement = TinderPacketUtil.getChildElement(outElement, "profile");
-        if (profileElement == null) {
-            parseErrors.add(String.format("Invalid %s; missing 'profile' element is mandatory", DESCRIPTION));
-        } else {
+        if (profileElement != null) {
             final Optional<ProfileId> profileId = ProfileId.from(profileElement.attributeValue("id"));
             profileId.ifPresent(builder::setProfileId);
         }
@@ -85,7 +85,7 @@ public class GetFeaturesResult extends OpenlinkIQ {
         return request;
     }
 
-    public static final class Builder extends IQBuilder<Builder> {
+    public static final class Builder extends GetFeaturesResultBuilder<Builder, JID, Type> {
 
         @Nonnull
         public static Builder start() {
@@ -94,64 +94,32 @@ public class GetFeaturesResult extends OpenlinkIQ {
 
         @Nonnull
         private static Builder start(@Nonnull final IQ iq) {
-            return new Builder(iq);
+            final Builder builder = start();
+            TinderIQBuilder.setIQBuilder(builder, iq);
+            return builder;
         }
 
         @Nonnull
         public static Builder start(@Nonnull final GetFeaturesRequest request) {
-            final Builder builder = new Builder(IQ.createResultIQ(request));
+            final Builder builder = start(IQ.createResultIQ(request));
             request.getProfileId().ifPresent(builder::setProfileId);
             return builder;
         }
 
-        @Nullable ProfileId profileId;
-        @Nonnull private List<Feature> features = new ArrayList<>();
-
         private Builder() {
-        }
-
-        private Builder(@Nonnull final IQ iq) {
-            super(iq);
-        }
-
-        @Override
-        @Nonnull
-        protected Type getExpectedType() {
-            return Type.result;
+            super(IQ.Type.class);
         }
 
         @Nonnull
         public GetFeaturesResult build() {
-            validateBuilder();
-            if (profileId == null) {
-                throw new IllegalStateException("The profileId has not been set");
-            }
-            return build( Collections.emptyList());
+            validate();
+            return new GetFeaturesResult(this, null);
         }
 
         @Nonnull
         private GetFeaturesResult build(@Nonnull final List<String> parseErrors) {
+            validate(parseErrors);
             return new GetFeaturesResult(this, parseErrors);
         }
-
-        public Builder setProfileId(@Nonnull ProfileId profileId) {
-            this.profileId = profileId;
-            return this;
-        }
-
-        @Nonnull
-        public Builder addFeature(@Nonnull final Feature feature) {
-            if(feature.getId().isPresent()) {
-                this.features.forEach(existingFeature -> {
-                    if (existingFeature.getId().equals(feature.getId())) {
-                        throw new IllegalArgumentException("The feature id must be unique");
-                    }
-                });
-            }
-            this.features.add(feature);
-            return this;
-        }
-
     }
-
 }
