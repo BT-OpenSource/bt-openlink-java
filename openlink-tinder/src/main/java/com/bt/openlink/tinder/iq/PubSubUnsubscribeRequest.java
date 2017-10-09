@@ -1,7 +1,6 @@
 package com.bt.openlink.tinder.iq;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,20 +12,20 @@ import org.xmpp.packet.IQ;
 import org.xmpp.packet.JID;
 
 import com.bt.openlink.OpenlinkXmppNamespace;
+import com.bt.openlink.iq.PubSubUnsubscribeRequestBuilder;
 import com.bt.openlink.tinder.internal.TinderPacketUtil;
-import com.bt.openlink.type.InterestId;
 import com.bt.openlink.type.PubSubNodeId;
 
-public class PubSubUnsubscribeRequest extends OpenlinkIQ {
+public class PubSubUnsubscribeRequest extends OpenlinkIQ2 {
     private static final String STANZA_DESCRIPTION = "PubSub unsubscribe request";
 
     @Nullable private final PubSubNodeId pubSubNodeId;
     @Nullable private final JID jid;
 
-    private PubSubUnsubscribeRequest(@Nonnull Builder builder, @Nonnull List<String> parseErrors) {
+    private PubSubUnsubscribeRequest(@Nonnull Builder builder, @Nullable List<String> parseErrors) {
         super(builder, parseErrors);
-        this.pubSubNodeId = builder.pubSubNodeId;
-        this.jid = builder.jid;
+        this.pubSubNodeId = builder.getPubSubNodeId().orElse(null);
+        this.jid = builder.getJID().orElse(null);
         final Element pubSubElement = this.getElement().addElement("pubsub", OpenlinkXmppNamespace.XMPP_PUBSUB.uri());
         final Element unsubscribeElement = pubSubElement.addElement("unsubscribe");
         if (pubSubNodeId != null) {
@@ -57,10 +56,10 @@ public class PubSubUnsubscribeRequest extends OpenlinkIQ {
             parseErrors.add("Invalid " + STANZA_DESCRIPTION + "; missing 'unsubscribe' tag is mandatory");
         } else {
             final Optional<PubSubNodeId> pubSubNodeId = PubSubNodeId.from(TinderPacketUtil.getStringAttribute(unsubscribeElement,
-                    "node", true, STANZA_DESCRIPTION, parseErrors).orElse(null));
+                    "node", false, STANZA_DESCRIPTION, parseErrors).orElse(null));
             pubSubNodeId.ifPresent(builder::setPubSubNodeId);
             final Optional<JID> jid = TinderPacketUtil.getJID(TinderPacketUtil.getStringAttribute(unsubscribeElement,
-                    "jid", true, STANZA_DESCRIPTION, parseErrors).orElse(null));
+                    "jid", false, STANZA_DESCRIPTION, parseErrors).orElse(null));
             jid.ifPresent(builder::setJID);
         }
 
@@ -69,7 +68,7 @@ public class PubSubUnsubscribeRequest extends OpenlinkIQ {
         return request;
     }
 
-    public static final class Builder extends IQBuilder<Builder> {
+    public static final class Builder extends PubSubUnsubscribeRequestBuilder<Builder, JID, Type> {
 
         @Nonnull
         public static Builder start() {
@@ -78,56 +77,26 @@ public class PubSubUnsubscribeRequest extends OpenlinkIQ {
 
         @Nonnull
         private static Builder start(@Nonnull final IQ iq) {
-            return new Builder(iq);
+            final Builder builder = start();
+            TinderIQBuilder.setIQBuilder(builder, iq);
+            return builder;
         }
-
-        @Nullable private PubSubNodeId pubSubNodeId;
-        @Nullable private JID jid;
 
         private Builder() {
-        }
-
-        private Builder(@Nonnull final IQ iq) {
-            super(iq);
-        }
-
-        @Override
-        @Nonnull
-        protected Type getExpectedType() {
-            return Type.set;
+            super(IQ.Type.class);
         }
 
         @Nonnull
         public PubSubUnsubscribeRequest build() {
-            validateBuilder();
-            if (pubSubNodeId == null) {
-                throw new IllegalStateException("The stanza 'pubSubNodeId' has not been set");
-            }
-            if (jid == null) {
-                throw new IllegalStateException("The stanza 'jid' has not been set");
-            }
-            return build(Collections.emptyList());
+            super.validate();
+            return new PubSubUnsubscribeRequest(this, null);
         }
 
         @Nonnull
-        private PubSubUnsubscribeRequest build(@Nonnull final List<String> parseErrors) {
-            return new PubSubUnsubscribeRequest(this, parseErrors);
+        private PubSubUnsubscribeRequest build(@Nonnull final List<String> errors) {
+            super.validate(errors, true);
+            return new PubSubUnsubscribeRequest(this, errors);
         }
-
-        public Builder setPubSubNodeId(@Nonnull PubSubNodeId pubSubNodeId) {
-            this.pubSubNodeId = pubSubNodeId;
-            return this;
-        }
-
-        public Builder setInterestId(@Nonnull InterestId interestId) {
-            return setPubSubNodeId(interestId.toPubSubNodeId());
-        }
-
-        public Builder setJID(@Nonnull JID jid) {
-            this.jid = jid;
-            return this;
-        }
-
     }
 
 }

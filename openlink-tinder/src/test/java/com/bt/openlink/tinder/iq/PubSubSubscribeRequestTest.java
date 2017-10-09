@@ -27,7 +27,7 @@ public class PubSubSubscribeRequestTest {
     public void canCreateAStanza() throws Exception {
 
         final PubSubSubscribeRequest request = PubSubSubscribeRequest.Builder.start()
-                .setID(Fixtures.STANZA_ID)
+                .setId(Fixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
                 .setJID(Fixtures.USER_JID)
@@ -54,23 +54,10 @@ public class PubSubSubscribeRequestTest {
     }
 
     @Test
-    public void cannotCreateAStanzaWithoutAForInterestField() throws Exception {
-
-        expectedException.expect(IllegalStateException.class);
-        expectedException.expectMessage("The stanza 'pubSubNodeId' has not been set");
-        PubSubSubscribeRequest.Builder.start()
-                .setID(Fixtures.STANZA_ID)
-                .setTo(Fixtures.TO_JID)
-                .setFrom(Fixtures.FROM_JID)
-                .setJID(Fixtures.USER_JID)
-                .build();
-    }
-
-    @Test
     public void willGenerateAnXmppStanza() throws Exception {
 
         final PubSubSubscribeRequest request = PubSubSubscribeRequest.Builder.start()
-                .setID(Fixtures.STANZA_ID)
+                .setId(Fixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
                 .setJID(Fixtures.USER_JID)

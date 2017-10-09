@@ -28,7 +28,7 @@ public class PubSubUnsubscribeRequestTest {
     public void canCreateAStanza() throws Exception {
 
         final PubSubUnsubscribeRequest request = PubSubUnsubscribeRequest.Builder.start()
-                .setID(Fixtures.STANZA_ID)
+                .setId(Fixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
                 .setPubSubNodeId(Fixtures.NODE_ID)
@@ -43,32 +43,10 @@ public class PubSubUnsubscribeRequestTest {
     }
 
     @Test
-    public void cannotCreateAStanzaWithoutAPubSubNodeId() throws Exception {
-
-        expectedException.expect(IllegalStateException.class);
-        expectedException.expectMessage("The stanza 'pubSubNodeId' has not been set");
-        PubSubUnsubscribeRequest.Builder.start()
-                .setTo(Fixtures.TO_JID)
-                .setJID(Fixtures.USER_JID)
-                .build();
-    }
-
-    @Test
-    public void cannotCreateAStanzaWithoutAForUserField() throws Exception {
-
-        expectedException.expect(IllegalStateException.class);
-        expectedException.expectMessage("The stanza 'jid' has not been set");
-        PubSubUnsubscribeRequest.Builder.start()
-                .setTo(Fixtures.TO_JID)
-                .setPubSubNodeId(Fixtures.NODE_ID)
-                .build();
-    }
-
-    @Test
     public void willGenerateAnXmppStanza() throws Exception {
 
         final PubSubUnsubscribeRequest request = PubSubUnsubscribeRequest.Builder.start()
-                .setID(Fixtures.STANZA_ID)
+                .setId(Fixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
                 .setInterestId(Fixtures.INTEREST_ID)

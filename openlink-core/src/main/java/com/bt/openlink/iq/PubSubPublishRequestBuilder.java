@@ -120,10 +120,10 @@ public abstract class PubSubPublishRequestBuilder<B extends PubSubPublishRequest
             super.validate(errors);
         }
         if (pubSubNodeId == null) {
-            errors.add("Invalid pub-sub request stanza; missing node id/interest id");
+            errors.add("Invalid pub-sub publish request stanza; missing node id/interest id");
         }
-        validateUniqueness(callId -> errors.add("Invalid pub-sub request stanza; each call id must be unique - " + callId + " appears more than once"));
-        validateCallsAreOnTheCorrectInterest(call -> errors.add("Invalid pub-sub request stanza; the call with id " + call.getId().orElse(null) + " is on interest " + call.getInterestId().orElse(null)
+        validateUniqueness(callId -> errors.add("Invalid pub-sub publish request stanza; each call id must be unique - " + callId + " appears more than once"));
+        validateCallsAreOnTheCorrectInterest(call -> errors.add("Invalid pub-sub publish request stanza; the call with id " + call.getId().orElse(null) + " is on interest " + call.getInterestId().orElse(null)
                 + " which differs from the pub-sub node id " + pubSubNodeId));
     }
 }

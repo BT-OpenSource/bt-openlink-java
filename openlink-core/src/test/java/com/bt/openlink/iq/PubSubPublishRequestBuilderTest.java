@@ -101,7 +101,7 @@ public class PubSubPublishRequestBuilderTest {
 
         builder.validate(errors);
 
-        assertThat(errors, contains("Invalid pub-sub request stanza; missing node id/interest id"));
+        assertThat(errors, contains("Invalid pub-sub publish request stanza; missing node id/interest id"));
     }
 
     @Test
@@ -127,8 +127,8 @@ public class PubSubPublishRequestBuilderTest {
         builder.validate(errors);
 
         assertThat(errors, contains(
-                "Invalid pub-sub request stanza; each call id must be unique - test-call-id appears more than once",
-                "Invalid pub-sub request stanza; the call with id test-call-id is on interest another-interest-id which differs from the pub-sub node id test-interest-id"
+                "Invalid pub-sub publish request stanza; each call id must be unique - test-call-id appears more than once",
+                "Invalid pub-sub publish request stanza; the call with id test-call-id is on interest another-interest-id which differs from the pub-sub node id test-interest-id"
                 ));
     }
 
