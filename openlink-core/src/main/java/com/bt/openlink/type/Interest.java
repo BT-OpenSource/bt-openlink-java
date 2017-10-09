@@ -1,5 +1,6 @@
 package com.bt.openlink.type;
 
+import java.util.List;
 import java.util.Optional;
 
 import javax.annotation.Nonnull;
@@ -77,12 +78,23 @@ public final class Interest {
             if (isDefault == null) {
                 throw new IllegalStateException("The interest default indicator has not been set");
             }
-
-            return buildWithoutValidating();
+            return new Interest(this);
         }
 
         @Nonnull
-        public Interest buildWithoutValidating() {
+        public Interest build(final List<String> errors) {
+            if (interestId == null) {
+                errors.add("Invalid interest; the interest id has not been set");
+            }
+            if (interestType == null) {
+                errors.add("Invalid interest; the interest type has not been set");
+            }
+            if (label == null) {
+                errors.add("Invalid interest; the interest label has not been set");
+            }
+            if (isDefault == null) {
+                errors.add("Invalid interest; the interest default indicator has not been set");
+            }
             return new Interest(this);
         }
 

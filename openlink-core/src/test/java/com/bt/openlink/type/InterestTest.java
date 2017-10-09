@@ -1,8 +1,11 @@
 package com.bt.openlink.type;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.contains;
 import static org.junit.Assert.assertThat;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.Rule;
@@ -86,9 +89,18 @@ public class InterestTest {
 
     @Test
     public void willBuildAnInterestWithoutMandatoryValues() throws Exception {
-        final Interest interest = Interest.Builder.start()
-                .buildWithoutValidating();
 
+        final List<String> errors = new ArrayList<>();
+
+        final Interest interest = Interest.Builder.start()
+                .build(errors);
+
+        assertThat(errors, contains(
+                "Invalid interest; the interest id has not been set",
+                "Invalid interest; the interest type has not been set",
+                "Invalid interest; the interest label has not been set",
+                "Invalid interest; the interest default indicator has not been set"
+        ));
         assertThat(interest.getId(), is(Optional.empty()));
         assertThat(interest.getType(), is(Optional.empty()));
         assertThat(interest.getLabel(), is(Optional.empty()));

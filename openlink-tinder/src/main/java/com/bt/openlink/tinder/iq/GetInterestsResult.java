@@ -61,7 +61,7 @@ public class GetInterestsResult extends OpenlinkIQ {
                 label.ifPresent(interestBuilder::setLabel);
                 final Optional<Boolean> isDefault = TinderPacketUtil.getBooleanAttribute(interestElement, "default", true, DESCRIPTION, parseErrors);
                 isDefault.ifPresent(interestBuilder::setDefault);
-                builder.addInterest(interestBuilder.buildWithoutValidating());
+                builder.addInterest(interestBuilder.build(parseErrors));
             }
         }
 

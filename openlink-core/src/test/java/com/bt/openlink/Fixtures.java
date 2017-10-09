@@ -10,6 +10,7 @@ import com.bt.openlink.type.CallId;
 import com.bt.openlink.type.Feature;
 import com.bt.openlink.type.FeatureId;
 import com.bt.openlink.type.FeatureType;
+import com.bt.openlink.type.Interest;
 import com.bt.openlink.type.InterestId;
 import com.bt.openlink.type.InterestType;
 import com.bt.openlink.type.Participant;
@@ -44,12 +45,12 @@ public class Fixtures {
     public static final Site SITE = Site.Builder.start()
             .setId(42)
             .setType(Site.Type.BTSM)
-            .setName("test-site-name")
+            .setName("test site name")
             .setDefault(true)
             .build();
     public static final Profile PROFILE = Profile.Builder.start()
             .setId(PROFILE_ID)
-            .setLabel("test-profile")
+            .setLabel("test profile label")
             .setOnline(true)
             .setDefault(true)
             .setSite(SITE)
@@ -57,6 +58,12 @@ public class Fixtures {
     public static final Feature FEATURE = Feature.Builder.start()
             .setType(FeatureType.PRIVACY)
             .setId(FEATURE_ID)
-            .setLabel("Privact")
+            .setLabel("Privacy")
+            .build();
+    public static final Interest INTEREST = Interest.Builder.start()
+            .setType(INTEREST_TYPE)
+            .setDefault(true)
+            .setId(INTEREST_ID)
+            .setLabel("test interest label")
             .build();
 }

@@ -1,6 +1,7 @@
 package com.bt.openlink.tinder.iq;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.contains;
 import static org.junit.Assert.assertThat;
 import static org.xmlunit.matchers.CompareMatcher.isIdenticalTo;
 
@@ -25,7 +26,6 @@ public class GetInterestResultTest {
             .setLabel("6001/1")
             .setDefault(true)
             .build();
-
 
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
@@ -55,7 +55,7 @@ public class GetInterestResultTest {
     public void canCreateAStanza() throws Exception {
 
         final GetInterestResult result = GetInterestResult.Builder.start()
-                .setID(Fixtures.STANZA_ID)
+                .setId(Fixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
                 .setInterest(INTEREST)
@@ -81,7 +81,7 @@ public class GetInterestResultTest {
     public void willGenerateAnXmppStanza() throws Exception {
 
         final GetInterestResult result = GetInterestResult.Builder.start()
-                .setID(Fixtures.STANZA_ID)
+                .setId(Fixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
                 .setInterest(INTEREST)
@@ -111,13 +111,12 @@ public class GetInterestResultTest {
         final GetInterestResult result = GetInterestResult.from(Fixtures.iqFrom(GET_INTEREST_RESULT_WITH_BAD_VALUES));
 
         final List<String> parseErrors = result.getParseErrors();
-        int errorCount = 0;
-        assertThat(parseErrors.get(errorCount++), is("Invalid stanza; missing or incorrect 'type' attribute"));
-        assertThat(parseErrors.get(errorCount++), is("Invalid stanza; missing 'to' attribute is mandatory"));
-        assertThat(parseErrors.get(errorCount++), is("Invalid stanza; missing 'from' attribute is mandatory"));
-        assertThat(parseErrors.get(errorCount++), is("Invalid stanza; missing 'id' attribute is mandatory"));
-        assertThat(parseErrors.get(errorCount++), is("Invalid get-interest result; missing 'interest' element is mandatory"));
-        assertThat(parseErrors.size(), is(errorCount));
+        assertThat(result.getParseErrors(), contains(
+                "Invalid stanza; missing 'to' attribute is mandatory",
+                "Invalid stanza; missing 'from' attribute is mandatory",
+                "Invalid stanza; missing 'id' attribute is mandatory",
+                "Invalid stanza; missing or incorrect 'type' attribute",
+                "Invalid get-interest result stanza; missing 'interest'"));
     }
 
     @Test
@@ -126,11 +125,12 @@ public class GetInterestResultTest {
         final GetInterestRequest request = GetInterestRequest.Builder.start()
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
-                .setID(Fixtures.STANZA_ID)
+                .setId(Fixtures.STANZA_ID)
                 .setInterestId(Fixtures.INTEREST_ID)
                 .build();
 
         final GetInterestResult result = GetInterestResult.Builder.start(request)
+                .setInterest(Fixtures.INTEREST)
                 .build();
 
         assertThat(result.getID(), is(request.getID()));

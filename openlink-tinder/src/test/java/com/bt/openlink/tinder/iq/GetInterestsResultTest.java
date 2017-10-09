@@ -94,15 +94,12 @@ public class GetInterestsResultTest {
 
         expectedException.expect(IllegalArgumentException.class);
         expectedException.expectMessage("The interest id must be unique");
-        final Interest interest = Interest.Builder.start()
-                .setId(Fixtures.INTEREST_ID)
-                .buildWithoutValidating();
         GetInterestsResult.Builder.start()
                 .setID(Fixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
-                .addInterest(interest)
-                .addInterest(interest)
+                .addInterest(Fixtures.INTEREST)
+                .addInterest(Fixtures.INTEREST)
                 .build();
     }
 
