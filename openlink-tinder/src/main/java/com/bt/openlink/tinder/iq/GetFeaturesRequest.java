@@ -1,7 +1,6 @@
 package com.bt.openlink.tinder.iq;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -10,20 +9,21 @@ import javax.annotation.Nullable;
 
 import org.dom4j.Element;
 import org.xmpp.packet.IQ;
+import org.xmpp.packet.JID;
 
 import com.bt.openlink.OpenlinkXmppNamespace;
+import com.bt.openlink.iq.GetFeaturesRequestBuilder;
 import com.bt.openlink.tinder.internal.TinderPacketUtil;
 import com.bt.openlink.type.ProfileId;
 
-public class GetFeaturesRequest extends OpenlinkIQ {
+public class GetFeaturesRequest extends OpenlinkIQ2 {
     @Nullable private final ProfileId profileId;
 
-    private GetFeaturesRequest(@Nonnull Builder builder, @Nonnull List<String> parseErrors) {
+    private GetFeaturesRequest(@Nonnull Builder builder, @Nullable List<String> parseErrors) {
         super(builder, parseErrors);
-        this.profileId = builder.profileId;
+        this.profileId = builder.getProfileId().orElse(null);
         final Element inElement = TinderPacketUtil.addCommandIOInputElement(this, OpenlinkXmppNamespace.OPENLINK_GET_FEATURES);
         TinderPacketUtil.addElementWithTextIfNotNull(inElement, "profile", profileId);
-
     }
 
     @Nonnull
@@ -35,19 +35,19 @@ public class GetFeaturesRequest extends OpenlinkIQ {
     public static GetFeaturesRequest from(@Nonnull IQ iq) {
         final List<String> parseErrors = new ArrayList<>();
         final Element inElement = TinderPacketUtil.getIOInElement(iq);
-        final Builder builder = Builder.start(iq)
-                .setProfileId(TinderPacketUtil.getChildElementString(inElement,
-                        "profile",
-                        true,
-                        "get-features request",
-                        parseErrors));
-
+        final Builder builder = Builder.start(iq);
+        final Optional<ProfileId> profileId = ProfileId.from(TinderPacketUtil.getChildElementString(inElement,
+                "profile",
+                false,
+                "get-features request",
+                parseErrors));
+        profileId.ifPresent(builder::setProfileId);
         final GetFeaturesRequest request = builder.build(parseErrors);
         request.setID(iq.getID());
         return request;
     }
 
-    public static final class Builder extends IQBuilder<Builder> {
+    public static final class Builder extends GetFeaturesRequestBuilder<Builder, JID, IQ.Type> {
 
         @Nonnull
         public static Builder start() {
@@ -56,48 +56,26 @@ public class GetFeaturesRequest extends OpenlinkIQ {
 
         @Nonnull
         private static Builder start(@Nonnull final IQ iq) {
-            return new Builder(iq);
+            final Builder builder = start();
+            TinderIQBuilder.setIQBuilder(builder, iq);
+            return builder;
         }
-
-        @Nullable ProfileId profileId;
 
         private Builder() {
-        }
-
-        private Builder(final IQ iq) {
-            super(iq);
-        }
-
-        @Override
-        @Nonnull
-        protected Type getExpectedType() {
-            return Type.set;
+            super(IQ.Type.class);
         }
 
         @Nonnull
         public GetFeaturesRequest build() {
-            validateBuilder();
-            if (profileId == null) {
-                throw new IllegalStateException("The profileId has not been set");
-            }
-            return build( Collections.emptyList());
+            super.validate();
+            return new GetFeaturesRequest(this, null);
         }
 
         @Nonnull
-        private GetFeaturesRequest build(@Nonnull final List<String> parseErrors) {
-            return new GetFeaturesRequest(this, parseErrors);
+        private GetFeaturesRequest build(@Nonnull final List<String> errors) {
+            super.validate(errors, true);
+            return new GetFeaturesRequest(this, errors);
         }
-
-        private Builder setProfileId(@Nullable String profileId) {
-            this.profileId = ProfileId.from(profileId).orElse(null);
-            return this;
-        }
-
-        public Builder setProfileId(@Nonnull ProfileId profileId) {
-            this.profileId = profileId;
-            return this;
-        }
-
     }
 
 }

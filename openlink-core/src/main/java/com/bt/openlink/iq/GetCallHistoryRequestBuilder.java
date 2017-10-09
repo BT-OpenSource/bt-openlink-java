@@ -9,7 +9,7 @@ import javax.annotation.Nullable;
 
 import com.bt.openlink.type.CallType;
 
-public abstract class GetCallHistoryRequestBuilder<B extends IQBuilder, J, T extends Enum<T>> extends IQBuilder<B, J, T> {
+public abstract class GetCallHistoryRequestBuilder<B extends GetCallHistoryRequestBuilder, J, T extends Enum<T>> extends IQBuilder<B, J, T> {
 
     @Nullable J jid;
     @Nullable private String caller;

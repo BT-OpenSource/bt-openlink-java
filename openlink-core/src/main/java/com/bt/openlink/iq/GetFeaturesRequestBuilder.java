@@ -6,11 +6,13 @@ import java.util.Optional;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public abstract class GetProfilesRequestBuilder<B extends GetProfilesRequestBuilder, J, T extends Enum<T>> extends IQBuilder<B, J, T> {
+import com.bt.openlink.type.ProfileId;
 
-    @Nullable protected J jid;
+public abstract class GetFeaturesRequestBuilder<B extends GetFeaturesRequestBuilder, J, T extends Enum<T>> extends IQBuilder<B, J, T> {
 
-    protected GetProfilesRequestBuilder(final Class<T> typeClass) {
+    @Nullable protected ProfileId profileId;
+
+    protected GetFeaturesRequestBuilder(final Class<T> typeClass) {
         super(typeClass);
     }
 
@@ -22,21 +24,21 @@ public abstract class GetProfilesRequestBuilder<B extends GetProfilesRequestBuil
 
     @Nonnull
     @SuppressWarnings("unchecked")
-    public B setJID(@Nonnull final J jid) {
-        this.jid = jid;
+    public B setProfileId(@Nonnull final ProfileId profileId) {
+        this.profileId = profileId;
         return (B) this;
     }
 
     @Nonnull
-    public Optional<J> getJID() {
-        return Optional.ofNullable(jid);
+    public Optional<ProfileId> getProfileId() {
+        return Optional.ofNullable(profileId);
     }
 
     @Override
     protected void validate() {
         super.validate();
-        if (jid == null) {
-            throw new IllegalStateException("The get-profiles request 'jid' has not been set");
+        if (profileId == null) {
+            throw new IllegalStateException("The get-features request 'profileId' has not been set");
         }
     }
 
@@ -49,8 +51,8 @@ public abstract class GetProfilesRequestBuilder<B extends GetProfilesRequestBuil
         if (checkIQFields) {
             super.validate(errors);
         }
-        if (jid == null) {
-            errors.add("Invalid get-profiles request stanza; missing or invalid 'jid'");
+        if (profileId == null) {
+            errors.add("Invalid get-features request stanza; missing profile id");
         }
     }
 }

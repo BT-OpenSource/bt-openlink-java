@@ -1,10 +1,13 @@
 package com.bt.openlink.iq;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.empty;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -13,9 +16,10 @@ import org.junit.rules.ExpectedException;
 
 import com.bt.openlink.Fixtures;
 
-public class GetProfilesResultBuilderTest {
+@SuppressWarnings("ConstantConditions")
+public class GetFeaturesRequestBuilderTest {
 
-    private static class Builder extends GetProfilesResultBuilder<Builder, String, Fixtures.typeEnum> {
+    private static class Builder extends GetFeaturesRequestBuilder<Builder, String, Fixtures.typeEnum> {
         protected Builder() {
             super(Fixtures.typeEnum.class);
         }
@@ -38,35 +42,34 @@ public class GetProfilesResultBuilderTest {
     @Test
     public void willValidateAPopulatedBuilder() throws Exception {
 
-        builder.addProfile(Fixtures.PROFILE);
+        final List<String> errors = new ArrayList<>();
+        builder.setProfileId(Fixtures.PROFILE_ID);
 
         builder.validate();
+        builder.validate(errors);
 
-        assertThat(builder.getProfiles(), contains(Fixtures.PROFILE));
+        assertThat(errors, is(empty()));
+        assertThat(builder.getProfileId().get(), is(Fixtures.PROFILE_ID));
     }
 
     @Test
-    public void willValidateProfileUniqueness() throws Exception {
+    public void willValidateTheProfileIsSet() throws Exception {
 
         expectedException.expect(IllegalStateException.class);
-        expectedException.expectMessage("Each profile id must be unique - test-profile-id appears more than once");
-
-        builder.addProfile(Fixtures.PROFILE);
-        builder.addProfile(Fixtures.PROFILE);
+        expectedException.expectMessage("The get-features request 'profileId' has not been set");
 
         builder.validate();
     }
 
     @Test
-    public void willCheckProfileUniqueness() throws Exception {
+    public void willCheckThatProfileIsSet() throws Exception {
 
         final List<String> errors = new ArrayList<>();
 
-        builder.addProfile(Fixtures.PROFILE);
-        builder.addProfile(Fixtures.PROFILE);
-
         builder.validate(errors);
 
-        assertThat(errors, contains("Invalid get-profiles request stanza; each profile id must be unique - test-profile-id appears more than once"));
+        assertThat(errors, contains("Invalid get-features request stanza; missing profile id"));
+        assertThat(builder.getProfileId(), is(Optional.empty()));
     }
+
 }

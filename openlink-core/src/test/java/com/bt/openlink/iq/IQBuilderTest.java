@@ -21,8 +21,8 @@ import com.bt.openlink.Fixtures;
 @SuppressWarnings("ConstantConditions")
 public class IQBuilderTest {
 
-    private static class ConcreteIQBuilder extends IQBuilder<ConcreteIQBuilder, String, Fixtures.typeEnum> {
-        protected ConcreteIQBuilder() {
+    private static class Builder extends IQBuilder<Builder, String, Fixtures.typeEnum> {
+        protected Builder() {
             super(Fixtures.typeEnum.class);
         }
 
@@ -35,11 +35,11 @@ public class IQBuilderTest {
 
     @Rule public final ExpectedException expectedException = ExpectedException.none();
 
-    private ConcreteIQBuilder builder;
+    private Builder builder;
 
     @Before
     public void setUp() throws Exception {
-        builder = new ConcreteIQBuilder();
+        builder = new Builder();
     }
 
     @Test

@@ -18,20 +18,20 @@ import com.bt.openlink.Fixtures;
 
 public class GetCallHistoryRequestBuilderTest {
 
-    private static class ConcreteGetCallHistoryRequestBuilder extends GetCallHistoryRequestBuilder<GetProfilesResultBuilder, String, Fixtures.typeEnum> {
-        protected ConcreteGetCallHistoryRequestBuilder() {
+    private static class Builder extends GetCallHistoryRequestBuilder<Builder, String, Fixtures.typeEnum> {
+        protected Builder() {
             super(Fixtures.typeEnum.class);
         }
     }
 
     @Rule public final ExpectedException expectedException = ExpectedException.none();
 
-    private ConcreteGetCallHistoryRequestBuilder builder;
+    private Builder builder;
 
     @Before
     public void setUp() throws Exception {
 
-        builder = new ConcreteGetCallHistoryRequestBuilder();
+        builder = new Builder();
 
         builder.setTo("to");
         builder.setFrom("from");

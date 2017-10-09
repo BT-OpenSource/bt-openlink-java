@@ -10,7 +10,7 @@ import javax.annotation.Nonnull;
 import com.bt.openlink.type.Profile;
 import com.bt.openlink.type.ProfileId;
 
-public abstract class GetProfilesResultBuilder<B extends IQBuilder, J, T extends Enum<T>> extends IQBuilder<B, J, T> {
+public abstract class GetProfilesResultBuilder<B extends GetProfilesResultBuilder, J, T extends Enum<T>> extends IQBuilder<B, J, T> {
 
     @Nonnull private List<Profile> profiles = new ArrayList<>();
 

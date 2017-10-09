@@ -188,7 +188,7 @@ public class GetFeaturesResultTest {
         final GetFeaturesRequest request = GetFeaturesRequest.Builder.start()
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
-                .setID(Fixtures.STANZA_ID)
+                .setId(Fixtures.STANZA_ID)
                 .setProfileId(Fixtures.PROFILE_ID)
                 .build();
 

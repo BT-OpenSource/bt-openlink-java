@@ -19,20 +19,20 @@ import com.bt.openlink.Fixtures;
 @SuppressWarnings("ConstantConditions")
 public class GetProfilesRequestBuilderTest {
 
-    private static class ConcreteGetProfilesRequestBuilder extends GetProfilesRequestBuilder<GetProfilesResultBuilder, String, Fixtures.typeEnum> {
-        protected ConcreteGetProfilesRequestBuilder() {
+    private static class Builder extends GetProfilesRequestBuilder<Builder, String, Fixtures.typeEnum> {
+        protected Builder() {
             super(Fixtures.typeEnum.class);
         }
     }
 
     @Rule public final ExpectedException expectedException = ExpectedException.none();
 
-    private ConcreteGetProfilesRequestBuilder builder;
+    private Builder builder;
 
     @Before
     public void setUp() throws Exception {
 
-        builder = new ConcreteGetProfilesRequestBuilder();
+        builder = new Builder();
 
         builder.setTo("to");
         builder.setFrom("from");
