@@ -84,7 +84,7 @@ public abstract class GetFeaturesResultBuilder<B extends GetFeaturesResultBuilde
         if(profileId==null) {
             errors.add("Invalid get-features result stanza; missing profile");
         }
-        validateUniqueness(profileId -> errors.add("Invalid get-features result stanza; each feature id must be unique - " + profileId + " appears more than once"));
+        validateUniqueness(profile -> errors.add("Invalid get-features result stanza; each feature id must be unique - " + profile + " appears more than once"));
     }
 
 }

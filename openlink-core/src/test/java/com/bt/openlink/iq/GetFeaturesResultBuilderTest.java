@@ -15,6 +15,7 @@ import org.junit.rules.ExpectedException;
 
 import com.bt.openlink.Fixtures;
 
+@SuppressWarnings("ConstantConditions")
 public class GetFeaturesResultBuilderTest {
 
     private static class Builder extends GetFeaturesResultBuilder<Builder, String, Fixtures.typeEnum> {
@@ -48,6 +49,7 @@ public class GetFeaturesResultBuilderTest {
         builder.validate(errors);
 
         assertThat(errors, is(empty()));
+        assertThat(builder.getProfileId().get(), is(Fixtures.PROFILE_ID));
         assertThat(builder.getFeatures(), contains(Fixtures.FEATURE));
     }
 
