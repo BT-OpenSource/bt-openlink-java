@@ -57,7 +57,7 @@ subprojects {
         override = false
         pkg {
             repo = 'bt-openlink'
-            name = 'bt-openlink-java'
+            name = 'java-bt-openlink'
 //        userOrg = 'myorg' //An optional organization name when the repo belongs to one of the user's orgs
 //        desc = 'what a fantastic package indeed!'
             websiteUrl = 'https://github.com/BT-OpenSource/bt-openlink-java'
