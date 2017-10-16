@@ -3,7 +3,6 @@ package com.bt.openlink.tinder.internal;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -11,9 +10,9 @@ import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Optional;
+import java.util.TimeZone;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -294,9 +293,10 @@ public final class TinderPacketUtil {
                     participant.getType().ifPresent(type -> participantElement.addAttribute("type", type.getId()));
                     participant.getDirection().ifPresent(direction -> participantElement.addAttribute(ATTRIBUTE_DIRECTION, direction.getLabel()));
                     participant.getStartTime().ifPresent(startTime -> {
-                        participantElement.addAttribute(ATTRIBUTE_START_TIME, ISO_8601_FORMATTER.format(startTime.atZone(ZoneOffset.UTC)));
+                        final ZonedDateTime startTimeInUTC = startTime.atZone(TimeZone.getTimeZone("UTC").toZoneId());
+                        participantElement.addAttribute(ATTRIBUTE_START_TIME, ISO_8601_FORMATTER.format(startTimeInUTC));
                         // Include the legacy timestamp attribute too
-                            participantElement.addAttribute(ATTRIBUTE_TIMESTAMP, GregorianCalendar.from(ZonedDateTime.ofInstant(startTime, ZoneId.systemDefault())).getTime().toString());
+                        participantElement.addAttribute(ATTRIBUTE_TIMESTAMP, JAVA_UTIL_DATE_FORMATTER.format(startTimeInUTC));
                         });
                     participant.getDuration().ifPresent(duration -> participantElement.addAttribute(ATTRIBUTE_DURATION, String.valueOf(duration.toMillis())));
                 });

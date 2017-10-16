@@ -9,11 +9,11 @@ import static org.xmlunit.matchers.CompareMatcher.isIdenticalTo;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.TimeZone;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -75,21 +75,21 @@ public class CallStatusMessageTest {
             "    </items>\n" +
             "  </event>\n" +
             "</message>";
-    private static ZoneId systemDefaultZoneId;
 
     @Rule public final ExpectedException expectedException = ExpectedException.none();
 
+    private static TimeZone systemDefaultTimeZone;
+
     @BeforeClass
     public static void setupClass() {
-        systemDefaultZoneId = ZoneId.systemDefault();
-        System.setProperty("user.timezone", "Europe/London");
+        systemDefaultTimeZone = TimeZone.getDefault();
+        TimeZone.setDefault(TimeZone.getTimeZone("Europe/London"));
     }
 
     @AfterClass
     public static void tearDownClass() {
-        System.setProperty("user.timezone", systemDefaultZoneId.getId());
+        TimeZone.setDefault(systemDefaultTimeZone);
     }
-
 
     @Test
     public void canCreateAStanza() throws Exception {
@@ -200,7 +200,7 @@ public class CallStatusMessageTest {
                 "              <AnswerCall/>\n" +
                 "            </actions>\n" +
                 "            <participants>\n" +
-                "              <participant direction='Incoming' jid='test-user@test-domain' starttime='2017-10-09T08:07:00.000Z' timestamp='Mon Oct 09 09:07:00 BST 2017' duration='60000' type='Active'/>\n" +
+                "              <participant direction='Incoming' jid='test-user@test-domain' starttime='2017-10-09T08:07:00.000Z' timestamp='Mon Oct 09 08:07:00 UTC 2017' duration='60000' type='Active'/>\n" +
                 "            </participants>\n" +
                 "          </call>\n" +
                 "        </callstatus>\n" +
@@ -305,7 +305,7 @@ public class CallStatusMessageTest {
                 "              <AnswerCall/>\n" +
                 "            </actions>\n" +
                 "            <participants>\n" +
-                "              <participant direction='Incoming' jid='test-user@test-domain' starttime='2017-10-09T08:07:00.000Z' timestamp='Mon Oct 09 09:07:00 BST 2017' duration='60000' type='Active'/>\n" +
+                "              <participant direction='Incoming' jid='test-user@test-domain' starttime='2017-10-09T08:07:00.000Z' timestamp='Mon Oct 09 08:07:00 UTC 2017' duration='60000' type='Active'/>\n" +
                 "            </participants>\n" +
                 "          </call>\n" +
                 "        </callstatus>\n" +
@@ -389,7 +389,7 @@ public class CallStatusMessageTest {
         assertThat(parseErrors.get(i++), is("Invalid Call status message; invalid starttime 'yesterday'; format should be compliant with XEP-0082"));
         assertThat(parseErrors.get(i++), is("Invalid Call status message; invalid duration 'a while'; please supply an integer"));
         assertThat(parseErrors.get(i++), is("Invalid Call status message; invalid timestamp 'not-a-timestamp'; format should be compliant with XEP-0082"));
-        assertThat(parseErrors.size(),is(i));
+        assertThat(parseErrors.size(), is(i));
     }
 
     @Test
@@ -407,8 +407,8 @@ public class CallStatusMessageTest {
                         "            <state>CallOriginated</state>\n" +
                         "            <direction>Incoming</direction>\n" +
                         "            <participants>\n" +
-                        "              <participant direction='Incoming' jid='test-user@test-domain' timestamp='Tue May 18 16:12:51 GMT 2010' duration='0' type='Inactive'/>\n" +
-                "            </participants>\n" +
+                        "              <participant direction='Incoming' jid='test-user@test-domain' timestamp='Tue May 18 16:12:51 PST 2010' duration='0' type='Inactive'/>\n" +
+                        "            </participants>\n" +
                         "          </call>\n" +
                         "        </callstatus>\n" +
                         "      </item>\n" +
@@ -418,6 +418,6 @@ public class CallStatusMessageTest {
 
         final CallStatusMessage message = (CallStatusMessage) OpenlinkMessageParser.parse(stanza);
 
-        assertThat(message.getCalls().get(0).getParticipants().get(0).getStartTime().get(), is(Instant.parse("2010-05-18T16:12:51.000Z")));
+        assertThat(message.getCalls().get(0).getParticipants().get(0).getStartTime().get(), is(Instant.parse("2010-05-18T23:12:51.000Z")));
     }
 }

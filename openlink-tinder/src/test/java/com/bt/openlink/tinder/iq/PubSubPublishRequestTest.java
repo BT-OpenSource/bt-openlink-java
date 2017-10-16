@@ -4,9 +4,9 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.xmlunit.matchers.CompareMatcher.isIdenticalTo;
 
-import java.time.ZoneId;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.TimeZone;
 
 import org.hamcrest.CoreMatchers;
 import org.junit.AfterClass;
@@ -82,17 +82,17 @@ public class PubSubPublishRequestTest {
             "  </pubsub>" +
             "</iq>\n";
 
-    private static ZoneId systemDefaultZoneId;
+    private static TimeZone systemDefaultTimeZone;
 
     @BeforeClass
     public static void setupClass() {
-        systemDefaultZoneId = ZoneId.systemDefault();
-        System.setProperty("user.timezone", "Europe/London");
+        systemDefaultTimeZone = TimeZone.getDefault();
+        TimeZone.setDefault(TimeZone.getTimeZone("Europe/London"));
     }
 
     @AfterClass
     public static void tearDownClass() {
-        System.setProperty("user.timezone", systemDefaultZoneId.getId());
+        TimeZone.setDefault(systemDefaultTimeZone);
     }
 
     @Test
@@ -162,7 +162,7 @@ public class PubSubPublishRequestTest {
                 "              <AnswerCall/>\n" +
                 "            </actions>\n" +
                 "            <participants>\n" +
-                "              <participant direction='Incoming' jid='test-user@test-domain' starttime='2017-10-09T08:07:00.000Z' timestamp='Mon Oct 09 09:07:00 BST 2017' duration='60000' type='Active'/>\n" +
+                "              <participant direction='Incoming' jid='test-user@test-domain' starttime='2017-10-09T08:07:00.000Z' timestamp='Mon Oct 09 08:07:00 UTC 2017' duration='60000' type='Active'/>\n" +
                 "            </participants>\n" +
                 "          </call>\n" +
                 "        </callstatus>\n" +
@@ -219,7 +219,7 @@ public class PubSubPublishRequestTest {
                 "              <AnswerCall/>\n" +
                 "            </actions>\n" +
                 "            <participants>\n" +
-                "              <participant direction='Incoming' jid='test-user@test-domain' starttime='2017-10-09T08:07:00.000Z' timestamp='Mon Oct 09 09:07:00 BST 2017' duration='60000' type='Active'/>\n" +
+                "              <participant direction='Incoming' jid='test-user@test-domain' starttime='2017-10-09T08:07:00.000Z' timestamp='Mon Oct 09 08:07:00 UTC 2017' duration='60000' type='Active'/>\n" +
                 "            </participants>\n" +
                 "          </call>\n" +
                 "        </callstatus>\n" +
