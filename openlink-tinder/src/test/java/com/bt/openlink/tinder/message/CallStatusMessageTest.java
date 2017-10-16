@@ -300,6 +300,7 @@ public class CallStatusMessageTest {
                 "           <site default='true' id='42' type='BTSM'>test-site-name</site>" +
                 "            <profile>" + Fixtures.PROFILE_ID + "</profile>\n" +
                 "            <interest>" + Fixtures.INTEREST_ID + "</interest>\n" +
+                "            <changed>State</changed>\n" +
                 "            <state>CallOriginated</state>\n" +
                 "            <direction>Incoming</direction>\n" +
                 "            <starttime>2017-10-09T08:07:00.000Z</starttime>\n" +
