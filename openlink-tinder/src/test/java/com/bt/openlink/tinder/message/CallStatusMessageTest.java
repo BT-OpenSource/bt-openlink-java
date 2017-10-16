@@ -9,11 +9,14 @@ import static org.xmlunit.matchers.CompareMatcher.isIdenticalTo;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -72,8 +75,21 @@ public class CallStatusMessageTest {
             "    </items>\n" +
             "  </event>\n" +
             "</message>";
+    private static ZoneId systemDefaultZoneId;
 
     @Rule public final ExpectedException expectedException = ExpectedException.none();
+
+    @BeforeClass
+    public static void setupClass() {
+        systemDefaultZoneId = ZoneId.systemDefault();
+        System.setProperty("user.timezone", "Europe/London");
+    }
+
+    @AfterClass
+    public static void tearDownClass() {
+        System.setProperty("user.timezone", systemDefaultZoneId.getId());
+    }
+
 
     @Test
     public void canCreateAStanza() throws Exception {
@@ -184,7 +200,7 @@ public class CallStatusMessageTest {
                 "              <AnswerCall/>\n" +
                 "            </actions>\n" +
                 "            <participants>\n" +
-                "              <participant direction='Incoming' jid='test-user@test-domain' starttime='2017-10-09T08:07:00.000Z' duration='60000' type='Active'/>\n" +
+                "              <participant direction='Incoming' jid='test-user@test-domain' starttime='2017-10-09T08:07:00.000Z' timestamp='Mon Oct 09 09:07:00 BST 2017' duration='60000' type='Active'/>\n" +
                 "            </participants>\n" +
                 "          </call>\n" +
                 "        </callstatus>\n" +
@@ -201,7 +217,6 @@ public class CallStatusMessageTest {
                 .addCall(Fixtures.CALL)
                 .build();
 
-        //        System.out.println(stanza);
         assertThat(message.toXML(), isIdenticalTo(expectedXML).ignoreWhitespace());
     }
 
@@ -222,7 +237,6 @@ public class CallStatusMessageTest {
         final CallStatusMessage message = CallStatusMessage.Builder.start()
                 .build(new ArrayList<>());
 
-        //System.out.println(generatedStanza);
         assertThat(message.toXML(), isIdenticalTo(expectedXML).ignoreWhitespace());
     }
 
@@ -291,7 +305,7 @@ public class CallStatusMessageTest {
                 "              <AnswerCall/>\n" +
                 "            </actions>\n" +
                 "            <participants>\n" +
-                "              <participant direction='Incoming' jid='test-user@test-domain' starttime='2017-10-09T08:07:00.000Z' duration='60000' type='Active'/>\n" +
+                "              <participant direction='Incoming' jid='test-user@test-domain' starttime='2017-10-09T08:07:00.000Z' timestamp='Mon Oct 09 09:07:00 BST 2017' duration='60000' type='Active'/>\n" +
                 "            </participants>\n" +
                 "          </call>\n" +
                 "        </callstatus>\n" +
@@ -376,5 +390,34 @@ public class CallStatusMessageTest {
         assertThat(parseErrors.get(i++), is("Invalid Call status message; invalid duration 'a while'; please supply an integer"));
         assertThat(parseErrors.get(i++), is("Invalid Call status message; invalid timestamp 'not-a-timestamp'; format should be compliant with XEP-0082"));
         assertThat(parseErrors.size(),is(i));
+    }
+
+    @Test
+    public void willParseAMessageWithALegacyTimestamp() throws Exception {
+        final Message stanza = Fixtures.messageFrom(
+                "<message from='" + Fixtures.FROM_JID + "' to='" + Fixtures.TO_JID + "' id='" + Fixtures.STANZA_ID + "'>\n" +
+                        "  <event xmlns='http://jabber.org/protocol/pubsub#event'>\n" +
+                        "    <items node='" + Fixtures.INTEREST_ID + "'>\n" +
+                        "      <item>\n" +
+                        "        <callstatus xmlns='http://xmpp.org/protocol/openlink:01:00:00#call-status'>\n" +
+                        "          <call>\n" +
+                        "            <id>" + Fixtures.CALL_ID + "</id>\n" +
+                        "            <profile>" + Fixtures.PROFILE_ID + "</profile>\n" +
+                        "            <interest>" + Fixtures.INTEREST_ID + "</interest>\n" +
+                        "            <state>CallOriginated</state>\n" +
+                        "            <direction>Incoming</direction>\n" +
+                        "            <participants>\n" +
+                        "              <participant direction='Incoming' jid='test-user@test-domain' timestamp='Tue May 18 16:12:51 GMT 2010' duration='0' type='Inactive'/>\n" +
+                "            </participants>\n" +
+                        "          </call>\n" +
+                        "        </callstatus>\n" +
+                        "      </item>\n" +
+                        "    </items>\n" +
+                        "  </event>\n" +
+                        "</message>");
+
+        final CallStatusMessage message = (CallStatusMessage) OpenlinkMessageParser.parse(stanza);
+
+        assertThat(message.getCalls().get(0).getParticipants().get(0).getStartTime().get(), is(Instant.parse("2010-05-18T16:12:51.000Z")));
     }
 }

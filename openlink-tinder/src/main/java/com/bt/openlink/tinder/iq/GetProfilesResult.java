@@ -62,13 +62,13 @@ public class GetProfilesResult extends OpenlinkIQ2 {
                 final Profile.Builder profileBuilder = Profile.Builder.start();
                 final Optional<ProfileId> profileId = ProfileId.from(TinderPacketUtil.getStringAttribute(profileElement, "id", false, DESCRIPTION, parseErrors).orElse(null));
                 profileId.ifPresent(profileBuilder::setId);
-                final Optional<Boolean> isDefault = TinderPacketUtil.getBooleanAttribute(profileElement, ATTRIBUTE_DEFAULT, false, DESCRIPTION, parseErrors);
+                final Optional<Boolean> isDefault = TinderPacketUtil.getBooleanAttribute(profileElement, ATTRIBUTE_DEFAULT, DESCRIPTION, parseErrors);
                 isDefault.ifPresent(profileBuilder::setDefault);
                 final Optional<String> device = Optional.ofNullable(TinderPacketUtil.getStringAttribute(profileElement, "device", false, DESCRIPTION, parseErrors).orElse(null));
                 device.ifPresent(profileBuilder::setDevice);
                 final Optional<String> label = Optional.ofNullable(TinderPacketUtil.getStringAttribute(profileElement, ATTRIBUTE_LABEL, false, DESCRIPTION, parseErrors).orElse(null));
                 label.ifPresent(profileBuilder::setLabel);
-                final Optional<Boolean> online = TinderPacketUtil.getBooleanAttribute(profileElement, "online", false, DESCRIPTION, parseErrors);
+                final Optional<Boolean> online = TinderPacketUtil.getBooleanAttribute(profileElement, "online", DESCRIPTION, parseErrors);
                 online.ifPresent(profileBuilder::setOnline);
                 final Optional<Site> site = TinderPacketUtil.getSite(profileElement, DESCRIPTION, parseErrors);
                 site.ifPresent(profileBuilder::setSite);

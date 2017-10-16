@@ -70,13 +70,13 @@ public class GetCallHistoryRequest extends OpenlinkIQ2 {
             parseErrors.add(String.format("Invalid %s; invalid calltype - '%s' should be 'in', 'out' or 'missed'", STANZA_DESCRIPTION, callTypeString));
         }
         final Optional<LocalDate> fromDate = Optional.ofNullable(TinderPacketUtil.getChildElementLocalDate(inElement,
-                "fromdate", DATE_FORMATTER, false, STANZA_DESCRIPTION, DATE_PATTERN, parseErrors));
+                "fromdate", DATE_FORMATTER, STANZA_DESCRIPTION, DATE_PATTERN, parseErrors));
         final Optional<LocalDate> upToDate = Optional.ofNullable(TinderPacketUtil.getChildElementLocalDate(inElement,
-                "uptodate", DATE_FORMATTER, false, STANZA_DESCRIPTION, DATE_PATTERN, parseErrors));
+                "uptodate", DATE_FORMATTER, STANZA_DESCRIPTION, DATE_PATTERN, parseErrors));
         final Optional<Long> start = Optional.ofNullable(TinderPacketUtil.getChildElementLong(inElement,
-                "start", false, STANZA_DESCRIPTION, parseErrors));
+                "start", STANZA_DESCRIPTION, parseErrors));
         final Optional<Long> count = Optional.ofNullable(TinderPacketUtil.getChildElementLong(inElement,
-                "count", false, STANZA_DESCRIPTION, parseErrors));
+                "count", STANZA_DESCRIPTION, parseErrors));
         final Builder builder = Builder.start(iq);
         jid.ifPresent(builder::setJID);
         caller.ifPresent(builder::setCaller);

@@ -3,12 +3,15 @@ package com.bt.openlink.tinder.internal;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,8 +40,10 @@ import com.bt.openlink.type.Site;
 public final class TinderPacketUtil {
 
     private static final DateTimeFormatter ISO_8601_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+    private static final DateTimeFormatter JAVA_UTIL_DATE_FORMATTER = DateTimeFormatter.ofPattern("EEE MMM dd HH:mm:ss zzz yyyy");
     private static final String ATTRIBUTE_DIRECTION = "direction";
     private static final String ATTRIBUTE_START_TIME = "starttime";
+    private static final String ATTRIBUTE_TIMESTAMP = "timestamp";
     private static final String ATTRIBUTE_DURATION = "duration";
 
     private TinderPacketUtil() {
@@ -112,11 +117,10 @@ public final class TinderPacketUtil {
             @Nullable final Element parentElement,
             @Nonnull final String childElementName,
             @Nonnull final DateTimeFormatter dateTimeFormatter,
-            final boolean isRequired,
             final String stanzaDescription,
             @Nonnull final String dateFormat,
             final List<String> parseErrors) {
-        final String dateText = getChildElementString(parentElement, childElementName, isRequired, stanzaDescription, parseErrors);
+        final String dateText = getChildElementString(parentElement, childElementName, false, stanzaDescription, parseErrors);
         if (dateText != null) {
             try {
                 return LocalDate.parse(dateText, dateTimeFormatter);
@@ -131,10 +135,9 @@ public final class TinderPacketUtil {
     private static Optional<Instant> getChildElementISO8601(
             @Nullable final Element parentElement,
             @Nonnull final String childElementName,
-            final boolean isRequired,
             @Nonnull final String stanzaDescription,
             @Nonnull final List<String> parseErrors) {
-        final String childElementText = getChildElementString(parentElement, childElementName, isRequired, stanzaDescription, parseErrors);
+        final String childElementText = getChildElementString(parentElement, childElementName, false, stanzaDescription, parseErrors);
         if (childElementText != null) {
             try {
                 return Optional.of(Instant.parse(childElementText));
@@ -149,10 +152,9 @@ public final class TinderPacketUtil {
     public static Long getChildElementLong(
             @Nullable final Element parentElement,
             @Nonnull final String childElementName,
-            final boolean isRequired,
             @Nonnull final String stanzaDescription,
             @Nonnull final List<String> parseErrors) {
-        final String childElementText = getChildElementString(parentElement, childElementName, isRequired, stanzaDescription, parseErrors);
+        final String childElementText = getChildElementString(parentElement, childElementName, false, stanzaDescription, parseErrors);
         if (childElementText != null) {
             try {
                 return Long.parseLong(childElementText);
@@ -190,8 +192,8 @@ public final class TinderPacketUtil {
     }
 
     @Nonnull
-    public static Optional<Long> getLongAttribute(final Element parentElement, final String attributeName, final boolean isRequired, final String description, final List<String> parseErrors) {
-        final Optional<String> stringValue = getStringAttribute(parentElement, attributeName, isRequired, description, parseErrors);
+    public static Optional<Long> getLongAttribute(final Element parentElement, final String attributeName, final String description, final List<String> parseErrors) {
+        final Optional<String> stringValue = getStringAttribute(parentElement, attributeName, false, description, parseErrors);
         try {
             return stringValue.map(Long::valueOf);
         } catch (final NumberFormatException e) {
@@ -200,8 +202,8 @@ public final class TinderPacketUtil {
         }
     }
 
-    private static Optional<Instant> getISO8601Attribute(final Element parentElement, final String attributeName, final boolean isRequired, final String description, final List<String> parseErrors) {
-        final Optional<String> stringValue = getStringAttribute(parentElement, attributeName, isRequired, description, parseErrors);
+    private static Optional<Instant> getISO8601Attribute(final Element parentElement, final String attributeName, final String description, final List<String> parseErrors) {
+        final Optional<String> stringValue = getStringAttribute(parentElement, attributeName, false, description, parseErrors);
         try {
             if (stringValue.isPresent()) {
                 return Optional.ofNullable(Instant.parse(stringValue.get()));
@@ -212,9 +214,21 @@ public final class TinderPacketUtil {
         return Optional.empty();
     }
 
+    private static Optional<Instant> getJavaUtilDateAttribute(final Element parentElement, final String attributeName, final String description, final List<String> parseErrors) {
+        final Optional<String> stringValue = getStringAttribute(parentElement, attributeName, false, description, parseErrors);
+        try {
+            if (stringValue.isPresent()) {
+                return Optional.of(Instant.from(JAVA_UTIL_DATE_FORMATTER.parse(stringValue.get())));
+            }
+        } catch (final DateTimeParseException ignored) {
+            parseErrors.add(String.format("Invalid %s; invalid %s '%s'; format should be 'dow mon dd hh:mm:ss zzz yyyy'", description, attributeName, stringValue));
+        }
+        return Optional.empty();
+    }
+
     @Nonnull
-    public static Optional<Boolean> getBooleanAttribute(final Element siteElement, final String id, final boolean isRequired, final String description, final List<String> parseErrors) {
-        final Optional<String> stringValue = getStringAttribute(siteElement, id, isRequired, description, parseErrors);
+    public static Optional<Boolean> getBooleanAttribute(final Element siteElement, final String id, final String description, final List<String> parseErrors) {
+        final Optional<String> stringValue = getStringAttribute(siteElement, id, false, description, parseErrors);
         return stringValue.map(Boolean::valueOf);
     }
 
@@ -279,7 +293,11 @@ public final class TinderPacketUtil {
                     participant.getJID().ifPresent(jid -> participantElement.addAttribute("jid", jid));
                     participant.getType().ifPresent(type -> participantElement.addAttribute("type", type.getId()));
                     participant.getDirection().ifPresent(direction -> participantElement.addAttribute(ATTRIBUTE_DIRECTION, direction.getLabel()));
-                    participant.getStartTime().ifPresent(startTime -> participantElement.addAttribute(ATTRIBUTE_START_TIME, ISO_8601_FORMATTER.format(startTime.atZone(ZoneOffset.UTC))));
+                    participant.getStartTime().ifPresent(startTime -> {
+                        participantElement.addAttribute(ATTRIBUTE_START_TIME, ISO_8601_FORMATTER.format(startTime.atZone(ZoneOffset.UTC)));
+                        // Include the legacy timestamp attribute too
+                            participantElement.addAttribute(ATTRIBUTE_TIMESTAMP, GregorianCalendar.from(ZonedDateTime.ofInstant(startTime, ZoneId.systemDefault())).getTime().toString());
+                        });
                     participant.getDuration().ifPresent(duration -> participantElement.addAttribute(ATTRIBUTE_DURATION, String.valueOf(duration.toMillis())));
                 });
             }
@@ -301,9 +319,9 @@ public final class TinderPacketUtil {
         }
         final Site.Builder siteBuilder = Site.Builder.start()
                 .setName(siteElement.getText());
-        final Optional<Long> id = getLongAttribute(siteElement, "id", true, description, parseErrors);
+        final Optional<Long> id = getLongAttribute(siteElement, "id", description, parseErrors);
         id.ifPresent(siteBuilder::setId);
-        final Optional<Boolean> isDefaultSite = getBooleanAttribute(siteElement, OpenlinkXmppNamespace.TAG_DEFAULT, false, description, parseErrors);
+        final Optional<Boolean> isDefaultSite = getBooleanAttribute(siteElement, OpenlinkXmppNamespace.TAG_DEFAULT, description, parseErrors);
         isDefaultSite.ifPresent(siteBuilder::setDefault);
         final Optional<Site.Type> type = Site.Type.from(getStringAttribute(siteElement, "type", false, description, parseErrors).orElse(null));
         type.ifPresent(siteBuilder::setType);
@@ -330,9 +348,9 @@ public final class TinderPacketUtil {
             state.ifPresent(callBuilder::setState);
             final Optional<CallDirection> direction = CallDirection.from(getChildElementString(callElement, ATTRIBUTE_DIRECTION, true, description, parseErrors));
             direction.ifPresent(callBuilder::setDirection);
-            final Optional<Instant> startTime = getChildElementISO8601(callElement, ATTRIBUTE_START_TIME, true, description, parseErrors);
+            final Optional<Instant> startTime = getChildElementISO8601(callElement, ATTRIBUTE_START_TIME, description, parseErrors);
             startTime.ifPresent(callBuilder::setStartTime);
-            final Optional<Long> duration = Optional.ofNullable(getChildElementLong(callElement, ATTRIBUTE_DURATION, true, description, parseErrors));
+            final Optional<Long> duration = Optional.ofNullable(getChildElementLong(callElement, ATTRIBUTE_DURATION, description, parseErrors));
             duration.ifPresent(millis -> callBuilder.setDuration(Duration.ofMillis(millis)));
             final Element actionsElement = callElement.element("actions");
             if (actionsElement != null) {
@@ -353,9 +371,14 @@ public final class TinderPacketUtil {
                     participantType.ifPresent(participantBuilder::setType);
                     final Optional<CallDirection> callDirection = CallDirection.from(getStringAttribute(participantElement, ATTRIBUTE_DIRECTION, true, description, parseErrors).orElse(null));
                     callDirection.ifPresent(participantBuilder::setDirection);
-                    final Optional<Instant> participantStart = getISO8601Attribute(participantElement, ATTRIBUTE_START_TIME, true, description, parseErrors);
-                    participantStart.ifPresent(participantBuilder::setStartTime);
-                    final Optional<Long> participantDuration = getLongAttribute(participantElement, ATTRIBUTE_DURATION, true, description, parseErrors);
+                    final Optional<Instant> participantStartTime = getISO8601Attribute(participantElement, ATTRIBUTE_START_TIME, description, parseErrors);
+                    if (participantStartTime.isPresent()) {
+                        participantBuilder.setStartTime(participantStartTime.get());
+                    } else {
+                        final Optional<Instant> participantTimestamp = getJavaUtilDateAttribute(participantElement, ATTRIBUTE_TIMESTAMP, description, parseErrors);
+                        participantTimestamp.ifPresent(participantBuilder::setStartTime);
+                    }
+                    final Optional<Long> participantDuration = getLongAttribute(participantElement, ATTRIBUTE_DURATION, description, parseErrors);
                     participantDuration.ifPresent(millis -> participantBuilder.setDuration(Duration.ofMillis(millis)));
                     callBuilder.addParticipant(participantBuilder.buildWithoutValidating());
                 }
