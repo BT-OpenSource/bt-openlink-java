@@ -266,7 +266,7 @@ public final class TinderPacketUtil {
         return jidString == null || jidString.isEmpty() ? Optional.empty() : Optional.of(new JID(jidString));
     }
 
-    public static void addItemCallStatusCalls(final Element parentElement, final Collection<Call> calls) {
+    public static void addItemCallStatusCalls(@Nonnull final Element parentElement, @Nonnull final Collection<Call> calls) {
         final Element itemElement = parentElement.addElement("item");
         final Element callStatusElement = itemElement.addElement("callstatus", OpenlinkXmppNamespace.OPENLINK_CALL_STATUS.uri());
         calls.forEach(call -> {
@@ -279,29 +279,37 @@ public final class TinderPacketUtil {
             call.getDirection().ifPresent(direction -> callElement.addElement(ATTRIBUTE_DIRECTION).setText(direction.getLabel()));
             call.getStartTime().ifPresent(startTime -> callElement.addElement(ATTRIBUTE_START_TIME).setText(ISO_8601_FORMATTER.format(startTime.atZone(ZoneOffset.UTC))));
             call.getDuration().ifPresent(duration -> callElement.addElement(ATTRIBUTE_DURATION).setText(String.valueOf(duration.toMillis())));
-            final Collection<RequestAction> actions = call.getActions();
-            if (!actions.isEmpty()) {
-                final Element actionsElement = callElement.addElement("actions");
-                actions.forEach(action -> actionsElement.addElement(action.getId()));
-            }
-            final List<Participant> participants = call.getParticipants();
-            if (!participants.isEmpty()) {
-                final Element participantsElement = callElement.addElement("participants");
-                participants.forEach(participant -> {
-                    final Element participantElement = participantsElement.addElement("participant");
-                    participant.getJID().ifPresent(jid -> participantElement.addAttribute("jid", jid));
-                    participant.getType().ifPresent(type -> participantElement.addAttribute("type", type.getId()));
-                    participant.getDirection().ifPresent(direction -> participantElement.addAttribute(ATTRIBUTE_DIRECTION, direction.getLabel()));
-                    participant.getStartTime().ifPresent(startTime -> {
-                        final ZonedDateTime startTimeInUTC = startTime.atZone(TimeZone.getTimeZone("UTC").toZoneId());
-                        participantElement.addAttribute(ATTRIBUTE_START_TIME, ISO_8601_FORMATTER.format(startTimeInUTC));
-                        // Include the legacy timestamp attribute too
-                        participantElement.addAttribute(ATTRIBUTE_TIMESTAMP, JAVA_UTIL_DATE_FORMATTER.format(startTimeInUTC));
-                        });
-                    participant.getDuration().ifPresent(duration -> participantElement.addAttribute(ATTRIBUTE_DURATION, String.valueOf(duration.toMillis())));
-                });
-            }
+            addActions(call, callElement);
+            addParticipants(call, callElement);
         });
+    }
+
+    private static void addActions(@Nonnull final Call call, @Nonnull final Element callElement) {
+        final Collection<RequestAction> actions = call.getActions();
+        if (!actions.isEmpty()) {
+            final Element actionsElement = callElement.addElement("actions");
+            actions.forEach(action -> actionsElement.addElement(action.getId()));
+        }
+    }
+
+    private static void addParticipants(@Nonnull final Call call, @Nonnull final Element callElement) {
+        final List<Participant> participants = call.getParticipants();
+        if (!participants.isEmpty()) {
+            final Element participantsElement = callElement.addElement("participants");
+            participants.forEach(participant -> {
+                final Element participantElement = participantsElement.addElement("participant");
+                participant.getJID().ifPresent(jid -> participantElement.addAttribute("jid", jid));
+                participant.getType().ifPresent(type -> participantElement.addAttribute("type", type.getId()));
+                participant.getDirection().ifPresent(direction -> participantElement.addAttribute(ATTRIBUTE_DIRECTION, direction.getLabel()));
+                participant.getStartTime().ifPresent(startTime -> {
+                    final ZonedDateTime startTimeInUTC = startTime.atZone(TimeZone.getTimeZone("UTC").toZoneId());
+                    participantElement.addAttribute(ATTRIBUTE_START_TIME, ISO_8601_FORMATTER.format(startTimeInUTC));
+                    // Include the legacy timestamp attribute too
+                    participantElement.addAttribute(ATTRIBUTE_TIMESTAMP, JAVA_UTIL_DATE_FORMATTER.format(startTimeInUTC));
+                    });
+                participant.getDuration().ifPresent(duration -> participantElement.addAttribute(ATTRIBUTE_DURATION, String.valueOf(duration.toMillis())));
+            });
+        }
     }
 
     public static void addSite(final Element parentElement, final Site site) {
@@ -352,41 +360,50 @@ public final class TinderPacketUtil {
             startTime.ifPresent(callBuilder::setStartTime);
             final Optional<Long> duration = Optional.ofNullable(getChildElementLong(callElement, ATTRIBUTE_DURATION, description, parseErrors));
             duration.ifPresent(millis -> callBuilder.setDuration(Duration.ofMillis(millis)));
-            final Element actionsElement = callElement.element("actions");
-            if (actionsElement != null) {
-                final List<Element> actionElements = actionsElement.elements();
-                for (final Element actionElement : actionElements) {
-                    final Optional<RequestAction> action = RequestAction.from(actionElement.getName());
-                    action.ifPresent(callBuilder::addAction);
-                }
-            }
-            final Element participantsElement = callElement.element("participants");
-            if (participantsElement != null) {
-                final List<Element> participantElements = participantsElement.elements("participant");
-                for (final Element participantElement : participantElements) {
-                    final Participant.Builder participantBuilder = Participant.Builder.start();
-                    final Optional<String> jid = getStringAttribute(participantElement, "jid", true, description, parseErrors);
-                    jid.ifPresent(participantBuilder::setJID);
-                    final Optional<ParticipantType> participantType = ParticipantType.from(getStringAttribute(participantElement, "type", true, description, parseErrors).orElse(null));
-                    participantType.ifPresent(participantBuilder::setType);
-                    final Optional<CallDirection> callDirection = CallDirection.from(getStringAttribute(participantElement, ATTRIBUTE_DIRECTION, true, description, parseErrors).orElse(null));
-                    callDirection.ifPresent(participantBuilder::setDirection);
-                    final Optional<Instant> participantStartTime = getISO8601Attribute(participantElement, ATTRIBUTE_START_TIME, description, parseErrors);
-                    if (participantStartTime.isPresent()) {
-                        participantBuilder.setStartTime(participantStartTime.get());
-                    } else {
-                        final Optional<Instant> participantTimestamp = getJavaUtilDateAttribute(participantElement, ATTRIBUTE_TIMESTAMP, description, parseErrors);
-                        participantTimestamp.ifPresent(participantBuilder::setStartTime);
-                    }
-                    final Optional<Long> participantDuration = getLongAttribute(participantElement, ATTRIBUTE_DURATION, description, parseErrors);
-                    participantDuration.ifPresent(millis -> participantBuilder.setDuration(Duration.ofMillis(millis)));
-                    callBuilder.addParticipant(participantBuilder.buildWithoutValidating());
-                }
-
-            }
+            getActions(callElement, callBuilder);
+            getParticipants(callElement, callBuilder, description, parseErrors);
             calls.add(callBuilder.buildWithoutValidating());
         }
         return calls;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static void getParticipants(@Nonnull final Element callElement, @Nonnull final Call.Builder callBuilder, @Nonnull final String description, @Nonnull final List<String> parseErrors) {
+        final Element participantsElement = callElement.element("participants");
+        if (participantsElement != null) {
+            final List<Element> participantElements = participantsElement.elements("participant");
+            for (final Element participantElement : participantElements) {
+                final Participant.Builder participantBuilder = Participant.Builder.start();
+                final Optional<String> jid = getStringAttribute(participantElement, "jid", true, description, parseErrors);
+                jid.ifPresent(participantBuilder::setJID);
+                final Optional<ParticipantType> participantType = ParticipantType.from(getStringAttribute(participantElement, "type", true, description, parseErrors).orElse(null));
+                participantType.ifPresent(participantBuilder::setType);
+                final Optional<CallDirection> callDirection = CallDirection.from(getStringAttribute(participantElement, ATTRIBUTE_DIRECTION, true, description, parseErrors).orElse(null));
+                callDirection.ifPresent(participantBuilder::setDirection);
+                final Optional<Instant> participantStartTime = getISO8601Attribute(participantElement, ATTRIBUTE_START_TIME, description, parseErrors);
+                if (participantStartTime.isPresent()) {
+                    participantBuilder.setStartTime(participantStartTime.get());
+                } else {
+                    final Optional<Instant> participantTimestamp = getJavaUtilDateAttribute(participantElement, ATTRIBUTE_TIMESTAMP, description, parseErrors);
+                    participantTimestamp.ifPresent(participantBuilder::setStartTime);
+                }
+                final Optional<Long> participantDuration = getLongAttribute(participantElement, ATTRIBUTE_DURATION, description, parseErrors);
+                participantDuration.ifPresent(millis -> participantBuilder.setDuration(Duration.ofMillis(millis)));
+                callBuilder.addParticipant(participantBuilder.buildWithoutValidating());
+            }
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private static void getActions(@Nonnull final Element callElement, @Nonnull final Call.Builder callBuilder) {
+        final Element actionsElement = callElement.element("actions");
+        if (actionsElement != null) {
+            final List<Element> actionElements = actionsElement.elements();
+            for (final Element actionElement : actionElements) {
+                final Optional<RequestAction> action = RequestAction.from(actionElement.getName());
+                action.ifPresent(callBuilder::addAction);
+            }
+        }
     }
 
 }
