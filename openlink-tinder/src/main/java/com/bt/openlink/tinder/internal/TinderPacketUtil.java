@@ -26,6 +26,7 @@ import com.bt.openlink.type.Call;
 import com.bt.openlink.type.CallDirection;
 import com.bt.openlink.type.CallId;
 import com.bt.openlink.type.CallState;
+import com.bt.openlink.type.Changed;
 import com.bt.openlink.type.InterestId;
 import com.bt.openlink.type.Participant;
 import com.bt.openlink.type.ParticipantType;
@@ -275,6 +276,7 @@ public final class TinderPacketUtil {
             call.getSite().ifPresent(site -> addSite(callElement, site));
             call.getProfileId().ifPresent(profileId -> callElement.addElement("profile").setText(profileId.value()));
             call.getInterestId().ifPresent(interestId -> callElement.addElement("interest").setText(interestId.value()));
+            call.getChanged().ifPresent(changed -> callElement.addElement("changed").setText(changed.getId()));
             call.getState().ifPresent(state -> callElement.addElement("state").setText(state.getLabel()));
             call.getDirection().ifPresent(direction -> callElement.addElement(ATTRIBUTE_DIRECTION).setText(direction.getLabel()));
             call.getStartTime().ifPresent(startTime -> callElement.addElement(ATTRIBUTE_START_TIME).setText(ISO_8601_FORMATTER.format(startTime.atZone(ZoneOffset.UTC))));
@@ -352,6 +354,8 @@ public final class TinderPacketUtil {
             profileId.ifPresent(callBuilder::setProfileId);
             final Optional<InterestId> interestId = InterestId.from(getChildElementString(callElement, "interest", true, description, parseErrors));
             interestId.ifPresent(callBuilder::setInterestId);
+            final Optional<Changed> changed = Changed.from(getChildElementString(callElement, "changed", false, description, parseErrors));
+            changed.ifPresent(callBuilder::setChanged);
             final Optional<CallState> state = CallState.from(getChildElementString(callElement, "state", true, description, parseErrors));
             state.ifPresent(callBuilder::setState);
             final Optional<CallDirection> direction = CallDirection.from(getChildElementString(callElement, ATTRIBUTE_DIRECTION, true, description, parseErrors));

@@ -19,6 +19,7 @@ import com.bt.openlink.type.Call;
 import com.bt.openlink.type.CallDirection;
 import com.bt.openlink.type.CallId;
 import com.bt.openlink.type.CallState;
+import com.bt.openlink.type.Changed;
 import com.bt.openlink.type.Interest;
 import com.bt.openlink.type.InterestId;
 import com.bt.openlink.type.InterestType;
@@ -69,6 +70,7 @@ public final class Fixtures {
             .setSite(SITE)
             .setProfileId(PROFILE_ID)
             .setInterestId(INTEREST_ID)
+            .setChanged(Changed.STATE)
             .setState(CallState.CALL_ORIGINATED)
             .setDirection(CallDirection.INCOMING)
             .setStartTime(START_TIME)

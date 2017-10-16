@@ -18,6 +18,7 @@ public class Call {
     @Nullable private final Site site;
     @Nullable private final ProfileId profileId;
     @Nullable private final InterestId interestId;
+    @Nullable private final Changed changed;
     @Nullable private final CallState state;
     @Nullable private final CallDirection direction;
     @Nullable private final Instant startTime;
@@ -30,6 +31,7 @@ public class Call {
         this.site = builder.site;
         this.profileId = builder.profileId;
         this.interestId = builder.interestId;
+        this.changed = builder.changed;
         this.state = builder.state;
         this.direction = builder.direction;
         this.startTime = builder.startTime;
@@ -56,6 +58,11 @@ public class Call {
     @Nonnull
     public Optional<InterestId> getInterestId() {
         return Optional.ofNullable(interestId);
+    }
+
+    @Nonnull
+    public Optional<Changed> getChanged() {
+        return Optional.ofNullable(changed);
     }
 
     @Nonnull
@@ -97,6 +104,7 @@ public class Call {
         @Nullable private Site site;
         @Nullable private ProfileId profileId;
         @Nullable private InterestId interestId;
+        @Nullable private Changed changed;
         @Nullable private CallState state;
         @Nullable private CallDirection direction;
         @Nullable private Instant startTime;
@@ -174,6 +182,12 @@ public class Call {
         @Nonnull
         public Builder setState(@Nonnull final CallState state) {
             this.state = state;
+            return this;
+        }
+
+        @Nonnull
+        public Builder setChanged(@Nonnull final Changed changed) {
+            this.changed = changed;
             return this;
         }
 

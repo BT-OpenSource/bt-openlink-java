@@ -26,6 +26,7 @@ import com.bt.openlink.tinder.Fixtures;
 import com.bt.openlink.type.Call;
 import com.bt.openlink.type.CallDirection;
 import com.bt.openlink.type.CallState;
+import com.bt.openlink.type.Changed;
 import com.bt.openlink.type.PubSubNodeId;
 
 @SuppressWarnings("ConstantConditions")
@@ -192,6 +193,7 @@ public class CallStatusMessageTest {
                 "            <site default='true' id='42' type='BTSM'>test-site-name</site>" +
                 "            <profile>" + Fixtures.PROFILE_ID + "</profile>\n" +
                 "            <interest>" + Fixtures.INTEREST_ID + "</interest>\n" +
+                "            <changed>State</changed>\n" +
                 "            <state>CallOriginated</state>\n" +
                 "            <direction>Incoming</direction>\n" +
                 "            <starttime>2017-10-09T08:07:00.000Z</starttime>\n" +
@@ -256,6 +258,7 @@ public class CallStatusMessageTest {
         assertThat(theOnlyCall.getId().get(), is(Fixtures.CALL_ID));
         assertThat(theOnlyCall.getProfileId().get(), is(Fixtures.PROFILE_ID));
         assertThat(theOnlyCall.getInterestId().get(), is(Fixtures.INTEREST_ID));
+        assertThat(theOnlyCall.getChanged().get(), is(Changed.STATE));
         assertThat(theOnlyCall.getState().get(), is(CallState.CALL_ORIGINATED));
         assertThat(theOnlyCall.getDirection().get(), is(CallDirection.OUTGOING));
         assertThat(theOnlyCall.getStartTime().get(), is(Fixtures.START_TIME));
@@ -339,6 +342,7 @@ public class CallStatusMessageTest {
                         "            <id>" + Fixtures.CALL_ID + "</id>\n" +
                         "            <profile>" + Fixtures.PROFILE_ID + "</profile>\n" +
                         "            <interest>" + Fixtures.INTEREST_ID + "</interest>\n" +
+                        "            <changed>State</changed>\n" +
                         "            <state>CallOriginated</state>\n" +
                         "            <direction>Incoming</direction>\n" +
                         "          </call>\n" +

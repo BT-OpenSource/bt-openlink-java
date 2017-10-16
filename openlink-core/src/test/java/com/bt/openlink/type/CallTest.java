@@ -31,6 +31,7 @@ public class CallTest {
                 .setSite(Fixtures.SITE)
                 .setProfileId(Fixtures.PROFILE_ID)
                 .setInterestId(Fixtures.INTEREST_ID)
+                .setChanged(Changed.STATE)
                 .setState(CallState.CALL_ORIGINATED)
                 .setDirection(CallDirection.INCOMING)
                 .setStartTime(startTime)
@@ -43,6 +44,7 @@ public class CallTest {
         assertThat(call.getSite().get(), is(Fixtures.SITE));
         assertThat(call.getProfileId().get(), is(Fixtures.PROFILE_ID));
         assertThat(call.getInterestId().get(), is(Fixtures.INTEREST_ID));
+        assertThat(call.getChanged().get(), is(Changed.STATE));
         assertThat(call.getState().get(), is(CallState.CALL_ORIGINATED));
         assertThat(call.getDirection().get(), is(CallDirection.INCOMING));
         assertThat(call.getStartTime().get(), is(startTime));
@@ -206,6 +208,7 @@ public class CallTest {
         assertThat(call.getSite(), is(Optional.empty()));
         assertThat(call.getProfileId(), is(Optional.empty()));
         assertThat(call.getInterestId(), is(Optional.empty()));
+        assertThat(call.getChanged(), is(Optional.empty()));
         assertThat(call.getState(), is(Optional.empty()));
         assertThat(call.getDirection(), is(Optional.empty()));
         assertThat(call.getStartTime(), is(Optional.empty()));
