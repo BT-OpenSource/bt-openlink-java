@@ -260,8 +260,7 @@ public final class TinderPacketUtil {
     }
 
     public static void addItemCallStatusCalls(@Nonnull final Element parentElement, @Nonnull final Collection<Call> calls) {
-        final Element itemElement = parentElement.addElement("item");
-        final Element callStatusElement = itemElement.addElement("callstatus", OpenlinkXmppNamespace.OPENLINK_CALL_STATUS.uri());
+        final Element callStatusElement = parentElement.addElement("callstatus", OpenlinkXmppNamespace.OPENLINK_CALL_STATUS.uri());
         calls.forEach(call -> {
             final Element callElement = callStatusElement.addElement("call");
             call.getId().ifPresent(callId -> callElement.addElement("id").setText(callId.value()));
@@ -331,34 +330,35 @@ public final class TinderPacketUtil {
     }
 
     @SuppressWarnings("unchecked")
-    public static List<Call> getCalls(@Nonnull final Element parentElement, @Nonnull final String description, @Nonnull final List<String> parseErrors) {
+    public static List<Call> getCalls(@Nullable final Element parentElement, @Nonnull final String description, @Nonnull final List<String> parseErrors) {
         final List<Call> calls = new ArrayList<>();
-        final Element itemElement = parentElement.element("item");
-        final Element callStatusElement = itemElement.element("callstatus");
-        final List<Element> callElements = callStatusElement.elements("call");
-        for (final Element callElement : callElements) {
-            final Call.Builder callBuilder = Call.Builder.start();
-            final Optional<CallId> callId = CallId.from(getChildElementString(callElement, "id"));
-            callId.ifPresent(callBuilder::setId);
-            final Optional<Site> site = getSite(callElement, description, parseErrors);
-            site.ifPresent(callBuilder::setSite);
-            final Optional<ProfileId> profileId = ProfileId.from(getChildElementString(callElement, "profile"));
-            profileId.ifPresent(callBuilder::setProfileId);
-            final Optional<InterestId> interestId = InterestId.from(getChildElementString(callElement, "interest"));
-            interestId.ifPresent(callBuilder::setInterestId);
-            final Optional<Changed> changed = Changed.from(getChildElementString(callElement, "changed"));
-            changed.ifPresent(callBuilder::setChanged);
-            final Optional<CallState> state = CallState.from(getChildElementString(callElement, "state"));
-            state.ifPresent(callBuilder::setState);
-            final Optional<CallDirection> direction = CallDirection.from(getChildElementString(callElement, ATTRIBUTE_DIRECTION));
-            direction.ifPresent(callBuilder::setDirection);
-            final Optional<Instant> startTime = getChildElementISO8601(callElement, ATTRIBUTE_START_TIME, description, parseErrors);
-            startTime.ifPresent(callBuilder::setStartTime);
-            final Optional<Long> duration = Optional.ofNullable(getChildElementLong(callElement, ATTRIBUTE_DURATION, description, parseErrors));
-            duration.ifPresent(millis -> callBuilder.setDuration(Duration.ofMillis(millis)));
-            getActions(callElement, callBuilder);
-            getParticipants(callElement, callBuilder, description, parseErrors);
-            calls.add(callBuilder.build(parseErrors));
+        final Element callStatusElement = getChildElement(parentElement, "callstatus");
+        if(callStatusElement!=null) {
+            final List<Element> callElements = callStatusElement.elements("call");
+            for (final Element callElement : callElements) {
+                final Call.Builder callBuilder = Call.Builder.start();
+                final Optional<CallId> callId = CallId.from(getChildElementString(callElement, "id"));
+                callId.ifPresent(callBuilder::setId);
+                final Optional<Site> site = getSite(callElement, description, parseErrors);
+                site.ifPresent(callBuilder::setSite);
+                final Optional<ProfileId> profileId = ProfileId.from(getChildElementString(callElement, "profile"));
+                profileId.ifPresent(callBuilder::setProfileId);
+                final Optional<InterestId> interestId = InterestId.from(getChildElementString(callElement, "interest"));
+                interestId.ifPresent(callBuilder::setInterestId);
+                final Optional<Changed> changed = Changed.from(getChildElementString(callElement, "changed"));
+                changed.ifPresent(callBuilder::setChanged);
+                final Optional<CallState> state = CallState.from(getChildElementString(callElement, "state"));
+                state.ifPresent(callBuilder::setState);
+                final Optional<CallDirection> direction = CallDirection.from(getChildElementString(callElement, ATTRIBUTE_DIRECTION));
+                direction.ifPresent(callBuilder::setDirection);
+                final Optional<Instant> startTime = getChildElementISO8601(callElement, ATTRIBUTE_START_TIME, description, parseErrors);
+                startTime.ifPresent(callBuilder::setStartTime);
+                final Optional<Long> duration = Optional.ofNullable(getChildElementLong(callElement, ATTRIBUTE_DURATION, description, parseErrors));
+                duration.ifPresent(millis -> callBuilder.setDuration(Duration.ofMillis(millis)));
+                getActions(callElement, callBuilder);
+                getParticipants(callElement, callBuilder, description, parseErrors);
+                calls.add(callBuilder.build(parseErrors));
+            }
         }
         return calls;
     }

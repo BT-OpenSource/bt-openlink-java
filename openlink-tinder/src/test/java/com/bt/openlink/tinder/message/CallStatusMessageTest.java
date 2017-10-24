@@ -98,7 +98,7 @@ public class CallStatusMessageTest {
     public void canCreateAStanza() throws Exception {
 
         final CallStatusMessage message = CallStatusMessage.Builder.start()
-                .setID(Fixtures.STANZA_ID)
+                .setId(Fixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
                 .setPubSubNodeId(Fixtures.CALL.getInterestId().get())
@@ -134,7 +134,7 @@ public class CallStatusMessageTest {
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("The stanza 'to' has not been set");
         CallStatusMessage.Builder.start()
-                .setID(Fixtures.STANZA_ID)
+                .setId(Fixtures.STANZA_ID)
                 .setFrom(Fixtures.FROM_JID)
                 .setPubSubNodeId(Fixtures.CALL.getInterestId().get())
                 .addCall(Fixtures.CALL)
@@ -147,7 +147,7 @@ public class CallStatusMessageTest {
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("The stanza 'pubSubNodeId' has not been set");
         CallStatusMessage.Builder.start()
-                .setID(Fixtures.STANZA_ID)
+                .setId(Fixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
                 .addCall(Fixtures.CALL)
@@ -160,7 +160,7 @@ public class CallStatusMessageTest {
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("The call with id 'test-call-id' is not on this pubsub node");
         CallStatusMessage.Builder.start()
-                .setID(Fixtures.STANZA_ID)
+                .setId(Fixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
                 .setPubSubNodeId(PubSubNodeId.from("not-" + Fixtures.INTEREST_ID).get())
@@ -214,7 +214,7 @@ public class CallStatusMessageTest {
                 "</message>";
 
         final CallStatusMessage message = CallStatusMessage.Builder.start()
-                .setID(Fixtures.STANZA_ID)
+                .setId(Fixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
                 .setPubSubNodeId(Fixtures.CALL.getInterestId().get())
@@ -322,7 +322,7 @@ public class CallStatusMessageTest {
                 "</message>";
 
         final CallStatusMessage message = CallStatusMessage.Builder.start()
-                .setID(Fixtures.STANZA_ID)
+                .setId(Fixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
                 .setPubSubNodeId(Fixtures.CALL.getInterestId().get())

@@ -49,7 +49,8 @@ public class CallStatusMessage extends Message {
         if (pubSubNodeId != null) {
             itemsElement.addAttribute("node", pubSubNodeId.value());
         }
-        TinderPacketUtil.addItemCallStatusCalls(itemsElement, calls);
+        final Element itemElement = itemsElement.addElement("item");
+        TinderPacketUtil.addItemCallStatusCalls(itemElement, calls);
         if (delay != null) {
             messageElement.addElement("delay", "urn:xmpp:delay").addAttribute("stamp", delay.toString());
         }
@@ -78,14 +79,15 @@ public class CallStatusMessage extends Message {
     @Nonnull
     public static CallStatusMessage from(@Nonnull final Message message) {
         final Builder builder = Builder.start()
-                .setID(message.getID())
+                .setId(message.getID())
                 .setFrom(message.getFrom())
                 .setTo(message.getTo());
         final List<String> parseErrors = new ArrayList<>();
         final Element itemsElement = message.getChildElement("event", "http://jabber.org/protocol/pubsub#event").element("items");
         final Optional<PubSubNodeId> node = PubSubNodeId.from(itemsElement.attributeValue("node"));
         node.ifPresent(builder::setPubSubNodeId);
-        builder.addCalls(TinderPacketUtil.getCalls(itemsElement, STANZA_DESCRIPTION, parseErrors));
+        final Element itemElement = itemsElement.element("item");
+        builder.addCalls(TinderPacketUtil.getCalls(itemElement, STANZA_DESCRIPTION, parseErrors));
         final Element delayElement = message.getChildElement("delay", "urn:xmpp:delay");
         final Optional<String> stampOptional = TinderPacketUtil.getStringAttribute(delayElement, "stamp");
         if (stampOptional.isPresent()) {
@@ -147,7 +149,7 @@ public class CallStatusMessage extends Message {
             return this;
         }
 
-        public Builder setID(@Nullable String id) {
+        public Builder setId(@Nullable String id) {
             this.id = id;
             return this;
         }
@@ -175,6 +177,7 @@ public class CallStatusMessage extends Message {
             return this;
         }
 
+        @Nonnull
         public Builder addCalls(final List<Call> calls) {
             this.calls.addAll(calls);
             return this;

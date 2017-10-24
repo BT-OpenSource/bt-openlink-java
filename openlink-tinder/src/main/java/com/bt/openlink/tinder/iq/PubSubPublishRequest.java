@@ -32,7 +32,8 @@ public class PubSubPublishRequest extends OpenlinkIQ {
         final Element pubSubElement = this.getElement().addElement("pubsub", OpenlinkXmppNamespace.XMPP_PUBSUB.uri());
         final Element publishElement = pubSubElement.addElement("publish");
         getPubSubNodeId().ifPresent(nodeId -> publishElement.addAttribute("node", nodeId.value()));
-        TinderPacketUtil.addItemCallStatusCalls(publishElement, calls);
+        final Element itemElement = publishElement.addElement("item");
+        TinderPacketUtil.addItemCallStatusCalls(itemElement, calls);
     }
 
     @Nonnull
@@ -55,7 +56,8 @@ public class PubSubPublishRequest extends OpenlinkIQ {
             final Optional<PubSubNodeId> pubSubNodeId = PubSubNodeId.from(TinderPacketUtil.getStringAttribute(publishElement,
                     "node", false, STANZA_DESCRIPTION, parseErrors).orElse(null));
             pubSubNodeId.ifPresent(builder::setPubSubNodeId);
-            builder.addCalls(TinderPacketUtil.getCalls(publishElement, STANZA_DESCRIPTION, parseErrors));
+            final Element itemElement = publishElement.element("item");
+            builder.addCalls(TinderPacketUtil.getCalls(itemElement, STANZA_DESCRIPTION, parseErrors));
         }
         final PubSubPublishRequest request = builder.build(parseErrors);
         request.setID(iq.getID());
