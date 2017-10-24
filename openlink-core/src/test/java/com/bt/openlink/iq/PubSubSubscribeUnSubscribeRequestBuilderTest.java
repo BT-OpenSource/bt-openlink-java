@@ -16,8 +16,8 @@ import org.junit.rules.ExpectedException;
 import com.bt.openlink.Fixtures;
 
 @SuppressWarnings("ConstantConditions")
-public class PubSubUnsubscribeRequestBuilderTest {
-    private static class Builder extends PubSubUnsubscribeRequestBuilder<Builder, String, Fixtures.typeEnum> {
+public class PubSubSubscribeUnSubscribeRequestBuilderTest {
+    private static class Builder extends PubSubSubscribeUnSubscribeRequestBuilder<Builder, String, Fixtures.typeEnum> {
         protected Builder() {
             super(Fixtures.typeEnum.class);
         }
@@ -81,8 +81,8 @@ public class PubSubUnsubscribeRequestBuilderTest {
         builder.validate(errors);
 
         assertThat(errors, contains(
-                "Invalid pub-sub unsubscribe request stanza; missing node id/interest id",
-                "Invalid pub-sub unsubscribe request stanza; missing jid"
+                "Invalid pub-sub subscription request stanza; missing node id/interest id",
+                "Invalid pub-sub subscription request stanza; missing jid"
         ));
     }
 }

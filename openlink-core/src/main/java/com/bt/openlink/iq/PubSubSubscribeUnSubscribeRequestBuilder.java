@@ -9,12 +9,12 @@ import javax.annotation.Nullable;
 import com.bt.openlink.type.InterestId;
 import com.bt.openlink.type.PubSubNodeId;
 
-public abstract class PubSubUnsubscribeRequestBuilder<B extends PubSubUnsubscribeRequestBuilder, J, T extends Enum<T>> extends IQBuilder<B, J, T> {
+public abstract class PubSubSubscribeUnSubscribeRequestBuilder<B extends PubSubSubscribeUnSubscribeRequestBuilder, J, T extends Enum<T>> extends IQBuilder<B, J, T> {
 
     @Nullable private PubSubNodeId pubSubNodeId;
     @Nullable private J jid;
 
-    protected PubSubUnsubscribeRequestBuilder(final Class<T> typeClass) {
+    protected PubSubSubscribeUnSubscribeRequestBuilder(final Class<T> typeClass) {
         super(typeClass);
     }
 
@@ -80,10 +80,10 @@ public abstract class PubSubUnsubscribeRequestBuilder<B extends PubSubUnsubscrib
             super.validate(errors);
         }
         if (pubSubNodeId == null) {
-            errors.add("Invalid pub-sub unsubscribe request stanza; missing node id/interest id");
+            errors.add("Invalid pub-sub subscription request stanza; missing node id/interest id");
         }
         if (jid == null) {
-            errors.add("Invalid pub-sub unsubscribe request stanza; missing jid");
+            errors.add("Invalid pub-sub subscription request stanza; missing jid");
         }
     }
 }

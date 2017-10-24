@@ -12,7 +12,7 @@ import org.xmpp.packet.IQ;
 import org.xmpp.packet.JID;
 
 import com.bt.openlink.OpenlinkXmppNamespace;
-import com.bt.openlink.iq.PubSubUnsubscribeRequestBuilder;
+import com.bt.openlink.iq.PubSubSubscribeUnSubscribeRequestBuilder;
 import com.bt.openlink.tinder.internal.TinderPacketUtil;
 import com.bt.openlink.type.PubSubNodeId;
 
@@ -68,7 +68,7 @@ public class PubSubUnsubscribeRequest extends OpenlinkIQ2 {
         return request;
     }
 
-    public static final class Builder extends PubSubUnsubscribeRequestBuilder<Builder, JID, Type> {
+    public static final class Builder extends PubSubSubscribeUnSubscribeRequestBuilder<Builder, JID, Type> {
 
         @Nonnull
         public static Builder start() {
