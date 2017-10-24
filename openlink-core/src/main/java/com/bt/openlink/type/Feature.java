@@ -1,5 +1,6 @@
 package com.bt.openlink.type;
 
+import java.util.List;
 import java.util.Optional;
 
 import javax.annotation.Nonnull;
@@ -56,11 +57,20 @@ public final class Feature {
             if (label == null) {
                 throw new IllegalStateException("The feature label has not been set");
             }
-            return buildWithoutValidating();
+            return new Feature(this);
         }
 
         @Nonnull
-        public Feature buildWithoutValidating() {
+        public Feature build(final List<String> errors) {
+            if (featureId == null) {
+                errors.add("Invalid feature; missing feature id is mandatory");
+            }
+            if (featureType == null) {
+                errors.add("Invalid feature; missing feature type is mandatory");
+            }
+            if (label == null) {
+                errors.add("Invalid feature; missing feature label is mandatory");
+            }
             return new Feature(this);
         }
 

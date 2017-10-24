@@ -385,7 +385,7 @@ public final class TinderPacketUtil {
                 }
                 final Optional<Long> participantDuration = getLongAttribute(participantElement, ATTRIBUTE_DURATION, description, parseErrors);
                 participantDuration.ifPresent(millis -> participantBuilder.setDuration(Duration.ofMillis(millis)));
-                callBuilder.addParticipant(participantBuilder.buildWithoutValidating());
+                callBuilder.addParticipant(participantBuilder.build(parseErrors));
             }
         }
     }

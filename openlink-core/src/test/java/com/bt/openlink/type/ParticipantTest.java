@@ -1,7 +1,12 @@
 package com.bt.openlink.type;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.Assert.assertThat;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -96,5 +101,28 @@ public class ParticipantTest {
                 .setStartTime(Fixtures.START_TIME)
                 .build();
     }
+
+    @Test
+    public void willBuildAParticipantWithoutMandatoryValues() throws Exception {
+
+        final List<String> errors = new ArrayList<>();
+
+        final Participant participant = Participant.Builder.start()
+                .build(errors);
+
+        assertThat(participant.getJID(), is(Optional.empty()));
+        assertThat(participant.getType(), is(Optional.empty()));
+        assertThat(participant.getDirection(), is(Optional.empty()));
+        assertThat(participant.getStartTime(), is(Optional.empty()));
+        assertThat(participant.getDuration(), is(Optional.empty()));
+        assertThat(errors, containsInAnyOrder(
+                "Invalid participant; missing participation jid is mandatory",
+                "Invalid participant; missing participation type is mandatory",
+                "Invalid participant; missing participation direction is mandatory",
+                "Invalid participant; missing participation start time is mandatory",
+                "Invalid participant; missing participation duration is mandatory"
+        ));
+    }
+
 
 }

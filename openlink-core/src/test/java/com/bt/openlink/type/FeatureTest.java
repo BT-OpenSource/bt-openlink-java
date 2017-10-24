@@ -1,8 +1,11 @@
 package com.bt.openlink.type;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.Assert.assertThat;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.Rule;
@@ -10,7 +13,6 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import com.bt.openlink.Fixtures;
-
 @SuppressWarnings("ConstantConditions")
 public class FeatureTest {
 
@@ -68,11 +70,19 @@ public class FeatureTest {
 
     @Test
     public void willBuildAFeatureWithoutMandatoryValues() throws Exception {
+
+        final List<String> errors = new ArrayList<>();
+
         final Feature feature = Feature.Builder.start()
-                .buildWithoutValidating();
+                .build(errors);
 
         assertThat(feature.getId(), is(Optional.empty()));
         assertThat(feature.getType(), is(Optional.empty()));
         assertThat(feature.getLabel(), is(Optional.empty()));
+        assertThat(errors, containsInAnyOrder(
+                "Invalid feature; missing feature id is mandatory",
+                "Invalid feature; missing feature type is mandatory",
+                "Invalid feature; missing feature label is mandatory"
+                ));
     }
 }

@@ -2,6 +2,7 @@ package com.bt.openlink.type;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 
 import javax.annotation.Nonnull;
@@ -80,11 +81,26 @@ public final class Participant {
             if (duration == null) {
                 throw new IllegalStateException("The participation duration has not been set");
             }
-            return buildWithoutValidating();
+            return new Participant(this);
         }
 
         @Nonnull
-        public Participant buildWithoutValidating() {
+        public Participant build(final List<String> errors) {
+            if (jid == null) {
+                errors.add("Invalid participant; missing participation jid is mandatory");
+            }
+            if (participantType == null) {
+                errors.add("Invalid participant; missing participation type is mandatory");
+            }
+            if (direction == null) {
+                errors.add("Invalid participant; missing participation direction is mandatory");
+            }
+            if (startTime == null) {
+                errors.add("Invalid participant; missing participation start time is mandatory");
+            }
+            if (duration == null) {
+                errors.add("Invalid participant; missing participation duration is mandatory");
+            }
             return new Participant(this);
         }
 
