@@ -18,7 +18,7 @@ import com.bt.openlink.iq.GetCallHistoryRequestBuilder;
 import com.bt.openlink.tinder.internal.TinderPacketUtil;
 import com.bt.openlink.type.CallType;
 
-public class GetCallHistoryRequest extends OpenlinkIQ2 {
+public class GetCallHistoryRequest extends OpenlinkIQ {
     private static final String STANZA_DESCRIPTION = "get-call-history request";
     private static final String DATE_PATTERN = "MM/dd/yyyy";
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern(DATE_PATTERN);

@@ -17,7 +17,7 @@ import com.bt.openlink.tinder.internal.TinderPacketUtil;
 import com.bt.openlink.type.InterestId;
 import com.bt.openlink.type.PhoneNumber;
 
-public class MakeCallRequest extends OpenlinkIQ2 {
+public class MakeCallRequest extends OpenlinkIQ {
     private static final String STANZA_DESCRIPTION = "make-call request";
 
     @Nullable private final JID jid;

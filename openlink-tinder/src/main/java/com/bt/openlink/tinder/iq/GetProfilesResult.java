@@ -21,7 +21,7 @@ import com.bt.openlink.type.ProfileId;
 import com.bt.openlink.type.RequestAction;
 import com.bt.openlink.type.Site;
 
-public class GetProfilesResult extends OpenlinkIQ2 {
+public class GetProfilesResult extends OpenlinkIQ {
     private static final String DESCRIPTION = "get-profiles result";
     private static final String ATTRIBUTE_DEFAULT = "default";
     private static final String ATTRIBUTE_LABEL = "label";

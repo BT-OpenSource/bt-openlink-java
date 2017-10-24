@@ -15,7 +15,7 @@ import com.bt.openlink.OpenlinkXmppNamespace;
 import com.bt.openlink.iq.GetProfilesRequestBuilder;
 import com.bt.openlink.tinder.internal.TinderPacketUtil;
 
-public class GetProfilesRequest extends OpenlinkIQ2 {
+public class GetProfilesRequest extends OpenlinkIQ {
     @Nullable private final JID jid;
 
     private GetProfilesRequest(@Nonnull Builder builder, @Nullable List<String> parseErrors) {

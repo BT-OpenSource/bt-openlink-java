@@ -12,11 +12,11 @@ import org.xmpp.packet.JID;
 
 import com.bt.openlink.iq.IQBuilder;
 
-abstract class OpenlinkIQ2 extends IQ {
+abstract class OpenlinkIQ extends IQ {
 
     @Nonnull private List<String> parseErrors;
 
-    OpenlinkIQ2(@Nonnull final IQBuilder<?, JID, IQ.Type> builder, @Nullable final List<String> parseErrors) {
+    OpenlinkIQ(@Nonnull final IQBuilder<?, JID, IQ.Type> builder, @Nullable final List<String> parseErrors) {
         builder.getTo().ifPresent(this::setTo);
         builder.getFrom().ifPresent(this::setFrom);
         builder.getId().ifPresent(this::setID);

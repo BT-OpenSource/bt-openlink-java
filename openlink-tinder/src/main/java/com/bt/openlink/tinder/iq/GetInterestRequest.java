@@ -16,7 +16,7 @@ import com.bt.openlink.iq.GetInterestRequestBuilder;
 import com.bt.openlink.tinder.internal.TinderPacketUtil;
 import com.bt.openlink.type.InterestId;
 
-public class GetInterestRequest extends OpenlinkIQ2 {
+public class GetInterestRequest extends OpenlinkIQ {
     @Nullable private final InterestId interestId;
 
     private GetInterestRequest(@Nonnull Builder builder, @Nullable List<String> parseErrors) {

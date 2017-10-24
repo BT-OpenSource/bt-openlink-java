@@ -19,7 +19,7 @@ import com.bt.openlink.tinder.internal.TinderPacketUtil;
 import com.bt.openlink.type.Call;
 import com.bt.openlink.type.PubSubNodeId;
 
-public class PubSubPublishRequest extends OpenlinkIQ2 {
+public class PubSubPublishRequest extends OpenlinkIQ {
     private static final String STANZA_DESCRIPTION = "PubSub unsubscribe request";
 
     @Nullable private final PubSubNodeId pubSubNodeId;

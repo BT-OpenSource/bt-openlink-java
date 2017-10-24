@@ -20,7 +20,7 @@ import com.bt.openlink.type.FeatureId;
 import com.bt.openlink.type.FeatureType;
 import com.bt.openlink.type.ProfileId;
 
-public class GetFeaturesResult extends OpenlinkIQ2 {
+public class GetFeaturesResult extends OpenlinkIQ {
     private static final String DESCRIPTION = "get-features result";
     @Nullable private final ProfileId profileId;
     @Nonnull private final List<Feature> features;

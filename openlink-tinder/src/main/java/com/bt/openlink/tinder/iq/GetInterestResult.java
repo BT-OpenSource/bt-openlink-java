@@ -18,7 +18,7 @@ import com.bt.openlink.type.Interest;
 import com.bt.openlink.type.InterestId;
 import com.bt.openlink.type.InterestType;
 
-public class GetInterestResult extends OpenlinkIQ2 {
+public class GetInterestResult extends OpenlinkIQ {
     private static final String DESCRIPTION = "get-interests result";
 
     @Nullable private final Interest interest;
