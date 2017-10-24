@@ -18,8 +18,6 @@ import com.bt.openlink.type.InterestId;
 import com.bt.openlink.type.PhoneNumber;
 
 public class MakeCallRequest extends OpenlinkIQ {
-    private static final String STANZA_DESCRIPTION = "make-call request";
-
     @Nullable private final JID jid;
     @Nullable private final InterestId interestId;
     @Nullable private final PhoneNumber destination;
@@ -55,30 +53,18 @@ public class MakeCallRequest extends OpenlinkIQ {
         final List<String> parseErrors = new ArrayList<>();
         final Element inElement = TinderPacketUtil.getIOInElement(iq);
         final Builder builder = Builder.start(iq);
-        final Optional<JID> jid = TinderPacketUtil.getJID(TinderPacketUtil.getChildElementString(inElement,
-                "jid",
-                false,
-                STANZA_DESCRIPTION,
-                parseErrors));
+        final Optional<JID> jid = TinderPacketUtil.getJID(TinderPacketUtil.getChildElementString(inElement, "jid"));
         jid.ifPresent(builder::setJID);
-        final Optional<InterestId> interestId = InterestId.from(TinderPacketUtil.getChildElementString(inElement,
-                "interest",
-                false,
-                STANZA_DESCRIPTION,
-                parseErrors));
+        final Optional<InterestId> interestId = InterestId.from(TinderPacketUtil.getChildElementString(inElement, "interest"));
         interestId.ifPresent(builder::setInterestId);
-        final Optional<PhoneNumber> destination = PhoneNumber.from(TinderPacketUtil.getChildElementString(inElement,
-                "destination",
-                false,
-                STANZA_DESCRIPTION,
-                parseErrors));
+        final Optional<PhoneNumber> destination = PhoneNumber.from(TinderPacketUtil.getChildElementString(inElement, "destination"));
         destination.ifPresent(builder::setDestination);
         final MakeCallRequest request = builder.build(parseErrors);
         request.setID(iq.getID());
         return request;
     }
 
-    public static final class Builder extends MakeCallRequestBuilder<Builder, JID ,Type> {
+    public static final class Builder extends MakeCallRequestBuilder<Builder, JID, Type> {
 
         @Nonnull
         public static Builder start() {

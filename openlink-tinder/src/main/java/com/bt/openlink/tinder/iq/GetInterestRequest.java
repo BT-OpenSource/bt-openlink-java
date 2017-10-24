@@ -36,11 +36,7 @@ public class GetInterestRequest extends OpenlinkIQ {
         final List<String> parseErrors = new ArrayList<>();
         final Element inElement = TinderPacketUtil.getIOInElement(iq);
         final Builder builder = Builder.start(iq);
-        final Optional<InterestId> interestId = InterestId.from(TinderPacketUtil.getChildElementString(inElement,
-                "interest",
-                false,
-                "get-interest request",
-                parseErrors));
+        final Optional<InterestId> interestId = InterestId.from(TinderPacketUtil.getChildElementString(inElement, "interest"));
         interestId.ifPresent(builder::setInterestId);
 
         final GetInterestRequest request = builder.build(parseErrors);

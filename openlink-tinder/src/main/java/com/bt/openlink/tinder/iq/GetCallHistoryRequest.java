@@ -57,14 +57,10 @@ public class GetCallHistoryRequest extends OpenlinkIQ {
     public static GetCallHistoryRequest from(@Nonnull IQ iq) {
         final List<String> parseErrors = new ArrayList<>();
         final Element inElement = TinderPacketUtil.getIOInElement(iq);
-        final Optional<JID> jid = TinderPacketUtil.getJID(TinderPacketUtil.getChildElementString(inElement,
-                "jid", false, STANZA_DESCRIPTION, parseErrors));
-        final Optional<String> caller = Optional.ofNullable(TinderPacketUtil.getChildElementString(inElement,
-                "caller", false, STANZA_DESCRIPTION, parseErrors));
-        final Optional<String> called = Optional.ofNullable(TinderPacketUtil.getChildElementString(inElement,
-                "called", false, STANZA_DESCRIPTION, parseErrors));
-        final String callTypeString = TinderPacketUtil.getChildElementString(inElement,
-                "calltype", false, STANZA_DESCRIPTION, parseErrors);
+        final Optional<JID> jid = TinderPacketUtil.getJID(TinderPacketUtil.getChildElementString(inElement, "jid"));
+        final Optional<String> caller = Optional.ofNullable(TinderPacketUtil.getChildElementString(inElement, "caller"));
+        final Optional<String> called = Optional.ofNullable(TinderPacketUtil.getChildElementString(inElement, "called"));
+        final String callTypeString = TinderPacketUtil.getChildElementString(inElement, "calltype");
         final Optional<CallType> callType = CallType.from(callTypeString);
         if (!callType.isPresent() && callTypeString != null && !callTypeString.isEmpty()) {
             parseErrors.add(String.format("Invalid %s; invalid calltype - '%s' should be 'in', 'out' or 'missed'", STANZA_DESCRIPTION, callTypeString));

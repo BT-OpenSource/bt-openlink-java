@@ -22,7 +22,7 @@ import com.bt.openlink.type.PubSubNodeId;
 
 public class CallStatusMessage extends Message {
 
-    private static final String STANZA_DESCRIPTION = "Call status message";
+    private static final String STANZA_DESCRIPTION = "call status";
 
     @Nullable private final Instant delay;
     @Nullable private final PubSubNodeId pubSubNodeId;

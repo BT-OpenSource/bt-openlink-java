@@ -96,10 +96,10 @@ public class InterestTest {
                 .build(errors);
 
         assertThat(errors, contains(
-                "Invalid interest; the interest id has not been set",
-                "Invalid interest; the interest type has not been set",
-                "Invalid interest; the interest label has not been set",
-                "Invalid interest; the interest default indicator has not been set"
+                "Invalid interest; missing interest id is mandatory",
+                "Invalid interest; missing interest type is mandatory",
+                "Invalid interest; missing interest label is mandatory",
+                "Invalid interest; missing interest default indicator is mandatory"
         ));
         assertThat(interest.getId(), is(Optional.empty()));
         assertThat(interest.getType(), is(Optional.empty()));

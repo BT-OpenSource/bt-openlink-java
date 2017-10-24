@@ -7,6 +7,8 @@ import static org.junit.Assert.assertThat;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.Rule;
@@ -201,8 +203,10 @@ public class CallTest {
 
     @Test
     public void willCreateACallWithoutMandatoryFields() throws Exception {
+        final List<String> errors = new ArrayList<>();
+
         final Call call = Call.Builder.start()
-                .buildWithoutValidating();
+                .build(errors);
 
         assertThat(call.getId(), is(Optional.empty()));
         assertThat(call.getSite(), is(Optional.empty()));
@@ -216,5 +220,16 @@ public class CallTest {
         assertThat(call.isParticipating(), is(false));
         assertThat(call.getActions(), is(empty()));
         assertThat(call.getParticipants(), is(empty()));
+        assertThat(errors, contains(
+                "Invalid call status; missing call id is mandatory",
+                "Invalid call status; missing call site is mandatory",
+                "Invalid call status; missing profile id is mandatory",
+                "Invalid call status; missing interest id is mandatory",
+                "Invalid call status; missing call state is mandatory",
+                "Invalid call status; missing call direction is mandatory",
+                "Invalid call status; missing call start time is mandatory",
+                "Invalid call status; missing call duration is mandatory"
+        ));
+
     }
 }

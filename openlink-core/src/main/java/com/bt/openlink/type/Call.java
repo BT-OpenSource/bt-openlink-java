@@ -147,11 +147,35 @@ public class Call {
                 throw new IllegalStateException("The call duration has not been set");
             }
 
-            return buildWithoutValidating();
+            return  new Call(this);
         }
 
         @Nonnull
-        public Call buildWithoutValidating() {
+        public Call build(@Nonnull final List<String> errors) {
+            if (callId == null) {
+                errors.add("Invalid call status; missing call id is mandatory");
+            }
+            if (site == null) {
+                errors.add("Invalid call status; missing call site is mandatory");
+            }
+            if (profileId == null) {
+                errors.add("Invalid call status; missing profile id is mandatory");
+            }
+            if (interestId == null) {
+                errors.add("Invalid call status; missing interest id is mandatory");
+            }
+            if (state == null) {
+                errors.add("Invalid call status; missing call state is mandatory");
+            }
+            if (direction == null) {
+                errors.add("Invalid call status; missing call direction is mandatory");
+            }
+            if (startTime == null) {
+                errors.add("Invalid call status; missing call start time is mandatory");
+            }
+            if (duration == null) {
+                errors.add("Invalid call status; missing call duration is mandatory");
+            }
             return new Call(this);
         }
 

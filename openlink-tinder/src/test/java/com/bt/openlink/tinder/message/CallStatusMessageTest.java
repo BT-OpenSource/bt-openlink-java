@@ -3,6 +3,7 @@ package com.bt.openlink.tinder.message;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
 import static org.junit.Assert.assertThat;
 import static org.xmlunit.matchers.CompareMatcher.isIdenticalTo;
@@ -272,12 +273,18 @@ public class CallStatusMessageTest {
 
         final Message stanza = Fixtures
                 .messageFrom(
-                "<message from='pubsub.btp194094' to='ucwa.btp194094' id='Sma0SFtv'>\n" +
-                        "  <event xmlns='http://jabber.org/protocol/pubsub#event'>\n" +
-                        "    <items node='sip:6004@uta.bt.com-DirectDial-1sales1@btsm2'>\n" +
-                        "      <item id='sip:6004@uta.bt.com-DirectDial-1sales1@btsm2'>\n" +
-                        "        <devicestatus xmlns='http://xmpp.org/protocol/openlink:01:00:00#device-status'>\n" +
-                        "          <profile online='true'>/netrix/Cluster1|/uta/enterprises/bt/users/Sales1/denormalised-profiles/UCSales1/versions/72?build=70&amp;location=global.uk.Ipswich&amp;device=NetrixHiTouch</profile>\n" +
+                "<message from='pubsub.btp194094' to='ucwa.btp194094' id='Sma0SFtv'>\n"
+                        +
+                        "  <event xmlns='http://jabber.org/protocol/pubsub#event'>\n"
+                        +
+                        "    <items node='sip:6004@uta.bt.com-DirectDial-1sales1@btsm2'>\n"
+                        +
+                        "      <item id='sip:6004@uta.bt.com-DirectDial-1sales1@btsm2'>\n"
+                        +
+                        "        <devicestatus xmlns='http://xmpp.org/protocol/openlink:01:00:00#device-status'>\n"
+                        +
+                        "          <profile online='true'>/netrix/Cluster1|/uta/enterprises/bt/users/Sales1/denormalised-profiles/UCSales1/versions/72?build=70&amp;location=global.uk.Ipswich&amp;device=NetrixHiTouch</profile>\n"
+                        +
                         "          <interest id='sip:6004@uta.bt.com-DirectDial-1sales1@btsm2' online='true'/>\n" +
                         "        </devicestatus>\n" +
                         "      </item>\n" +
@@ -384,17 +391,21 @@ public class CallStatusMessageTest {
 
         final CallStatusMessage message = (CallStatusMessage) OpenlinkMessageParser.parse(stanza);
         assertThat(message.getDelay(), is(Optional.empty()));
-        final List<String> parseErrors = message.getParseErrors();
-        int i = 0;
-        assertThat(parseErrors.get(i++), is("Invalid Call status message; missing 'id' field is mandatory"));
-        assertThat(parseErrors.get(i++), is("Invalid Call status message; missing 'profile' field is mandatory"));
-        assertThat(parseErrors.get(i++), is("Invalid Call status message; missing 'interest' field is mandatory"));
-        assertThat(parseErrors.get(i++), is("Invalid Call status message; missing 'state' field is mandatory"));
-        assertThat(parseErrors.get(i++), is("Invalid Call status message; missing 'direction' field is mandatory"));
-        assertThat(parseErrors.get(i++), is("Invalid Call status message; invalid starttime 'yesterday'; format should be compliant with XEP-0082"));
-        assertThat(parseErrors.get(i++), is("Invalid Call status message; invalid duration 'a while'; please supply an integer"));
-        assertThat(parseErrors.get(i++), is("Invalid Call status message; invalid timestamp 'not-a-timestamp'; format should be compliant with XEP-0082"));
-        assertThat(parseErrors.size(), is(i));
+        assertThat(
+                message.getParseErrors(),
+                containsInAnyOrder(
+                        "Invalid call status; missing call id is mandatory",
+                        "Invalid call status; missing call site is mandatory",
+                        "Invalid call status; missing profile id is mandatory",
+                        "Invalid call status; missing interest id is mandatory",
+                        "Invalid call status; missing call state is mandatory",
+                        "Invalid call status; missing call direction is mandatory",
+                        "Invalid call status; missing call start time is mandatory",
+                        "Invalid call status; missing call duration is mandatory",
+                        "Invalid call status; invalid starttime 'yesterday'; format should be compliant with XEP-0082",
+                        "Invalid call status; invalid duration 'a while'; please supply an integer",
+                        "Invalid call status; invalid timestamp 'not-a-timestamp'; format should be compliant with XEP-0082"
+                ));
     }
 
     @Test

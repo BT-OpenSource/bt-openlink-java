@@ -84,16 +84,16 @@ public final class Interest {
         @Nonnull
         public Interest build(final List<String> errors) {
             if (interestId == null) {
-                errors.add("Invalid interest; the interest id has not been set");
+                errors.add("Invalid interest; missing interest id is mandatory");
             }
             if (interestType == null) {
-                errors.add("Invalid interest; the interest type has not been set");
+                errors.add("Invalid interest; missing interest type is mandatory");
             }
             if (label == null) {
-                errors.add("Invalid interest; the interest label has not been set");
+                errors.add("Invalid interest; missing interest label is mandatory");
             }
             if (isDefault == null) {
-                errors.add("Invalid interest; the interest default indicator has not been set");
+                errors.add("Invalid interest; missing interest default indicator is mandatory");
             }
             return new Interest(this);
         }

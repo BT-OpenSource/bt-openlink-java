@@ -83,13 +83,13 @@ public class Site {
         @Nonnull
         public Site build(@Nonnull final List<String> errors) {
             if (id == null) {
-                errors.add("The site id has not been set");
+                errors.add("Invalid site; missing site id is mandatory");
             }
             if (type == null) {
-                errors.add("The site type has not been set");
+                errors.add("Invalid site; missing site type is mandatory");
             }
             if (name == null) {
-                errors.add("The site name has not been set");
+                errors.add("Invalid site; missing site name is mandatory");
             }
             return new Site(this);
         }

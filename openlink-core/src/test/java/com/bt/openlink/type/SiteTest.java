@@ -81,9 +81,9 @@ public class SiteTest {
                 .build(errors);
 
         assertThat(errors, contains(
-                "The site id has not been set",
-                "The site type has not been set",
-                "The site name has not been set"
+                "Invalid site; missing site id is mandatory",
+                "Invalid site; missing site type is mandatory",
+                "Invalid site; missing site name is mandatory"
         ));
         assertThat(site.getName(), is(Optional.empty()));
         assertThat(site.getId(), is(Optional.empty()));

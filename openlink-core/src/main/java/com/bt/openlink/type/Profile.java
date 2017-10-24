@@ -114,19 +114,19 @@ public final class Profile {
         @Nonnull
         public Profile build(@Nonnull final List<String> errors) {
             if (profileId == null) {
-                errors.add("Invalid profile; the profile id has not been set");
+                errors.add("Invalid profile; missing profile id is mandatory");
             }
             if (site == null) {
-                errors.add("Invalid profile; the site has not been set");
+                errors.add("Invalid profile; missing site is mandatory");
             }
             if (isDefault == null) {
-                errors.add("Invalid profile; the default indicator has not been set");
+                errors.add("Invalid profile; missing default indicator is mandatory");
             }
             if (label == null) {
-                errors.add("Invalid profile; the label has not been set");
+                errors.add("Invalid profile; missing label is mandatory");
             }
             if (online == null) {
-                errors.add("Invalid profile; the online indicator has not been set");
+                errors.add("Invalid profile; missing online indicator is mandatory");
             }
             return new Profile(this);
         }

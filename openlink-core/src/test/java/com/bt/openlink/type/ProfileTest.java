@@ -123,10 +123,10 @@ public class ProfileTest {
         assertThat(profile.getLabel(), is(Optional.empty()));
         assertThat(profile.isOnline(), is(Optional.empty()));
         assertThat(errors, contains(
-                "Invalid profile; the profile id has not been set",
-                "Invalid profile; the site has not been set",
-                "Invalid profile; the default indicator has not been set",
-                "Invalid profile; the label has not been set",
-                "Invalid profile; the online indicator has not been set"));
+                "Invalid profile; missing profile id is mandatory",
+                "Invalid profile; missing site is mandatory",
+                "Invalid profile; missing default indicator is mandatory",
+                "Invalid profile; missing label is mandatory",
+                "Invalid profile; missing online indicator is mandatory"));
     }
 }

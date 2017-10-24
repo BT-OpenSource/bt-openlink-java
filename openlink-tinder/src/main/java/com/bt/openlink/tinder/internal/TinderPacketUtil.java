@@ -93,21 +93,13 @@ public final class TinderPacketUtil {
     }
 
     @Nullable
-    public static String getChildElementString(
-            @Nullable final Element parentElement,
-            @Nonnull final String childElementName,
-            final boolean isRequired,
-            final String stanzaDescription,
-            final List<String> parseErrors) {
+    public static String getChildElementString(@Nullable final Element parentElement, @Nonnull final String childElementName) {
         final Element childElement = getChildElement(parentElement, childElementName);
         if (childElement != null) {
             final String childElementText = childElement.getText().trim();
             if (!childElementText.isEmpty()) {
                 return childElementText;
             }
-        }
-        if (isRequired) {
-            parseErrors.add(String.format("Invalid %s; missing '%s' field is mandatory", stanzaDescription, childElementName));
         }
         return null;
     }
@@ -120,7 +112,7 @@ public final class TinderPacketUtil {
             final String stanzaDescription,
             @Nonnull final String dateFormat,
             final List<String> parseErrors) {
-        final String dateText = getChildElementString(parentElement, childElementName, false, stanzaDescription, parseErrors);
+        final String dateText = getChildElementString(parentElement, childElementName);
         if (dateText != null) {
             try {
                 return LocalDate.parse(dateText, dateTimeFormatter);
@@ -137,7 +129,7 @@ public final class TinderPacketUtil {
             @Nonnull final String childElementName,
             @Nonnull final String stanzaDescription,
             @Nonnull final List<String> parseErrors) {
-        final String childElementText = getChildElementString(parentElement, childElementName, false, stanzaDescription, parseErrors);
+        final String childElementText = getChildElementString(parentElement, childElementName);
         if (childElementText != null) {
             try {
                 return Optional.of(Instant.parse(childElementText));
@@ -154,7 +146,7 @@ public final class TinderPacketUtil {
             @Nonnull final String childElementName,
             @Nonnull final String stanzaDescription,
             @Nonnull final List<String> parseErrors) {
-        final String childElementText = getChildElementString(parentElement, childElementName, false, stanzaDescription, parseErrors);
+        final String childElementText = getChildElementString(parentElement, childElementName);
         if (childElementText != null) {
             try {
                 return Long.parseLong(childElementText);
@@ -307,7 +299,7 @@ public final class TinderPacketUtil {
                     final ZonedDateTime startTimeInUTC = startTime.atZone(TimeZone.getTimeZone("UTC").toZoneId());
                     participantElement.addAttribute(ATTRIBUTE_START_TIME, ISO_8601_FORMATTER.format(startTimeInUTC));
                     // Include the legacy timestamp attribute too
-                    participantElement.addAttribute(ATTRIBUTE_TIMESTAMP, JAVA_UTIL_DATE_FORMATTER.format(startTimeInUTC));
+                        participantElement.addAttribute(ATTRIBUTE_TIMESTAMP, JAVA_UTIL_DATE_FORMATTER.format(startTimeInUTC));
                     });
                 participant.getDuration().ifPresent(duration -> participantElement.addAttribute(ATTRIBUTE_DURATION, String.valueOf(duration.toMillis())));
             });
@@ -346,19 +338,19 @@ public final class TinderPacketUtil {
         final List<Element> callElements = callStatusElement.elements("call");
         for (final Element callElement : callElements) {
             final Call.Builder callBuilder = Call.Builder.start();
-            final Optional<CallId> callId = CallId.from(getChildElementString(callElement, "id", true, description, parseErrors));
+            final Optional<CallId> callId = CallId.from(getChildElementString(callElement, "id"));
             callId.ifPresent(callBuilder::setId);
             final Optional<Site> site = getSite(callElement, description, parseErrors);
             site.ifPresent(callBuilder::setSite);
-            final Optional<ProfileId> profileId = ProfileId.from(getChildElementString(callElement, "profile", true, description, parseErrors));
+            final Optional<ProfileId> profileId = ProfileId.from(getChildElementString(callElement, "profile"));
             profileId.ifPresent(callBuilder::setProfileId);
-            final Optional<InterestId> interestId = InterestId.from(getChildElementString(callElement, "interest", true, description, parseErrors));
+            final Optional<InterestId> interestId = InterestId.from(getChildElementString(callElement, "interest"));
             interestId.ifPresent(callBuilder::setInterestId);
-            final Optional<Changed> changed = Changed.from(getChildElementString(callElement, "changed", false, description, parseErrors));
+            final Optional<Changed> changed = Changed.from(getChildElementString(callElement, "changed"));
             changed.ifPresent(callBuilder::setChanged);
-            final Optional<CallState> state = CallState.from(getChildElementString(callElement, "state", true, description, parseErrors));
+            final Optional<CallState> state = CallState.from(getChildElementString(callElement, "state"));
             state.ifPresent(callBuilder::setState);
-            final Optional<CallDirection> direction = CallDirection.from(getChildElementString(callElement, ATTRIBUTE_DIRECTION, true, description, parseErrors));
+            final Optional<CallDirection> direction = CallDirection.from(getChildElementString(callElement, ATTRIBUTE_DIRECTION));
             direction.ifPresent(callBuilder::setDirection);
             final Optional<Instant> startTime = getChildElementISO8601(callElement, ATTRIBUTE_START_TIME, description, parseErrors);
             startTime.ifPresent(callBuilder::setStartTime);
@@ -366,7 +358,7 @@ public final class TinderPacketUtil {
             duration.ifPresent(millis -> callBuilder.setDuration(Duration.ofMillis(millis)));
             getActions(callElement, callBuilder);
             getParticipants(callElement, callBuilder, description, parseErrors);
-            calls.add(callBuilder.buildWithoutValidating());
+            calls.add(callBuilder.build(parseErrors));
         }
         return calls;
     }
