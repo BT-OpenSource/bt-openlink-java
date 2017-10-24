@@ -3,6 +3,7 @@ package com.bt.openlink.tinder.message;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
 import static org.junit.Assert.assertThat;
@@ -273,18 +274,12 @@ public class CallStatusMessageTest {
 
         final Message stanza = Fixtures
                 .messageFrom(
-                "<message from='pubsub.btp194094' to='ucwa.btp194094' id='Sma0SFtv'>\n"
-                        +
-                        "  <event xmlns='http://jabber.org/protocol/pubsub#event'>\n"
-                        +
-                        "    <items node='sip:6004@uta.bt.com-DirectDial-1sales1@btsm2'>\n"
-                        +
-                        "      <item id='sip:6004@uta.bt.com-DirectDial-1sales1@btsm2'>\n"
-                        +
-                        "        <devicestatus xmlns='http://xmpp.org/protocol/openlink:01:00:00#device-status'>\n"
-                        +
-                        "          <profile online='true'>/netrix/Cluster1|/uta/enterprises/bt/users/Sales1/denormalised-profiles/UCSales1/versions/72?build=70&amp;location=global.uk.Ipswich&amp;device=NetrixHiTouch</profile>\n"
-                        +
+                "<message from='pubsub.btp194094' to='ucwa.btp194094' id='Sma0SFtv'>\n" +
+                        "  <event xmlns='http://jabber.org/protocol/pubsub#event'>\n" +
+                        "    <items node='sip:6004@uta.bt.com-DirectDial-1sales1@btsm2'>\n" +
+                        "      <item id='sip:6004@uta.bt.com-DirectDial-1sales1@btsm2'>\n" +
+                        "        <devicestatus xmlns='http://xmpp.org/protocol/openlink:01:00:00#device-status'>\n" +
+                        "          <profile online='true'>/netrix/Cluster1|/uta/enterprises/bt/users/Sales1/denormalised-profiles/UCSales1/versions/72?build=70&amp;location=global.uk.Ipswich&amp;device=NetrixHiTouch</profile>\n" +
                         "          <interest id='sip:6004@uta.bt.com-DirectDial-1sales1@btsm2' online='true'/>\n" +
                         "        </devicestatus>\n" +
                         "      </item>\n" +
@@ -304,7 +299,7 @@ public class CallStatusMessageTest {
                 "        <callstatus xmlns='http://xmpp.org/protocol/openlink:01:00:00#call-status'>\n" +
                 "          <call>\n" +
                 "            <id>" + Fixtures.CALL_ID + "</id>\n" +
-                "           <site default='true' id='42' type='BTSM'>test-site-name</site>" +
+                "            <site default='true' id='42' type='BTSM'>test-site-name</site>" +
                 "            <profile>" + Fixtures.PROFILE_ID + "</profile>\n" +
                 "            <interest>" + Fixtures.INTEREST_ID + "</interest>\n" +
                 "            <changed>State</changed>\n" +
@@ -435,5 +430,41 @@ public class CallStatusMessageTest {
         final CallStatusMessage message = (CallStatusMessage) OpenlinkMessageParser.parse(stanza);
 
         assertThat(message.getCalls().get(0).getParticipants().get(0).getStartTime().get(), is(Instant.parse("2010-05-18T23:12:51.000Z")));
+    }
+
+    @Test
+    public void theLegacyTimestampShouldMatchTheStartTime() throws Exception {
+        final Message stanza = Fixtures.messageFrom(
+                "<message from='" + Fixtures.FROM_JID + "' to='" + Fixtures.TO_JID + "' id='" + Fixtures.STANZA_ID + "'>\n" +
+                        "  <event xmlns='http://jabber.org/protocol/pubsub#event'>\n" +
+                        "    <items node='" + Fixtures.INTEREST_ID + "'>\n" +
+                        "      <item>\n" +
+                        "        <callstatus xmlns='http://xmpp.org/protocol/openlink:01:00:00#call-status'>\n" +
+                        "          <call>\n" +
+                        "            <id>" + Fixtures.CALL_ID + "</id>\n" +
+                        "            <site default='true' id='42' type='BTSM'>test-site-name</site>" +
+                        "            <profile>" + Fixtures.PROFILE_ID + "</profile>\n" +
+                        "            <interest>" + Fixtures.INTEREST_ID + "</interest>\n" +
+                        "            <changed>State</changed>\n" +
+                        "            <state>CallOriginated</state>\n" +
+                        "            <direction>Incoming</direction>\n" +
+                        "            <starttime>2017-10-09T08:07:00.000Z</starttime>\n" +
+                        "            <duration>60000</duration>\n" +
+                        "            <actions>\n" +
+                        "              <AnswerCall/>\n" +
+                        "            </actions>\n" +
+                        "            <participants>\n" +
+                        "              <participant direction='Incoming' jid='test-user@test-domain' starttime='2017-10-09T09:07:00.000Z' timestamp='Mon Oct 09 08:07:00 UTC 2017' duration='60000' type='Active'/>\n" +
+                        "            </participants>\n" +
+                        "          </call>\n" +
+                        "        </callstatus>\n" +
+                        "      </item>\n" +
+                        "    </items>\n" +
+                        "  </event>\n" +
+                        "</message>");
+
+        final CallStatusMessage message = (CallStatusMessage) OpenlinkMessageParser.parse(stanza);
+
+        assertThat(message.getParseErrors(),contains("Invalid participant; the legacy timestamp field does not match the start time field"));
     }
 }

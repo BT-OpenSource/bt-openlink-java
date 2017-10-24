@@ -376,12 +376,12 @@ public final class TinderPacketUtil {
                 participantType.ifPresent(participantBuilder::setType);
                 final Optional<CallDirection> callDirection = CallDirection.from(getStringAttribute(participantElement, ATTRIBUTE_DIRECTION, true, description, parseErrors).orElse(null));
                 callDirection.ifPresent(participantBuilder::setDirection);
+                final Optional<Instant> participantTimestamp = getJavaUtilDateAttribute(participantElement, ATTRIBUTE_TIMESTAMP, description, parseErrors);
+                participantTimestamp.ifPresent(participantBuilder::setStartTime);
                 final Optional<Instant> participantStartTime = getISO8601Attribute(participantElement, ATTRIBUTE_START_TIME, description, parseErrors);
-                if (participantStartTime.isPresent()) {
-                    participantBuilder.setStartTime(participantStartTime.get());
-                } else {
-                    final Optional<Instant> participantTimestamp = getJavaUtilDateAttribute(participantElement, ATTRIBUTE_TIMESTAMP, description, parseErrors);
-                    participantTimestamp.ifPresent(participantBuilder::setStartTime);
+                participantStartTime.ifPresent(participantBuilder::setStartTime);
+                if (participantStartTime.isPresent() && participantTimestamp.isPresent() && !participantStartTime.equals(participantTimestamp)) {
+                    parseErrors.add("Invalid participant; the legacy timestamp field does not match the start time field");
                 }
                 final Optional<Long> participantDuration = getLongAttribute(participantElement, ATTRIBUTE_DURATION, description, parseErrors);
                 participantDuration.ifPresent(millis -> participantBuilder.setDuration(Duration.ofMillis(millis)));
