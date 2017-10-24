@@ -25,6 +25,7 @@ import com.bt.openlink.type.InterestId;
 import com.bt.openlink.type.InterestType;
 import com.bt.openlink.type.Participant;
 import com.bt.openlink.type.ParticipantType;
+import com.bt.openlink.type.PhoneNumber;
 import com.bt.openlink.type.ProfileId;
 import com.bt.openlink.type.PubSubNodeId;
 import com.bt.openlink.type.RequestAction;
@@ -78,6 +79,7 @@ public final class Fixtures {
             .addAction(RequestAction.ANSWER_CALL)
             .addParticipant(PARTICIPANT)
             .build();
+    public static final PhoneNumber DESTINATION = PhoneNumber.from("+44 800 141 2868").get();
 
     public static final PubSubNodeId NODE_ID = INTEREST_ID.toPubSubNodeId();
 

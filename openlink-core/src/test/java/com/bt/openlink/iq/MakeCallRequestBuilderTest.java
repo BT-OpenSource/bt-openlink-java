@@ -17,8 +17,8 @@ import org.junit.rules.ExpectedException;
 import com.bt.openlink.Fixtures;
 
 @SuppressWarnings("ConstantConditions")
-public class PubSubSubscribeUnSubscribeRequestBuilderTest {
-    private static class Builder extends PubSubSubscribeUnSubscribeRequestBuilder<Builder, String, Fixtures.typeEnum> {
+public class MakeCallRequestBuilderTest {
+    private static class Builder extends MakeCallRequestBuilder<MakeCallRequestBuilder, String, Fixtures.typeEnum> {
         protected Builder() {
             super(Fixtures.typeEnum.class);
         }
@@ -42,8 +42,9 @@ public class PubSubSubscribeUnSubscribeRequestBuilderTest {
     public void willValidateAPopulatedBuilder() throws Exception {
 
         final List<String> errors = new ArrayList<>();
-        builder.setInterestId(Fixtures.INTEREST_ID)
-                .setJID("jid");
+        builder.setJID("jid")
+                .setInterestId(Fixtures.INTEREST_ID)
+                .setDestination(Fixtures.DESTINATION);
 
         builder.validate();
         builder.validate(errors);
@@ -51,44 +52,29 @@ public class PubSubSubscribeUnSubscribeRequestBuilderTest {
         assertThat(errors, is(empty()));
         assertThat(builder.getJID().get(), is("jid"));
         assertThat(builder.getInterestId().get(), is(Fixtures.INTEREST_ID));
-        assertThat(builder.getPubSubNodeId().get(), is(Fixtures.INTEREST_ID.toPubSubNodeId()));
-    }
-
-    @Test
-    public void willValidateTheNodeIdIsSet() throws Exception {
-
-        expectedException.expect(IllegalStateException.class);
-        expectedException.expectMessage("The stanza 'pubSubNodeId'/'interestId' has not been set");
-
-        builder.setJID("jid");
-
-        builder.validate();
+        assertThat(builder.getDestination().get(), is(Fixtures.DESTINATION));
     }
 
     @Test
     public void willValidateTheJidIsSet() throws Exception {
 
         expectedException.expect(IllegalStateException.class);
-        expectedException.expectMessage("The stanza 'jid' has not been set");
-
-        builder.setInterestId(Fixtures.INTEREST_ID);
+        expectedException.expectMessage("The make-call request 'jid' has not been set");
 
         builder.validate();
     }
 
     @Test
-    public void willCheckMandatoryFields() throws Exception {
+    public void willCheckThatJidIsSet() throws Exception {
+
         final List<String> errors = new ArrayList<>();
 
         builder.validate(errors);
 
+        assertThat(errors, contains("Invalid make-call request stanza; missing or invalid 'jid'"));
         assertThat(builder.getJID(), is(Optional.empty()));
         assertThat(builder.getInterestId(), is(Optional.empty()));
-        assertThat(builder.getPubSubNodeId(), is(Optional.empty()));
-
-        assertThat(errors, contains(
-                "Invalid pub-sub subscription request stanza; missing node id/interest id",
-                "Invalid pub-sub subscription request stanza; missing jid"
-        ));
+        assertThat(builder.getDestination(), is(Optional.empty()));
     }
+
 }
