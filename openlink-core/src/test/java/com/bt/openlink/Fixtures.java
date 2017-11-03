@@ -39,6 +39,13 @@ public class Fixtures {
     public static final InterestId INTEREST_ID = InterestId.from("test-interest-id").get();
     public static final InterestType INTEREST_TYPE = InterestType.from("test-interest-type").get();
     public static final FeatureId FEATURE_ID = FeatureId.from("test-feature-id").get();
+    public static final PhoneNumber CALLER_NUMBER = PhoneNumber.from("test-caller-number").get();
+    public static final String CALLER_NAME = "test-caller-name";
+    public static final PhoneNumber CALLER_E164_NUMBER = PhoneNumber.from("test-caller-e164-number").get();
+    public static final PhoneNumber CALLED_NUMBER = PhoneNumber.from("test-called-number").get();
+    public static final String CALLED_NAME = "test-called-name";
+    public static final PhoneNumber CALLED_DESTINATION = PhoneNumber.from("test-called-destination").get();
+    public static final PhoneNumber CALLED_E164_NUMBER = PhoneNumber.from("test-called-e164-number").get();
     public static final Participant PARTICIPANT = Participant.Builder.start()
             .setJID(JID)
             .setType(ParticipantType.ACTIVE)

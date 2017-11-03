@@ -21,6 +21,13 @@ public class Call {
     @Nullable private final Changed changed;
     @Nullable private final CallState state;
     @Nullable private final CallDirection direction;
+    @Nullable private PhoneNumber callerNumber;
+    @Nullable private String callerName;
+    @Nonnull private final List<PhoneNumber> callerE164Numbers;
+    @Nullable private PhoneNumber calledNumber;
+    @Nullable private String calledName;
+    @Nullable private PhoneNumber calledDestination;
+    @Nonnull private final List<PhoneNumber> calledE164Numbers;
     @Nullable private final Instant startTime;
     @Nullable private final Duration duration;
     @Nonnull private final Collection<RequestAction> actions;
@@ -34,6 +41,13 @@ public class Call {
         this.changed = builder.changed;
         this.state = builder.state;
         this.direction = builder.direction;
+        this.callerNumber = builder.callerNumber;
+        this.callerName = builder.callerName;
+        this.callerE164Numbers = Collections.unmodifiableList(builder.callerE164Numbers);
+        this.calledNumber = builder.calledNumber;
+        this.calledName = builder.calledName;
+        this.calledDestination = builder.calledDestination;
+        this.calledE164Numbers = Collections.unmodifiableList(builder.calledE164Numbers);
         this.startTime = builder.startTime;
         this.duration = builder.duration;
         this.actions = Collections.unmodifiableCollection(builder.actions);
@@ -76,6 +90,41 @@ public class Call {
     }
 
     @Nonnull
+    public Optional<PhoneNumber> getCallerNumber() {
+        return Optional.ofNullable(callerNumber);
+    }
+
+    @Nonnull
+    public Optional<String> getCallerName() {
+        return Optional.ofNullable(callerName);
+    }
+
+    @Nonnull
+    public List<PhoneNumber> getCallerE164Numbers() {
+        return callerE164Numbers;
+    }
+
+    @Nonnull
+    public Optional<PhoneNumber> getCalledNumber() {
+        return Optional.ofNullable(calledNumber);
+    }
+
+    @Nonnull
+    public Optional<String> getCalledName() {
+        return Optional.ofNullable(calledName);
+    }
+
+    @Nonnull
+    public Optional<PhoneNumber> getCalledDestination() {
+        return Optional.ofNullable(calledDestination);
+    }
+
+    @Nonnull
+    public List<PhoneNumber> getCalledE164Numbers() {
+        return calledE164Numbers;
+    }
+
+    @Nonnull
     public Optional<Instant> getStartTime() {
         return Optional.ofNullable(startTime);
     }
@@ -107,6 +156,13 @@ public class Call {
         @Nullable private Changed changed;
         @Nullable private CallState state;
         @Nullable private CallDirection direction;
+        @Nullable private PhoneNumber callerNumber;
+        @Nullable private String callerName;
+        @Nonnull private final List<PhoneNumber> callerE164Numbers = new ArrayList<>();
+        @Nullable private PhoneNumber calledNumber;
+        @Nullable private String calledName;
+        @Nullable private PhoneNumber calledDestination;
+        @Nonnull private final List<PhoneNumber> calledE164Numbers = new ArrayList<>();
         @Nullable private Instant startTime;
         @Nullable private Duration duration;
         @Nonnull private final List<RequestAction> actions = new ArrayList<>();
@@ -222,8 +278,62 @@ public class Call {
         }
 
         @Nonnull
-        public Builder setStartTime(final Instant startTime) {
+        public Builder setStartTime(@Nonnull final Instant startTime) {
             this.startTime = startTime;
+            return this;
+        }
+
+        @Nonnull
+        public Builder setCallerNumber(final PhoneNumber callerNumber) {
+            this.callerNumber = callerNumber;
+            return this;
+        }
+
+        @Nonnull
+        public Builder setCallerName(final String callerName) {
+            this.callerName = callerName;
+            return this;
+        }
+
+        @Nonnull
+        public Builder addCallerE164Number(final PhoneNumber callerE164Number) {
+            this.callerE164Numbers.add(callerE164Number);
+            return this;
+        }
+
+        @Nonnull
+        public Builder addCallerE164Numbers(final List<PhoneNumber> callerE164Numbers) {
+            this.callerE164Numbers.addAll(callerE164Numbers);
+            return this;
+        }
+
+        @Nonnull
+        public Builder setCalledNumber(final PhoneNumber calledNumber) {
+            this.calledNumber = calledNumber;
+            return this;
+        }
+
+        @Nonnull
+        public Builder setCalledDestination(final PhoneNumber calledDestination) {
+            this.calledDestination = calledDestination;
+            return this;
+        }
+
+        @Nonnull
+        public Builder setCalledName(final String calledName) {
+            this.calledName = calledName;
+            return this;
+        }
+
+        @Nonnull
+        public Builder addCalledE164Number(final PhoneNumber calledE164Number) {
+            this.calledE164Numbers.add(calledE164Number);
+            return this;
+        }
+
+        @Nonnull
+        public Builder addCalledE164Numbers(final List<PhoneNumber> calledE164Numbers) {
+            this.calledE164Numbers.addAll(calledE164Numbers);
             return this;
         }
 

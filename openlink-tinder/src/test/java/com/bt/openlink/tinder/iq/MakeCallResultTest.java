@@ -40,12 +40,12 @@ public class MakeCallResultTest {
             "            <state>CallOriginated</state>\n" +
             "            <direction>Outgoing</direction>\n" +
             "            <caller>\n" +
-            "              <number>6001</number>\n" +
-            "              <name>6001/1</name>\n" +
+            "              <number e164='" + Fixtures.CALLER_E164_NUMBER + "'>" + Fixtures.CALLER_NUMBER + "</number>\n" +
+            "              <name>" + Fixtures.CALLER_NAME + "</name>\n" +
             "            </caller>\n" +
             "            <called>\n" +
-            "              <number></number>\n" +
-            "              <name></name>\n" +
+            "              <number e164='" + Fixtures.CALLED_E164_NUMBER + "' destination='" + Fixtures.CALLED_DESTINATION + "'>" + Fixtures.CALLED_NUMBER + "</number>\n" +
+            "              <name>" + Fixtures.CALLED_NAME + "</name>\n" +
             "            </called>\n" +
             "            <starttime>2017-10-09T08:07:00.000Z</starttime>\n" +
             "            <duration>0</duration>\n" +
@@ -98,6 +98,14 @@ public class MakeCallResultTest {
                 "            <changed>State</changed>\n" +
                 "            <state>CallOriginated</state>\n" +
                 "            <direction>Incoming</direction>\n" +
+                "            <caller>\n" +
+                "              <number e164='" + Fixtures.CALLER_E164_NUMBER + "'>" + Fixtures.CALLER_NUMBER + "</number>\n" +
+                "              <name>" + Fixtures.CALLER_NAME + "</name>\n" +
+                "            </caller>\n" +
+                "            <called>\n" +
+                "              <number e164='" + Fixtures.CALLED_E164_NUMBER + "' destination='" + Fixtures.CALLED_DESTINATION + "'>" + Fixtures.CALLED_NUMBER + "</number>\n" +
+                "              <name>" + Fixtures.CALLED_NAME + "</name>\n" +
+                "            </called>\n" +
                 "            <starttime>2017-10-09T08:07:00.000Z</starttime>\n" +
                 "            <duration>60000</duration>\n" +
                 "            <actions>\n" +
@@ -150,6 +158,13 @@ public class MakeCallResultTest {
         assertThat(theOnlyCall.getChanged().get(), is(Changed.STATE));
         assertThat(theOnlyCall.getState().get(), is(CallState.CALL_ORIGINATED));
         assertThat(theOnlyCall.getDirection().get(), is(CallDirection.OUTGOING));
+        assertThat(theOnlyCall.getCallerNumber().get(), is(Fixtures.CALLER_NUMBER));
+        assertThat(theOnlyCall.getCallerName().get(), is(Fixtures.CALLER_NAME));
+        assertThat(theOnlyCall.getCallerE164Numbers(), is(Collections.singletonList(Fixtures.CALLER_E164_NUMBER)));
+        assertThat(theOnlyCall.getCalledNumber().get(), is(Fixtures.CALLED_NUMBER));
+        assertThat(theOnlyCall.getCalledName().get(), is(Fixtures.CALLED_NAME));
+        assertThat(theOnlyCall.getCalledDestination().get(), is(Fixtures.CALLED_DESTINATION));
+        assertThat(theOnlyCall.getCalledE164Numbers(), is(Collections.singletonList(Fixtures.CALLED_E164_NUMBER)));
         assertThat(theOnlyCall.getStartTime().get(), is(Fixtures.START_TIME));
         assertThat(theOnlyCall.getDuration().get(), is(Duration.ZERO));
         assertThat(calls.size(), is(1));
@@ -173,7 +188,6 @@ public class MakeCallResultTest {
                 "Invalid stanza; missing 'from' attribute is mandatory",
                 "Invalid stanza; missing 'id' attribute is mandatory",
                 "Invalid stanza; missing or incorrect 'type' attribute",
-                "Invalid make-call result stanza; missing or invalid calls"
-                ));
+                "Invalid make-call result stanza; missing or invalid calls"));
     }
 }

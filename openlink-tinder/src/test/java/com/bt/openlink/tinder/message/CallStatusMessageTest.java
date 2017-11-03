@@ -3,9 +3,7 @@ package com.bt.openlink.tinder.message;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 import static org.xmlunit.matchers.CompareMatcher.isIdenticalTo;
 
@@ -198,6 +196,14 @@ public class CallStatusMessageTest {
                 "            <changed>State</changed>\n" +
                 "            <state>CallOriginated</state>\n" +
                 "            <direction>Incoming</direction>\n" +
+                "            <caller>\n" +
+                "               <number e164='" + Fixtures.CALLER_E164_NUMBER + "'>" + Fixtures.CALLER_NUMBER + "</number>\n" +
+                "               <name>" + Fixtures.CALLER_NAME + "</name>\n" +
+                "            </caller>\n" +
+                "            <called>\n" +
+                "               <number destination='" + Fixtures.CALLED_DESTINATION + "' e164='" + Fixtures.CALLED_E164_NUMBER + "'>" + Fixtures.CALLED_NUMBER + "</number>\n" +
+                "               <name>" + Fixtures.CALLED_NAME + "</name>\n" +
+                "            </called>\n" +
                 "            <starttime>2017-10-09T08:07:00.000Z</starttime>\n" +
                 "            <duration>60000</duration>\n" +
                 "            <actions>\n" +
@@ -305,6 +311,14 @@ public class CallStatusMessageTest {
                 "            <changed>State</changed>\n" +
                 "            <state>CallOriginated</state>\n" +
                 "            <direction>Incoming</direction>\n" +
+                "            <caller>\n" +
+                "               <number e164='" + Fixtures.CALLER_E164_NUMBER + "'>" + Fixtures.CALLER_NUMBER + "</number>\n" +
+                "               <name>" + Fixtures.CALLER_NAME + "</name>\n" +
+                "            </caller>\n" +
+                "            <called>\n" +
+                "               <number destination='" + Fixtures.CALLED_DESTINATION + "' e164='" + Fixtures.CALLED_E164_NUMBER + "'>" + Fixtures.CALLED_NUMBER + "</number>\n" +
+                "               <name>" + Fixtures.CALLED_NAME + "</name>\n" +
+                "            </called>\n" +
                 "            <starttime>2017-10-09T08:07:00.000Z</starttime>\n" +
                 "            <duration>60000</duration>\n" +
                 "            <actions>\n" +

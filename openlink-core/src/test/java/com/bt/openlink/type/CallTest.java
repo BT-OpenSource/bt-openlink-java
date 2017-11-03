@@ -8,6 +8,7 @@ import static org.junit.Assert.assertThat;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,6 +37,13 @@ public class CallTest {
                 .setChanged(Changed.STATE)
                 .setState(CallState.CALL_ORIGINATED)
                 .setDirection(CallDirection.INCOMING)
+                .setCallerNumber(Fixtures.CALLER_NUMBER)
+                .setCallerName(Fixtures.CALLER_NAME)
+                .addCallerE164Number(Fixtures.CALLER_E164_NUMBER)
+                .setCalledNumber(Fixtures.CALLED_NUMBER)
+                .setCalledName(Fixtures.CALLED_NAME)
+                .setCalledDestination(Fixtures.CALLED_DESTINATION)
+                .addCalledE164Number(Fixtures.CALLED_E164_NUMBER)
                 .setStartTime(startTime)
                 .setDuration(duration)
                 .addAction(RequestAction.ANSWER_CALL)
@@ -49,6 +57,13 @@ public class CallTest {
         assertThat(call.getChanged().get(), is(Changed.STATE));
         assertThat(call.getState().get(), is(CallState.CALL_ORIGINATED));
         assertThat(call.getDirection().get(), is(CallDirection.INCOMING));
+        assertThat(call.getCallerNumber().get(), is(Fixtures.CALLER_NUMBER));
+        assertThat(call.getCallerName().get(), is(Fixtures.CALLER_NAME));
+        assertThat(call.getCallerE164Numbers(), is(Collections.singletonList(Fixtures.CALLER_E164_NUMBER)));
+        assertThat(call.getCalledNumber().get(), is(Fixtures.CALLED_NUMBER));
+        assertThat(call.getCalledName().get(), is(Fixtures.CALLED_NAME));
+        assertThat(call.getCalledDestination().get(), is(Fixtures.CALLED_DESTINATION));
+        assertThat(call.getCalledE164Numbers(), is(Collections.singletonList(Fixtures.CALLED_E164_NUMBER)));
         assertThat(call.getStartTime().get(), is(startTime));
         assertThat(call.getDuration().get(), is(duration));
         assertThat(call.isParticipating(), is(false));
@@ -178,6 +193,8 @@ public class CallTest {
                 .setInterestId(Fixtures.INTEREST_ID)
                 .setState(CallState.CALL_ORIGINATED)
                 .setDirection(CallDirection.INCOMING)
+                .addCalledE164Numbers(Collections.singletonList(Fixtures.CALLED_E164_NUMBER))
+                .addCallerE164Numbers(Collections.singletonList(Fixtures.CALLER_E164_NUMBER))
                 .setDuration(duration)
                 .addAction(RequestAction.ANSWER_CALL)
                 .build();
@@ -215,6 +232,13 @@ public class CallTest {
         assertThat(call.getChanged(), is(Optional.empty()));
         assertThat(call.getState(), is(Optional.empty()));
         assertThat(call.getDirection(), is(Optional.empty()));
+        assertThat(call.getCallerNumber(), is(Optional.empty()));
+        assertThat(call.getCallerName(), is(Optional.empty()));
+        assertThat(call.getCallerE164Numbers(), is(empty()));
+        assertThat(call.getCalledNumber(), is(Optional.empty()));
+        assertThat(call.getCalledName(), is(Optional.empty()));
+        assertThat(call.getCalledDestination(), is(Optional.empty()));
+        assertThat(call.getCalledE164Numbers(), is(empty()));
         assertThat(call.getStartTime(), is(Optional.empty()));
         assertThat(call.getDuration(), is(Optional.empty()));
         assertThat(call.isParticipating(), is(false));
