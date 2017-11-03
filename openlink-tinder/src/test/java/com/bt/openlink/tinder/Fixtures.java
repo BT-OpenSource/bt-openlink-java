@@ -38,16 +38,23 @@ public final class Fixtures {
     }
 
     public static final Instant START_TIME = LocalDateTime.parse("2017-10-09T08:07:00").atZone(ZoneId.of("UTC")).toInstant();
-    public static final Duration DURATION = Duration.ofMinutes(1);
+    private static final Duration DURATION = Duration.ofMinutes(1);
     public static final String STANZA_ID = "test-stanza-id";
     public static final JID TO_JID = new JID("test-to@test-domain/test-resource");
     public static final JID FROM_JID = new JID("test-from@test-domain/test-resource");
     public static final JID USER_JID = new JID("test-user@test-domain/test-resource");
-    public static final String BARE_JID = USER_JID.toBareJID();
+    private static final String BARE_JID = USER_JID.toBareJID();
     public static final ProfileId PROFILE_ID = ProfileId.from("test-profile-id").get();
     public static final InterestId INTEREST_ID = InterestId.from("test-interest-id").get();
     public static final CallId CALL_ID = CallId.from("test-call-id").get();
-    public static final Participant PARTICIPANT = Participant.Builder.start()
+    public static final PhoneNumber CALLER_NUMBER = PhoneNumber.from("test-caller-number").get();
+    public static final String CALLER_NAME = "test-caller-name";
+    public static final PhoneNumber CALLER_E164_NUMBER = PhoneNumber.from("test-caller-e164-number").get();
+    public static final PhoneNumber CALLED_NUMBER = PhoneNumber.from("test-called-number").get();
+    public static final String CALLED_NAME = "test-called-name";
+    public static final PhoneNumber CALLED_DESTINATION = PhoneNumber.from("test-called-destination").get();
+    public static final PhoneNumber CALLED_E164_NUMBER = PhoneNumber.from("test-called-e164-number").get();
+    private static final Participant PARTICIPANT = Participant.Builder.start()
             .setJID(BARE_JID)
             .setType(ParticipantType.ACTIVE)
             .setDirection(CallDirection.INCOMING)
@@ -60,7 +67,7 @@ public final class Fixtures {
             .setLabel("test-default-interest")
             .setType(InterestType.from("test-interest-type").get())
             .build();
-    public static Site SITE = Site.Builder.start()
+    private static Site SITE = Site.Builder.start()
             .setId(42)
             .setType(Site.Type.BTSM)
             .setName("test-site-name")
@@ -74,6 +81,13 @@ public final class Fixtures {
             .setChanged(Changed.STATE)
             .setState(CallState.CALL_ORIGINATED)
             .setDirection(CallDirection.INCOMING)
+            .setCallerNumber(CALLER_NUMBER)
+            .setCallerName(CALLER_NAME)
+            .addCallerE164Number(CALLER_E164_NUMBER)
+            .setCalledNumber(CALLED_NUMBER)
+            .setCalledName(CALLED_NAME)
+            .setCalledDestination(CALLED_DESTINATION)
+            .addCalledE164Number(CALLED_E164_NUMBER)
             .setStartTime(START_TIME)
             .setDuration(DURATION)
             .addAction(RequestAction.ANSWER_CALL)

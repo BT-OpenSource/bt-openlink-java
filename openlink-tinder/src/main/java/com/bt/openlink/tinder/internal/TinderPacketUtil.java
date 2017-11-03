@@ -8,11 +8,13 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.TimeZone;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -30,6 +32,7 @@ import com.bt.openlink.type.Changed;
 import com.bt.openlink.type.InterestId;
 import com.bt.openlink.type.Participant;
 import com.bt.openlink.type.ParticipantType;
+import com.bt.openlink.type.PhoneNumber;
 import com.bt.openlink.type.ProfileId;
 import com.bt.openlink.type.RequestAction;
 import com.bt.openlink.type.Site;
@@ -184,7 +187,7 @@ public final class TinderPacketUtil {
     }
 
     @Nonnull
-    public static Optional<Long> getLongAttribute(final Element parentElement, final String attributeName, final String description, final List<String> parseErrors) {
+    private static Optional<Long> getLongAttribute(final Element parentElement, final String attributeName, final String description, final List<String> parseErrors) {
         final Optional<String> stringValue = getStringAttribute(parentElement, attributeName, false, description, parseErrors);
         try {
             return stringValue.map(Long::valueOf);
@@ -225,13 +228,8 @@ public final class TinderPacketUtil {
     }
 
     @Nonnull
-    public static Element addCommandElement(@Nonnull final IQ request) {
-        return addChildElement(request, "command", OpenlinkXmppNamespace.XMPP_COMMANDS);
-    }
-
-    @Nonnull
-    public static Element addChildElement(@Nonnull final IQ request, @Nonnull final String elementName, @Nonnull final OpenlinkXmppNamespace namespace) {
-        return request.getElement().addElement(elementName, namespace.uri());
+    private static Element addCommandElement(@Nonnull final IQ request) {
+        return request.getElement().addElement("command", OpenlinkXmppNamespace.XMPP_COMMANDS.uri());
     }
 
     @Nonnull
@@ -270,6 +268,25 @@ public final class TinderPacketUtil {
             call.getChanged().ifPresent(changed -> callElement.addElement("changed").setText(changed.getId()));
             call.getState().ifPresent(state -> callElement.addElement("state").setText(state.getLabel()));
             call.getDirection().ifPresent(direction -> callElement.addElement(ATTRIBUTE_DIRECTION).setText(direction.getLabel()));
+            final Element callerElement = callElement.addElement("caller");
+            final Element callerNumberElement = callerElement.addElement("number");
+            call.getCallerNumber().ifPresent(callerNumber -> callerNumberElement.setText(callerNumber.value()));
+            final String callerE164Numbers =String.join(",", call.getCallerE164Numbers().stream().map(PhoneNumber::value).collect(Collectors.toList()));
+            if(!callerE164Numbers.isEmpty()) {
+                callerNumberElement.addAttribute("e164", callerE164Numbers);
+            }
+            final Element callerNameElement = callerElement.addElement("name");
+            call.getCallerName().ifPresent(callerNameElement::setText);
+            final Element calledElement = callElement.addElement("called");
+            final Element calledNumberElement = calledElement.addElement("number");
+            call.getCalledNumber().ifPresent(calledNumber -> calledNumberElement.setText(calledNumber.value()));
+            call.getCalledDestination().ifPresent(calledDestination -> calledNumberElement.addAttribute("destination", calledDestination.value()));
+            final String calledE164Numbers =String.join(",", call.getCalledE164Numbers().stream().map(PhoneNumber::value).collect(Collectors.toList()));
+            if(!calledE164Numbers.isEmpty()) {
+                calledNumberElement.addAttribute("e164", calledE164Numbers);
+            }
+            final Element calledNameElement = calledElement.addElement("name");
+            call.getCalledName().ifPresent(calledNameElement::setText);
             call.getStartTime().ifPresent(startTime -> callElement.addElement(ATTRIBUTE_START_TIME).setText(ISO_8601_FORMATTER.format(startTime.atZone(ZoneOffset.UTC))));
             call.getDuration().ifPresent(duration -> callElement.addElement(ATTRIBUTE_DURATION).setText(String.valueOf(duration.toMillis())));
             addActions(call, callElement);
@@ -351,6 +368,39 @@ public final class TinderPacketUtil {
                 state.ifPresent(callBuilder::setState);
                 final Optional<CallDirection> direction = CallDirection.from(getChildElementString(callElement, ATTRIBUTE_DIRECTION));
                 direction.ifPresent(callBuilder::setDirection);
+                final Element callerElement = getChildElement(callElement, "caller");
+                final Optional<PhoneNumber> callerNumber = PhoneNumber.from(getChildElementString(callerElement, "number"));
+                callerNumber.ifPresent(callBuilder::setCallerNumber);
+                final Optional<String> callerName = Optional.ofNullable(getChildElementString(callerElement, "name"));
+                callerName.ifPresent(callBuilder::setCallerName);
+                final Optional<String> callerE164 = getStringAttribute(getChildElement(callerElement, "number"), "e164");
+                callerE164.ifPresent(e164List -> {
+                    final List<PhoneNumber> callerE164Numbers = Arrays.stream(e164List.split(","))
+                            .map(String::trim)
+                            .map(PhoneNumber::from)
+                            .filter(Optional::isPresent)
+                            .map(Optional::get)
+                            .collect(Collectors.toList());
+                    callBuilder.addCallerE164Numbers(callerE164Numbers);
+                });
+                final Element calledElement = getChildElement(callElement, "called");
+                final Optional<PhoneNumber> calledNumber = PhoneNumber.from(getChildElementString(calledElement, "number"));
+                calledNumber.ifPresent(callBuilder::setCalledNumber);
+                final Optional<String> calledName = Optional.ofNullable(getChildElementString(calledElement, "name"));
+                calledName.ifPresent(callBuilder::setCalledName);
+                final Element calledNumberElement = getChildElement(calledElement, "number");
+                final Optional<PhoneNumber> calledDestination = PhoneNumber.from(getStringAttribute(calledNumberElement, "destination").orElse(null));
+                calledDestination.ifPresent(callBuilder::setCalledDestination);
+                final Optional<String> calledE164 = getStringAttribute(calledNumberElement, "e164");
+                calledE164.ifPresent(e164List -> {
+                    final List<PhoneNumber> calledE164Numbers = Arrays.stream(e164List.split(","))
+                            .map(String::trim)
+                            .map(PhoneNumber::from)
+                            .filter(Optional::isPresent)
+                            .map(Optional::get)
+                            .collect(Collectors.toList());
+                    callBuilder.addCalledE164Numbers(calledE164Numbers);
+                });
                 final Optional<Instant> startTime = getChildElementISO8601(callElement, ATTRIBUTE_START_TIME, description, parseErrors);
                 startTime.ifPresent(callBuilder::setStartTime);
                 final Optional<Long> duration = Optional.ofNullable(getChildElementLong(callElement, ATTRIBUTE_DURATION, description, parseErrors));

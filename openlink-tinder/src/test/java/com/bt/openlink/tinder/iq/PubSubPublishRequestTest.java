@@ -157,6 +157,14 @@ public class PubSubPublishRequestTest {
                 "            <changed>State</changed>\n" +
                 "            <state>CallOriginated</state>\n" +
                 "            <direction>Incoming</direction>\n" +
+                "            <caller>\n" +
+                "               <number e164='" + Fixtures.CALLER_E164_NUMBER + "'>" + Fixtures.CALLER_NUMBER + "</number>\n" +
+                "               <name>" + Fixtures.CALLER_NAME + "</name>\n" +
+                "            </caller>\n" +
+                "            <called>\n" +
+                "               <number destination='" + Fixtures.CALLED_DESTINATION + "' e164='" + Fixtures.CALLED_E164_NUMBER + "'>" + Fixtures.CALLED_NUMBER + "</number>\n" +
+                "               <name>" + Fixtures.CALLED_NAME + "</name>\n" +
+                "            </called>\n" +
                 "            <starttime>2017-10-09T08:07:00.000Z</starttime>\n" +
                 "            <duration>60000</duration>\n" +
                 "            <actions>\n" +
@@ -215,6 +223,14 @@ public class PubSubPublishRequestTest {
                 "            <interest>" + Fixtures.INTEREST_ID + "</interest>\n" +
                 "            <state>CallOriginated</state>\n" +
                 "            <direction>Incoming</direction>\n" +
+                "            <caller>\n" +
+                "               <number></number>\n" +
+                "               <name></name>\n" +
+                "            </caller>\n" +
+                "            <called>\n" +
+                "               <number></number>\n" +
+                "               <name></name>\n" +
+                "            </called>\n" +
                 "            <duration>0</duration>\n" +
                 "            <actions>\n" +
                 "              <AnswerCall/>\n" +
