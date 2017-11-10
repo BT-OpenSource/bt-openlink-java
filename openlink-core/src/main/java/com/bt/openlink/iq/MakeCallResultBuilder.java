@@ -3,15 +3,19 @@ package com.bt.openlink.iq;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import com.bt.openlink.type.Call;
 
 // TODO: (Greg 2017-10-24) Add feature support
 public abstract class MakeCallResultBuilder<B extends MakeCallResultBuilder, J, T extends Enum<T>> extends IQBuilder<B, J, T> {
 
+    @Nullable private Boolean callStatusBusy = null;
     @Nonnull private List<Call> calls = new ArrayList<>();
+
 
     protected MakeCallResultBuilder(final Class<T> typeClass) {
         super(typeClass);
@@ -42,12 +46,25 @@ public abstract class MakeCallResultBuilder<B extends MakeCallResultBuilder, J, 
         return calls;
     }
 
+    @SuppressWarnings("unchecked")
+    @Nonnull
+    public B setCallStatusBusy(final boolean callStatusBusy) {
+        this.callStatusBusy = callStatusBusy;
+        return (B) this;
+    }
+
+    @Nonnull
+    public Optional<Boolean> isCallStatusBusy() {
+        return Optional.ofNullable(callStatusBusy);
+    }
+
     @Override
     protected void validate() {
         super.validate();
         if (calls.isEmpty()) {
             throw new IllegalStateException("The make-call result has no calls");
         }
+        Call.oneOrMoreCallsIsBusy(calls).ifPresent(this::setCallStatusBusy);
     }
 
     @Override

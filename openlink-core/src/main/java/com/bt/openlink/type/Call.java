@@ -7,12 +7,33 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 // TODO: (Greg 2017-09-27) Add all call related fields to this class
 public class Call {
+
+    public static Optional<Boolean> oneOrMoreCallsIsBusy(final Collection<Call> calls) {
+        final AtomicBoolean callBusySet = new AtomicBoolean(false);
+        final AtomicBoolean aCallIsBusy = new AtomicBoolean(false);
+        calls.forEach(call -> call.getState().ifPresent(callState -> call.getDirection().ifPresent(callDirection -> {
+            final boolean participating = callState.isParticipating(callDirection);
+            if (!callBusySet.get() || participating) {
+                callBusySet.compareAndSet(false, true);
+                aCallIsBusy.compareAndSet(false, participating);
+            }
+        })));
+
+        if(callBusySet.get()) {
+            return Optional.of(aCallIsBusy.get());
+        } else {
+            return Optional.empty();
+        }
+
+    }
+
 
     @Nullable private final CallId callId;
     @Nullable private final Site site;
@@ -30,7 +51,8 @@ public class Call {
     @Nonnull private final List<PhoneNumber> calledE164Numbers;
     @Nullable private final Instant startTime;
     @Nullable private final Duration duration;
-    @Nonnull private final Collection<RequestAction> actions;
+    @Nonnull private final List<RequestAction> actions;
+    @Nonnull private final List<CallFeature> features;
     @Nonnull private final List<Participant> participants;
 
     private Call(@Nonnull final Builder builder) {
@@ -50,7 +72,8 @@ public class Call {
         this.calledE164Numbers = Collections.unmodifiableList(builder.calledE164Numbers);
         this.startTime = builder.startTime;
         this.duration = builder.duration;
-        this.actions = Collections.unmodifiableCollection(builder.actions);
+        this.actions = Collections.unmodifiableList(builder.actions);
+        this.features = Collections.unmodifiableList(builder.features);
         this.participants = Collections.unmodifiableList(builder.participants);
     }
 
@@ -135,8 +158,13 @@ public class Call {
     }
 
     @Nonnull
-    public Collection<RequestAction> getActions() {
+    public List<RequestAction> getActions() {
         return actions;
+    }
+
+    @Nonnull
+    public List<CallFeature> getFeatures() {
+        return features;
     }
 
     @Nonnull
@@ -166,6 +194,7 @@ public class Call {
         @Nullable private Instant startTime;
         @Nullable private Duration duration;
         @Nonnull private final List<RequestAction> actions = new ArrayList<>();
+        @Nonnull private final List<CallFeature> features = new ArrayList<>();
         @Nonnull private final List<Participant> participants = new ArrayList<>();
 
         private Builder() {
@@ -346,6 +375,12 @@ public class Call {
         @Nonnull
         public Builder addAction(@Nonnull final RequestAction action) {
             actions.add(action);
+            return this;
+        }
+
+        @Nonnull
+        public Builder addFeature(@Nonnull final CallFeature feature) {
+            features.add(feature);
             return this;
         }
 

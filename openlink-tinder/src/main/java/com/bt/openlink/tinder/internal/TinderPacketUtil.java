@@ -26,6 +26,7 @@ import org.xmpp.packet.JID;
 import com.bt.openlink.OpenlinkXmppNamespace;
 import com.bt.openlink.type.Call;
 import com.bt.openlink.type.CallDirection;
+import com.bt.openlink.type.CallFeature;
 import com.bt.openlink.type.CallId;
 import com.bt.openlink.type.CallState;
 import com.bt.openlink.type.Changed;
@@ -257,8 +258,11 @@ public final class TinderPacketUtil {
         return jidString == null || jidString.isEmpty() ? Optional.empty() : Optional.of(new JID(jidString));
     }
 
-    public static void addItemCallStatusCalls(@Nonnull final Element parentElement, @Nonnull final Collection<Call> calls) {
+    public static void addItemCallStatusCalls(@Nonnull final Element parentElement, @Nullable final Boolean callStatusBusy, @Nonnull final Collection<Call> calls) {
         final Element callStatusElement = parentElement.addElement("callstatus", OpenlinkXmppNamespace.OPENLINK_CALL_STATUS.uri());
+        if (callStatusBusy != null) {
+            callStatusElement.addAttribute("busy", String.valueOf(callStatusBusy));
+        }
         calls.forEach(call -> {
             final Element callElement = callStatusElement.addElement("call");
             call.getId().ifPresent(callId -> callElement.addElement("id").setText(callId.value()));
@@ -290,8 +294,27 @@ public final class TinderPacketUtil {
             call.getStartTime().ifPresent(startTime -> callElement.addElement(ATTRIBUTE_START_TIME).setText(ISO_8601_FORMATTER.format(startTime.atZone(ZoneOffset.UTC))));
             call.getDuration().ifPresent(duration -> callElement.addElement(ATTRIBUTE_DURATION).setText(String.valueOf(duration.toMillis())));
             addActions(call, callElement);
+            addFeatures(call, callElement);
             addParticipants(call, callElement);
         });
+    }
+
+    private static void addFeatures(@Nonnull final Call call, @Nonnull final Element callElement) {
+        final List<CallFeature> features = call.getFeatures();
+        if (!features.isEmpty()) {
+            final Element featuresElement = callElement.addElement("features");
+            features.forEach(feature -> {
+                final Element featureElement = featuresElement.addElement("feature");
+                feature.getId().ifPresent(id -> featureElement.addAttribute("id", id.value()));
+                feature.getLabel().ifPresent(label -> featureElement.addAttribute("label", label));
+                feature.getType().ifPresent(type -> featureElement.addAttribute("type", type.getId()));
+                feature.isEnabled().ifPresent(enabled -> featureElement.setText(String.valueOf(enabled)));
+                feature.getDeviceKey().ifPresent(deviceKey -> {
+                    final Element deviceKeysElement = featureElement.addElement("devicekeys", "http://xmpp.org/protocol/openlink:01:00:00/features#device-keys");
+                    deviceKeysElement.addElement("key").setText(deviceKey.value());
+                });
+            });
+        }
     }
 
     private static void addActions(@Nonnull final Call call, @Nonnull final Element callElement) {

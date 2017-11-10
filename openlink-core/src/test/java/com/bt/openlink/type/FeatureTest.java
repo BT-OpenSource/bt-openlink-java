@@ -13,13 +13,14 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import com.bt.openlink.Fixtures;
+
 @SuppressWarnings("ConstantConditions")
 public class FeatureTest {
 
     @Rule public final ExpectedException expectedException = ExpectedException.none();
 
     @Test
-    public void willBuildAFeature() throws Exception {
+    public void willBuildAFeatureWithAnEnabledFlag() throws Exception {
 
         final Feature feature = Feature.Builder.start()
                 .setId(Fixtures.FEATURE_ID)

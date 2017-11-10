@@ -18,6 +18,7 @@ import com.bt.openlink.OpenlinkXmppNamespace;
 import com.bt.openlink.tinder.internal.TinderPacketUtil;
 import com.bt.openlink.type.Call;
 import com.bt.openlink.type.InterestId;
+import com.bt.openlink.type.ItemId;
 import com.bt.openlink.type.PubSubNodeId;
 
 public class CallStatusMessage extends Message {
@@ -26,6 +27,8 @@ public class CallStatusMessage extends Message {
 
     @Nullable private final Instant delay;
     @Nullable private final PubSubNodeId pubSubNodeId;
+    @Nullable private final ItemId itemId;
+    @Nullable private final Boolean callStatusBusy;
     @Nonnull private final List<Call> calls;
     @Nonnull private final List<String> parseErrors;
 
@@ -37,6 +40,8 @@ public class CallStatusMessage extends Message {
         }
         this.delay = builder.delay;
         this.pubSubNodeId = builder.pubSubNodeId;
+        this.itemId = builder.itemId;
+        this.callStatusBusy = builder.callStatusBusy;
         this.calls = Collections.unmodifiableList(builder.calls);
         if (parseErrors == null) {
             this.parseErrors = Collections.emptyList();
@@ -50,7 +55,8 @@ public class CallStatusMessage extends Message {
             itemsElement.addAttribute("node", pubSubNodeId.value());
         }
         final Element itemElement = itemsElement.addElement("item");
-        TinderPacketUtil.addItemCallStatusCalls(itemElement, calls);
+        getItemId().ifPresent(id -> itemElement.addAttribute("id", id.value()));
+        TinderPacketUtil.addItemCallStatusCalls(itemElement, callStatusBusy, calls);
         if (delay != null) {
             messageElement.addElement("delay", "urn:xmpp:delay").addAttribute("stamp", delay.toString());
         }
@@ -69,6 +75,16 @@ public class CallStatusMessage extends Message {
     @Nonnull
     public Optional<PubSubNodeId> getPubSubNodeId() {
         return Optional.ofNullable(pubSubNodeId);
+    }
+
+    @Nonnull
+    public Optional<ItemId> getItemId() {
+        return Optional.ofNullable(itemId);
+    }
+
+    @Nonnull
+    public Optional<Boolean> isCallStatusBusy() {
+        return Optional.ofNullable(callStatusBusy);
     }
 
     @Nonnull
@@ -108,6 +124,8 @@ public class CallStatusMessage extends Message {
         @Nullable String id;
         @Nullable private Instant delay;
         @Nullable private PubSubNodeId pubSubNodeId;
+        @Nullable private ItemId itemId;
+        @Nullable private Boolean callStatusBusy;
         @Nonnull private List<Call> calls = new ArrayList<>();
 
         private Builder() {
@@ -131,6 +149,7 @@ public class CallStatusMessage extends Message {
                     throw new IllegalStateException(String.format("The call with id '%s' is not on this pubsub node", call.getId().orElse(null)));
                 }
             });
+            Call.oneOrMoreCallsIsBusy(calls).ifPresent(this::setCallStatusBusy);
             return build(null);
         }
 
@@ -168,6 +187,18 @@ public class CallStatusMessage extends Message {
         @Nonnull
         public Builder setPubSubNodeId(@Nonnull final PubSubNodeId pubSubNodeId) {
             this.pubSubNodeId = pubSubNodeId;
+            return this;
+        }
+
+        @Nonnull
+        public Builder setItemId(@Nonnull final ItemId itemId) {
+            this.itemId = itemId;
+            return this;
+        }
+
+        @Nonnull
+        public Builder setCallStatusBusy(final boolean callStatusBusy) {
+            this.callStatusBusy = callStatusBusy;
             return this;
         }
 

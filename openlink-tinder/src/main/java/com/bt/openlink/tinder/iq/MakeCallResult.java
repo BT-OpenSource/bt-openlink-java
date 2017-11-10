@@ -3,6 +3,7 @@ package com.bt.openlink.tinder.iq;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -17,18 +18,25 @@ import com.bt.openlink.tinder.internal.TinderPacketUtil;
 import com.bt.openlink.type.Call;
 
 public class MakeCallResult extends OpenlinkIQ {
+    @Nullable private final Boolean callStatusBusy;
     @Nonnull private final List<Call> calls;
 
     private MakeCallResult(@Nonnull Builder builder, @Nullable List<String> parseErrors) {
         super(builder, parseErrors);
         this.calls = Collections.unmodifiableList(builder.getCalls());
+        this.callStatusBusy = builder.isCallStatusBusy().orElse(null);
         final Element outElement = TinderPacketUtil.addCommandIOOutputElement(this, OpenlinkXmppNamespace.OPENLINK_MAKE_CALL);
-        TinderPacketUtil.addItemCallStatusCalls(outElement, calls);
+        TinderPacketUtil.addItemCallStatusCalls(outElement, callStatusBusy, calls);
     }
 
     @Nonnull
     public List<Call> getCalls() {
         return calls;
+    }
+
+    @Nonnull
+    public Optional<Boolean> isCallStatusBusy() {
+        return Optional.ofNullable(callStatusBusy);
     }
 
     @Nonnull

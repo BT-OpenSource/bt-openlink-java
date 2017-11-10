@@ -32,48 +32,36 @@ public class PubSubPublishRequestTest {
             "          <call>\n" +
             "            <id>" + Fixtures.CALL_ID + "</id>\n" +
             "            <site default='true' id='42' type='BTSM'>test-site-name</site>\n" +
-            "            <profile devicenum='258'>" + Fixtures.PROFILE_ID + "</profile>\n" +
+            "            <profile>" + Fixtures.PROFILE_ID + "</profile>\n" +
             "            <interest>" + Fixtures.INTEREST_ID + "</interest>\n" +
-            "            <state>CallDelivered</state>\n" +
+            "            <changed>State</changed>\n" +
+            "            <state>CallOriginated</state>\n" +
             "            <direction>Outgoing</direction>\n" +
             "            <caller>\n" +
-            "              <number>8866</number>\n" +
-            "              <name>Lucia Law 8866</name>\n" +
+            "              <number e164='test-caller-e164-number'>test-caller-number</number>\n" +
+            "              <name>test-caller-name</name>\n" +
             "            </caller>\n" +
             "            <called>\n" +
-            "              <number destination='888970008'>888970008</number>\n" +
-            "              <name>888970008</name>\n" +
+            "              <number destination='test-called-destination' e164='test-called-e164-number'>test-called-number</number>\n" +
+            "              <name>test-called-name</name>\n" +
             "            </called>\n" +
-            "            <duration>6000</duration>\n" +
+            "            <starttime>2017-10-09T08:07:00.000Z</starttime>\n" +
+            "            <duration>60000</duration>\n" +
             "            <actions>\n" +
-            "              <ClearConnection/>\n" +
-            "              <HoldCall/>\n" +
-            "              <PrivateCall/>\n" +
-            "              <ConferenceCall/>\n" +
-            "              <ConnectSpeaker/>\n" +
-            "              <ClearCall/>\n" +
+            "              <AnswerCall/>\n" +
             "            </actions>\n" +
             "            <features>\n" +
-            "              <feature id='priv_1'>false</feature>\n" +
-            "              <feature id='hs_1'>true</feature>\n" +
-            "              <feature id='hs_2'>false</feature>\n" +
-            "              <feature id='Netrix_8866'>\n" +
+            "              <feature id='hs_1' label='Handset 1' type='Handset'>false</feature>\n" +
+            "              <feature id='hs_2' label='Handset 2' type='Handset'>false</feature>\n" +
+            "              <feature id='priv_1' label='Privacy' type='Privacy'>false</feature>\n" +
+            "              <feature id='NetrixHiTouch_sales1' label='NetrixHiTouch' type='DeviceKeys'>\n" +
             "                <devicekeys xmlns='http://xmpp.org/protocol/openlink:01:00:00/features#device-keys'>\n" +
-            "                  <key>key_1:0:7</key>\n" +
+            "                  <key>key_1:1:1</key>\n" +
             "                </devicekeys>\n" +
-            "              </feature>\n" +
-            "              <feature id='MK1205'>VoiceMessage</feature>\n" +
-            "              <feature id='voicerecorder_1'>\n" +
-            "                <voicerecorder xmlns='http://xmpp.org/protocol/openlink:01:00:00/features#voice-recorder'>\n" +
-            "                  <recnumber>001</recnumber>\n" +
-            "                  <recport>1</recport>\n" +
-            "                  <recchan>4</recchan>\n" +
-            "                  <rectype>?</rectype>\n" +
-            "                </voicerecorder>\n" +
             "              </feature>\n" +
             "            </features>\n" +
             "            <participants>\n" +
-            "              <participant jid='lawl@moitrader.int.clsa.com' type='Active' direction='Outgoing' timestamp='Wed Mar 18 20:27:25 CST 2015' duration='0'/>\n" +
+            "              <participant direction='Incoming' duration='60000' jid='test-user@test-domain' starttime='2017-10-09T08:07:00.000Z' timestamp='Mon Oct 09 08:07:00 UTC 2017' type='Active'/>\n\n" +
             "            </participants>\n" +
             "          </call>\n" +
             "        </callstatus>\n" +
@@ -187,7 +175,7 @@ public class PubSubPublishRequestTest {
                 .addCall(Fixtures.CALL)
                 .setInterestId(Fixtures.INTEREST_ID)
                 .build();
-        assertThat(request.toXML(), isIdenticalTo(partRequest).ignoreWhitespace());
+        assertThat(request.toXML(), isIdenticalTo(PUBLISH_REQUEST).ignoreWhitespace());
     }
 
     @Test

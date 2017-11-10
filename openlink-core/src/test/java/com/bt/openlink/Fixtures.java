@@ -7,6 +7,7 @@ import java.time.ZoneId;
 
 import com.bt.openlink.type.Call;
 import com.bt.openlink.type.CallDirection;
+import com.bt.openlink.type.CallFeature;
 import com.bt.openlink.type.CallId;
 import com.bt.openlink.type.CallState;
 import com.bt.openlink.type.Feature;
@@ -70,6 +71,12 @@ public class Fixtures {
             .setType(FeatureType.PRIVACY)
             .setId(FEATURE_ID)
             .setLabel("Privacy")
+            .build();
+    public static final CallFeature CALL_FEATURE = CallFeature.Builder.start()
+            .setType(FeatureType.PRIVACY)
+            .setId(FEATURE_ID)
+            .setLabel("Privacy")
+            .setEnabled(true)
             .build();
     public static final Interest INTEREST = Interest.Builder.start()
             .setType(INTEREST_TYPE)

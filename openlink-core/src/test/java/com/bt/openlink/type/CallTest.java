@@ -47,6 +47,7 @@ public class CallTest {
                 .setStartTime(startTime)
                 .setDuration(duration)
                 .addAction(RequestAction.ANSWER_CALL)
+                .addFeature(Fixtures.CALL_FEATURE)
                 .addParticipant(Fixtures.PARTICIPANT)
                 .build();
 
@@ -68,6 +69,7 @@ public class CallTest {
         assertThat(call.getDuration().get(), is(duration));
         assertThat(call.isParticipating(), is(false));
         assertThat(call.getActions(), contains(RequestAction.ANSWER_CALL));
+        assertThat(call.getFeatures(), contains(Fixtures.CALL_FEATURE));
         assertThat(call.getParticipants(), contains(Fixtures.PARTICIPANT));
     }
 
@@ -243,6 +245,7 @@ public class CallTest {
         assertThat(call.getDuration(), is(Optional.empty()));
         assertThat(call.isParticipating(), is(false));
         assertThat(call.getActions(), is(empty()));
+        assertThat(call.getFeatures(), is(empty()));
         assertThat(call.getParticipants(), is(empty()));
         assertThat(errors, contains(
                 "Invalid call status; missing call id is mandatory",

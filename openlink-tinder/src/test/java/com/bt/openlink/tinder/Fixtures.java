@@ -17,9 +17,13 @@ import org.xmpp.packet.Message;
 
 import com.bt.openlink.type.Call;
 import com.bt.openlink.type.CallDirection;
+import com.bt.openlink.type.CallFeature;
 import com.bt.openlink.type.CallId;
 import com.bt.openlink.type.CallState;
 import com.bt.openlink.type.Changed;
+import com.bt.openlink.type.DeviceKey;
+import com.bt.openlink.type.FeatureId;
+import com.bt.openlink.type.FeatureType;
 import com.bt.openlink.type.Interest;
 import com.bt.openlink.type.InterestId;
 import com.bt.openlink.type.InterestType;
@@ -80,7 +84,7 @@ public final class Fixtures {
             .setInterestId(INTEREST_ID)
             .setChanged(Changed.STATE)
             .setState(CallState.CALL_ORIGINATED)
-            .setDirection(CallDirection.INCOMING)
+            .setDirection(CallDirection.OUTGOING)
             .setCallerNumber(CALLER_NUMBER)
             .setCallerName(CALLER_NAME)
             .addCallerE164Number(CALLER_E164_NUMBER)
@@ -91,17 +95,16 @@ public final class Fixtures {
             .setStartTime(START_TIME)
             .setDuration(DURATION)
             .addAction(RequestAction.ANSWER_CALL)
+            .addFeature(CallFeature.Builder.start().setId(FeatureId.from("hs_1").get()).setType(FeatureType.HANDSET).setLabel("Handset 1").setEnabled(false).build())
+            .addFeature(CallFeature.Builder.start().setId(FeatureId.from("hs_2").get()).setType(FeatureType.HANDSET).setLabel("Handset 2").setEnabled(false).build())
+            .addFeature(CallFeature.Builder.start().setId(FeatureId.from("priv_1").get()).setType(FeatureType.PRIVACY).setLabel("Privacy").setEnabled(false).build())
+            .addFeature(CallFeature.Builder.start().setId(FeatureId.from("NetrixHiTouch_sales1").get()).setType(FeatureType.DEVICE_KEYS).setLabel("NetrixHiTouch").setDeviceKey(DeviceKey.from("key_1:1:1").get()).build())
             .addParticipant(PARTICIPANT)
             .build();
     public static final PhoneNumber DESTINATION = PhoneNumber.from("+44 800 141 2868").get();
 
     public static final PubSubNodeId NODE_ID = INTEREST_ID.toPubSubNodeId();
 
-    //    public static final FeatureId FEATURE_ID = FeatureId.from("test-feature-id");
-    //    public static final CallId CALL_ID = CallId.from("test-call-id");
-
-    // Note; this is also found in collab-test-framework, but to reduce dependencies it's also copied here
-    @SuppressWarnings("Duplicates")
     private static Element elementFrom(final InputStream is) {
         try {
             final SAXReader reader = new SAXReader();

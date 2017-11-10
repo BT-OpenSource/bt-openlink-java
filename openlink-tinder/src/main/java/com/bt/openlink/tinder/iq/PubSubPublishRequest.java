@@ -33,7 +33,7 @@ public class PubSubPublishRequest extends OpenlinkIQ {
         final Element publishElement = pubSubElement.addElement("publish");
         getPubSubNodeId().ifPresent(nodeId -> publishElement.addAttribute("node", nodeId.value()));
         final Element itemElement = publishElement.addElement("item");
-        TinderPacketUtil.addItemCallStatusCalls(itemElement, calls);
+        TinderPacketUtil.addItemCallStatusCalls(itemElement, null, calls);
     }
 
     @Nonnull

@@ -28,13 +28,8 @@ public class MakeCallResultTest {
             "        <callstatus xmlns='http://xmpp.org/protocol/openlink:01:00:00#call-status' busy='true'>\n" +
             "          <call>\n" +
             "            <id>" + Fixtures.CALL_ID + "</id>\n" +
-            "            <site id='42' type='BTSM'>itrader-dev-sm-5</site>\n" +
+            "            <site id='42' type='BTSM' default='true'>test-site-name</site>\n" +
             "            <profile>" + Fixtures.PROFILE_ID + "</profile>\n" +
-            "            <eventTimestamps>\n" +
-            "              <switch>1470739100996</switch>\n" +
-            "              <received>1470738955156</received>\n" +
-            "              <published>1470738955156</published>\n" +
-            "            </eventTimestamps>\n" +
             "            <interest>" + Fixtures.INTEREST_ID + "</interest>\n" +
             "            <changed>State</changed>\n" +
             "            <state>CallOriginated</state>\n" +
@@ -48,18 +43,23 @@ public class MakeCallResultTest {
             "              <name>" + Fixtures.CALLED_NAME + "</name>\n" +
             "            </called>\n" +
             "            <starttime>2017-10-09T08:07:00.000Z</starttime>\n" +
-            "            <duration>0</duration>\n" +
-            "            <actions/>\n" +
+            "            <duration>60000</duration>\n" +
+            "            <actions>\n" +
+            "              <AnswerCall/>\n" +
+            "            </actions>\n" +
             "            <features>\n" +
-            "              <feature id='hs_1' type='HANDSET' label='Handset 1'>false</feature>\n" +
-            "              <feature id='hs_2' type='HANDSET' label='Handset 2'>false</feature>\n" +
-            "              <feature id='priv_1' type='PRIVACY' label='Privacy'>false</feature>\n" +
-            "              <feature id='NetrixHiTouch_sales1' type='DEVICEKEYS' label='NetrixHiTouch'>\n" +
+            "              <feature id='hs_1' type='Handset' label='Handset 1'>false</feature>\n" +
+            "              <feature id='hs_2' type='Handset' label='Handset 2'>false</feature>\n" +
+            "              <feature id='priv_1' type='Privacy' label='Privacy'>false</feature>\n" +
+            "              <feature id='NetrixHiTouch_sales1' type='DeviceKeys' label='NetrixHiTouch'>\n" +
             "                <devicekeys xmlns='http://xmpp.org/protocol/openlink:01:00:00/features#device-keys'>\n" +
             "                  <key>key_1:1:1</key>\n" +
             "                </devicekeys>\n" +
             "              </feature>\n" +
             "            </features>\n" +
+            "            <participants>\n" +
+            "              <participant direction=\"Incoming\" duration=\"60000\" jid=\"test-user@test-domain\" starttime=\"2017-10-09T08:07:00.000Z\" timestamp=\"Mon Oct 09 08:07:00 UTC 2017\" type=\"Active\"/>\n" +
+            "            </participants>\n" +
             "          </call>\n" +
             "        </callstatus>\n" +
             "      </out>\n" +
@@ -128,7 +128,7 @@ public class MakeCallResultTest {
                 .addCalls(Collections.singletonList(Fixtures.CALL))
                 .build();
 
-        assertThat(result.toXML(), isIdenticalTo(expectedXML).ignoreWhitespace());
+        assertThat(result.toXML(), isIdenticalTo(MAKE_CALL_RESULT).ignoreWhitespace());
     }
 
     @Test
@@ -166,7 +166,7 @@ public class MakeCallResultTest {
         assertThat(theOnlyCall.getCalledDestination().get(), is(Fixtures.CALLED_DESTINATION));
         assertThat(theOnlyCall.getCalledE164Numbers(), is(Collections.singletonList(Fixtures.CALLED_E164_NUMBER)));
         assertThat(theOnlyCall.getStartTime().get(), is(Fixtures.START_TIME));
-        assertThat(theOnlyCall.getDuration().get(), is(Duration.ZERO));
+        assertThat(theOnlyCall.getDuration().get(), is(Duration.ofMinutes(1)));
         assertThat(calls.size(), is(1));
         assertThat(result.getParseErrors().size(), is(0));
     }
