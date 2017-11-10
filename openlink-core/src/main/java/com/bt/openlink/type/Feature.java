@@ -32,7 +32,7 @@ public class Feature {
         return Optional.ofNullable(label);
     }
 
-    protected static abstract class AbstractFeatureBuilder<B extends AbstractFeatureBuilder> {
+    protected abstract static class AbstractFeatureBuilder<B extends AbstractFeatureBuilder> {
 
         @Nullable private FeatureId featureId = null;
         @Nullable private FeatureType featureType = null;
