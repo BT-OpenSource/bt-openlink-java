@@ -8,6 +8,8 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.xmlunit.matchers.CompareMatcher.isIdenticalTo;
 
+import java.util.Optional;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -109,6 +111,11 @@ public class GetProfilesRequestTest {
                 "Invalid stanza; missing or incorrect 'type' attribute",
                 "Invalid get-profiles request stanza; missing or invalid 'jid'"
         ));
+        assertThat(request.getTo(), is(nullValue()));
+        assertThat(request.getFrom(), is(nullValue()));
+        assertThat(request.getID(), is(nullValue()));
+        assertThat(request.getType(), is(IQ.Type.get));
+        assertThat(request.getJID(), is(Optional.empty()));
     }
 
     @Test

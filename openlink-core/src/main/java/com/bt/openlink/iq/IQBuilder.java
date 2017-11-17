@@ -39,7 +39,7 @@ public abstract class IQBuilder<B extends IQBuilder, J, T extends Enum<T>> exten
         if (!getFrom().isPresent()) {
             throw new IllegalStateException("The stanza 'from' has not been set");
         }
-        // Note; not neccesary to validate id/type as these can be automatically set
+        // Note; not necessary to validate id/type as these can be automatically set
     }
 
     public void validate(final List<String> errors) {

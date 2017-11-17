@@ -1,12 +1,13 @@
 package com.bt.openlink.smack.iq;
 
-import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.xmlunit.matchers.CompareMatcher.isIdenticalTo;
+
+import java.util.Optional;
 
 import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.provider.ProviderManager;
@@ -52,27 +53,6 @@ public class GetProfilesRequestTest {
     }
 
     @Test
-    public void cannotCreateAStanzaWithoutAToField() throws Exception {
-
-        expectedException.expect(IllegalStateException.class);
-        expectedException.expectMessage("The stanza 'to' has not been set");
-        GetProfilesRequest.Builder.start()
-                .setJID(Fixtures.USER_FULL_JID)
-                .build();
-    }
-
-    @Test
-    public void cannotCreateAStanzaWithoutAJid() throws Exception {
-
-        expectedException.expect(IllegalStateException.class);
-        expectedException.expectMessage("The get-profiles request 'jid' has not been set");
-        GetProfilesRequest.Builder.start()
-                .setTo(Fixtures.TO_JID)
-                .setFrom(Fixtures.FROM_JID)
-                .build();
-    }
-
-    @Test
     public void willGenerateAnXmppStanza() throws Exception {
 
         final GetProfilesRequest request = GetProfilesRequest.Builder.start().setId(CoreFixtures.STANZA_ID)
@@ -82,19 +62,6 @@ public class GetProfilesRequestTest {
                 .build();
 
         assertThat(request.toXML().toString(), isIdenticalTo(TestStanzas.GET_PROFILES_REQUEST).ignoreWhitespace());
-    }
-
-    @Test
-    public void willGenerateAnXmppStanzaWithARandomId() throws Exception {
-
-        final GetProfilesRequest request = GetProfilesRequest.Builder.start()
-                .setTo(Fixtures.TO_JID)
-                .setFrom(Fixtures.FROM_JID)
-                .setJID(Fixtures.USER_FULL_JID)
-                .build();
-
-        assertThat(request.getStanzaId(), is(not(nullValue())));
-
     }
 
     @Test
@@ -125,6 +92,12 @@ public class GetProfilesRequestTest {
 //                "Invalid stanza; missing or incorrect 'type' attribute",
                 "Invalid get-profiles request stanza; missing or invalid 'jid'"
         ));
+        assertThat(request.getTo(), is(nullValue()));
+        assertThat(request.getFrom(), is(nullValue()));
+        assertThat(request.getStanzaId(), is(nullValue()));
+        assertThat(request.getType(), is(IQ.Type.get));
+        assertThat(request.getJID(), is(Optional.empty()));
+
     }
 
     @Test
