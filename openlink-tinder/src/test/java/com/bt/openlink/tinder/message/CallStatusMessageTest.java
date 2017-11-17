@@ -24,6 +24,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.xmpp.packet.Message;
 
+import com.bt.openlink.CoreFixtures;
 import com.bt.openlink.tinder.Fixtures;
 import com.bt.openlink.type.Call;
 import com.bt.openlink.type.CallDirection;
@@ -34,19 +35,19 @@ import com.bt.openlink.type.PubSubNodeId;
 
 @SuppressWarnings("ConstantConditions")
 public class CallStatusMessageTest {
-    private static final String CALL_STATUS_MESSAGE = "<message from='" + Fixtures.FROM_JID + "' to='" + Fixtures.TO_JID + "' id='" + Fixtures.STANZA_ID + "'>\n" +
+    private static final String CALL_STATUS_MESSAGE = "<message from='" + Fixtures.FROM_JID + "' to='" + Fixtures.TO_JID + "' id='" + CoreFixtures.STANZA_ID + "'>\n" +
             "  <event xmlns='http://jabber.org/protocol/pubsub#event'>\n" +
-            "    <items node='" + Fixtures.NODE_ID + "'>\n" +
+            "    <items node='" + CoreFixtures.NODE_ID + "'>\n" +
             "      <item id='test-item-id'>\n" +
-            "        <callstatus xmlns='http://xmpp.org/protocol/openlink:01:00:00#call-status' busy='true'>\n" +
+            "        <callstatus xmlns='http://xmpp.org/protocol/openlink:01:00:00#call-status' busy='false'>\n" +
             "          <call>\n" +
-            "            <id>" + Fixtures.CALL_ID + "</id>\n" +
-            "            <site default='true' id='42' type='BTSM'>test-site-name</site>\n" +
-            "            <profile>" + Fixtures.PROFILE_ID + "</profile>\n" +
-            "            <interest>" + Fixtures.INTEREST_ID + "</interest>\n" +
+            "            <id>" + CoreFixtures.CALL_ID + "</id>\n" +
+            "            <site default='true' id='42' type='BTSM'>test site name</site>\n" +
+            "            <profile>" + CoreFixtures.PROFILE_ID + "</profile>\n" +
+            "            <interest>" + CoreFixtures.INTEREST_ID + "</interest>\n" +
             "            <changed>State</changed>\n" +
             "            <state>CallOriginated</state>\n" +
-            "            <direction>Outgoing</direction>\n" +
+            "            <direction>Incoming</direction>\n" +
             "            <caller>\n" +
             "              <number e164=\"test-caller-e164-number\">test-caller-number</number>\n" +
             "              <name>test-caller-name</name>\n" +
@@ -102,20 +103,20 @@ public class CallStatusMessageTest {
     public void canCreateAStanza() throws Exception {
 
         final CallStatusMessage message = CallStatusMessage.Builder.start()
-                .setId(Fixtures.STANZA_ID)
+                .setId(CoreFixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
-                .setPubSubNodeId(Fixtures.CALL.getInterestId().get())
-                .addCall(Fixtures.CALL)
+                .setPubSubNodeId(CoreFixtures.CALL.getInterestId().get())
+                .addCall(CoreFixtures.CALL)
                 .build();
 
-        assertThat(message.getID(), is(Fixtures.STANZA_ID));
+        assertThat(message.getID(), is(CoreFixtures.STANZA_ID));
         assertThat(message.getTo(), is(Fixtures.TO_JID));
         assertThat(message.getFrom(), is(Fixtures.FROM_JID));
-        assertThat(message.getPubSubNodeId().get(), is(Fixtures.NODE_ID));
+        assertThat(message.getPubSubNodeId().get(), is(CoreFixtures.NODE_ID));
         final List<Call> calls = message.getCalls();
         final Call theOnlyCall = calls.get(0);
-        assertThat(theOnlyCall, is(sameInstance(Fixtures.CALL)));
+        assertThat(theOnlyCall, is(sameInstance(CoreFixtures.CALL)));
         assertThat(calls.size(), is(1));
     }
 
@@ -125,8 +126,8 @@ public class CallStatusMessageTest {
         final CallStatusMessage message = CallStatusMessage.Builder.start()
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
-                .setPubSubNodeId(Fixtures.CALL.getInterestId().get())
-                .addCalls(Collections.singletonList(Fixtures.CALL))
+                .setPubSubNodeId(CoreFixtures.CALL.getInterestId().get())
+                .addCalls(Collections.singletonList(CoreFixtures.CALL))
                 .build();
 
         assertThat(message.getID(), is(nullValue()));
@@ -138,10 +139,10 @@ public class CallStatusMessageTest {
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("The stanza 'to' has not been set");
         CallStatusMessage.Builder.start()
-                .setId(Fixtures.STANZA_ID)
+                .setId(CoreFixtures.STANZA_ID)
                 .setFrom(Fixtures.FROM_JID)
-                .setPubSubNodeId(Fixtures.CALL.getInterestId().get())
-                .addCall(Fixtures.CALL)
+                .setPubSubNodeId(CoreFixtures.CALL.getInterestId().get())
+                .addCall(CoreFixtures.CALL)
                 .build();
     }
 
@@ -151,10 +152,10 @@ public class CallStatusMessageTest {
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("The stanza 'pubSubNodeId' has not been set");
         CallStatusMessage.Builder.start()
-                .setId(Fixtures.STANZA_ID)
+                .setId(CoreFixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
-                .addCall(Fixtures.CALL)
+                .addCall(CoreFixtures.CALL)
                 .build();
     }
 
@@ -164,11 +165,11 @@ public class CallStatusMessageTest {
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("The call with id 'test-call-id' is not on this pubsub node");
         CallStatusMessage.Builder.start()
-                .setId(Fixtures.STANZA_ID)
+                .setId(CoreFixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
-                .setPubSubNodeId(PubSubNodeId.from("not-" + Fixtures.INTEREST_ID).get())
-                .addCall(Fixtures.CALL)
+                .setPubSubNodeId(PubSubNodeId.from("not-" + CoreFixtures.INTEREST_ID).get())
+                .addCall(CoreFixtures.CALL)
                 .build();
     }
 
@@ -189,13 +190,13 @@ public class CallStatusMessageTest {
     public void willGenerateAnXmppStanza() throws Exception {
 
         final CallStatusMessage message = CallStatusMessage.Builder.start()
-                .setId(Fixtures.STANZA_ID)
+                .setId(CoreFixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
-                .setPubSubNodeId(Fixtures.CALL.getInterestId().get())
+                .setPubSubNodeId(CoreFixtures.CALL.getInterestId().get())
                 .setItemId(ItemId.from("test-item-id").get())
                 .setCallStatusBusy(true)
-                .addCall(Fixtures.CALL)
+                .addCall(CoreFixtures.CALL)
                 .build();
 
         assertThat(message.toXML(), isIdenticalTo(CALL_STATUS_MESSAGE).ignoreWhitespace());
@@ -228,19 +229,19 @@ public class CallStatusMessageTest {
 
         final CallStatusMessage message = (CallStatusMessage) OpenlinkMessageParser.parse(stanza);
 
-        assertThat(message.getID(), is(Fixtures.STANZA_ID));
+        assertThat(message.getID(), is(CoreFixtures.STANZA_ID));
         assertThat(message.getTo(), is(Fixtures.TO_JID));
         assertThat(message.getFrom(), is(Fixtures.FROM_JID));
-        assertThat(message.getPubSubNodeId().get(), is(Fixtures.NODE_ID));
+        assertThat(message.getPubSubNodeId().get(), is(CoreFixtures.NODE_ID));
         final List<Call> calls = message.getCalls();
         final Call theOnlyCall = calls.get(0);
-        assertThat(theOnlyCall.getId().get(), is(Fixtures.CALL_ID));
-        assertThat(theOnlyCall.getProfileId().get(), is(Fixtures.PROFILE_ID));
-        assertThat(theOnlyCall.getInterestId().get(), is(Fixtures.INTEREST_ID));
+        assertThat(theOnlyCall.getId().get(), is(CoreFixtures.CALL_ID));
+        assertThat(theOnlyCall.getProfileId().get(), is(CoreFixtures.PROFILE_ID));
+        assertThat(theOnlyCall.getInterestId().get(), is(CoreFixtures.INTEREST_ID));
         assertThat(theOnlyCall.getChanged().get(), is(Changed.STATE));
         assertThat(theOnlyCall.getState().get(), is(CallState.CALL_ORIGINATED));
-        assertThat(theOnlyCall.getDirection().get(), is(CallDirection.OUTGOING));
-        assertThat(theOnlyCall.getStartTime().get(), is(Fixtures.START_TIME));
+        assertThat(theOnlyCall.getDirection().get(), is(CallDirection.INCOMING));
+        assertThat(theOnlyCall.getStartTime().get(), is(CoreFixtures.START_TIME));
         assertThat(theOnlyCall.getDuration().get(), is(Duration.ofMinutes(1)));
         assertThat(calls.size(), is(1));
         assertThat(message.getParseErrors().size(), is(0));
@@ -271,12 +272,12 @@ public class CallStatusMessageTest {
     public void willBuildAMessageWithADelay() throws Exception {
 
         final CallStatusMessage message = CallStatusMessage.Builder.start()
-                .setId(Fixtures.STANZA_ID)
+                .setId(CoreFixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
-                .setPubSubNodeId(Fixtures.CALL.getInterestId().get())
+                .setPubSubNodeId(CoreFixtures.CALL.getInterestId().get())
                 .setItemId(ItemId.from("test-item-id").get())
-                .addCall(Fixtures.CALL)
+                .addCall(CoreFixtures.CALL)
                 .setDelay(delayedFrom)
                 .build();
 
@@ -294,9 +295,9 @@ public class CallStatusMessageTest {
     @Test
     public void willParseAMessageWithBadFields() throws Exception {
         final Message stanza = Fixtures.messageFrom(
-                "<message from='" + Fixtures.FROM_JID + "' to='" + Fixtures.TO_JID + "' id='" + Fixtures.STANZA_ID + "'>\n" +
+                "<message from='" + Fixtures.FROM_JID + "' to='" + Fixtures.TO_JID + "' id='" + CoreFixtures.STANZA_ID + "'>\n" +
                         "  <event xmlns='http://jabber.org/protocol/pubsub#event'>\n" +
-                        "    <items node='" + Fixtures.INTEREST_ID + "'>\n" +
+                        "    <items node='" + CoreFixtures.INTEREST_ID + "'>\n" +
                         "      <item>\n" +
                         "        <callstatus xmlns='http://xmpp.org/protocol/openlink:01:00:00#call-status'>\n" +
                         "          <call>\n" +
@@ -337,15 +338,15 @@ public class CallStatusMessageTest {
     @Test
     public void willParseAMessageWithALegacyTimestamp() throws Exception {
         final Message stanza = Fixtures.messageFrom(
-                "<message from='" + Fixtures.FROM_JID + "' to='" + Fixtures.TO_JID + "' id='" + Fixtures.STANZA_ID + "'>\n" +
+                "<message from='" + Fixtures.FROM_JID + "' to='" + Fixtures.TO_JID + "' id='" + CoreFixtures.STANZA_ID + "'>\n" +
                         "  <event xmlns='http://jabber.org/protocol/pubsub#event'>\n" +
-                        "    <items node='" + Fixtures.INTEREST_ID + "'>\n" +
+                        "    <items node='" + CoreFixtures.INTEREST_ID + "'>\n" +
                         "      <item>\n" +
                         "        <callstatus xmlns='http://xmpp.org/protocol/openlink:01:00:00#call-status'>\n" +
                         "          <call>\n" +
-                        "            <id>" + Fixtures.CALL_ID + "</id>\n" +
-                        "            <profile>" + Fixtures.PROFILE_ID + "</profile>\n" +
-                        "            <interest>" + Fixtures.INTEREST_ID + "</interest>\n" +
+                        "            <id>" + CoreFixtures.CALL_ID + "</id>\n" +
+                        "            <profile>" + CoreFixtures.PROFILE_ID + "</profile>\n" +
+                        "            <interest>" + CoreFixtures.INTEREST_ID + "</interest>\n" +
                         "            <state>CallOriginated</state>\n" +
                         "            <direction>Incoming</direction>\n" +
                         "            <participants>\n" +
@@ -366,16 +367,16 @@ public class CallStatusMessageTest {
     @Test
     public void theLegacyTimestampShouldMatchTheStartTime() throws Exception {
         final Message stanza = Fixtures.messageFrom(
-                "<message from='" + Fixtures.FROM_JID + "' to='" + Fixtures.TO_JID + "' id='" + Fixtures.STANZA_ID + "'>\n" +
+                "<message from='" + Fixtures.FROM_JID + "' to='" + Fixtures.TO_JID + "' id='" + CoreFixtures.STANZA_ID + "'>\n" +
                         "  <event xmlns='http://jabber.org/protocol/pubsub#event'>\n" +
-                        "    <items node='" + Fixtures.INTEREST_ID + "'>\n" +
+                        "    <items node='" + CoreFixtures.INTEREST_ID + "'>\n" +
                         "      <item>\n" +
                         "        <callstatus xmlns='http://xmpp.org/protocol/openlink:01:00:00#call-status'>\n" +
                         "          <call>\n" +
-                        "            <id>" + Fixtures.CALL_ID + "</id>\n" +
+                        "            <id>" + CoreFixtures.CALL_ID + "</id>\n" +
                         "            <site default='true' id='42' type='BTSM'>test-site-name</site>" +
-                        "            <profile>" + Fixtures.PROFILE_ID + "</profile>\n" +
-                        "            <interest>" + Fixtures.INTEREST_ID + "</interest>\n" +
+                        "            <profile>" + CoreFixtures.PROFILE_ID + "</profile>\n" +
+                        "            <interest>" + CoreFixtures.INTEREST_ID + "</interest>\n" +
                         "            <changed>State</changed>\n" +
                         "            <state>CallOriginated</state>\n" +
                         "            <direction>Incoming</direction>\n" +

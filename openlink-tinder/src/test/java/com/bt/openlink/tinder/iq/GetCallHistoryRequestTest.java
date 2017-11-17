@@ -14,15 +14,16 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.xmpp.packet.IQ;
 
+import com.bt.openlink.CoreFixtures;
 import com.bt.openlink.tinder.Fixtures;
 import com.bt.openlink.type.CallType;
 
 @SuppressWarnings({ "OptionalGetWithoutIsPresent", "ConstantConditions" })
 public class GetCallHistoryRequestTest {
 
-    private static final String GET_CALL_HISTORY_REQUEST = "<iq type=\"set\" id=\"" + Fixtures.STANZA_ID + "\" to=\"" + Fixtures.TO_JID + "\" from=\"" + Fixtures.FROM_JID + "\">\n" +
-            "  <command xmlns=\"http://jabber.org/protocol/commands\" node=\"http://xmpp.org/protocol/openlink:01:00:00#get-call-history\" action=\"execute\">\n" +
-            "    <iodata xmlns=\"urn:xmpp:tmp:io-data\" type=\"input\">\n" +
+    private static final String GET_CALL_HISTORY_REQUEST = "<iq type='set' id='" + CoreFixtures.STANZA_ID + "' to='" + Fixtures.TO_JID + "' from='" + Fixtures.FROM_JID + "'>\n" +
+            "  <command xmlns='http://jabber.org/protocol/commands' node='http://xmpp.org/protocol/openlink:01:00:00#get-call-history' action='execute'>\n" +
+            "    <iodata xmlns='urn:xmpp:tmp:io-data' type='input'>\n" +
             "      <in>\n" +
             "        <jid>" + Fixtures.USER_JID + "</jid>\n" +
             "      </in>\n" +
@@ -30,9 +31,9 @@ public class GetCallHistoryRequestTest {
             "  </command>\n" +
             "</iq>\n";
 
-    private static final String GET_CALL_HISTORY_REQUEST_WITH_ALL_FIELDS = "<iq type=\"set\" id=\"" + Fixtures.STANZA_ID + "\" to=\"" + Fixtures.TO_JID + "\" from=\"" + Fixtures.FROM_JID + "\">\n" +
-            "  <command xmlns=\"http://jabber.org/protocol/commands\" node=\"http://xmpp.org/protocol/openlink:01:00:00#get-call-history\" action=\"execute\">\n" +
-            "    <iodata xmlns=\"urn:xmpp:tmp:io-data\" type=\"input\">\n" +
+    private static final String GET_CALL_HISTORY_REQUEST_WITH_ALL_FIELDS = "<iq type='set' id='" + CoreFixtures.STANZA_ID + "' to='" + Fixtures.TO_JID + "' from='" + Fixtures.FROM_JID + "'>\n" +
+            "  <command xmlns='http://jabber.org/protocol/commands' node='http://xmpp.org/protocol/openlink:01:00:00#get-call-history' action='execute'>\n" +
+            "    <iodata xmlns='urn:xmpp:tmp:io-data' type='input'>\n" +
             "      <in>\n" +
             "        <jid>" + Fixtures.USER_JID + "</jid>\n" +
             "        <caller>from-caller</caller>\n" +
@@ -47,9 +48,9 @@ public class GetCallHistoryRequestTest {
             "  </command>\n" +
             "</iq>\n";
 
-    private static final String GET_CALL_HISTORY_REQUEST_WITH_BAD_VALUES = "<iq type=\"result\">\n" +
-            "  <command xmlns=\"http://jabber.org/protocol/commands\" node=\"http://xmpp.org/protocol/openlink:01:00:00#get-call-history\" action=\"execute\">\n" +
-            "    <iodata xmlns=\"urn:xmpp:tmp:io-data\" type=\"input\">\n" +
+    private static final String GET_CALL_HISTORY_REQUEST_WITH_BAD_VALUES = "<iq type='result'>\n" +
+            "  <command xmlns='http://jabber.org/protocol/commands' node='http://xmpp.org/protocol/openlink:01:00:00#get-call-history' action='execute'>\n" +
+            "    <iodata xmlns='urn:xmpp:tmp:io-data' type='input'>\n" +
             "      <in>\n" +
             "        <caller>from-caller</caller>\n" +
             "        <called>to-destination</called>\n" +
@@ -62,9 +63,9 @@ public class GetCallHistoryRequestTest {
             "    </iodata>\n" +
             "  </command>\n" +
             "</iq>\n";
-    private static final String GET_CALL_HISTORY_REQUEST_FOR_ALL_USERS = "<iq type=\"set\" id=\"test-stanza-id\" to=\"test-to@test-domain/test-resource\" from=\"" + Fixtures.FROM_JID + "\">\n" +
-            "  <command xmlns=\"http://jabber.org/protocol/commands\" action=\"execute\" node=\"http://xmpp.org/protocol/openlink:01:00:00#get-call-history\">\n" +
-            "    <iodata xmlns=\"urn:xmpp:tmp:io-data\" type=\"input\">\n" +
+    private static final String GET_CALL_HISTORY_REQUEST_FOR_ALL_USERS = "<iq type='set' id='" + CoreFixtures.STANZA_ID + "' to='" + Fixtures.TO_JID + "' from='" + Fixtures.FROM_JID + "'>\n" +
+            "  <command xmlns='http://jabber.org/protocol/commands' action='execute' node='http://xmpp.org/protocol/openlink:01:00:00#get-call-history'>\n" +
+            "    <iodata xmlns='urn:xmpp:tmp:io-data' type='input'>\n" +
             "      <in/>\n" +
             "    </iodata>\n" +
             "  </command>\n" +
@@ -76,12 +77,12 @@ public class GetCallHistoryRequestTest {
     public void canCreateAStanza() throws Exception {
 
         final GetCallHistoryRequest request = GetCallHistoryRequest.Builder.start()
-                .setId(Fixtures.STANZA_ID)
+                .setId(CoreFixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
                 .setJID(Fixtures.USER_JID).build();
 
-        assertThat(request.getID(), CoreMatchers.is(Fixtures.STANZA_ID));
+        assertThat(request.getID(), CoreMatchers.is(CoreFixtures.STANZA_ID));
         assertThat(request.getTo(), CoreMatchers.is(Fixtures.TO_JID));
         assertThat(request.getFrom(), CoreMatchers.is(Fixtures.FROM_JID));
         assertThat(request.getJID().get(), is(Fixtures.USER_JID));
@@ -98,7 +99,7 @@ public class GetCallHistoryRequestTest {
     public void canCreateAStanzaWithoutAJID() throws Exception {
 
         final GetCallHistoryRequest request = GetCallHistoryRequest.Builder.start()
-                .setId(Fixtures.STANZA_ID)
+                .setId(CoreFixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
                 .build();
@@ -110,7 +111,7 @@ public class GetCallHistoryRequestTest {
     public void willGenerateAnXmppStanza() throws Exception {
 
         final GetCallHistoryRequest request = GetCallHistoryRequest.Builder.start()
-                .setId(Fixtures.STANZA_ID)
+                .setId(CoreFixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
                 .setJID(Fixtures.USER_JID)
@@ -123,7 +124,7 @@ public class GetCallHistoryRequestTest {
     public void willGenerateAnXmppStanzaWithAllFields() throws Exception {
 
         final GetCallHistoryRequest request = GetCallHistoryRequest.Builder.start()
-                .setId(Fixtures.STANZA_ID)
+                .setId(CoreFixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
                 .setJID(Fixtures.USER_JID)
@@ -143,7 +144,7 @@ public class GetCallHistoryRequestTest {
     public void willParseAnXmppStanza() throws Exception {
 
         final GetCallHistoryRequest request = (GetCallHistoryRequest) OpenlinkIQParser.parse(Fixtures.iqFrom(GET_CALL_HISTORY_REQUEST));
-        assertThat(request.getID(), CoreMatchers.is(Fixtures.STANZA_ID));
+        assertThat(request.getID(), CoreMatchers.is(CoreFixtures.STANZA_ID));
         assertThat(request.getTo(), CoreMatchers.is(Fixtures.TO_JID));
         assertThat(request.getFrom(), CoreMatchers.is(Fixtures.FROM_JID));
         assertThat(request.getType(), is(IQ.Type.set));
@@ -162,7 +163,7 @@ public class GetCallHistoryRequestTest {
     public void willParseAnXmppStanzaWithAnEmptyForJid() throws Exception {
 
         final GetCallHistoryRequest request = (GetCallHistoryRequest) OpenlinkIQParser.parse(Fixtures.iqFrom(GET_CALL_HISTORY_REQUEST_FOR_ALL_USERS));
-        assertThat(request.getID(), is(Fixtures.STANZA_ID));
+        assertThat(request.getID(), is(CoreFixtures.STANZA_ID));
         assertThat(request.getTo(), is(Fixtures.TO_JID));
         assertThat(request.getFrom(), is(Fixtures.FROM_JID));
         assertThat(request.getType(), is(IQ.Type.set));
@@ -182,7 +183,7 @@ public class GetCallHistoryRequestTest {
 
         final GetCallHistoryRequest request = (GetCallHistoryRequest) OpenlinkIQParser.parse(Fixtures.iqFrom(GET_CALL_HISTORY_REQUEST_WITH_ALL_FIELDS));
 
-        assertThat(request.getID(), CoreMatchers.is(Fixtures.STANZA_ID));
+        assertThat(request.getID(), CoreMatchers.is(CoreFixtures.STANZA_ID));
         assertThat(request.getTo(), CoreMatchers.is(Fixtures.TO_JID));
         assertThat(request.getFrom(), CoreMatchers.is(Fixtures.FROM_JID));
         assertThat(request.getType(), is(IQ.Type.set));

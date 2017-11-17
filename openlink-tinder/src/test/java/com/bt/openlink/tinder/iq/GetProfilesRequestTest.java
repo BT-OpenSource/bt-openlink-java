@@ -13,6 +13,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.xmpp.packet.IQ;
 
+import com.bt.openlink.CoreFixtures;
 import com.bt.openlink.tinder.Fixtures;
 
 @SuppressWarnings({ "OptionalGetWithoutIsPresent", "ConstantConditions" })
@@ -20,7 +21,7 @@ public class GetProfilesRequestTest {
 
     @Rule public final ExpectedException expectedException = ExpectedException.none();
 
-    private static final String GET_PROFILES_REQUEST = "<iq type=\"set\" id=\"" + Fixtures.STANZA_ID + "\" to=\"" + Fixtures.TO_JID + "\" from=\"" + Fixtures.FROM_JID + "\">\n" +
+    private static final String GET_PROFILES_REQUEST = "<iq type=\"set\" id=\"" + CoreFixtures.STANZA_ID + "\" to=\"" + Fixtures.TO_JID + "\" from=\"" + Fixtures.FROM_JID + "\">\n" +
             "  <command xmlns=\"http://jabber.org/protocol/commands\" action=\"execute\" node=\"http://xmpp.org/protocol/openlink:01:00:00#get-profiles\">\n" +
             "    <iodata xmlns=\"urn:xmpp:tmp:io-data\" type=\"input\">\n" +
             "      <in>\n" +
@@ -42,13 +43,13 @@ public class GetProfilesRequestTest {
     public void canCreateAStanza() throws Exception {
 
         final GetProfilesRequest request = GetProfilesRequest.Builder.start()
-                .setId(Fixtures.STANZA_ID)
+                .setId(CoreFixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
                 .setJID(Fixtures.USER_JID)
                 .build();
 
-        assertThat(request.getID(), is(Fixtures.STANZA_ID));
+        assertThat(request.getID(), is(CoreFixtures.STANZA_ID));
         assertThat(request.getTo(), is(Fixtures.TO_JID));
         assertThat(request.getFrom(), is(Fixtures.FROM_JID));
         assertThat(request.getJID().get(), is(Fixtures.USER_JID));
@@ -78,7 +79,7 @@ public class GetProfilesRequestTest {
     public void willGenerateAnXmppStanza() throws Exception {
 
         final GetProfilesRequest request = GetProfilesRequest.Builder.start()
-                .setId(Fixtures.STANZA_ID)
+                .setId(CoreFixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
                 .setJID(Fixtures.USER_JID)
@@ -103,7 +104,7 @@ public class GetProfilesRequestTest {
     public void willParseAnXmppStanza() throws Exception {
 
         final GetProfilesRequest request = (GetProfilesRequest) OpenlinkIQParser.parse(Fixtures.iqFrom(GET_PROFILES_REQUEST));
-        assertThat(request.getID(), is(Fixtures.STANZA_ID));
+        assertThat(request.getID(), is(CoreFixtures.STANZA_ID));
         assertThat(request.getTo(), is(Fixtures.TO_JID));
         assertThat(request.getFrom(), is(Fixtures.FROM_JID));
         assertThat(request.getType(), is(IQ.Type.set));

@@ -16,6 +16,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.xmpp.packet.IQ;
 
+import com.bt.openlink.CoreFixtures;
 import com.bt.openlink.tinder.Fixtures;
 import com.bt.openlink.type.Call;
 import com.bt.openlink.type.PubSubNodeId;
@@ -24,19 +25,19 @@ import com.bt.openlink.type.PubSubNodeId;
 public class PubSubPublishRequestTest {
     @Rule public final ExpectedException expectedException = ExpectedException.none();
 
-    private static final String PUBLISH_REQUEST = "<iq type='set' id='" + Fixtures.STANZA_ID + "' to='" + Fixtures.TO_JID + "' from='" + Fixtures.FROM_JID + "'>\n" +
+    private static final String PUBLISH_REQUEST = "<iq type='set' id='" + CoreFixtures.STANZA_ID + "' to='" + Fixtures.TO_JID + "' from='" + Fixtures.FROM_JID + "'>\n" +
             "   <pubsub xmlns='http://jabber.org/protocol/pubsub'>\n" +
-            "    <publish node='" + Fixtures.INTEREST_ID + "'>\n" +
+            "    <publish node='" + CoreFixtures.INTEREST_ID + "'>\n" +
             "      <item>\n" +
             "        <callstatus xmlns='http://xmpp.org/protocol/openlink:01:00:00#call-status'>\n" +
             "          <call>\n" +
-            "            <id>" + Fixtures.CALL_ID + "</id>\n" +
-            "            <site default='true' id='42' type='BTSM'>test-site-name</site>\n" +
-            "            <profile>" + Fixtures.PROFILE_ID + "</profile>\n" +
-            "            <interest>" + Fixtures.INTEREST_ID + "</interest>\n" +
+            "            <id>" + CoreFixtures.CALL_ID + "</id>\n" +
+            "            <site default='true' id='42' type='BTSM'>test site name</site>\n" +
+            "            <profile>" + CoreFixtures.PROFILE_ID + "</profile>\n" +
+            "            <interest>" + CoreFixtures.INTEREST_ID + "</interest>\n" +
             "            <changed>State</changed>\n" +
             "            <state>CallOriginated</state>\n" +
-            "            <direction>Outgoing</direction>\n" +
+            "            <direction>Incoming</direction>\n" +
             "            <caller>\n" +
             "              <number e164='test-caller-e164-number'>test-caller-number</number>\n" +
             "              <name>test-caller-name</name>\n" +
@@ -87,19 +88,19 @@ public class PubSubPublishRequestTest {
     public void canCreateAStanza() throws Exception {
 
         final PubSubPublishRequest request = PubSubPublishRequest.Builder.start()
-                .setId(Fixtures.STANZA_ID)
+                .setId(CoreFixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
-                .setPubSubNodeId(Fixtures.NODE_ID)
-                .addCall(Fixtures.CALL)
+                .setPubSubNodeId(CoreFixtures.NODE_ID)
+                .addCall(CoreFixtures.CALL)
                 .build();
 
-        assertThat(request.getID(), is(Fixtures.STANZA_ID));
+        assertThat(request.getID(), is(CoreFixtures.STANZA_ID));
         assertThat(request.getTo(), is(Fixtures.TO_JID));
         assertThat(request.getFrom(), is(Fixtures.FROM_JID));
-        assertThat(request.getPubSubNodeId().get(), is(Fixtures.NODE_ID));
+        assertThat(request.getPubSubNodeId().get(), is(CoreFixtures.NODE_ID));
         assertThat(request.getCalls().size(), is(1));
-        assertThat(request.getCalls().iterator().next(), is(Fixtures.CALL));
+        assertThat(request.getCalls().iterator().next(), is(CoreFixtures.CALL));
     }
 
     @Test
@@ -110,7 +111,7 @@ public class PubSubPublishRequestTest {
         PubSubPublishRequest.Builder.start()
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
-                .addCall(Fixtures.CALL)
+                .addCall(CoreFixtures.CALL)
                 .build();
     }
 
@@ -120,11 +121,11 @@ public class PubSubPublishRequestTest {
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("The call with id test-call-id is on interest test-interest-id which differs from the pub-sub node id another-node");
         PubSubPublishRequest.Builder.start()
-                .setId(Fixtures.STANZA_ID)
+                .setId(CoreFixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
                 .setPubSubNodeId(PubSubNodeId.from("another-node").get())
-                .addCalls(Collections.singletonList(Fixtures.CALL))
+                .addCalls(Collections.singletonList(CoreFixtures.CALL))
                 .build();
     }
 
@@ -132,26 +133,26 @@ public class PubSubPublishRequestTest {
     public void willGenerateAnXmppStanza() throws Exception {
 
         // TODO: (Greg 2017-10-03) Implement all features, use PUBLISH_REQUEST
-        final String partRequest = "<iq type='set' id='" + Fixtures.STANZA_ID + "' to='" + Fixtures.TO_JID + "' from='" + Fixtures.FROM_JID + "'>\n" +
+        final String partRequest = "<iq type='set' id='" + CoreFixtures.STANZA_ID + "' to='" + Fixtures.TO_JID + "' from='" + Fixtures.FROM_JID + "'>\n" +
                 "   <pubsub xmlns='http://jabber.org/protocol/pubsub'>\n" +
-                "    <publish node='" + Fixtures.INTEREST_ID + "'>\n" +
+                "    <publish node='" + CoreFixtures.INTEREST_ID + "'>\n" +
                 "      <item>\n" +
                 "        <callstatus xmlns='http://xmpp.org/protocol/openlink:01:00:00#call-status'>\n" +
                 "          <call>\n" +
-                "            <id>" + Fixtures.CALL_ID + "</id>\n" +
+                "            <id>" + CoreFixtures.CALL_ID + "</id>\n" +
                 "            <site default='true' id='42' type='BTSM'>test-site-name</site>\n" +
-                "            <profile>" + Fixtures.PROFILE_ID + "</profile>\n" +
-                "            <interest>" + Fixtures.INTEREST_ID + "</interest>\n" +
+                "            <profile>" + CoreFixtures.PROFILE_ID + "</profile>\n" +
+                "            <interest>" + CoreFixtures.INTEREST_ID + "</interest>\n" +
                 "            <changed>State</changed>\n" +
                 "            <state>CallOriginated</state>\n" +
                 "            <direction>Incoming</direction>\n" +
                 "            <caller>\n" +
-                "               <number e164='" + Fixtures.CALLER_E164_NUMBER + "'>" + Fixtures.CALLER_NUMBER + "</number>\n" +
-                "               <name>" + Fixtures.CALLER_NAME + "</name>\n" +
+                "               <number e164='" + CoreFixtures.CALLER_E164_NUMBER + "'>" + CoreFixtures.CALLER_NUMBER + "</number>\n" +
+                "               <name>" + CoreFixtures.CALLER_NAME + "</name>\n" +
                 "            </caller>\n" +
                 "            <called>\n" +
-                "               <number destination='" + Fixtures.CALLED_DESTINATION + "' e164='" + Fixtures.CALLED_E164_NUMBER + "'>" + Fixtures.CALLED_NUMBER + "</number>\n" +
-                "               <name>" + Fixtures.CALLED_NAME + "</name>\n" +
+                "               <number destination='" + CoreFixtures.CALLED_DESTINATION + "' e164='" + CoreFixtures.CALLED_E164_NUMBER + "'>" + CoreFixtures.CALLED_NUMBER + "</number>\n" +
+                "               <name>" + CoreFixtures.CALLED_NAME + "</name>\n" +
                 "            </called>\n" +
                 "            <starttime>2017-10-09T08:07:00.000Z</starttime>\n" +
                 "            <duration>60000</duration>\n" +
@@ -169,11 +170,11 @@ public class PubSubPublishRequestTest {
                 "</iq>\n";
 
         final PubSubPublishRequest request = PubSubPublishRequest.Builder.start()
-                .setId(Fixtures.STANZA_ID)
+                .setId(CoreFixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
-                .addCall(Fixtures.CALL)
-                .setInterestId(Fixtures.INTEREST_ID)
+                .addCall(CoreFixtures.CALL)
+                .setInterestId(CoreFixtures.INTEREST_ID)
                 .build();
         assertThat(request.toXML(), isIdenticalTo(PUBLISH_REQUEST).ignoreWhitespace());
     }
@@ -182,33 +183,33 @@ public class PubSubPublishRequestTest {
     public void willParseAnXmppStanza() throws Exception {
 
         final PubSubPublishRequest request = (PubSubPublishRequest) OpenlinkIQParser.parse(Fixtures.iqFrom(PUBLISH_REQUEST));
-        assertThat(request.getID(), CoreMatchers.is(Fixtures.STANZA_ID));
+        assertThat(request.getID(), CoreMatchers.is(CoreFixtures.STANZA_ID));
         assertThat(request.getTo(), CoreMatchers.is(Fixtures.TO_JID));
         assertThat(request.getFrom(), CoreMatchers.is(Fixtures.FROM_JID));
         assertThat(request.getType(), is(IQ.Type.set));
-        assertThat(request.getPubSubNodeId().get(), is(Fixtures.NODE_ID));
+        assertThat(request.getPubSubNodeId().get(), is(CoreFixtures.NODE_ID));
         final Collection<Call> calls = request.getCalls();
         assertThat(calls.size(), is(1));
         final Call call = calls.iterator().next();
-        assertThat(call.getId().get(), is(Fixtures.CALL_ID));
-        assertThat(call.getInterestId().get(), is(Fixtures.INTEREST_ID));
-        assertThat(call.getProfileId().get(), is(Fixtures.PROFILE_ID));
+        assertThat(call.getId().get(), is(CoreFixtures.CALL_ID));
+        assertThat(call.getInterestId().get(), is(CoreFixtures.INTEREST_ID));
+        assertThat(call.getProfileId().get(), is(CoreFixtures.PROFILE_ID));
     }
 
     @Test
     public void willRoundTripAnXmppStanza() throws Exception {
 
         // TODO: (Greg 2017-10-03) Implement all features, use PUBLISH_REQUEST
-        final String partRequest = "<iq type='set' id='" + Fixtures.STANZA_ID + "' to='" + Fixtures.TO_JID + "' from='" + Fixtures.FROM_JID + "'>\n" +
+        final String partRequest = "<iq type='set' id='" + CoreFixtures.STANZA_ID + "' to='" + Fixtures.TO_JID + "' from='" + Fixtures.FROM_JID + "'>\n" +
                 "   <pubsub xmlns='http://jabber.org/protocol/pubsub'>\n" +
-                "    <publish node='" + Fixtures.INTEREST_ID + "'>\n" +
+                "    <publish node='" + CoreFixtures.INTEREST_ID + "'>\n" +
                 "      <item>\n" +
                 "        <callstatus xmlns='http://xmpp.org/protocol/openlink:01:00:00#call-status'>\n" +
                 "          <call>\n" +
-                "            <id>" + Fixtures.CALL_ID + "</id>\n" +
+                "            <id>" + CoreFixtures.CALL_ID + "</id>\n" +
                 "            <site default='true' id='42' type='BTSM'>test-site-name</site>\n" +
-                "            <profile>" + Fixtures.PROFILE_ID + "</profile>\n" +
-                "            <interest>" + Fixtures.INTEREST_ID + "</interest>\n" +
+                "            <profile>" + CoreFixtures.PROFILE_ID + "</profile>\n" +
+                "            <interest>" + CoreFixtures.INTEREST_ID + "</interest>\n" +
                 "            <state>CallOriginated</state>\n" +
                 "            <direction>Incoming</direction>\n" +
                 "            <caller>\n" +

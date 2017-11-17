@@ -12,6 +12,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.xmpp.packet.IQ;
 
+import com.bt.openlink.CoreFixtures;
 import com.bt.openlink.tinder.Fixtures;
 import com.bt.openlink.type.Feature;
 import com.bt.openlink.type.FeatureId;
@@ -22,11 +23,11 @@ public class GetFeaturesResultTest {
 
     @Rule public final ExpectedException expectedException = ExpectedException.none();
 
-    private static final String GET_FEATURES_RESULT = "<iq type=\"result\" id=\"" + Fixtures.STANZA_ID + "\" to=\"" + Fixtures.TO_JID + "\" from=\"" + Fixtures.FROM_JID + "\">\n" +
+    private static final String GET_FEATURES_RESULT = "<iq type=\"result\" id=\"" + CoreFixtures.STANZA_ID + "\" to=\"" + Fixtures.TO_JID + "\" from=\"" + Fixtures.FROM_JID + "\">\n" +
             "  <command xmlns=\"http://jabber.org/protocol/commands\" node=\"http://xmpp.org/protocol/openlink:01:00:00#get-features\" status=\"completed\">\n" +
             "    <iodata xmlns=\"urn:xmpp:tmp:io-data\" type=\"output\">\n" +
             "      <out>\n" +
-            "        <profile id=\"" + Fixtures.PROFILE_ID + "\"/>\n" +
+            "        <profile id=\"" + CoreFixtures.PROFILE_ID + "\"/>\n" +
             "        <features xmlns=\"http://xmpp.org/protocol/openlink:01:00:00/features\">\n" +
             "          <feature id=\"hs_1\" type=\"Handset\" label=\"Handset 1\"/>\n" +
             "          <feature id=\"hs_2\" type=\"Handset\" label=\"Handset 2\"/>\n" +
@@ -51,17 +52,17 @@ public class GetFeaturesResultTest {
     public void canCreateAStanza() throws Exception {
 
         final GetFeaturesResult result = GetFeaturesResult.Builder.start()
-                .setId(Fixtures.STANZA_ID)
+                .setId(CoreFixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
-                .setProfileId(Fixtures.PROFILE_ID)
+                .setProfileId(CoreFixtures.PROFILE_ID)
                 .build();
 
         assertThat(result.getType(), is(IQ.Type.result));
-        assertThat(result.getID(), is(Fixtures.STANZA_ID));
+        assertThat(result.getID(), is(CoreFixtures.STANZA_ID));
         assertThat(result.getTo(), is(Fixtures.TO_JID));
         assertThat(result.getFrom(), is(Fixtures.FROM_JID));
-        assertThat(result.getProfileId().get(), is(Fixtures.PROFILE_ID));
+        assertThat(result.getProfileId().get(), is(CoreFixtures.PROFILE_ID));
     }
 
     @Test
@@ -97,10 +98,10 @@ public class GetFeaturesResultTest {
                 .setLabel("Call Forward")
                 .build();
         final GetFeaturesResult result = GetFeaturesResult.Builder.start()
-                .setId(Fixtures.STANZA_ID)
+                .setId(CoreFixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
-                .setProfileId(Fixtures.PROFILE_ID)
+                .setProfileId(CoreFixtures.PROFILE_ID)
                 .addFeature(hs1Feature)
                 .addFeature(hs2Feature)
                 .addFeature(privFeature)
@@ -123,10 +124,10 @@ public class GetFeaturesResultTest {
                 .setLabel("Handset 1")
                 .build();
         GetFeaturesResult.Builder.start()
-                .setId(Fixtures.STANZA_ID)
+                .setId(CoreFixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
-                .setProfileId(Fixtures.PROFILE_ID)
+                .setProfileId(CoreFixtures.PROFILE_ID)
                 .addFeature(hs1Feature)
                 .addFeature(hs1Feature)
                 .build();
@@ -143,7 +144,7 @@ public class GetFeaturesResultTest {
                 .setLabel("Handset 1")
                 .build();
         GetFeaturesResult.Builder.start()
-                .setId(Fixtures.STANZA_ID)
+                .setId(CoreFixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
                 .addFeature(hs1Feature)
@@ -154,11 +155,11 @@ public class GetFeaturesResultTest {
     public void willParseAnXmppStanza() throws Exception {
 
         final GetFeaturesResult result = (GetFeaturesResult) OpenlinkIQParser.parse(Fixtures.iqFrom(GET_FEATURES_RESULT));
-        assertThat(result.getID(), is(Fixtures.STANZA_ID));
+        assertThat(result.getID(), is(CoreFixtures.STANZA_ID));
         assertThat(result.getTo(), is(Fixtures.TO_JID));
         assertThat(result.getFrom(), is(Fixtures.FROM_JID));
         assertThat(result.getType(), is(IQ.Type.result));
-        assertThat(result.getProfileId().get(), is(Fixtures.PROFILE_ID));
+        assertThat(result.getProfileId().get(), is(CoreFixtures.PROFILE_ID));
         final List<Feature> features = result.getFeatures();
         assertThat(features.size(), is(4));
         assertThat(features.get(0).getId(), is(FeatureId.from("hs_1")));
@@ -190,8 +191,8 @@ public class GetFeaturesResultTest {
         final GetFeaturesRequest request = GetFeaturesRequest.Builder.start()
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
-                .setId(Fixtures.STANZA_ID)
-                .setProfileId(Fixtures.PROFILE_ID)
+                .setId(CoreFixtures.STANZA_ID)
+                .setProfileId(CoreFixtures.PROFILE_ID)
                 .build();
 
         final GetFeaturesResult result = GetFeaturesResult.Builder.start(request)

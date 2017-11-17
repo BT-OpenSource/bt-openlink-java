@@ -3,10 +3,6 @@ package com.bt.openlink.tinder;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 
 import org.dom4j.Document;
 import org.dom4j.Element;
@@ -15,25 +11,7 @@ import org.xmpp.packet.IQ;
 import org.xmpp.packet.JID;
 import org.xmpp.packet.Message;
 
-import com.bt.openlink.type.Call;
-import com.bt.openlink.type.CallDirection;
-import com.bt.openlink.type.CallFeature;
-import com.bt.openlink.type.CallId;
-import com.bt.openlink.type.CallState;
-import com.bt.openlink.type.Changed;
-import com.bt.openlink.type.DeviceKey;
-import com.bt.openlink.type.FeatureId;
-import com.bt.openlink.type.FeatureType;
-import com.bt.openlink.type.Interest;
-import com.bt.openlink.type.InterestId;
-import com.bt.openlink.type.InterestType;
-import com.bt.openlink.type.Participant;
-import com.bt.openlink.type.ParticipantType;
-import com.bt.openlink.type.PhoneNumber;
-import com.bt.openlink.type.ProfileId;
-import com.bt.openlink.type.PubSubNodeId;
-import com.bt.openlink.type.RequestAction;
-import com.bt.openlink.type.Site;
+import com.bt.openlink.CoreFixtures;
 
 @SuppressWarnings("ConstantConditions")
 public final class Fixtures {
@@ -41,69 +19,9 @@ public final class Fixtures {
     private Fixtures() {
     }
 
-    public static final Instant START_TIME = LocalDateTime.parse("2017-10-09T08:07:00").atZone(ZoneId.of("UTC")).toInstant();
-    private static final Duration DURATION = Duration.ofMinutes(1);
-    public static final String STANZA_ID = "test-stanza-id";
-    public static final JID TO_JID = new JID("test-to@test-domain/test-resource");
-    public static final JID FROM_JID = new JID("test-from@test-domain/test-resource");
-    public static final JID USER_JID = new JID("test-user@test-domain/test-resource");
-    private static final String BARE_JID = USER_JID.toBareJID();
-    public static final ProfileId PROFILE_ID = ProfileId.from("test-profile-id").get();
-    public static final InterestId INTEREST_ID = InterestId.from("test-interest-id").get();
-    public static final CallId CALL_ID = CallId.from("test-call-id").get();
-    public static final PhoneNumber CALLER_NUMBER = PhoneNumber.from("test-caller-number").get();
-    public static final String CALLER_NAME = "test-caller-name";
-    public static final PhoneNumber CALLER_E164_NUMBER = PhoneNumber.from("test-caller-e164-number").get();
-    public static final PhoneNumber CALLED_NUMBER = PhoneNumber.from("test-called-number").get();
-    public static final String CALLED_NAME = "test-called-name";
-    public static final PhoneNumber CALLED_DESTINATION = PhoneNumber.from("test-called-destination").get();
-    public static final PhoneNumber CALLED_E164_NUMBER = PhoneNumber.from("test-called-e164-number").get();
-    private static final Participant PARTICIPANT = Participant.Builder.start()
-            .setJID(BARE_JID)
-            .setType(ParticipantType.ACTIVE)
-            .setDirection(CallDirection.INCOMING)
-            .setStartTime(START_TIME)
-            .setDuration(DURATION)
-            .build();
-    public static final Interest INTEREST = Interest.Builder.start()
-            .setId(INTEREST_ID)
-            .setDefault(true)
-            .setLabel("test-default-interest")
-            .setType(InterestType.from("test-interest-type").get())
-            .build();
-    private static Site SITE = Site.Builder.start()
-            .setId(42)
-            .setType(Site.Type.BTSM)
-            .setName("test-site-name")
-            .setDefault(true)
-            .build();
-    public static final Call CALL = Call.Builder.start()
-            .setId(CALL_ID)
-            .setSite(SITE)
-            .setProfileId(PROFILE_ID)
-            .setInterestId(INTEREST_ID)
-            .setChanged(Changed.STATE)
-            .setState(CallState.CALL_ORIGINATED)
-            .setDirection(CallDirection.OUTGOING)
-            .setCallerNumber(CALLER_NUMBER)
-            .setCallerName(CALLER_NAME)
-            .addCallerE164Number(CALLER_E164_NUMBER)
-            .setCalledNumber(CALLED_NUMBER)
-            .setCalledName(CALLED_NAME)
-            .setCalledDestination(CALLED_DESTINATION)
-            .addCalledE164Number(CALLED_E164_NUMBER)
-            .setStartTime(START_TIME)
-            .setDuration(DURATION)
-            .addAction(RequestAction.ANSWER_CALL)
-            .addFeature(CallFeature.Builder.start().setId(FeatureId.from("hs_1").get()).setType(FeatureType.HANDSET).setLabel("Handset 1").setEnabled(false).build())
-            .addFeature(CallFeature.Builder.start().setId(FeatureId.from("hs_2").get()).setType(FeatureType.HANDSET).setLabel("Handset 2").setEnabled(false).build())
-            .addFeature(CallFeature.Builder.start().setId(FeatureId.from("priv_1").get()).setType(FeatureType.PRIVACY).setLabel("Privacy").setEnabled(false).build())
-            .addFeature(CallFeature.Builder.start().setId(FeatureId.from("NetrixHiTouch_sales1").get()).setType(FeatureType.DEVICE_KEYS).setLabel("NetrixHiTouch").setDeviceKey(DeviceKey.from("key_1:1:1").get()).build())
-            .addParticipant(PARTICIPANT)
-            .build();
-    public static final PhoneNumber DESTINATION = PhoneNumber.from("+44 800 141 2868").get();
-
-    public static final PubSubNodeId NODE_ID = INTEREST_ID.toPubSubNodeId();
+    public static final JID USER_JID = new JID(CoreFixtures.USER_JID_STRING);
+    public static final JID TO_JID = new JID(CoreFixtures.TO_JID_STRING);
+    public static final JID FROM_JID = new JID(CoreFixtures.FROM_JID_STRING);
 
     private static Element elementFrom(final InputStream is) {
         try {

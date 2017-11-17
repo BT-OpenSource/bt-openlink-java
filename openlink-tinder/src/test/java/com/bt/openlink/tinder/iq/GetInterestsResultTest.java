@@ -12,6 +12,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.xmpp.packet.IQ;
 
+import com.bt.openlink.CoreFixtures;
 import com.bt.openlink.tinder.Fixtures;
 import com.bt.openlink.type.Interest;
 import com.bt.openlink.type.InterestId;
@@ -22,12 +23,12 @@ public class GetInterestsResultTest {
 
     @Rule public final ExpectedException expectedException = ExpectedException.none();
 
-    private static final String GET_INTERESTS_RESULT = "<iq type=\"result\" id=\"" + Fixtures.STANZA_ID + "\" to=\"" + Fixtures.TO_JID + "\" from=\"" + Fixtures.FROM_JID + "\">\n" +
+    private static final String GET_INTERESTS_RESULT = "<iq type=\"result\" id=\"" + CoreFixtures.STANZA_ID + "\" to=\"" + Fixtures.TO_JID + "\" from=\"" + Fixtures.FROM_JID + "\">\n" +
             "  <command xmlns=\"http://jabber.org/protocol/commands\" node=\"http://xmpp.org/protocol/openlink:01:00:00#get-interests\" status=\"completed\">\n" +
             "    <iodata xmlns=\"urn:xmpp:tmp:io-data\" type=\"output\">\n" +
             "      <out>\n" +
             "        <interests xmlns=\"http://xmpp.org/protocol/openlink:01:00:00/interests\">\n" +
-            "          <interest id=\"" + Fixtures.INTEREST_ID + "\" type=\"test-interest-type\" label=\"test-default-interest\" default=\"true\"/>\n" +
+            "          <interest id=\"" + CoreFixtures.INTEREST_ID + "\" type=\"test-interest-type\" label=\"test interest label\" default=\"true\"/>\n" +
             "          <interest id=\"sip:6001@uta.bt.com-DirectDial-1trader1@btsm11\" type=\"DirectoryNumber\" label=\"6001/1\" default=\"false\"/>\n" +
             "        </interests>\n" +
             "      </out>\n" +
@@ -48,17 +49,17 @@ public class GetInterestsResultTest {
     public void canCreateAStanza() throws Exception {
 
         final GetInterestsResult result = GetInterestsResult.Builder.start()
-                .setId(Fixtures.STANZA_ID)
+                .setId(CoreFixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
-                .addInterest(Fixtures.INTEREST)
+                .addInterest(CoreFixtures.INTEREST)
                 .build();
 
         assertThat(result.getType(), is(IQ.Type.result));
-        assertThat(result.getID(), is(Fixtures.STANZA_ID));
+        assertThat(result.getID(), is(CoreFixtures.STANZA_ID));
         assertThat(result.getTo(), is(Fixtures.TO_JID));
         assertThat(result.getFrom(), is(Fixtures.FROM_JID));
-        assertThat(result.getInterests().get(0), is(Fixtures.INTEREST));
+        assertThat(result.getInterests().get(0), is(CoreFixtures.INTEREST));
     }
 
     @Test
@@ -71,10 +72,10 @@ public class GetInterestsResultTest {
                 .setDefault(false)
                 .build();
         final GetInterestsResult result = GetInterestsResult.Builder.start()
-                .setId(Fixtures.STANZA_ID)
+                .setId(CoreFixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
-                .addInterest(Fixtures.INTEREST)
+                .addInterest(CoreFixtures.INTEREST)
                 .addInterest(interest2)
                 .build();
 
@@ -87,11 +88,11 @@ public class GetInterestsResultTest {
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("Each interest id must be unique - test-interest-id appears more than once");
         GetInterestsResult.Builder.start()
-                .setId(Fixtures.STANZA_ID)
+                .setId(CoreFixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
-                .addInterest(Fixtures.INTEREST)
-                .addInterest(Fixtures.INTEREST)
+                .addInterest(CoreFixtures.INTEREST)
+                .addInterest(CoreFixtures.INTEREST)
                 .build();
     }
 
@@ -99,7 +100,7 @@ public class GetInterestsResultTest {
     public void willParseAnXmppStanza() throws Exception {
 
         final GetInterestsResult result = (GetInterestsResult) OpenlinkIQParser.parse(Fixtures.iqFrom(GET_INTERESTS_RESULT));
-        assertThat(result.getID(), is(Fixtures.STANZA_ID));
+        assertThat(result.getID(), is(CoreFixtures.STANZA_ID));
         assertThat(result.getTo(), is(Fixtures.TO_JID));
         assertThat(result.getFrom(), is(Fixtures.FROM_JID));
         assertThat(result.getType(), is(IQ.Type.result));
@@ -107,8 +108,8 @@ public class GetInterestsResultTest {
 
         int i = 0;
         Interest interest = interests.get(i++);
-        assertThat(interest.getId().get(),is(Fixtures.INTEREST_ID));
-        assertThat(interest.getLabel().get(),is("test-default-interest"));
+        assertThat(interest.getId().get(),is(CoreFixtures.INTEREST_ID));
+        assertThat(interest.getLabel().get(),is("test interest label"));
         assertThat(interest.getType(),is(InterestType.from("test-interest-type")));
 
         interest = interests.get(i++);
@@ -141,8 +142,8 @@ public class GetInterestsResultTest {
         final GetInterestsRequest request = GetInterestsRequest.Builder.start()
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
-                .setId(Fixtures.STANZA_ID)
-                .setProfileId(Fixtures.PROFILE_ID)
+                .setId(CoreFixtures.STANZA_ID)
+                .setProfileId(CoreFixtures.PROFILE_ID)
                 .build();
 
         final GetInterestsResult result = GetInterestsResult.Builder.start(request)

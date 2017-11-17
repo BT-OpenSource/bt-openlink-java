@@ -14,6 +14,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.xmpp.packet.IQ;
 
+import com.bt.openlink.CoreFixtures;
 import com.bt.openlink.tinder.Fixtures;
 
 @SuppressWarnings("ConstantConditions")
@@ -22,13 +23,13 @@ public class MakeCallRequestTest {
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
 
-    private static final String MAKE_CALL_REQUEST = "<iq type='set' id='" + Fixtures.STANZA_ID + "' to='" + Fixtures.TO_JID + "' from='" + Fixtures.FROM_JID + "'>\n" +
+    private static final String MAKE_CALL_REQUEST = "<iq type='set' id='" + CoreFixtures.STANZA_ID + "' to='" + Fixtures.TO_JID + "' from='" + Fixtures.FROM_JID + "'>\n" +
             "  <command xmlns='http://jabber.org/protocol/commands' action='execute' node='http://xmpp.org/protocol/openlink:01:00:00#make-call'>\n" +
             "    <iodata xmlns='urn:xmpp:tmp:io-data' type='input'>\n" +
             "      <in>\n" +
             "        <jid>" + Fixtures.USER_JID + "</jid>\n" +
-            "        <interest>" + Fixtures.INTEREST_ID + "</interest>\n" +
-            "        <destination>" + Fixtures.DESTINATION + "</destination>\n" +
+            "        <interest>" + CoreFixtures.INTEREST_ID + "</interest>\n" +
+            "        <destination>" + CoreFixtures.CALLED_DESTINATION + "</destination>\n" +
             "      </in>\n" +
             "    </iodata>\n" +
             "  </command>\n" +
@@ -46,20 +47,20 @@ public class MakeCallRequestTest {
     public void canCreateAStanza() throws Exception {
 
         final MakeCallRequest request = MakeCallRequest.Builder.start()
-                .setId(Fixtures.STANZA_ID)
+                .setId(CoreFixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
                 .setJID(Fixtures.USER_JID)
-                .setInterestId(Fixtures.INTEREST_ID)
-                .setDestination(Fixtures.DESTINATION)
+                .setInterestId(CoreFixtures.INTEREST_ID)
+                .setDestination(CoreFixtures.CALLED_DESTINATION)
                 .build();
 
-        assertThat(request.getID(), is(Fixtures.STANZA_ID));
+        assertThat(request.getID(), is(CoreFixtures.STANZA_ID));
         assertThat(request.getTo(), is(Fixtures.TO_JID));
         assertThat(request.getFrom(), is(Fixtures.FROM_JID));
         assertThat(request.getJID().get(), is(Fixtures.USER_JID));
-        assertThat(request.getInterestId().get(), is(Fixtures.INTEREST_ID));
-        assertThat(request.getDestination().get(), is(Fixtures.DESTINATION));
+        assertThat(request.getInterestId().get(), is(CoreFixtures.INTEREST_ID));
+        assertThat(request.getDestination().get(), is(CoreFixtures.CALLED_DESTINATION));
     }
 
     @Test
@@ -77,12 +78,12 @@ public class MakeCallRequestTest {
     public void willGenerateAnXmppStanza() throws Exception {
 
         final MakeCallRequest request = MakeCallRequest.Builder.start()
-                .setId(Fixtures.STANZA_ID)
+                .setId(CoreFixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
                 .setJID(Fixtures.USER_JID)
-                .setInterestId(Fixtures.INTEREST_ID)
-                .setDestination(Fixtures.DESTINATION)
+                .setInterestId(CoreFixtures.INTEREST_ID)
+                .setDestination(CoreFixtures.CALLED_DESTINATION)
                 .build();
 
         assertThat(request.toXML(), isIdenticalTo(MAKE_CALL_REQUEST).ignoreWhitespace());
@@ -92,13 +93,13 @@ public class MakeCallRequestTest {
     public void willParseAnXmppStanza() throws Exception {
 
         final MakeCallRequest request = (MakeCallRequest) OpenlinkIQParser.parse(Fixtures.iqFrom(MAKE_CALL_REQUEST));
-        assertThat(request.getID(), is(Fixtures.STANZA_ID));
+        assertThat(request.getID(), is(CoreFixtures.STANZA_ID));
         assertThat(request.getTo(), is(Fixtures.TO_JID));
         assertThat(request.getFrom(), is(Fixtures.FROM_JID));
         assertThat(request.getType(), is(IQ.Type.set));
         assertThat(request.getJID().get(), is(Fixtures.USER_JID));
-        assertThat(request.getInterestId().get(), is(Fixtures.INTEREST_ID));
-        assertThat(request.getDestination().get(), is(Fixtures.DESTINATION));
+        assertThat(request.getInterestId().get(), is(CoreFixtures.INTEREST_ID));
+        assertThat(request.getDestination().get(), is(CoreFixtures.CALLED_DESTINATION));
         assertThat(request.getParseErrors(), is(empty()));
     }
 

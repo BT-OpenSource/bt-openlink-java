@@ -17,6 +17,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import com.bt.openlink.CoreFixtures;
 import com.bt.openlink.OpenlinkXmppNamespace;
 import com.bt.openlink.smack.Fixtures;
 import com.bt.openlink.type.Profile;
@@ -34,7 +35,7 @@ public class GetProfilesResultTest {
             .setName("test-site-name")
             .build();
     private static final Profile PROFILE_1 = Profile.Builder.start()
-            .setId(Fixtures.PROFILE_ID)
+            .setId(CoreFixtures.PROFILE_ID)
             .setDefault(true)
             .setDevice("uta")
             .setLabel("7001")
@@ -63,12 +64,12 @@ public class GetProfilesResultTest {
 
     @Rule public final ExpectedException expectedException = ExpectedException.none();
 
-    private static final String GET_PROFILES_RESULT_WITH_NO_NOTES = "<iq type=\"result\" id=\"" + Fixtures.STANZA_ID + "\" to=\"" + Fixtures.TO_JID + "\" from=\"" + Fixtures.FROM_JID + "\">\n" +
+    private static final String GET_PROFILES_RESULT_WITH_NO_NOTES = "<iq type=\"result\" id=\"" + CoreFixtures.STANZA_ID + "\" to=\"" + Fixtures.TO_JID + "\" from=\"" + Fixtures.FROM_JID + "\">\n" +
             "  <command xmlns=\"http://jabber.org/protocol/commands\" node=\"http://xmpp.org/protocol/openlink:01:00:00#get-profiles\" status=\"completed\">\n" +
             "    <iodata xmlns=\"urn:xmpp:tmp:io-data\" type=\"output\">\n" +
             "      <out>\n" +
             "        <profiles xmlns=\"http://xmpp.org/protocol/openlink:01:00:00/profiles\">\n" +
-            "          <profile default=\"true\" device=\"uta\" id=\"" + Fixtures.PROFILE_ID + "\" label=\"7001\" online=\"true\">\n" +
+            "          <profile default=\"true\" device=\"uta\" id=\"" + CoreFixtures.PROFILE_ID + "\" label=\"7001\" online=\"true\">\n" +
             "            <site default=\"false\" id=\"1\" type=\"IPT\">test-site-name</site>\n" +
             "            <actions>\n" +
             "              <action id=\"AnswerCall\" label=\"Answer a ringing call\"/>\n" +
@@ -97,7 +98,7 @@ public class GetProfilesResultTest {
             "  </command>\n" +
             "</iq>\n";
 
-    private static final String GET_PROFILES_RESULT_WITH_NO_PROFILES = "<iq type=\"result\" id=\"" + Fixtures.STANZA_ID + "\" to=\"" + Fixtures.TO_JID + "\" from=\"" + Fixtures.FROM_JID + "\">\n" +
+    private static final String GET_PROFILES_RESULT_WITH_NO_PROFILES = "<iq type=\"result\" id=\"" + CoreFixtures.STANZA_ID + "\" to=\"" + Fixtures.TO_JID + "\" from=\"" + Fixtures.FROM_JID + "\">\n" +
             "  <command xmlns=\"http://jabber.org/protocol/commands\" node=\"http://xmpp.org/protocol/openlink:01:00:00#get-profiles\" status=\"completed\">\n" +
             "    <iodata xmlns=\"urn:xmpp:tmp:io-data\" type=\"output\">\n" +
             "      <out>\n" +
@@ -122,13 +123,13 @@ public class GetProfilesResultTest {
     public void canCreateAStanza() throws Exception {
 
         final GetProfilesResult result = GetProfilesResult.Builder.start()
-                .setId(Fixtures.STANZA_ID)
+                .setId(CoreFixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
                 .build();
 
         assertThat(result.getType(), is(IQ.Type.result));
-        assertThat(result.getStanzaId(), is(Fixtures.STANZA_ID));
+        assertThat(result.getStanzaId(), is(CoreFixtures.STANZA_ID));
         assertThat(result.getTo(), is(Fixtures.TO_JID));
         assertThat(result.getFrom(), is(Fixtures.FROM_JID));
     }
@@ -137,7 +138,7 @@ public class GetProfilesResultTest {
     public void willGenerateAnXmppStanza() throws Exception {
 
         final GetProfilesResult result = GetProfilesResult.Builder.start()
-                .setId(Fixtures.STANZA_ID)
+                .setId(CoreFixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
                 .addProfile(PROFILE_1)
@@ -153,14 +154,14 @@ public class GetProfilesResultTest {
         final GetProfilesResult result = PacketParserUtils.parseStanza(GET_PROFILES_RESULT_WITH_NO_NOTES);
         assertThat(result.getTo(), is(Fixtures.TO_JID));
         assertThat(result.getFrom(), is(Fixtures.FROM_JID));
-        assertThat(result.getStanzaId(), is(Fixtures.STANZA_ID));
+        assertThat(result.getStanzaId(), is(CoreFixtures.STANZA_ID));
         assertThat(result.getType(), is(IQ.Type.result));
         final List<Profile> profiles = result.getProfiles();
         int i = 0;
 
         Profile profile = profiles.get(i++);
         Site site = profile.getSite().get();
-        assertThat(profile.getId().get(), is(Fixtures.PROFILE_ID));
+        assertThat(profile.getId().get(), is(CoreFixtures.PROFILE_ID));
         assertThat(profile.isDefaultProfile().get(), is(true));
         assertThat(profile.getDevice().get(), is("uta"));
         assertThat(profile.getLabel().get(), is("7001"));
@@ -213,7 +214,7 @@ public class GetProfilesResultTest {
         final GetProfilesRequest request = GetProfilesRequest.Builder.start()
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
-                .setId(Fixtures.STANZA_ID)
+                .setId(CoreFixtures.STANZA_ID)
                 .setJID(Fixtures.USER_JID)
                 .build();
 
