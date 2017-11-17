@@ -22,8 +22,6 @@ public class GetProfilesRequestTest {
 
     @Rule public final ExpectedException expectedException = ExpectedException.none();
 
-    private static final String GET_PROFILES_REQUEST_WITH_BAD_VALUES = TestStanzas.GET_PROFILES_REQUEST_WITH_BAD_VALUES;
-
     @Test
     public void canCreateAStanza() throws Exception {
 
@@ -100,7 +98,7 @@ public class GetProfilesRequestTest {
     @Test
     public void willReturnParsingErrors() throws Exception {
 
-        final IQ iq = Fixtures.iqFrom(GET_PROFILES_REQUEST_WITH_BAD_VALUES);
+        final IQ iq = Fixtures.iqFrom(TestStanzas.GET_PROFILES_REQUEST_WITH_BAD_VALUES);
 
         final GetProfilesRequest request = GetProfilesRequest.from(iq);
 
@@ -116,7 +114,7 @@ public class GetProfilesRequestTest {
     @Test
     public void willGenerateAStanzaEvenWithParsingErrors() throws Exception {
 
-        final IQ iq = Fixtures.iqFrom(GET_PROFILES_REQUEST_WITH_BAD_VALUES);
+        final IQ iq = Fixtures.iqFrom(TestStanzas.GET_PROFILES_REQUEST_WITH_BAD_VALUES);
 
         final GetProfilesRequest request = GetProfilesRequest.from(iq);
 
