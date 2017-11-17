@@ -28,17 +28,6 @@ public class GetProfilesFixtures {
                     "  </command>\n" +
                     "</iq>\n";
 
-    public static final Site SITE_1 = CoreFixtures.SITE;
-    public static final Profile PROFILE_1 = Profile.Builder.start()
-            .setId(CoreFixtures.PROFILE_ID)
-            .setDefault(true)
-            .setDevice("uta")
-            .setLabel("7001")
-            .setOnline(true)
-            .setSite(SITE_1)
-            .addAction(RequestAction.ANSWER_CALL)
-            .addAction(RequestAction.CLEAR_CALL)
-            .build();
     public static final Site SITE_2 = Site.Builder.start()
             .setId(11)
             .setType(Site.Type.ITS)
@@ -62,12 +51,8 @@ public class GetProfilesFixtures {
                     "    <iodata xmlns='urn:xmpp:tmp:io-data' type='output'>\n" +
                     "      <out>\n" +
                     "        <profiles xmlns='http://xmpp.org/protocol/openlink:01:00:00/profiles'>\n" +
-                    "          <profile default='true' device='uta' id='" + CoreFixtures.PROFILE_ID + "' label='7001' online='true'>\n" +
+                    "          <profile default='true' id='" + CoreFixtures.PROFILE_ID + "' label='test profile label' online='true'>\n" +
                     "            <site default='true' id='42' type='BTSM'>test site name</site>\n" +
-                    "            <actions>\n" +
-                    "              <action id='AnswerCall' label='Answer a ringing call'/>\n" +
-                    "              <action id='ClearCall' label='Remove all participants from a call'/>\n" +
-                    "            </actions>\n" +
                     "          </profile>\n" +
                     "          <profile default='true' device='uta' id='" + PROFILE_ID_2 + "' label='7001' online='true'>\n" +
                     "            <site id='11' type='ITS'>another-test-site-name</site>\n" +

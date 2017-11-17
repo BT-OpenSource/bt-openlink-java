@@ -49,7 +49,7 @@ public class GetProfilesResultTest {
                 .setId(CoreFixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
-                .addProfile(GetProfilesFixtures.PROFILE_1)
+                .addProfile(CoreFixtures.PROFILE)
                 .addProfile(GetProfilesFixtures.PROFILE_2)
                 .build();
 
@@ -71,10 +71,10 @@ public class GetProfilesResultTest {
         Site site = profile.getSite().get();
         assertThat(profile.getId().get(), is(CoreFixtures.PROFILE_ID));
         assertThat(profile.isDefaultProfile().get(), is(true));
-        assertThat(profile.getDevice().get(), is("uta"));
-        assertThat(profile.getLabel().get(), is("7001"));
+        assertThat(profile.getDevice(), is(Optional.empty()));
+        assertThat(profile.getLabel().get(), is("test profile label"));
         assertThat(profile.isOnline().get(), is(true));
-        assertThat(profile.getActions(), contains(RequestAction.ANSWER_CALL, RequestAction.CLEAR_CALL));
+        assertThat(profile.getActions(), is(empty()));
         assertThat(site.getId().get(), is(42L));
         assertThat(site.getType().get(), is(Site.Type.BTSM));
         assertThat(site.isDefault().get(), is(true));

@@ -40,11 +40,14 @@ public class GetProfilesResult extends OpenlinkIQ {
             profile.getLabel().ifPresent(label -> profileElement.addAttribute(ATTRIBUTE_LABEL, label));
             profile.isOnline().ifPresent(online -> profileElement.addAttribute("online", String.valueOf(online)));
             profile.getSite().ifPresent(site -> TinderPacketUtil.addSite(profileElement, site));
-            final Element actionsElement = profileElement.addElement("actions");
-            for (final RequestAction requestAction : profile.getActions()) {
-                final Element actionElement = actionsElement.addElement("action");
-                actionElement.addAttribute("id", requestAction.getId());
-                actionElement.addAttribute(ATTRIBUTE_LABEL, requestAction.getLabel());
+            final List<RequestAction> actions = profile.getActions();
+            if (!actions.isEmpty()) {
+                final Element actionsElement = profileElement.addElement("actions");
+                for (final RequestAction requestAction : actions) {
+                    final Element actionElement = actionsElement.addElement("action");
+                    actionElement.addAttribute("id", requestAction.getId());
+                    actionElement.addAttribute(ATTRIBUTE_LABEL, requestAction.getLabel());
+                }
             }
         });
     }
