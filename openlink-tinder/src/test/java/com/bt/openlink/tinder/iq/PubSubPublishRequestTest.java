@@ -117,44 +117,10 @@ public class PubSubPublishRequestTest {
     @Test
     public void willRoundTripAnXmppStanza() throws Exception {
 
-        // TODO: (Greg 2017-10-03) Implement all features, use PUBLISH_REQUEST
-        final String partRequest = "<iq type='set' id='" + CoreFixtures.STANZA_ID + "' to='" + Fixtures.TO_JID + "' from='" + Fixtures.FROM_JID + "'>\n" +
-                "   <pubsub xmlns='http://jabber.org/protocol/pubsub'>\n" +
-                "    <publish node='" + CoreFixtures.INTEREST_ID + "'>\n" +
-                "      <item>\n" +
-                "        <callstatus xmlns='http://xmpp.org/protocol/openlink:01:00:00#call-status'>\n" +
-                "          <call>\n" +
-                "            <id>" + CoreFixtures.CALL_ID + "</id>\n" +
-                "            <site default='true' id='42' type='BTSM'>test-site-name</site>\n" +
-                "            <profile>" + CoreFixtures.PROFILE_ID + "</profile>\n" +
-                "            <interest>" + CoreFixtures.INTEREST_ID + "</interest>\n" +
-                "            <state>CallOriginated</state>\n" +
-                "            <direction>Incoming</direction>\n" +
-                "            <caller>\n" +
-                "               <number></number>\n" +
-                "               <name></name>\n" +
-                "            </caller>\n" +
-                "            <called>\n" +
-                "               <number></number>\n" +
-                "               <name></name>\n" +
-                "            </called>\n" +
-                "            <duration>0</duration>\n" +
-                "            <actions>\n" +
-                "              <AnswerCall/>\n" +
-                "            </actions>\n" +
-                "            <participants>\n" +
-                "              <participant direction='Incoming' jid='test-user@test-domain' starttime='2017-10-09T08:07:00.000Z' timestamp='Mon Oct 09 08:07:00 UTC 2017' duration='60000' type='Active'/>\n" +
-                "            </participants>\n" +
-                "          </call>\n" +
-                "        </callstatus>\n" +
-                "      </item>\n" +
-                "    </publish>\n" +
-                "  </pubsub>" +
-                "</iq>\n";
-        final IQ originalIQ = Fixtures.iqFrom(partRequest);
+        final IQ originalIQ = Fixtures.iqFrom(PubSubPublishFixtures.PUBLISH_REQUEST_WITH_NO_FEATURES);
         final PubSubPublishRequest request = (PubSubPublishRequest) OpenlinkIQParser.parse(originalIQ);
 
-        assertThat(request.toXML(), isIdenticalTo(partRequest).ignoreWhitespace());
+        assertThat(request.toXML(), isIdenticalTo(PubSubPublishFixtures.PUBLISH_REQUEST_WITH_NO_FEATURES).ignoreWhitespace());
     }
 
 }

@@ -94,14 +94,7 @@ public class MakeCallResultTest {
     @Test
     public void willReturnParsingErrors() throws Exception {
 
-        final MakeCallResult result = MakeCallResult.from(Fixtures.iqFrom("<iq>\n" +
-                "   <command xmlns=\"http://jabber.org/protocol/commands\" node=\"http://xmpp.org/protocol/openlink:01:00:00#make-call\" status=\"completed\">\n" +
-                "     <iodata xmlns=\"urn:xmpp:tmp:io-data\" type=\"output\">\n" +
-                "      <out>\n" +
-                "      </out>\n" +
-                "    </iodata>\n" +
-                "  </command>\n" +
-                "</iq>"));
+        final MakeCallResult result = MakeCallResult.from(Fixtures.iqFrom(MakeCallFixtures.MAKE_CALL_RESULT_WITH_BAD_VALUES));
 
         assertThat(result.getParseErrors(), contains(
                 "Invalid stanza; missing 'to' attribute is mandatory",
