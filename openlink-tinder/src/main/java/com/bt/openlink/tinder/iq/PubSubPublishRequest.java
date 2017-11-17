@@ -23,22 +23,29 @@ public class PubSubPublishRequest extends OpenlinkIQ {
     private static final String STANZA_DESCRIPTION = "PubSub unsubscribe request";
 
     @Nullable private final PubSubNodeId pubSubNodeId;
+    @Nullable private final Boolean callStatusBusy;
     @Nonnull private final Collection<Call> calls;
 
     private PubSubPublishRequest(@Nonnull Builder builder, @Nullable List<String> parseErrors) {
         super(builder, parseErrors);
         this.pubSubNodeId = builder.getPubSubNodeId().orElse(null);
         this.calls = Collections.unmodifiableCollection(builder.getCalls());
+        this.callStatusBusy = builder.isCallStatusBusy().orElse(null);
         final Element pubSubElement = this.getElement().addElement("pubsub", OpenlinkXmppNamespace.XMPP_PUBSUB.uri());
         final Element publishElement = pubSubElement.addElement("publish");
         getPubSubNodeId().ifPresent(nodeId -> publishElement.addAttribute("node", nodeId.value()));
         final Element itemElement = publishElement.addElement("item");
-        TinderPacketUtil.addItemCallStatusCalls(itemElement, null, calls);
+        TinderPacketUtil.addItemCallStatusCalls(itemElement, callStatusBusy, calls);
     }
 
     @Nonnull
     public Optional<PubSubNodeId> getPubSubNodeId() {
         return Optional.ofNullable(pubSubNodeId);
+    }
+
+    @Nonnull
+    public Optional<Boolean> isCallStatusBusy() {
+        return Optional.ofNullable(callStatusBusy);
     }
 
     @Nonnull
@@ -57,6 +64,9 @@ public class PubSubPublishRequest extends OpenlinkIQ {
                     "node", false, STANZA_DESCRIPTION, parseErrors).orElse(null));
             pubSubNodeId.ifPresent(builder::setPubSubNodeId);
             final Element itemElement = publishElement.element("item");
+            final Element callStatusElement = TinderPacketUtil.getChildElement(itemElement, "callstatus");
+            final Optional<Boolean> busy = TinderPacketUtil.getBooleanAttribute(callStatusElement, "busy", "busy attribute", parseErrors);
+            busy.ifPresent(builder::setCallStatusBusy);
             builder.addCalls(TinderPacketUtil.getCalls(itemElement, STANZA_DESCRIPTION, parseErrors));
         }
         final PubSubPublishRequest request = builder.build(parseErrors);

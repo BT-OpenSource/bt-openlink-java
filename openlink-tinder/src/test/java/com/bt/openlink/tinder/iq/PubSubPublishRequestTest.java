@@ -154,7 +154,7 @@ public class PubSubPublishRequestTest {
         final IQ originalIQ = Fixtures.iqFrom(partRequest);
         final PubSubPublishRequest request = (PubSubPublishRequest) OpenlinkIQParser.parse(originalIQ);
 
-        assertThat(request.toXML(), isIdenticalTo(originalIQ.toXML()).ignoreWhitespace());
+        assertThat(request.toXML(), isIdenticalTo(partRequest).ignoreWhitespace());
     }
 
 }

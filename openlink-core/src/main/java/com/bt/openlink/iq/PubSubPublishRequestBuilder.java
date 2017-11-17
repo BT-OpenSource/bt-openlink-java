@@ -17,6 +17,7 @@ import com.bt.openlink.type.PubSubNodeId;
 public abstract class PubSubPublishRequestBuilder<B extends PubSubPublishRequestBuilder, J, T extends Enum<T>> extends IQBuilder<B, J, T> {
 
     @Nullable private PubSubNodeId pubSubNodeId;
+    @Nullable private Boolean callStatusBusy = null;
     @Nonnull private final List<Call> calls = new ArrayList<>();
 
     protected PubSubPublishRequestBuilder(final Class<T> typeClass) {
@@ -71,6 +72,18 @@ public abstract class PubSubPublishRequestBuilder<B extends PubSubPublishRequest
         return calls;
     }
 
+    @SuppressWarnings("unchecked")
+    @Nonnull
+    public B setCallStatusBusy(final boolean callStatusBusy) {
+        this.callStatusBusy = callStatusBusy;
+        return (B) this;
+    }
+
+    @Nonnull
+    public Optional<Boolean> isCallStatusBusy() {
+        return Optional.ofNullable(callStatusBusy);
+    }
+
     @Override
     protected void validate() {
         super.validate();
@@ -83,7 +96,7 @@ public abstract class PubSubPublishRequestBuilder<B extends PubSubPublishRequest
         validateCallsAreOnTheCorrectInterest(call -> {
             throw new IllegalStateException("The call with id " + call.getId().orElse(null) + " is on interest " + call.getInterestId().orElse(null) + " which differs from the pub-sub node id " + pubSubNodeId);
         });
-
+        Call.oneOrMoreCallsIsBusy(calls).ifPresent(this::setCallStatusBusy);
     }
 
     private void validateUniqueness(final Consumer<CallId> errorConsumer) {
