@@ -11,6 +11,7 @@ import org.junit.rules.ExpectedException;
 import org.xmpp.packet.IQ;
 
 import com.bt.openlink.CoreFixtures;
+import com.bt.openlink.PubSubSubscribeFixtures;
 import com.bt.openlink.tinder.Fixtures;
 
 @SuppressWarnings("ConstantConditions")
@@ -18,12 +19,6 @@ public class PubSubUnsubscribeRequestTest {
 
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
-
-    private static final String UNSUBSCRIBE_REQUEST = "<iq type=\"set\" id=\"" + CoreFixtures.STANZA_ID + "\" to=\"" + Fixtures.TO_JID + "\" from=\"" + Fixtures.FROM_JID + "\">\n" +
-            "    <pubsub xmlns=\"http://jabber.org/protocol/pubsub\">\n" +
-            "        <unsubscribe node=\"" + CoreFixtures.NODE_ID + "\" jid=\"" + Fixtures.USER_FULL_JID + "\"/>\n" +
-            "    </pubsub>\n" +
-            "</iq>\n";
 
     @Test
     public void canCreateAStanza() throws Exception {
@@ -54,13 +49,13 @@ public class PubSubUnsubscribeRequestTest {
                 .setJID(Fixtures.USER_FULL_JID)
                 .build();
 
-        assertThat(request.toXML(),isIdenticalTo(UNSUBSCRIBE_REQUEST).ignoreWhitespace());
+        assertThat(request.toXML(),isIdenticalTo(PubSubSubscribeFixtures.UNSUBSCRIBE_REQUEST).ignoreWhitespace());
     }
 
     @Test
     public void willParseAnXmppStanza() throws Exception {
 
-        final PubSubUnsubscribeRequest request = (PubSubUnsubscribeRequest) OpenlinkIQParser.parse(Fixtures.iqFrom(UNSUBSCRIBE_REQUEST));
+        final PubSubUnsubscribeRequest request = (PubSubUnsubscribeRequest) OpenlinkIQParser.parse(Fixtures.iqFrom(PubSubSubscribeFixtures.UNSUBSCRIBE_REQUEST));
         assertThat(request.getID(), CoreMatchers.is(CoreFixtures.STANZA_ID));
         assertThat(request.getTo(), CoreMatchers.is(Fixtures.TO_JID));
         assertThat(request.getFrom(), CoreMatchers.is(Fixtures.FROM_JID));
@@ -73,10 +68,10 @@ public class PubSubUnsubscribeRequestTest {
     @Test
     public void willRoundTripAnXmppStanza() throws Exception {
 
-        final IQ originalIQ = Fixtures.iqFrom(UNSUBSCRIBE_REQUEST);
+        final IQ originalIQ = Fixtures.iqFrom(PubSubSubscribeFixtures.UNSUBSCRIBE_REQUEST);
         final PubSubUnsubscribeRequest request = (PubSubUnsubscribeRequest) OpenlinkIQParser.parse(originalIQ);
 
-        assertThat(request.toXML(),isIdenticalTo(UNSUBSCRIBE_REQUEST).ignoreWhitespace());
+        assertThat(request.toXML(),isIdenticalTo(PubSubSubscribeFixtures.UNSUBSCRIBE_REQUEST).ignoreWhitespace());
     }
 
 }
