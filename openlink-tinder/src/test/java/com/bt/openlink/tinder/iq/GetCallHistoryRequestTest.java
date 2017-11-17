@@ -25,7 +25,7 @@ public class GetCallHistoryRequestTest {
             "  <command xmlns='http://jabber.org/protocol/commands' node='http://xmpp.org/protocol/openlink:01:00:00#get-call-history' action='execute'>\n" +
             "    <iodata xmlns='urn:xmpp:tmp:io-data' type='input'>\n" +
             "      <in>\n" +
-            "        <jid>" + Fixtures.USER_JID + "</jid>\n" +
+            "        <jid>" + Fixtures.USER_FULL_JID + "</jid>\n" +
             "      </in>\n" +
             "    </iodata>\n" +
             "  </command>\n" +
@@ -35,7 +35,7 @@ public class GetCallHistoryRequestTest {
             "  <command xmlns='http://jabber.org/protocol/commands' node='http://xmpp.org/protocol/openlink:01:00:00#get-call-history' action='execute'>\n" +
             "    <iodata xmlns='urn:xmpp:tmp:io-data' type='input'>\n" +
             "      <in>\n" +
-            "        <jid>" + Fixtures.USER_JID + "</jid>\n" +
+            "        <jid>" + Fixtures.USER_FULL_JID + "</jid>\n" +
             "        <caller>from-caller</caller>\n" +
             "        <called>to-destination</called>\n" +
             "        <calltype>missed</calltype>\n" +
@@ -80,12 +80,12 @@ public class GetCallHistoryRequestTest {
                 .setId(CoreFixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
-                .setJID(Fixtures.USER_JID).build();
+                .setJID(Fixtures.USER_FULL_JID).build();
 
         assertThat(request.getID(), CoreMatchers.is(CoreFixtures.STANZA_ID));
         assertThat(request.getTo(), CoreMatchers.is(Fixtures.TO_JID));
         assertThat(request.getFrom(), CoreMatchers.is(Fixtures.FROM_JID));
-        assertThat(request.getJID().get(), is(Fixtures.USER_JID));
+        assertThat(request.getJID().get(), is(Fixtures.USER_FULL_JID));
         assertThat(request.getCaller(), is(Optional.empty()));
         assertThat(request.getCalled(), is(Optional.empty()));
         assertThat(request.getCallType(), is(Optional.empty()));
@@ -114,7 +114,7 @@ public class GetCallHistoryRequestTest {
                 .setId(CoreFixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
-                .setJID(Fixtures.USER_JID)
+                .setJID(Fixtures.USER_FULL_JID)
                 .build();
 
         assertThat(request.toXML(), isIdenticalTo(GET_CALL_HISTORY_REQUEST).ignoreWhitespace());
@@ -127,7 +127,7 @@ public class GetCallHistoryRequestTest {
                 .setId(CoreFixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
-                .setJID(Fixtures.USER_JID)
+                .setJID(Fixtures.USER_FULL_JID)
                 .setCaller("from-caller")
                 .setCalled("to-destination")
                 .setCallType(CallType.MISSED)
@@ -148,7 +148,7 @@ public class GetCallHistoryRequestTest {
         assertThat(request.getTo(), CoreMatchers.is(Fixtures.TO_JID));
         assertThat(request.getFrom(), CoreMatchers.is(Fixtures.FROM_JID));
         assertThat(request.getType(), is(IQ.Type.set));
-        assertThat(request.getJID().get(), is(Fixtures.USER_JID));
+        assertThat(request.getJID().get(), is(Fixtures.USER_FULL_JID));
         assertThat(request.getCaller(), is(Optional.empty()));
         assertThat(request.getCalled(), is(Optional.empty()));
         assertThat(request.getCallType(), is(Optional.empty()));
@@ -187,7 +187,7 @@ public class GetCallHistoryRequestTest {
         assertThat(request.getTo(), CoreMatchers.is(Fixtures.TO_JID));
         assertThat(request.getFrom(), CoreMatchers.is(Fixtures.FROM_JID));
         assertThat(request.getType(), is(IQ.Type.set));
-        assertThat(request.getJID().get(), is(Fixtures.USER_JID));
+        assertThat(request.getJID().get(), is(Fixtures.USER_FULL_JID));
         assertThat(request.getCaller().get(), is("from-caller"));
         assertThat(request.getCalled().get(), is("to-destination"));
         assertThat(request.getCallType().get(), is(CallType.MISSED));

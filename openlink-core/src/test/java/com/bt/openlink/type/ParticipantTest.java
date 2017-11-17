@@ -23,14 +23,14 @@ public class ParticipantTest {
     public void willBuildAParticipation() throws Exception {
 
         final Participant participant = Participant.Builder.start()
-                .setJID(CoreFixtures.USER_JID_STRING)
+                .setJID(CoreFixtures.USER_FULL_JID_STRING)
                 .setType(ParticipantType.ACTIVE)
                 .setDirection(CallDirection.INCOMING)
                 .setStartTime(CoreFixtures.START_TIME)
                 .setDuration(CoreFixtures.DURATION)
                 .build();
 
-        assertThat(participant.getJID().get(), is(CoreFixtures.USER_JID_STRING));
+        assertThat(participant.getJID().get(), is(CoreFixtures.USER_FULL_JID_STRING));
         assertThat(participant.getType().get(), is(ParticipantType.ACTIVE));
         assertThat(participant.getDirection().get(), is(CallDirection.INCOMING));
         assertThat(participant.getStartTime().get(), is(CoreFixtures.START_TIME));
@@ -56,7 +56,7 @@ public class ParticipantTest {
         expectedException.expectMessage("The participation type has not been set");
 
         Participant.Builder.start()
-                .setJID(CoreFixtures.USER_JID_STRING)
+                .setJID(CoreFixtures.USER_FULL_JID_STRING)
                 .setDirection(CallDirection.INCOMING)
                 .setStartTime(CoreFixtures.START_TIME)
                 .setDuration(CoreFixtures.DURATION)
@@ -69,7 +69,7 @@ public class ParticipantTest {
         expectedException.expectMessage("The participation direction has not been set");
 
         Participant.Builder.start()
-                .setJID(CoreFixtures.USER_JID_STRING)
+                .setJID(CoreFixtures.USER_FULL_JID_STRING)
                 .setType(ParticipantType.ACTIVE)
                 .setStartTime(CoreFixtures.START_TIME)
                 .setDuration(CoreFixtures.DURATION)
@@ -82,7 +82,7 @@ public class ParticipantTest {
         expectedException.expectMessage("The participation start time has not been set");
 
         Participant.Builder.start()
-                .setJID(CoreFixtures.USER_JID_STRING)
+                .setJID(CoreFixtures.USER_FULL_JID_STRING)
                 .setType(ParticipantType.ACTIVE)
                 .setDirection(CallDirection.INCOMING)
                 .setDuration(CoreFixtures.DURATION)
@@ -95,7 +95,7 @@ public class ParticipantTest {
         expectedException.expectMessage("The participation duration has not been set");
 
         Participant.Builder.start()
-                .setJID(CoreFixtures.USER_JID_STRING)
+                .setJID(CoreFixtures.USER_FULL_JID_STRING)
                 .setType(ParticipantType.ACTIVE)
                 .setDirection(CallDirection.INCOMING)
                 .setStartTime(CoreFixtures.START_TIME)

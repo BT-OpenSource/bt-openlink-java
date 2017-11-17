@@ -19,30 +19,12 @@ import org.junit.rules.ExpectedException;
 
 import com.bt.openlink.CoreFixtures;
 import com.bt.openlink.OpenlinkXmppNamespace;
+import com.bt.openlink.TestStanzas;
 import com.bt.openlink.smack.Fixtures;
 
 @SuppressWarnings("ConstantConditions")
 public class GetProfilesRequestTest {
     @Rule public final ExpectedException expectedException = ExpectedException.none();
-
-    private static final String GET_PROFILES_REQUEST = "<iq type=\"set\" id=\"" + CoreFixtures.STANZA_ID + "\" to=\"" + Fixtures.TO_JID + "\" from=\"" + Fixtures.FROM_JID + "\">\n" +
-            "  <command xmlns=\"http://jabber.org/protocol/commands\" action=\"execute\" node=\"http://xmpp.org/protocol/openlink:01:00:00#get-profiles\">\n" +
-            "    <iodata xmlns=\"urn:xmpp:tmp:io-data\" type=\"input\">\n" +
-            "      <in>\n" +
-            "        <jid>" + Fixtures.USER_JID + "</jid>\n" +
-            "      </in>\n" +
-            "    </iodata>\n" +
-            "  </command>\n" +
-            "</iq>\n";
-
-    private static final String GET_PROFILES_REQUEST_WITH_BAD_VALUES = "<iq type='get'>\n" +
-            "  <command xmlns=\"http://jabber.org/protocol/commands\" action=\"execute\" node=\"http://xmpp.org/protocol/openlink:01:00:00#get-profiles\">\n" +
-            "    <iodata xmlns=\"urn:xmpp:tmp:io-data\" type=\"input\">\n" +
-            "      <in>\n" +
-            "      </in>\n" +
-            "    </iodata>\n" +
-            "  </command>\n" +
-            "</iq>\n";
 
     @BeforeClass
     public static void setUpClass() throws Exception {
@@ -60,13 +42,13 @@ public class GetProfilesRequestTest {
         final GetProfilesRequest request = GetProfilesRequest.Builder.start().setId(CoreFixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
-                .setJID(Fixtures.USER_JID)
+                .setJID(Fixtures.USER_FULL_JID)
                 .build();
 
         assertThat(request.getStanzaId(), is(CoreFixtures.STANZA_ID));
         assertThat(request.getTo(), is(Fixtures.TO_JID));
         assertThat(request.getFrom(), is(Fixtures.FROM_JID));
-        assertThat(request.getJID().get(), is(Fixtures.USER_JID));
+        assertThat(request.getJID().get(), is(Fixtures.USER_FULL_JID));
     }
 
     @Test
@@ -75,7 +57,7 @@ public class GetProfilesRequestTest {
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("The stanza 'to' has not been set");
         GetProfilesRequest.Builder.start()
-                .setJID(Fixtures.USER_JID)
+                .setJID(Fixtures.USER_FULL_JID)
                 .build();
     }
 
@@ -96,10 +78,10 @@ public class GetProfilesRequestTest {
         final GetProfilesRequest request = GetProfilesRequest.Builder.start().setId(CoreFixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
-                .setJID(Fixtures.USER_JID)
+                .setJID(Fixtures.USER_BARE_JID)
                 .build();
 
-        assertThat(request.toXML().toString(), isIdenticalTo(GET_PROFILES_REQUEST).ignoreWhitespace());
+        assertThat(request.toXML().toString(), isIdenticalTo(TestStanzas.GET_PROFILES_REQUEST).ignoreWhitespace());
     }
 
     @Test
@@ -108,7 +90,7 @@ public class GetProfilesRequestTest {
         final GetProfilesRequest request = GetProfilesRequest.Builder.start()
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
-                .setJID(Fixtures.USER_JID)
+                .setJID(Fixtures.USER_FULL_JID)
                 .build();
 
         assertThat(request.getStanzaId(), is(not(nullValue())));
@@ -118,20 +100,20 @@ public class GetProfilesRequestTest {
     @Test
     public void willParseAnXmppStanza() throws Exception {
 
-        final GetProfilesRequest request = PacketParserUtils.parseStanza(GET_PROFILES_REQUEST);
+        final GetProfilesRequest request = PacketParserUtils.parseStanza(TestStanzas.GET_PROFILES_REQUEST);
 
         assertThat(request.getStanzaId(), is(CoreFixtures.STANZA_ID));
         assertThat(request.getTo(), is(Fixtures.TO_JID));
         assertThat(request.getFrom(), is(Fixtures.FROM_JID));
         assertThat(request.getType(), is(IQ.Type.set));
-        assertThat(request.getJID().get(), is(Fixtures.USER_JID));
+        assertThat(request.getJID().get(), is(Fixtures.USER_BARE_JID));
         assertThat(request.getParseErrors(), is(empty()));
     }
 
     @Test
     public void willReturnParsingErrors() throws Exception {
 
-        final GetProfilesRequest request = PacketParserUtils.parseStanza(GET_PROFILES_REQUEST_WITH_BAD_VALUES);
+        final GetProfilesRequest request = PacketParserUtils.parseStanza(TestStanzas.GET_PROFILES_REQUEST_WITH_BAD_VALUES);
 
         // Note; it's not possible to validate the core elements of Smack packets as the to/from/id/type are not
         // set until after the parsing is complete.
@@ -148,9 +130,9 @@ public class GetProfilesRequestTest {
     @Test
     public void willGenerateAStanzaEvenWithParsingErrors() throws Exception {
 
-        final GetProfilesRequest request = PacketParserUtils.parseStanza(GET_PROFILES_REQUEST_WITH_BAD_VALUES);
+        final GetProfilesRequest request = PacketParserUtils.parseStanza(TestStanzas.GET_PROFILES_REQUEST_WITH_BAD_VALUES);
 
-        assertThat(request.toXML().toString(), isIdenticalTo(GET_PROFILES_REQUEST_WITH_BAD_VALUES).ignoreWhitespace());
+        assertThat(request.toXML().toString(), isIdenticalTo(TestStanzas.GET_PROFILES_REQUEST_WITH_BAD_VALUES).ignoreWhitespace());
 
     }
 

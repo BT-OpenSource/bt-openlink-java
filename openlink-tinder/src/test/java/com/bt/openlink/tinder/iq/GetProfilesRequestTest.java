@@ -14,6 +14,7 @@ import org.junit.rules.ExpectedException;
 import org.xmpp.packet.IQ;
 
 import com.bt.openlink.CoreFixtures;
+import com.bt.openlink.TestStanzas;
 import com.bt.openlink.tinder.Fixtures;
 
 @SuppressWarnings({ "OptionalGetWithoutIsPresent", "ConstantConditions" })
@@ -21,23 +22,7 @@ public class GetProfilesRequestTest {
 
     @Rule public final ExpectedException expectedException = ExpectedException.none();
 
-    private static final String GET_PROFILES_REQUEST = "<iq type=\"set\" id=\"" + CoreFixtures.STANZA_ID + "\" to=\"" + Fixtures.TO_JID + "\" from=\"" + Fixtures.FROM_JID + "\">\n" +
-            "  <command xmlns=\"http://jabber.org/protocol/commands\" action=\"execute\" node=\"http://xmpp.org/protocol/openlink:01:00:00#get-profiles\">\n" +
-            "    <iodata xmlns=\"urn:xmpp:tmp:io-data\" type=\"input\">\n" +
-            "      <in>\n" +
-            "        <jid>" + Fixtures.USER_JID + "</jid>\n" +
-            "      </in>\n" +
-            "    </iodata>\n" +
-            "  </command>\n" +
-            "</iq>\n";
-
-    private static final String GET_PROFILES_REQUEST_WITH_BAD_VALUES = "<iq type='get'>\n" +
-            "  <command xmlns=\"http://jabber.org/protocol/commands\" action=\"execute\" node=\"http://xmpp.org/protocol/openlink:01:00:00#get-profiles\">\n" +
-            "    <iodata xmlns=\"urn:xmpp:tmp:io-data\" type=\"input\">\n" +
-            "      <in/>\n" +
-            "    </iodata>\n" +
-            "  </command>\n" +
-            "</iq>\n";
+    private static final String GET_PROFILES_REQUEST_WITH_BAD_VALUES = TestStanzas.GET_PROFILES_REQUEST_WITH_BAD_VALUES;
 
     @Test
     public void canCreateAStanza() throws Exception {
@@ -46,13 +31,13 @@ public class GetProfilesRequestTest {
                 .setId(CoreFixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
-                .setJID(Fixtures.USER_JID)
+                .setJID(Fixtures.USER_FULL_JID)
                 .build();
 
         assertThat(request.getID(), is(CoreFixtures.STANZA_ID));
         assertThat(request.getTo(), is(Fixtures.TO_JID));
         assertThat(request.getFrom(), is(Fixtures.FROM_JID));
-        assertThat(request.getJID().get(), is(Fixtures.USER_JID));
+        assertThat(request.getJID().get(), is(Fixtures.USER_FULL_JID));
     }
 
     @Test
@@ -82,10 +67,10 @@ public class GetProfilesRequestTest {
                 .setId(CoreFixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
-                .setJID(Fixtures.USER_JID)
+                .setJID(Fixtures.USER_BARE_JID)
                 .build();
 
-        assertThat(request.toXML(), isIdenticalTo(GET_PROFILES_REQUEST).ignoreWhitespace());
+        assertThat(request.toXML(), isIdenticalTo(TestStanzas.GET_PROFILES_REQUEST).ignoreWhitespace());
     }
 
     @Test
@@ -94,7 +79,7 @@ public class GetProfilesRequestTest {
         final GetProfilesRequest request = GetProfilesRequest.Builder.start()
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
-                .setJID(Fixtures.USER_JID)
+                .setJID(Fixtures.USER_BARE_JID)
                 .build();
 
         assertThat(request.getID(), is(not(nullValue())));
@@ -103,12 +88,12 @@ public class GetProfilesRequestTest {
     @Test
     public void willParseAnXmppStanza() throws Exception {
 
-        final GetProfilesRequest request = (GetProfilesRequest) OpenlinkIQParser.parse(Fixtures.iqFrom(GET_PROFILES_REQUEST));
+        final GetProfilesRequest request = (GetProfilesRequest) OpenlinkIQParser.parse(Fixtures.iqFrom(TestStanzas.GET_PROFILES_REQUEST));
         assertThat(request.getID(), is(CoreFixtures.STANZA_ID));
         assertThat(request.getTo(), is(Fixtures.TO_JID));
         assertThat(request.getFrom(), is(Fixtures.FROM_JID));
         assertThat(request.getType(), is(IQ.Type.set));
-        assertThat(request.getJID().get(), is(Fixtures.USER_JID));
+        assertThat(request.getJID().get(), is(Fixtures.USER_BARE_JID));
         assertThat(request.getParseErrors(), is(empty()));
     }
 

@@ -208,7 +208,7 @@ public class GetProfilesResultTest {
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
                 .setId(CoreFixtures.STANZA_ID)
-                .setJID(Fixtures.USER_JID)
+                .setJID(Fixtures.USER_FULL_JID)
                 .build();
 
         final GetProfilesResult result = GetProfilesResult.Builder.start(request)

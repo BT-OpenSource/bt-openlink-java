@@ -21,7 +21,7 @@ public class PubSubUnsubscribeRequestTest {
 
     private static final String UNSUBSCRIBE_REQUEST = "<iq type=\"set\" id=\"" + CoreFixtures.STANZA_ID + "\" to=\"" + Fixtures.TO_JID + "\" from=\"" + Fixtures.FROM_JID + "\">\n" +
             "    <pubsub xmlns=\"http://jabber.org/protocol/pubsub\">\n" +
-            "        <unsubscribe node=\"" + CoreFixtures.NODE_ID + "\" jid=\"" + Fixtures.USER_JID + "\"/>\n" +
+            "        <unsubscribe node=\"" + CoreFixtures.NODE_ID + "\" jid=\"" + Fixtures.USER_FULL_JID + "\"/>\n" +
             "    </pubsub>\n" +
             "</iq>\n";
 
@@ -33,14 +33,14 @@ public class PubSubUnsubscribeRequestTest {
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
                 .setPubSubNodeId(CoreFixtures.NODE_ID)
-                .setJID(Fixtures.USER_JID)
+                .setJID(Fixtures.USER_FULL_JID)
                 .build();
 
         assertThat(request.getID(), is(CoreFixtures.STANZA_ID));
         assertThat(request.getTo(), is(Fixtures.TO_JID));
         assertThat(request.getFrom(), is(Fixtures.FROM_JID));
         assertThat(request.getPubSubNodeId().get(), is(CoreFixtures.NODE_ID));
-        assertThat(request.getJID().get(), is(Fixtures.USER_JID));
+        assertThat(request.getJID().get(), is(Fixtures.USER_FULL_JID));
     }
 
     @Test
@@ -51,7 +51,7 @@ public class PubSubUnsubscribeRequestTest {
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
                 .setInterestId(CoreFixtures.INTEREST_ID)
-                .setJID(Fixtures.USER_JID)
+                .setJID(Fixtures.USER_FULL_JID)
                 .build();
 
         assertThat(request.toXML(),isIdenticalTo(UNSUBSCRIBE_REQUEST).ignoreWhitespace());
@@ -66,7 +66,7 @@ public class PubSubUnsubscribeRequestTest {
         assertThat(request.getFrom(), CoreMatchers.is(Fixtures.FROM_JID));
         assertThat(request.getType(), is(IQ.Type.set));
         assertThat(request.getPubSubNodeId().get(), is(CoreFixtures.NODE_ID));
-        assertThat(request.getJID().get(), is(Fixtures.USER_JID));
+        assertThat(request.getJID().get(), is(Fixtures.USER_FULL_JID));
         assertThat(request.getParseErrors().size(), is(0));
     }
 

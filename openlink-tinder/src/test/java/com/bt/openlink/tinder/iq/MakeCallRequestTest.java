@@ -27,7 +27,7 @@ public class MakeCallRequestTest {
             "  <command xmlns='http://jabber.org/protocol/commands' action='execute' node='http://xmpp.org/protocol/openlink:01:00:00#make-call'>\n" +
             "    <iodata xmlns='urn:xmpp:tmp:io-data' type='input'>\n" +
             "      <in>\n" +
-            "        <jid>" + Fixtures.USER_JID + "</jid>\n" +
+            "        <jid>" + Fixtures.USER_FULL_JID + "</jid>\n" +
             "        <interest>" + CoreFixtures.INTEREST_ID + "</interest>\n" +
             "        <destination>" + CoreFixtures.CALLED_DESTINATION + "</destination>\n" +
             "      </in>\n" +
@@ -50,7 +50,7 @@ public class MakeCallRequestTest {
                 .setId(CoreFixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
-                .setJID(Fixtures.USER_JID)
+                .setJID(Fixtures.USER_FULL_JID)
                 .setInterestId(CoreFixtures.INTEREST_ID)
                 .setDestination(CoreFixtures.CALLED_DESTINATION)
                 .build();
@@ -58,7 +58,7 @@ public class MakeCallRequestTest {
         assertThat(request.getID(), is(CoreFixtures.STANZA_ID));
         assertThat(request.getTo(), is(Fixtures.TO_JID));
         assertThat(request.getFrom(), is(Fixtures.FROM_JID));
-        assertThat(request.getJID().get(), is(Fixtures.USER_JID));
+        assertThat(request.getJID().get(), is(Fixtures.USER_FULL_JID));
         assertThat(request.getInterestId().get(), is(CoreFixtures.INTEREST_ID));
         assertThat(request.getDestination().get(), is(CoreFixtures.CALLED_DESTINATION));
     }
@@ -81,7 +81,7 @@ public class MakeCallRequestTest {
                 .setId(CoreFixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
-                .setJID(Fixtures.USER_JID)
+                .setJID(Fixtures.USER_FULL_JID)
                 .setInterestId(CoreFixtures.INTEREST_ID)
                 .setDestination(CoreFixtures.CALLED_DESTINATION)
                 .build();
@@ -97,7 +97,7 @@ public class MakeCallRequestTest {
         assertThat(request.getTo(), is(Fixtures.TO_JID));
         assertThat(request.getFrom(), is(Fixtures.FROM_JID));
         assertThat(request.getType(), is(IQ.Type.set));
-        assertThat(request.getJID().get(), is(Fixtures.USER_JID));
+        assertThat(request.getJID().get(), is(Fixtures.USER_FULL_JID));
         assertThat(request.getInterestId().get(), is(CoreFixtures.INTEREST_ID));
         assertThat(request.getDestination().get(), is(CoreFixtures.CALLED_DESTINATION));
         assertThat(request.getParseErrors(), is(empty()));

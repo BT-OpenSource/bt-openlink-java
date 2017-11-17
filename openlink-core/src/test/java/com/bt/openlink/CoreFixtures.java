@@ -38,8 +38,8 @@ public class CoreFixtures {
     private static final String USER_ID = "test-user";
     private static final String DOMAIN = "test-domain";
     private static final String RESOURCE = "test-resource";
-    public static final String USER_JID_BARE_STRING = String.format("%s@%s", USER_ID, DOMAIN);
-    public static final String USER_JID_STRING = String.format("%s/%s", USER_JID_BARE_STRING, RESOURCE);
+    public static final String USER_BARE_JID_STRING = String.format("%s@%s", USER_ID, DOMAIN);
+    public static final String USER_FULL_JID_STRING = String.format("%s/%s", USER_BARE_JID_STRING, RESOURCE);
     public static final String TO_JID_STRING = String.format("test-to-user@%s/%s", DOMAIN, RESOURCE);
     public static final String FROM_JID_STRING = String.format("test-from-user@%s/%s", DOMAIN, RESOURCE);
     public static final String STANZA_ID = "test-stanza-id";
@@ -59,7 +59,7 @@ public class CoreFixtures {
     public static final PhoneNumber CALLED_DESTINATION = PhoneNumber.from("test-called-destination").get();
     public static final PhoneNumber CALLED_E164_NUMBER = PhoneNumber.from("test-called-e164-number").get();
     public static final Participant PARTICIPANT = Participant.Builder.start()
-            .setJID(USER_JID_BARE_STRING)
+            .setJID(USER_BARE_JID_STRING)
             .setType(ParticipantType.ACTIVE)
             .setDirection(CallDirection.INCOMING)
             .setStartTime(START_TIME)

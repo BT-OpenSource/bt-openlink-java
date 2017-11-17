@@ -19,7 +19,8 @@ public final class Fixtures {
     private Fixtures() {
     }
 
-    public static final JID USER_JID = new JID(CoreFixtures.USER_JID_STRING);
+    public static final JID USER_FULL_JID = new JID(CoreFixtures.USER_FULL_JID_STRING);
+    public static final JID USER_BARE_JID = new JID(CoreFixtures.USER_BARE_JID_STRING);
     public static final JID TO_JID = new JID(CoreFixtures.TO_JID_STRING);
     public static final JID FROM_JID = new JID(CoreFixtures.FROM_JID_STRING);
 
