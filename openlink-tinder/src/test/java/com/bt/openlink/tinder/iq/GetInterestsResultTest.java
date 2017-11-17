@@ -13,6 +13,7 @@ import org.junit.rules.ExpectedException;
 import org.xmpp.packet.IQ;
 
 import com.bt.openlink.CoreFixtures;
+import com.bt.openlink.GetInterestsFixtures;
 import com.bt.openlink.tinder.Fixtures;
 import com.bt.openlink.type.Interest;
 import com.bt.openlink.type.InterestId;
@@ -22,28 +23,6 @@ import com.bt.openlink.type.InterestType;
 public class GetInterestsResultTest {
 
     @Rule public final ExpectedException expectedException = ExpectedException.none();
-
-    private static final String GET_INTERESTS_RESULT = "<iq type=\"result\" id=\"" + CoreFixtures.STANZA_ID + "\" to=\"" + Fixtures.TO_JID + "\" from=\"" + Fixtures.FROM_JID + "\">\n" +
-            "  <command xmlns=\"http://jabber.org/protocol/commands\" node=\"http://xmpp.org/protocol/openlink:01:00:00#get-interests\" status=\"completed\">\n" +
-            "    <iodata xmlns=\"urn:xmpp:tmp:io-data\" type=\"output\">\n" +
-            "      <out>\n" +
-            "        <interests xmlns=\"http://xmpp.org/protocol/openlink:01:00:00/interests\">\n" +
-            "          <interest id=\"" + CoreFixtures.INTEREST_ID + "\" type=\"test-interest-type\" label=\"test interest label\" default=\"true\"/>\n" +
-            "          <interest id=\"sip:6001@uta.bt.com-DirectDial-1trader1@btsm11\" type=\"DirectoryNumber\" label=\"6001/1\" default=\"false\"/>\n" +
-            "        </interests>\n" +
-            "      </out>\n" +
-            "    </iodata>\n" +
-            "  </command>\n" +
-            "</iq>\n";
-
-    private static final String GET_INTERESTS_RESULT_WITH_BAD_VALUES = "<iq type=\"set\">\n" +
-            "  <command xmlns=\"http://jabber.org/protocol/commands\" action=\"execute\" node=\"http://xmpp.org/protocol/openlink:01:00:00#get-interests\">\n" +
-            "    <iodata xmlns=\"urn:xmpp:tmp:io-data\" type=\"output\">\n" +
-            "      <out>\n" +
-            "      </out>\n" +
-            "    </iodata>\n" +
-            "  </command>\n" +
-            "</iq>\n";
 
     @Test
     public void canCreateAStanza() throws Exception {
@@ -79,7 +58,7 @@ public class GetInterestsResultTest {
                 .addInterest(interest2)
                 .build();
 
-        assertThat(result.toXML(), isIdenticalTo(GET_INTERESTS_RESULT).ignoreWhitespace());
+        assertThat(result.toXML(), isIdenticalTo(GetInterestsFixtures.GET_INTERESTS_RESULT).ignoreWhitespace());
     }
 
     @Test
@@ -99,7 +78,7 @@ public class GetInterestsResultTest {
     @Test
     public void willParseAnXmppStanza() throws Exception {
 
-        final GetInterestsResult result = (GetInterestsResult) OpenlinkIQParser.parse(Fixtures.iqFrom(GET_INTERESTS_RESULT));
+        final GetInterestsResult result = (GetInterestsResult) OpenlinkIQParser.parse(Fixtures.iqFrom(GetInterestsFixtures.GET_INTERESTS_RESULT));
         assertThat(result.getID(), is(CoreFixtures.STANZA_ID));
         assertThat(result.getTo(), is(Fixtures.TO_JID));
         assertThat(result.getFrom(), is(Fixtures.FROM_JID));
@@ -126,7 +105,7 @@ public class GetInterestsResultTest {
     @Test
     public void willReturnParsingErrors() throws Exception {
 
-        final GetInterestsResult result = GetInterestsResult.from(Fixtures.iqFrom(GET_INTERESTS_RESULT_WITH_BAD_VALUES));
+        final GetInterestsResult result = GetInterestsResult.from(Fixtures.iqFrom(GetInterestsFixtures.GET_INTERESTS_RESULT_WITH_BAD_VALUES));
 
         assertThat(result.getParseErrors(), contains(
                 "Invalid stanza; missing 'to' attribute is mandatory",

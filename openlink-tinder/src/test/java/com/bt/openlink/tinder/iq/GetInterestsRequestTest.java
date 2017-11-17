@@ -12,6 +12,7 @@ import org.junit.rules.ExpectedException;
 import org.xmpp.packet.IQ;
 
 import com.bt.openlink.CoreFixtures;
+import com.bt.openlink.GetInterestsFixtures;
 import com.bt.openlink.tinder.Fixtures;
 
 @SuppressWarnings("ConstantConditions")
@@ -19,24 +20,6 @@ public class GetInterestsRequestTest {
 
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
-
-    private static final String GET_INTERESTS_REQUEST = "<iq type=\"set\" id=\"" + CoreFixtures.STANZA_ID + "\" to=\"" + Fixtures.TO_JID + "\" from=\"" + Fixtures.FROM_JID + "\">\n" +
-            "  <command xmlns=\"http://jabber.org/protocol/commands\" node=\"http://xmpp.org/protocol/openlink:01:00:00#get-interests\" action=\"execute\">\n" +
-            "    <iodata xmlns=\"urn:xmpp:tmp:io-data\" type=\"input\">\n" +
-            "      <in>\n" +
-            "        <profile>" + CoreFixtures.PROFILE_ID + "</profile>\n" +
-            "      </in>\n" +
-            "    </iodata>\n" +
-            "  </command>\n" +
-            "</iq>\n";
-
-    private static final String GET_INTERESTS_REQUEST_WITH_BAD_VALUES = "<iq type='get'>\n" +
-            "  <command xmlns=\"http://jabber.org/protocol/commands\" action=\"execute\" node=\"http://xmpp.org/protocol/openlink:01:00:00#get-interests\">\n" +
-            "    <iodata xmlns=\"urn:xmpp:tmp:io-data\" type=\"input\">\n" +
-            "      <in/>\n" +
-            "    </iodata>\n" +
-            "  </command>\n" +
-            "</iq>\n";
 
     @Test
     public void canCreateAStanza() throws Exception {
@@ -75,13 +58,13 @@ public class GetInterestsRequestTest {
                 .setProfileId(CoreFixtures.PROFILE_ID)
                 .build();
 
-        assertThat(request.toXML(), isIdenticalTo(GET_INTERESTS_REQUEST).ignoreWhitespace());
+        assertThat(request.toXML(), isIdenticalTo(GetInterestsFixtures.GET_INTERESTS_REQUEST).ignoreWhitespace());
     }
 
     @Test
     public void willParseAnXmppStanza() throws Exception {
 
-        final GetInterestsRequest request = (GetInterestsRequest) OpenlinkIQParser.parse(Fixtures.iqFrom(GET_INTERESTS_REQUEST));
+        final GetInterestsRequest request = (GetInterestsRequest) OpenlinkIQParser.parse(Fixtures.iqFrom(GetInterestsFixtures.GET_INTERESTS_REQUEST));
         assertThat(request.getID(), is(CoreFixtures.STANZA_ID));
         assertThat(request.getTo(), is(Fixtures.TO_JID));
         assertThat(request.getFrom(), is(Fixtures.FROM_JID));
@@ -93,7 +76,7 @@ public class GetInterestsRequestTest {
     @Test
     public void willReturnParsingErrors() throws Exception {
 
-        final IQ iq = Fixtures.iqFrom(GET_INTERESTS_REQUEST_WITH_BAD_VALUES);
+        final IQ iq = Fixtures.iqFrom(GetInterestsFixtures.GET_INTERESTS_REQUEST_WITH_BAD_VALUES);
 
         final GetInterestsRequest request = GetInterestsRequest.from(iq);
 
@@ -108,7 +91,7 @@ public class GetInterestsRequestTest {
     @Test
     public void willGenerateAStanzaEvenWithParsingErrors() throws Exception {
 
-        final IQ iq = Fixtures.iqFrom(GET_INTERESTS_REQUEST_WITH_BAD_VALUES);
+        final IQ iq = Fixtures.iqFrom(GetInterestsFixtures.GET_INTERESTS_REQUEST_WITH_BAD_VALUES);
 
         final GetInterestsRequest request = GetInterestsRequest.from(iq);
 
