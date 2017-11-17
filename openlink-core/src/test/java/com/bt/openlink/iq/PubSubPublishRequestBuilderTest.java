@@ -48,14 +48,14 @@ public class PubSubPublishRequestBuilderTest {
 
         final List<String> errors = new ArrayList<>();
         builder.setInterestId(CoreFixtures.INTEREST_ID)
-                .addCall(CoreFixtures.CALL);
+                .addCall(CoreFixtures.CALL_INCOMING_ORIGINATED);
 
         builder.validate();
         builder.validate(errors);
 
         assertThat(errors, is(empty()));
         assertThat(builder.getInterestId().get(), is(CoreFixtures.INTEREST_ID));
-        assertThat(builder.getCalls(), contains(CoreFixtures.CALL));
+        assertThat(builder.getCalls(), contains(CoreFixtures.CALL_INCOMING_ORIGINATED));
     }
 
     @Test
@@ -74,8 +74,8 @@ public class PubSubPublishRequestBuilderTest {
         expectedException.expectMessage("Each call id must be unique - test-call-id appears more than once");
 
         builder.setInterestId(CoreFixtures.INTEREST_ID)
-                .addCall(CoreFixtures.CALL)
-                .addCall(CoreFixtures.CALL);
+                .addCall(CoreFixtures.CALL_INCOMING_ORIGINATED)
+                .addCall(CoreFixtures.CALL_INCOMING_ORIGINATED);
 
         builder.validate();
     }
@@ -87,7 +87,7 @@ public class PubSubPublishRequestBuilderTest {
         expectedException.expectMessage("The call with id test-call-id is on interest test-interest-id which differs from the pub-sub node id test-interest-id-2");
 
         builder.setInterestId(InterestId.from("test-interest-id-2").get())
-                .addCall(CoreFixtures.CALL);
+                .addCall(CoreFixtures.CALL_INCOMING_ORIGINATED);
 
         builder.validate();
     }
@@ -97,7 +97,7 @@ public class PubSubPublishRequestBuilderTest {
 
         final List<String> errors = new ArrayList<>();
 
-        builder.addCall(CoreFixtures.CALL);
+        builder.addCall(CoreFixtures.CALL_INCOMING_ORIGINATED);
 
         builder.validate(errors);
 
@@ -110,7 +110,7 @@ public class PubSubPublishRequestBuilderTest {
         final List<String> errors = new ArrayList<>();
 
         builder.setInterestId(CoreFixtures.INTEREST_ID)
-                .addCall(CoreFixtures.CALL)
+                .addCall(CoreFixtures.CALL_INCOMING_ORIGINATED)
                 .addCall(Call.Builder.start()
                         .setId(CoreFixtures.CALL_ID)
                         .setSite(CoreFixtures.SITE)

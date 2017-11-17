@@ -14,6 +14,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import com.bt.openlink.CoreFixtures;
+import com.bt.openlink.MakeCallFixtures;
 import com.bt.openlink.tinder.Fixtures;
 import com.bt.openlink.type.Call;
 import com.bt.openlink.type.CallDirection;
@@ -22,51 +23,6 @@ import com.bt.openlink.type.Changed;
 
 @SuppressWarnings("ConstantConditions")
 public class MakeCallResultTest {
-    private static final String MAKE_CALL_RESULT = "<iq from='" + Fixtures.FROM_JID + "' to='" + Fixtures.TO_JID + "' id='" + CoreFixtures.STANZA_ID + "' type='result'>\n" +
-            "   <command xmlns=\"http://jabber.org/protocol/commands\" node=\"http://xmpp.org/protocol/openlink:01:00:00#make-call\" status=\"completed\">\n" +
-            "     <iodata xmlns=\"urn:xmpp:tmp:io-data\" type=\"output\">\n" +
-            "      <out>\n" +
-            "        <callstatus xmlns='http://xmpp.org/protocol/openlink:01:00:00#call-status' busy='false'>\n" +
-            "          <call>\n" +
-            "            <id>" + CoreFixtures.CALL_ID + "</id>\n" +
-            "            <site id='42' type='BTSM' default='true'>test site name</site>\n" +
-            "            <profile>" + CoreFixtures.PROFILE_ID + "</profile>\n" +
-            "            <interest>" + CoreFixtures.INTEREST_ID + "</interest>\n" +
-            "            <changed>State</changed>\n" +
-            "            <state>CallOriginated</state>\n" +
-            "            <direction>Incoming</direction>\n" +
-            "            <caller>\n" +
-            "              <number e164='" + CoreFixtures.CALLER_E164_NUMBER + "'>" + CoreFixtures.CALLER_NUMBER + "</number>\n" +
-            "              <name>" + CoreFixtures.CALLER_NAME + "</name>\n" +
-            "            </caller>\n" +
-            "            <called>\n" +
-            "              <number e164='" + CoreFixtures.CALLED_E164_NUMBER + "' destination='" + CoreFixtures.CALLED_DESTINATION + "'>" + CoreFixtures.CALLED_NUMBER + "</number>\n" +
-            "              <name>" + CoreFixtures.CALLED_NAME + "</name>\n" +
-            "            </called>\n" +
-            "            <starttime>2017-10-09T08:07:00.000Z</starttime>\n" +
-            "            <duration>60000</duration>\n" +
-            "            <actions>\n" +
-            "              <AnswerCall/>\n" +
-            "            </actions>\n" +
-            "            <features>\n" +
-            "              <feature id='hs_1' type='Handset' label='Handset 1'>false</feature>\n" +
-            "              <feature id='hs_2' type='Handset' label='Handset 2'>false</feature>\n" +
-            "              <feature id='priv_1' type='Privacy' label='Privacy'>false</feature>\n" +
-            "              <feature id='NetrixHiTouch_sales1' type='DeviceKeys' label='NetrixHiTouch'>\n" +
-            "                <devicekeys xmlns='http://xmpp.org/protocol/openlink:01:00:00/features#device-keys'>\n" +
-            "                  <key>key_1:1:1</key>\n" +
-            "                </devicekeys>\n" +
-            "              </feature>\n" +
-            "            </features>\n" +
-            "            <participants>\n" +
-            "              <participant direction=\"Incoming\" duration=\"60000\" jid=\"test-user@test-domain\" starttime=\"2017-10-09T08:07:00.000Z\" timestamp=\"Mon Oct 09 08:07:00 UTC 2017\" type=\"Active\"/>\n" +
-            "            </participants>\n" +
-            "          </call>\n" +
-            "        </callstatus>\n" +
-            "      </out>\n" +
-            "    </iodata>\n" +
-            "  </command>\n" +
-            "</iq>";
 
     @Rule public final ExpectedException expectedException = ExpectedException.none();
 
@@ -76,10 +32,10 @@ public class MakeCallResultTest {
         final MakeCallResult result = MakeCallResult.Builder.start()
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
-                .addCall(CoreFixtures.CALL)
+                .addCall(CoreFixtures.CALL_INCOMING_ORIGINATED)
                 .build();
 
-        assertThat(result.getCalls(), contains(CoreFixtures.CALL));
+        assertThat(result.getCalls(), contains(CoreFixtures.CALL_INCOMING_ORIGINATED));
     }
 
     @Test
@@ -89,10 +45,10 @@ public class MakeCallResultTest {
                 .setId(CoreFixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
-                .addCalls(Collections.singletonList(CoreFixtures.CALL))
+                .addCalls(Collections.singletonList(CoreFixtures.CALL_INCOMING_ORIGINATED))
                 .build();
 
-        assertThat(result.toXML(), isIdenticalTo(MAKE_CALL_RESULT).ignoreWhitespace());
+        assertThat(result.toXML(), isIdenticalTo(MakeCallFixtures.MAKE_CALL_RESULT).ignoreWhitespace());
     }
 
     @Test
@@ -109,7 +65,7 @@ public class MakeCallResultTest {
     @Test
     public void willParseAnXmppStanza() throws Exception {
 
-        final MakeCallResult result = (MakeCallResult) OpenlinkIQParser.parse(Fixtures.iqFrom(MAKE_CALL_RESULT));
+        final MakeCallResult result = (MakeCallResult) OpenlinkIQParser.parse(Fixtures.iqFrom(MakeCallFixtures.MAKE_CALL_RESULT));
 
         assertThat(result.getID(), is(CoreFixtures.STANZA_ID));
         assertThat(result.getTo(), is(Fixtures.TO_JID));

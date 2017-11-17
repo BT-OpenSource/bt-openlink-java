@@ -42,25 +42,25 @@ public class MakeCallResultBuilderTest {
     public void willValidateAPopulatedBuilder() throws Exception {
 
         final List<String> errors = new ArrayList<>();
-        builder.addCall(CoreFixtures.CALL)
+        builder.addCall(CoreFixtures.CALL_INCOMING_ORIGINATED)
                 .validate();
         builder.validate(errors);
 
         assertThat(errors, is(empty()));
-        assertThat(builder.getCalls(), contains(CoreFixtures.CALL));
+        assertThat(builder.getCalls(), contains(CoreFixtures.CALL_INCOMING_ORIGINATED));
     }
 
     @Test
     public void willAddMultipleCalls() throws Exception {
 
         final List<String> errors = new ArrayList<>();
-        builder.addCall(CoreFixtures.CALL)
-                .addCall(CoreFixtures.CALL)
+        builder.addCall(CoreFixtures.CALL_INCOMING_ORIGINATED)
+                .addCall(CoreFixtures.CALL_INCOMING_ORIGINATED)
                 .validate();
         builder.validate(errors);
 
         assertThat(errors, is(empty()));
-        assertThat(builder.getCalls(), contains(CoreFixtures.CALL, CoreFixtures.CALL));
+        assertThat(builder.getCalls(), contains(CoreFixtures.CALL_INCOMING_ORIGINATED, CoreFixtures.CALL_INCOMING_ORIGINATED));
     }
 
     @Test

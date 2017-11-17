@@ -15,6 +15,7 @@ import org.junit.rules.ExpectedException;
 import org.xmpp.packet.IQ;
 
 import com.bt.openlink.CoreFixtures;
+import com.bt.openlink.MakeCallFixtures;
 import com.bt.openlink.tinder.Fixtures;
 
 @SuppressWarnings("ConstantConditions")
@@ -22,26 +23,6 @@ public class MakeCallRequestTest {
 
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
-
-    private static final String MAKE_CALL_REQUEST = "<iq type='set' id='" + CoreFixtures.STANZA_ID + "' to='" + Fixtures.TO_JID + "' from='" + Fixtures.FROM_JID + "'>\n" +
-            "  <command xmlns='http://jabber.org/protocol/commands' action='execute' node='http://xmpp.org/protocol/openlink:01:00:00#make-call'>\n" +
-            "    <iodata xmlns='urn:xmpp:tmp:io-data' type='input'>\n" +
-            "      <in>\n" +
-            "        <jid>" + Fixtures.USER_FULL_JID + "</jid>\n" +
-            "        <interest>" + CoreFixtures.INTEREST_ID + "</interest>\n" +
-            "        <destination>" + CoreFixtures.CALLED_DESTINATION + "</destination>\n" +
-            "      </in>\n" +
-            "    </iodata>\n" +
-            "  </command>\n" +
-            "</iq>\n";
-
-    private static final String MAKE_CALL_REQUEST_WITH_BAD_VALUES = "<iq type='get'>\n" +
-            "  <command xmlns='http://jabber.org/protocol/commands' action='execute' node='http://xmpp.org/protocol/openlink:01:00:00#make-call'>\n" +
-            "    <iodata xmlns='urn:xmpp:tmp:io-data' type='input'>\n" +
-            "      <in/>\n" +
-            "    </iodata>\n" +
-            "  </command>\n" +
-            "</iq>\n";
 
     @Test
     public void canCreateAStanza() throws Exception {
@@ -86,13 +67,13 @@ public class MakeCallRequestTest {
                 .setDestination(CoreFixtures.CALLED_DESTINATION)
                 .build();
 
-        assertThat(request.toXML(), isIdenticalTo(MAKE_CALL_REQUEST).ignoreWhitespace());
+        assertThat(request.toXML(), isIdenticalTo(MakeCallFixtures.MAKE_CALL_REQUEST).ignoreWhitespace());
     }
 
     @Test
     public void willParseAnXmppStanza() throws Exception {
 
-        final MakeCallRequest request = (MakeCallRequest) OpenlinkIQParser.parse(Fixtures.iqFrom(MAKE_CALL_REQUEST));
+        final MakeCallRequest request = (MakeCallRequest) OpenlinkIQParser.parse(Fixtures.iqFrom(MakeCallFixtures.MAKE_CALL_REQUEST));
         assertThat(request.getID(), is(CoreFixtures.STANZA_ID));
         assertThat(request.getTo(), is(Fixtures.TO_JID));
         assertThat(request.getFrom(), is(Fixtures.FROM_JID));
@@ -106,7 +87,7 @@ public class MakeCallRequestTest {
     @Test
     public void willReturnParsingErrors() throws Exception {
 
-        final IQ iq = Fixtures.iqFrom(MAKE_CALL_REQUEST_WITH_BAD_VALUES);
+        final IQ iq = Fixtures.iqFrom(MakeCallFixtures.MAKE_CALL_REQUEST_WITH_BAD_VALUES);
 
         final MakeCallRequest request = MakeCallRequest.from(iq);
 
@@ -129,7 +110,7 @@ public class MakeCallRequestTest {
     @Test
     public void willGenerateAStanzaEvenWithParsingErrors() throws Exception {
 
-        final IQ iq = Fixtures.iqFrom(MAKE_CALL_REQUEST_WITH_BAD_VALUES);
+        final IQ iq = Fixtures.iqFrom(MakeCallFixtures.MAKE_CALL_REQUEST_WITH_BAD_VALUES);
 
         final MakeCallRequest request = MakeCallRequest.from(iq);
 

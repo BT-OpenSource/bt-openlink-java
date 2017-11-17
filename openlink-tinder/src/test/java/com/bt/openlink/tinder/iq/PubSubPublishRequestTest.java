@@ -92,7 +92,7 @@ public class PubSubPublishRequestTest {
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
                 .setPubSubNodeId(CoreFixtures.NODE_ID)
-                .addCall(CoreFixtures.CALL)
+                .addCall(CoreFixtures.CALL_INCOMING_ORIGINATED)
                 .build();
 
         assertThat(request.getID(), is(CoreFixtures.STANZA_ID));
@@ -100,7 +100,7 @@ public class PubSubPublishRequestTest {
         assertThat(request.getFrom(), is(Fixtures.FROM_JID));
         assertThat(request.getPubSubNodeId().get(), is(CoreFixtures.NODE_ID));
         assertThat(request.getCalls().size(), is(1));
-        assertThat(request.getCalls().iterator().next(), is(CoreFixtures.CALL));
+        assertThat(request.getCalls().iterator().next(), is(CoreFixtures.CALL_INCOMING_ORIGINATED));
     }
 
     @Test
@@ -111,7 +111,7 @@ public class PubSubPublishRequestTest {
         PubSubPublishRequest.Builder.start()
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
-                .addCall(CoreFixtures.CALL)
+                .addCall(CoreFixtures.CALL_INCOMING_ORIGINATED)
                 .build();
     }
 
@@ -125,7 +125,7 @@ public class PubSubPublishRequestTest {
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
                 .setPubSubNodeId(PubSubNodeId.from("another-node").get())
-                .addCalls(Collections.singletonList(CoreFixtures.CALL))
+                .addCalls(Collections.singletonList(CoreFixtures.CALL_INCOMING_ORIGINATED))
                 .build();
     }
 
@@ -136,7 +136,7 @@ public class PubSubPublishRequestTest {
                 .setId(CoreFixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
-                .addCall(CoreFixtures.CALL)
+                .addCall(CoreFixtures.CALL_INCOMING_ORIGINATED)
                 .setInterestId(CoreFixtures.INTEREST_ID)
                 .build();
         assertThat(request.toXML(), isIdenticalTo(PUBLISH_REQUEST).ignoreWhitespace());

@@ -106,8 +106,8 @@ public class CallStatusMessageTest {
                 .setId(CoreFixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
-                .setPubSubNodeId(CoreFixtures.CALL.getInterestId().get())
-                .addCall(CoreFixtures.CALL)
+                .setPubSubNodeId(CoreFixtures.CALL_INCOMING_ORIGINATED.getInterestId().get())
+                .addCall(CoreFixtures.CALL_INCOMING_ORIGINATED)
                 .build();
 
         assertThat(message.getID(), is(CoreFixtures.STANZA_ID));
@@ -116,7 +116,7 @@ public class CallStatusMessageTest {
         assertThat(message.getPubSubNodeId().get(), is(CoreFixtures.NODE_ID));
         final List<Call> calls = message.getCalls();
         final Call theOnlyCall = calls.get(0);
-        assertThat(theOnlyCall, is(sameInstance(CoreFixtures.CALL)));
+        assertThat(theOnlyCall, is(sameInstance(CoreFixtures.CALL_INCOMING_ORIGINATED)));
         assertThat(calls.size(), is(1));
     }
 
@@ -126,8 +126,8 @@ public class CallStatusMessageTest {
         final CallStatusMessage message = CallStatusMessage.Builder.start()
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
-                .setPubSubNodeId(CoreFixtures.CALL.getInterestId().get())
-                .addCalls(Collections.singletonList(CoreFixtures.CALL))
+                .setPubSubNodeId(CoreFixtures.CALL_INCOMING_ORIGINATED.getInterestId().get())
+                .addCalls(Collections.singletonList(CoreFixtures.CALL_INCOMING_ORIGINATED))
                 .build();
 
         assertThat(message.getID(), is(nullValue()));
@@ -141,8 +141,8 @@ public class CallStatusMessageTest {
         CallStatusMessage.Builder.start()
                 .setId(CoreFixtures.STANZA_ID)
                 .setFrom(Fixtures.FROM_JID)
-                .setPubSubNodeId(CoreFixtures.CALL.getInterestId().get())
-                .addCall(CoreFixtures.CALL)
+                .setPubSubNodeId(CoreFixtures.CALL_INCOMING_ORIGINATED.getInterestId().get())
+                .addCall(CoreFixtures.CALL_INCOMING_ORIGINATED)
                 .build();
     }
 
@@ -155,7 +155,7 @@ public class CallStatusMessageTest {
                 .setId(CoreFixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
-                .addCall(CoreFixtures.CALL)
+                .addCall(CoreFixtures.CALL_INCOMING_ORIGINATED)
                 .build();
     }
 
@@ -169,7 +169,7 @@ public class CallStatusMessageTest {
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
                 .setPubSubNodeId(PubSubNodeId.from("not-" + CoreFixtures.INTEREST_ID).get())
-                .addCall(CoreFixtures.CALL)
+                .addCall(CoreFixtures.CALL_INCOMING_ORIGINATED)
                 .build();
     }
 
@@ -193,10 +193,10 @@ public class CallStatusMessageTest {
                 .setId(CoreFixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
-                .setPubSubNodeId(CoreFixtures.CALL.getInterestId().get())
+                .setPubSubNodeId(CoreFixtures.CALL_INCOMING_ORIGINATED.getInterestId().get())
                 .setItemId(ItemId.from("test-item-id").get())
                 .setCallStatusBusy(true)
-                .addCall(CoreFixtures.CALL)
+                .addCall(CoreFixtures.CALL_INCOMING_ORIGINATED)
                 .build();
 
         assertThat(message.toXML(), isIdenticalTo(CALL_STATUS_MESSAGE).ignoreWhitespace());
@@ -275,9 +275,9 @@ public class CallStatusMessageTest {
                 .setId(CoreFixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
-                .setPubSubNodeId(CoreFixtures.CALL.getInterestId().get())
+                .setPubSubNodeId(CoreFixtures.CALL_INCOMING_ORIGINATED.getInterestId().get())
                 .setItemId(ItemId.from("test-item-id").get())
-                .addCall(CoreFixtures.CALL)
+                .addCall(CoreFixtures.CALL_INCOMING_ORIGINATED)
                 .setDelay(delayedFrom)
                 .build();
 

@@ -4,6 +4,9 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.util.TimeZone;
 
 import com.bt.openlink.type.Call;
 import com.bt.openlink.type.CallDirection;
@@ -29,6 +32,10 @@ import com.bt.openlink.type.Site;
 
 @SuppressWarnings("ConstantConditions")
 public class CoreFixtures {
+
+    private static final DateTimeFormatter ISO_8601_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+    private static final DateTimeFormatter JAVA_UTIL_DATE_FORMATTER = DateTimeFormatter.ofPattern("EEE MMM dd HH:mm:ss zzz yyyy");
+
     public enum typeEnum {
         set,
         result,
@@ -95,7 +102,7 @@ public class CoreFixtures {
             .setId(INTEREST_ID)
             .setLabel("test interest label")
             .build();
-    public static final Call CALL = Call.Builder.start()
+    public static final Call CALL_INCOMING_ORIGINATED = Call.Builder.start()
             .setId(CALL_ID)
             .setSite(SITE)
             .setProfileId(PROFILE_ID)
@@ -119,5 +126,44 @@ public class CoreFixtures {
             .addFeature(CallFeature.Builder.start().setId(FeatureId.from("NetrixHiTouch_sales1").get()).setType(FeatureType.DEVICE_KEYS).setLabel("NetrixHiTouch").setDeviceKey(DeviceKey.from("key_1:1:1").get()).build())
             .addParticipant(PARTICIPANT)
             .build();
+
+    public static final String CALL_STATUS_INCOMING_ORIGINATED =
+            "<callstatus xmlns='http://xmpp.org/protocol/openlink:01:00:00#call-status' busy='false'>\n" +
+                    "  <call>\n" +
+                    "    <id>" + CoreFixtures.CALL_ID + "</id>\n" +
+                    "    <site id='42' type='BTSM' default='true'>test site name</site>\n" +
+                    "    <profile>" + CoreFixtures.PROFILE_ID + "</profile>\n" +
+                    "    <interest>" + CoreFixtures.INTEREST_ID + "</interest>\n" +
+                    "    <changed>State</changed>\n" +
+                    "    <state>CallOriginated</state>\n" +
+                    "    <direction>Incoming</direction>\n" +
+                    "    <caller>\n" +
+                    "      <number e164='" + CoreFixtures.CALLER_E164_NUMBER + "'>" + CoreFixtures.CALLER_NUMBER + "</number>\n" +
+                    "      <name>" + CoreFixtures.CALLER_NAME + "</name>\n" +
+                    "    </caller>\n" +
+                    "    <called>\n" +
+                    "      <number e164='" + CoreFixtures.CALLED_E164_NUMBER + "' destination='" + CoreFixtures.CALLED_DESTINATION + "'>" + CoreFixtures.CALLED_NUMBER + "</number>\n" +
+                    "      <name>" + CoreFixtures.CALLED_NAME + "</name>\n" +
+                    "    </called>\n" +
+                    "    <starttime>" + ISO_8601_FORMATTER.format(START_TIME.atZone(ZoneOffset.UTC)) + "</starttime>\n" +
+                    "    <duration>60000</duration>\n" +
+                    "    <actions>\n" +
+                    "      <AnswerCall/>\n" +
+                    "    </actions>\n" +
+                    "    <features>\n" +
+                    "      <feature id='hs_1' type='Handset' label='Handset 1'>false</feature>\n" +
+                    "      <feature id='hs_2' type='Handset' label='Handset 2'>false</feature>\n" +
+                    "      <feature id='priv_1' type='Privacy' label='Privacy'>false</feature>\n" +
+                    "      <feature id='NetrixHiTouch_sales1' type='DeviceKeys' label='NetrixHiTouch'>\n" +
+                    "        <devicekeys xmlns='http://xmpp.org/protocol/openlink:01:00:00/features#device-keys'>\n" +
+                    "          <key>key_1:1:1</key>\n" +
+                    "        </devicekeys>\n" +
+                    "      </feature>\n" +
+                    "    </features>\n" +
+                    "    <participants>\n" +
+                    "      <participant direction='Incoming' duration='60000' jid='test-user@test-domain' starttime='" + ISO_8601_FORMATTER.format(START_TIME.atZone(ZoneOffset.UTC)) + "' timestamp='" + JAVA_UTIL_DATE_FORMATTER.format(START_TIME.atZone(TimeZone.getTimeZone("UTC").toZoneId())) + "' type='Active'/>\n" +
+                    "    </participants>\n" +
+                    "  </call>\n" +
+                    "</callstatus>\n";
 
 }
