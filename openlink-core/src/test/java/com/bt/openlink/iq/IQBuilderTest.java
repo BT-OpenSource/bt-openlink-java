@@ -16,20 +16,20 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import com.bt.openlink.Fixtures;
+import com.bt.openlink.CoreFixtures;
 
 @SuppressWarnings("ConstantConditions")
 public class IQBuilderTest {
 
-    private static class Builder extends IQBuilder<Builder, String, Fixtures.typeEnum> {
+    private static class Builder extends IQBuilder<Builder, String, CoreFixtures.typeEnum> {
         protected Builder() {
-            super(Fixtures.typeEnum.class);
+            super(CoreFixtures.typeEnum.class);
         }
 
         @Nonnull
         @Override
         public String getExpectedIQType() {
-            return Fixtures.typeEnum.set.name();
+            return CoreFixtures.typeEnum.set.name();
         }
     }
 
@@ -49,7 +49,7 @@ public class IQBuilderTest {
         builder.setTo("to");
         builder.setFrom("from");
         builder.setId("id");
-        builder.setIQType(Fixtures.typeEnum.set);
+        builder.setIQType(CoreFixtures.typeEnum.set);
 
         builder.validate();
         builder.validate(errors);
@@ -58,14 +58,14 @@ public class IQBuilderTest {
         assertThat(builder.getTo().get(), is("to"));
         assertThat(builder.getFrom().get(), is("from"));
         assertThat(builder.getId().get(), is("id"));
-        assertThat(builder.getIqType().get(), is(Fixtures.typeEnum.set));
+        assertThat(builder.getIqType().get(), is(CoreFixtures.typeEnum.set));
     }
 
     @Test
     public void willValidateThatToIsSet() throws Exception {
         builder.setFrom("from");
         builder.setId("id");
-        builder.setIQType(Fixtures.typeEnum.set);
+        builder.setIQType(CoreFixtures.typeEnum.set);
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("The stanza 'to' has not been set");
 
@@ -76,7 +76,7 @@ public class IQBuilderTest {
     public void willValidateThatFromIsSet() throws Exception {
         builder.setTo("to");
         builder.setId("id");
-        builder.setIQType(Fixtures.typeEnum.set);
+        builder.setIQType(CoreFixtures.typeEnum.set);
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("The stanza 'from' has not been set");
 
@@ -87,7 +87,7 @@ public class IQBuilderTest {
     public void willCheckThatIdAndFromAndTypeAreSet() throws Exception {
 
         final List<String> errors = new ArrayList<>();
-        builder.setIQType(Fixtures.typeEnum.MY_UNEXPECTED_TYPE);
+        builder.setIQType(CoreFixtures.typeEnum.MY_UNEXPECTED_TYPE);
 
         builder.validate(errors);
 
@@ -99,7 +99,7 @@ public class IQBuilderTest {
         assertThat(builder.getTo(), is(Optional.empty()));
         assertThat(builder.getFrom(), is(Optional.empty()));
         assertThat(builder.getId(), is(Optional.empty()));
-        assertThat(builder.getIqType().get(), is(Fixtures.typeEnum.MY_UNEXPECTED_TYPE));
+        assertThat(builder.getIqType().get(), is(CoreFixtures.typeEnum.MY_UNEXPECTED_TYPE));
     }
 
 }

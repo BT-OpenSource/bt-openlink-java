@@ -13,14 +13,14 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import com.bt.openlink.Fixtures;
+import com.bt.openlink.CoreFixtures;
 
 @SuppressWarnings("ConstantConditions")
 public class MakeCallResultBuilderTest {
 
-    private static class Builder extends MakeCallResultBuilder<Builder, String, Fixtures.typeEnum> {
+    private static class Builder extends MakeCallResultBuilder<Builder, String, CoreFixtures.typeEnum> {
         protected Builder() {
-            super(Fixtures.typeEnum.class);
+            super(CoreFixtures.typeEnum.class);
         }
     }
 
@@ -42,25 +42,25 @@ public class MakeCallResultBuilderTest {
     public void willValidateAPopulatedBuilder() throws Exception {
 
         final List<String> errors = new ArrayList<>();
-        builder.addCall(Fixtures.CALL)
+        builder.addCall(CoreFixtures.CALL)
                 .validate();
         builder.validate(errors);
 
         assertThat(errors, is(empty()));
-        assertThat(builder.getCalls(), contains(Fixtures.CALL));
+        assertThat(builder.getCalls(), contains(CoreFixtures.CALL));
     }
 
     @Test
     public void willAddMultipleCalls() throws Exception {
 
         final List<String> errors = new ArrayList<>();
-        builder.addCall(Fixtures.CALL)
-                .addCall(Fixtures.CALL)
+        builder.addCall(CoreFixtures.CALL)
+                .addCall(CoreFixtures.CALL)
                 .validate();
         builder.validate(errors);
 
         assertThat(errors, is(empty()));
-        assertThat(builder.getCalls(), contains(Fixtures.CALL, Fixtures.CALL));
+        assertThat(builder.getCalls(), contains(CoreFixtures.CALL, CoreFixtures.CALL));
     }
 
     @Test

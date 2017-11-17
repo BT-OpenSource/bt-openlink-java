@@ -12,7 +12,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import com.bt.openlink.Fixtures;
+import com.bt.openlink.CoreFixtures;
 
 @SuppressWarnings("ConstantConditions")
 public class FeatureTest {
@@ -23,12 +23,12 @@ public class FeatureTest {
     public void willBuildAFeatureWithAnEnabledFlag() throws Exception {
 
         final Feature feature = Feature.Builder.start()
-                .setId(Fixtures.FEATURE_ID)
+                .setId(CoreFixtures.FEATURE_ID)
                 .setType(FeatureType.CALL_FORWARD)
                 .setLabel("test-feature-label")
                 .build();
 
-        assertThat(feature.getId().get(), is(Fixtures.FEATURE_ID));
+        assertThat(feature.getId().get(), is(CoreFixtures.FEATURE_ID));
         assertThat(feature.getType().get(), is(FeatureType.CALL_FORWARD));
         assertThat(feature.getLabel().get(), is("test-feature-label"));
     }
@@ -52,7 +52,7 @@ public class FeatureTest {
         expectedException.expectMessage("The feature type has not been set");
 
         Feature.Builder.start()
-                .setId(Fixtures.FEATURE_ID)
+                .setId(CoreFixtures.FEATURE_ID)
                 .setLabel("test-feature-label")
                 .build();
     }
@@ -64,7 +64,7 @@ public class FeatureTest {
         expectedException.expectMessage("The feature label has not been set");
 
         Feature.Builder.start()
-                .setId(Fixtures.FEATURE_ID)
+                .setId(CoreFixtures.FEATURE_ID)
                 .setType(FeatureType.CALL_FORWARD)
                 .build();
     }

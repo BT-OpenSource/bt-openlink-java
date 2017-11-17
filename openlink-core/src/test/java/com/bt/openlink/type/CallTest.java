@@ -16,7 +16,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import com.bt.openlink.Fixtures;
+import com.bt.openlink.CoreFixtures;
 
 @SuppressWarnings("ConstantConditions")
 public class CallTest {
@@ -30,47 +30,47 @@ public class CallTest {
     public void willCreateACall() throws Exception {
 
         final Call call = Call.Builder.start()
-                .setId(Fixtures.CALL_ID)
-                .setSite(Fixtures.SITE)
-                .setProfileId(Fixtures.PROFILE_ID)
-                .setInterestId(Fixtures.INTEREST_ID)
+                .setId(CoreFixtures.CALL_ID)
+                .setSite(CoreFixtures.SITE)
+                .setProfileId(CoreFixtures.PROFILE_ID)
+                .setInterestId(CoreFixtures.INTEREST_ID)
                 .setChanged(Changed.STATE)
                 .setState(CallState.CALL_ORIGINATED)
                 .setDirection(CallDirection.INCOMING)
-                .setCallerNumber(Fixtures.CALLER_NUMBER)
-                .setCallerName(Fixtures.CALLER_NAME)
-                .addCallerE164Number(Fixtures.CALLER_E164_NUMBER)
-                .setCalledNumber(Fixtures.CALLED_NUMBER)
-                .setCalledName(Fixtures.CALLED_NAME)
-                .setCalledDestination(Fixtures.CALLED_DESTINATION)
-                .addCalledE164Number(Fixtures.CALLED_E164_NUMBER)
+                .setCallerNumber(CoreFixtures.CALLER_NUMBER)
+                .setCallerName(CoreFixtures.CALLER_NAME)
+                .addCallerE164Number(CoreFixtures.CALLER_E164_NUMBER)
+                .setCalledNumber(CoreFixtures.CALLED_NUMBER)
+                .setCalledName(CoreFixtures.CALLED_NAME)
+                .setCalledDestination(CoreFixtures.CALLED_DESTINATION)
+                .addCalledE164Number(CoreFixtures.CALLED_E164_NUMBER)
                 .setStartTime(startTime)
                 .setDuration(duration)
                 .addAction(RequestAction.ANSWER_CALL)
-                .addFeature(Fixtures.CALL_FEATURE)
-                .addParticipant(Fixtures.PARTICIPANT)
+                .addFeature(CoreFixtures.CALL_FEATURE)
+                .addParticipant(CoreFixtures.PARTICIPANT)
                 .build();
 
-        assertThat(call.getId().get(), is(Fixtures.CALL_ID));
-        assertThat(call.getSite().get(), is(Fixtures.SITE));
-        assertThat(call.getProfileId().get(), is(Fixtures.PROFILE_ID));
-        assertThat(call.getInterestId().get(), is(Fixtures.INTEREST_ID));
+        assertThat(call.getId().get(), is(CoreFixtures.CALL_ID));
+        assertThat(call.getSite().get(), is(CoreFixtures.SITE));
+        assertThat(call.getProfileId().get(), is(CoreFixtures.PROFILE_ID));
+        assertThat(call.getInterestId().get(), is(CoreFixtures.INTEREST_ID));
         assertThat(call.getChanged().get(), is(Changed.STATE));
         assertThat(call.getState().get(), is(CallState.CALL_ORIGINATED));
         assertThat(call.getDirection().get(), is(CallDirection.INCOMING));
-        assertThat(call.getCallerNumber().get(), is(Fixtures.CALLER_NUMBER));
-        assertThat(call.getCallerName().get(), is(Fixtures.CALLER_NAME));
-        assertThat(call.getCallerE164Numbers(), is(Collections.singletonList(Fixtures.CALLER_E164_NUMBER)));
-        assertThat(call.getCalledNumber().get(), is(Fixtures.CALLED_NUMBER));
-        assertThat(call.getCalledName().get(), is(Fixtures.CALLED_NAME));
-        assertThat(call.getCalledDestination().get(), is(Fixtures.CALLED_DESTINATION));
-        assertThat(call.getCalledE164Numbers(), is(Collections.singletonList(Fixtures.CALLED_E164_NUMBER)));
+        assertThat(call.getCallerNumber().get(), is(CoreFixtures.CALLER_NUMBER));
+        assertThat(call.getCallerName().get(), is(CoreFixtures.CALLER_NAME));
+        assertThat(call.getCallerE164Numbers(), is(Collections.singletonList(CoreFixtures.CALLER_E164_NUMBER)));
+        assertThat(call.getCalledNumber().get(), is(CoreFixtures.CALLED_NUMBER));
+        assertThat(call.getCalledName().get(), is(CoreFixtures.CALLED_NAME));
+        assertThat(call.getCalledDestination().get(), is(CoreFixtures.CALLED_DESTINATION));
+        assertThat(call.getCalledE164Numbers(), is(Collections.singletonList(CoreFixtures.CALLED_E164_NUMBER)));
         assertThat(call.getStartTime().get(), is(startTime));
         assertThat(call.getDuration().get(), is(duration));
         assertThat(call.isParticipating(), is(false));
         assertThat(call.getActions(), contains(RequestAction.ANSWER_CALL));
-        assertThat(call.getFeatures(), contains(Fixtures.CALL_FEATURE));
-        assertThat(call.getParticipants(), contains(Fixtures.PARTICIPANT));
+        assertThat(call.getFeatures(), contains(CoreFixtures.CALL_FEATURE));
+        assertThat(call.getParticipants(), contains(CoreFixtures.PARTICIPANT));
     }
 
     @Test
@@ -80,9 +80,9 @@ public class CallTest {
         expectedException.expectMessage("The call id has not been set");
 
         Call.Builder.start()
-                .setSite(Fixtures.SITE)
-                .setProfileId(Fixtures.PROFILE_ID)
-                .setInterestId(Fixtures.INTEREST_ID)
+                .setSite(CoreFixtures.SITE)
+                .setProfileId(CoreFixtures.PROFILE_ID)
+                .setInterestId(CoreFixtures.INTEREST_ID)
                 .setState(CallState.CALL_ORIGINATED)
                 .setDirection(CallDirection.INCOMING)
                 .setStartTime(startTime)
@@ -98,9 +98,9 @@ public class CallTest {
         expectedException.expectMessage("The call site has not been set");
 
         Call.Builder.start()
-                .setId(Fixtures.CALL_ID)
-                .setProfileId(Fixtures.PROFILE_ID)
-                .setInterestId(Fixtures.INTEREST_ID)
+                .setId(CoreFixtures.CALL_ID)
+                .setProfileId(CoreFixtures.PROFILE_ID)
+                .setInterestId(CoreFixtures.INTEREST_ID)
                 .setState(CallState.CALL_ORIGINATED)
                 .setDirection(CallDirection.INCOMING)
                 .setStartTime(startTime)
@@ -116,9 +116,9 @@ public class CallTest {
         expectedException.expectMessage("The profile id has not been set");
 
         Call.Builder.start()
-                .setId(Fixtures.CALL_ID)
-                .setSite(Fixtures.SITE)
-                .setInterestId(Fixtures.INTEREST_ID)
+                .setId(CoreFixtures.CALL_ID)
+                .setSite(CoreFixtures.SITE)
+                .setInterestId(CoreFixtures.INTEREST_ID)
                 .setState(CallState.CALL_ORIGINATED)
                 .setDirection(CallDirection.INCOMING)
                 .setStartTime(startTime)
@@ -134,9 +134,9 @@ public class CallTest {
         expectedException.expectMessage("The interest id has not been set");
 
         Call.Builder.start()
-                .setId(Fixtures.CALL_ID)
-                .setSite(Fixtures.SITE)
-                .setProfileId(Fixtures.PROFILE_ID)
+                .setId(CoreFixtures.CALL_ID)
+                .setSite(CoreFixtures.SITE)
+                .setProfileId(CoreFixtures.PROFILE_ID)
                 .setState(CallState.CALL_ORIGINATED)
                 .setDirection(CallDirection.INCOMING)
                 .setStartTime(startTime)
@@ -153,10 +153,10 @@ public class CallTest {
         expectedException.expectMessage("The call state has not been set");
 
         Call.Builder.start()
-                .setId(Fixtures.CALL_ID)
-                .setSite(Fixtures.SITE)
-                .setProfileId(Fixtures.PROFILE_ID)
-                .setInterestId(Fixtures.INTEREST_ID)
+                .setId(CoreFixtures.CALL_ID)
+                .setSite(CoreFixtures.SITE)
+                .setProfileId(CoreFixtures.PROFILE_ID)
+                .setInterestId(CoreFixtures.INTEREST_ID)
                 .setDirection(CallDirection.INCOMING)
                 .setStartTime(startTime)
                 .setDuration(duration)
@@ -171,10 +171,10 @@ public class CallTest {
         expectedException.expectMessage("The call direction has not been set");
 
         Call.Builder.start()
-                .setId(Fixtures.CALL_ID)
-                .setSite(Fixtures.SITE)
-                .setProfileId(Fixtures.PROFILE_ID)
-                .setInterestId(Fixtures.INTEREST_ID)
+                .setId(CoreFixtures.CALL_ID)
+                .setSite(CoreFixtures.SITE)
+                .setProfileId(CoreFixtures.PROFILE_ID)
+                .setInterestId(CoreFixtures.INTEREST_ID)
                 .setState(CallState.CALL_ORIGINATED)
                 .setStartTime(startTime)
                 .setDuration(duration)
@@ -189,14 +189,14 @@ public class CallTest {
         expectedException.expectMessage("The call start time has not been set");
 
         Call.Builder.start()
-                .setId(Fixtures.CALL_ID)
-                .setSite(Fixtures.SITE)
-                .setProfileId(Fixtures.PROFILE_ID)
-                .setInterestId(Fixtures.INTEREST_ID)
+                .setId(CoreFixtures.CALL_ID)
+                .setSite(CoreFixtures.SITE)
+                .setProfileId(CoreFixtures.PROFILE_ID)
+                .setInterestId(CoreFixtures.INTEREST_ID)
                 .setState(CallState.CALL_ORIGINATED)
                 .setDirection(CallDirection.INCOMING)
-                .addCalledE164Numbers(Collections.singletonList(Fixtures.CALLED_E164_NUMBER))
-                .addCallerE164Numbers(Collections.singletonList(Fixtures.CALLER_E164_NUMBER))
+                .addCalledE164Numbers(Collections.singletonList(CoreFixtures.CALLED_E164_NUMBER))
+                .addCallerE164Numbers(Collections.singletonList(CoreFixtures.CALLER_E164_NUMBER))
                 .setDuration(duration)
                 .addAction(RequestAction.ANSWER_CALL)
                 .build();
@@ -209,10 +209,10 @@ public class CallTest {
         expectedException.expectMessage("The call duration has not been set");
 
         Call.Builder.start()
-                .setId(Fixtures.CALL_ID)
-                .setSite(Fixtures.SITE)
-                .setProfileId(Fixtures.PROFILE_ID)
-                .setInterestId(Fixtures.INTEREST_ID)
+                .setId(CoreFixtures.CALL_ID)
+                .setSite(CoreFixtures.SITE)
+                .setProfileId(CoreFixtures.PROFILE_ID)
+                .setInterestId(CoreFixtures.INTEREST_ID)
                 .setState(CallState.CALL_ORIGINATED)
                 .setDirection(CallDirection.INCOMING)
                 .setStartTime(startTime)

@@ -14,13 +14,13 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import com.bt.openlink.Fixtures;
+import com.bt.openlink.CoreFixtures;
 
 @SuppressWarnings("ConstantConditions")
 public class PubSubSubscribeUnSubscribeRequestBuilderTest {
-    private static class Builder extends PubSubSubscribeUnSubscribeRequestBuilder<Builder, String, Fixtures.typeEnum> {
+    private static class Builder extends PubSubSubscribeUnSubscribeRequestBuilder<Builder, String, CoreFixtures.typeEnum> {
         protected Builder() {
-            super(Fixtures.typeEnum.class);
+            super(CoreFixtures.typeEnum.class);
         }
     }
 
@@ -42,7 +42,7 @@ public class PubSubSubscribeUnSubscribeRequestBuilderTest {
     public void willValidateAPopulatedBuilder() throws Exception {
 
         final List<String> errors = new ArrayList<>();
-        builder.setInterestId(Fixtures.INTEREST_ID)
+        builder.setInterestId(CoreFixtures.INTEREST_ID)
                 .setJID("jid");
 
         builder.validate();
@@ -50,8 +50,8 @@ public class PubSubSubscribeUnSubscribeRequestBuilderTest {
 
         assertThat(errors, is(empty()));
         assertThat(builder.getJID().get(), is("jid"));
-        assertThat(builder.getInterestId().get(), is(Fixtures.INTEREST_ID));
-        assertThat(builder.getPubSubNodeId().get(), is(Fixtures.INTEREST_ID.toPubSubNodeId()));
+        assertThat(builder.getInterestId().get(), is(CoreFixtures.INTEREST_ID));
+        assertThat(builder.getPubSubNodeId().get(), is(CoreFixtures.INTEREST_ID.toPubSubNodeId()));
     }
 
     @Test
@@ -71,7 +71,7 @@ public class PubSubSubscribeUnSubscribeRequestBuilderTest {
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("The stanza 'jid' has not been set");
 
-        builder.setInterestId(Fixtures.INTEREST_ID);
+        builder.setInterestId(CoreFixtures.INTEREST_ID);
 
         builder.validate();
     }

@@ -13,13 +13,13 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import com.bt.openlink.Fixtures;
+import com.bt.openlink.CoreFixtures;
 
 public class GetInterestsResultBuilderTest {
 
-    private static class Builder extends GetInterestsResultBuilder<Builder, String, Fixtures.typeEnum> {
+    private static class Builder extends GetInterestsResultBuilder<Builder, String, CoreFixtures.typeEnum> {
         protected Builder() {
-            super(Fixtures.typeEnum.class);
+            super(CoreFixtures.typeEnum.class);
         }
     }
 
@@ -41,13 +41,13 @@ public class GetInterestsResultBuilderTest {
     public void willValidateAPopulatedBuilder() throws Exception {
 
         final List<String> errors = new ArrayList<>();
-        builder.addInterest(Fixtures.INTEREST);
+        builder.addInterest(CoreFixtures.INTEREST);
 
         builder.validate();
         builder.validate(errors);
 
         assertThat(errors, is(empty()));
-        assertThat(builder.getInterests(), contains(Fixtures.INTEREST));
+        assertThat(builder.getInterests(), contains(CoreFixtures.INTEREST));
     }
 
     @Test
@@ -56,8 +56,8 @@ public class GetInterestsResultBuilderTest {
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("Each interest id must be unique - test-interest-id appears more than once");
 
-        builder.addInterest(Fixtures.INTEREST);
-        builder.addInterest(Fixtures.INTEREST);
+        builder.addInterest(CoreFixtures.INTEREST);
+        builder.addInterest(CoreFixtures.INTEREST);
 
         builder.validate();
     }
@@ -67,8 +67,8 @@ public class GetInterestsResultBuilderTest {
 
         final List<String> errors = new ArrayList<>();
 
-        builder.addInterest(Fixtures.INTEREST);
-        builder.addInterest(Fixtures.INTEREST);
+        builder.addInterest(CoreFixtures.INTEREST);
+        builder.addInterest(CoreFixtures.INTEREST);
 
         builder.validate(errors);
 

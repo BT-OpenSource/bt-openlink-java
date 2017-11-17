@@ -12,7 +12,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import com.bt.openlink.Fixtures;
+import com.bt.openlink.CoreFixtures;
 
 @SuppressWarnings("ConstantConditions")
 public class ParticipantTest {
@@ -23,18 +23,18 @@ public class ParticipantTest {
     public void willBuildAParticipation() throws Exception {
 
         final Participant participant = Participant.Builder.start()
-                .setJID(Fixtures.JID)
+                .setJID(CoreFixtures.USER_JID_STRING)
                 .setType(ParticipantType.ACTIVE)
                 .setDirection(CallDirection.INCOMING)
-                .setStartTime(Fixtures.START_TIME)
-                .setDuration(Fixtures.DURATION)
+                .setStartTime(CoreFixtures.START_TIME)
+                .setDuration(CoreFixtures.DURATION)
                 .build();
 
-        assertThat(participant.getJID().get(), is(Fixtures.JID));
+        assertThat(participant.getJID().get(), is(CoreFixtures.USER_JID_STRING));
         assertThat(participant.getType().get(), is(ParticipantType.ACTIVE));
         assertThat(participant.getDirection().get(), is(CallDirection.INCOMING));
-        assertThat(participant.getStartTime().get(), is(Fixtures.START_TIME));
-        assertThat(participant.getDuration().get(), is(Fixtures.DURATION));
+        assertThat(participant.getStartTime().get(), is(CoreFixtures.START_TIME));
+        assertThat(participant.getDuration().get(), is(CoreFixtures.DURATION));
     }
 
     @Test
@@ -45,8 +45,8 @@ public class ParticipantTest {
         Participant.Builder.start()
                 .setType(ParticipantType.ACTIVE)
                 .setDirection(CallDirection.INCOMING)
-                .setStartTime(Fixtures.START_TIME)
-                .setDuration(Fixtures.DURATION)
+                .setStartTime(CoreFixtures.START_TIME)
+                .setDuration(CoreFixtures.DURATION)
                 .build();
     }
 
@@ -56,10 +56,10 @@ public class ParticipantTest {
         expectedException.expectMessage("The participation type has not been set");
 
         Participant.Builder.start()
-                .setJID(Fixtures.JID)
+                .setJID(CoreFixtures.USER_JID_STRING)
                 .setDirection(CallDirection.INCOMING)
-                .setStartTime(Fixtures.START_TIME)
-                .setDuration(Fixtures.DURATION)
+                .setStartTime(CoreFixtures.START_TIME)
+                .setDuration(CoreFixtures.DURATION)
                 .build();
     }
 
@@ -69,10 +69,10 @@ public class ParticipantTest {
         expectedException.expectMessage("The participation direction has not been set");
 
         Participant.Builder.start()
-                .setJID(Fixtures.JID)
+                .setJID(CoreFixtures.USER_JID_STRING)
                 .setType(ParticipantType.ACTIVE)
-                .setStartTime(Fixtures.START_TIME)
-                .setDuration(Fixtures.DURATION)
+                .setStartTime(CoreFixtures.START_TIME)
+                .setDuration(CoreFixtures.DURATION)
                 .build();
     }
 
@@ -82,10 +82,10 @@ public class ParticipantTest {
         expectedException.expectMessage("The participation start time has not been set");
 
         Participant.Builder.start()
-                .setJID(Fixtures.JID)
+                .setJID(CoreFixtures.USER_JID_STRING)
                 .setType(ParticipantType.ACTIVE)
                 .setDirection(CallDirection.INCOMING)
-                .setDuration(Fixtures.DURATION)
+                .setDuration(CoreFixtures.DURATION)
                 .build();
     }
 
@@ -95,10 +95,10 @@ public class ParticipantTest {
         expectedException.expectMessage("The participation duration has not been set");
 
         Participant.Builder.start()
-                .setJID(Fixtures.JID)
+                .setJID(CoreFixtures.USER_JID_STRING)
                 .setType(ParticipantType.ACTIVE)
                 .setDirection(CallDirection.INCOMING)
-                .setStartTime(Fixtures.START_TIME)
+                .setStartTime(CoreFixtures.START_TIME)
                 .build();
     }
 

@@ -14,14 +14,14 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import com.bt.openlink.Fixtures;
+import com.bt.openlink.CoreFixtures;
 
 @SuppressWarnings("ConstantConditions")
 public class GetProfilesRequestBuilderTest {
 
-    private static class Builder extends GetProfilesRequestBuilder<Builder, String, Fixtures.typeEnum> {
+    private static class Builder extends GetProfilesRequestBuilder<Builder, String, CoreFixtures.typeEnum> {
         protected Builder() {
-            super(Fixtures.typeEnum.class);
+            super(CoreFixtures.typeEnum.class);
         }
     }
 

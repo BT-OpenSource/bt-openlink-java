@@ -12,7 +12,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import com.bt.openlink.Fixtures;
+import com.bt.openlink.CoreFixtures;
 
 @SuppressWarnings("ConstantConditions")
 public class InterestTest {
@@ -23,14 +23,14 @@ public class InterestTest {
     public void willBuildAnInterest() throws Exception {
 
         final Interest interest = Interest.Builder.start()
-                .setId(Fixtures.INTEREST_ID)
-                .setType(Fixtures.INTEREST_TYPE)
+                .setId(CoreFixtures.INTEREST_ID)
+                .setType(CoreFixtures.INTEREST_TYPE)
                 .setLabel("test-interest-label")
                 .setDefault(true)
                 .build();
 
-        assertThat(interest.getId().get(), is(Fixtures.INTEREST_ID));
-        assertThat(interest.getType().get(), is(Fixtures.INTEREST_TYPE));
+        assertThat(interest.getId().get(), is(CoreFixtures.INTEREST_ID));
+        assertThat(interest.getType().get(), is(CoreFixtures.INTEREST_TYPE));
         assertThat(interest.getLabel().get(), is("test-interest-label"));
         assertThat(interest.isDefaultInterest().get(), is(true));
     }
@@ -42,7 +42,7 @@ public class InterestTest {
         expectedException.expectMessage("The interest id has not been set");
 
         Interest.Builder.start()
-                .setType(Fixtures.INTEREST_TYPE)
+                .setType(CoreFixtures.INTEREST_TYPE)
                 .setLabel("test-interest-label")
                 .setDefault(true)
                 .build();
@@ -55,7 +55,7 @@ public class InterestTest {
         expectedException.expectMessage("The interest type has not been set");
 
         Interest.Builder.start()
-                .setId(Fixtures.INTEREST_ID)
+                .setId(CoreFixtures.INTEREST_ID)
                 .setLabel("test-interest-label")
                 .setDefault(false)
                 .build();
@@ -68,8 +68,8 @@ public class InterestTest {
         expectedException.expectMessage("The interest label has not been set");
 
         Interest.Builder.start()
-                .setId(Fixtures.INTEREST_ID)
-                .setType(Fixtures.INTEREST_TYPE)
+                .setId(CoreFixtures.INTEREST_ID)
+                .setType(CoreFixtures.INTEREST_TYPE)
                 .setDefault(false)
                 .build();
     }
@@ -81,8 +81,8 @@ public class InterestTest {
         expectedException.expectMessage("The interest default indicator has not been set");
 
         Interest.Builder.start()
-                .setId(Fixtures.INTEREST_ID)
-                .setType(Fixtures.INTEREST_TYPE)
+                .setId(CoreFixtures.INTEREST_ID)
+                .setType(CoreFixtures.INTEREST_TYPE)
                 .setLabel("test-interest-label")
                 .build();
     }

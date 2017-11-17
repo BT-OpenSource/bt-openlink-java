@@ -13,7 +13,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import com.bt.openlink.Fixtures;
+import com.bt.openlink.CoreFixtures;
 import com.bt.openlink.type.Call;
 import com.bt.openlink.type.CallDirection;
 import com.bt.openlink.type.CallState;
@@ -23,9 +23,9 @@ import com.bt.openlink.type.RequestAction;
 @SuppressWarnings("ConstantConditions")
 public class PubSubPublishRequestBuilderTest {
 
-    private static class Builder extends PubSubPublishRequestBuilder<Builder, String, Fixtures.typeEnum> {
+    private static class Builder extends PubSubPublishRequestBuilder<Builder, String, CoreFixtures.typeEnum> {
         protected Builder() {
-            super(Fixtures.typeEnum.class);
+            super(CoreFixtures.typeEnum.class);
         }
     }
 
@@ -47,15 +47,15 @@ public class PubSubPublishRequestBuilderTest {
     public void willValidateAPopulatedBuilder() throws Exception {
 
         final List<String> errors = new ArrayList<>();
-        builder.setInterestId(Fixtures.INTEREST_ID)
-                .addCall(Fixtures.CALL);
+        builder.setInterestId(CoreFixtures.INTEREST_ID)
+                .addCall(CoreFixtures.CALL);
 
         builder.validate();
         builder.validate(errors);
 
         assertThat(errors, is(empty()));
-        assertThat(builder.getInterestId().get(), is(Fixtures.INTEREST_ID));
-        assertThat(builder.getCalls(), contains(Fixtures.CALL));
+        assertThat(builder.getInterestId().get(), is(CoreFixtures.INTEREST_ID));
+        assertThat(builder.getCalls(), contains(CoreFixtures.CALL));
     }
 
     @Test
@@ -73,9 +73,9 @@ public class PubSubPublishRequestBuilderTest {
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("Each call id must be unique - test-call-id appears more than once");
 
-        builder.setInterestId(Fixtures.INTEREST_ID)
-                .addCall(Fixtures.CALL)
-                .addCall(Fixtures.CALL);
+        builder.setInterestId(CoreFixtures.INTEREST_ID)
+                .addCall(CoreFixtures.CALL)
+                .addCall(CoreFixtures.CALL);
 
         builder.validate();
     }
@@ -87,7 +87,7 @@ public class PubSubPublishRequestBuilderTest {
         expectedException.expectMessage("The call with id test-call-id is on interest test-interest-id which differs from the pub-sub node id test-interest-id-2");
 
         builder.setInterestId(InterestId.from("test-interest-id-2").get())
-                .addCall(Fixtures.CALL);
+                .addCall(CoreFixtures.CALL);
 
         builder.validate();
     }
@@ -97,7 +97,7 @@ public class PubSubPublishRequestBuilderTest {
 
         final List<String> errors = new ArrayList<>();
 
-        builder.addCall(Fixtures.CALL);
+        builder.addCall(CoreFixtures.CALL);
 
         builder.validate(errors);
 
@@ -109,19 +109,19 @@ public class PubSubPublishRequestBuilderTest {
 
         final List<String> errors = new ArrayList<>();
 
-        builder.setInterestId(Fixtures.INTEREST_ID)
-                .addCall(Fixtures.CALL)
+        builder.setInterestId(CoreFixtures.INTEREST_ID)
+                .addCall(CoreFixtures.CALL)
                 .addCall(Call.Builder.start()
-                        .setId(Fixtures.CALL_ID)
-                        .setSite(Fixtures.SITE)
-                        .setProfileId(Fixtures.PROFILE_ID)
+                        .setId(CoreFixtures.CALL_ID)
+                        .setSite(CoreFixtures.SITE)
+                        .setProfileId(CoreFixtures.PROFILE_ID)
                         .setInterestId(InterestId.from("another-interest-id").get())
                         .setState(CallState.CALL_ORIGINATED)
                         .setDirection(CallDirection.INCOMING)
-                        .setStartTime(Fixtures.START_TIME)
-                        .setDuration(Fixtures.DURATION)
+                        .setStartTime(CoreFixtures.START_TIME)
+                        .setDuration(CoreFixtures.DURATION)
                         .addAction(RequestAction.ANSWER_CALL)
-                        .addParticipant(Fixtures.PARTICIPANT)
+                        .addParticipant(CoreFixtures.PARTICIPANT)
                         .build());
 
         builder.validate(errors);

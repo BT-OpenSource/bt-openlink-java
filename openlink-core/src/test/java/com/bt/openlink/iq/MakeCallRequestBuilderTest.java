@@ -14,13 +14,13 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import com.bt.openlink.Fixtures;
+import com.bt.openlink.CoreFixtures;
 
 @SuppressWarnings("ConstantConditions")
 public class MakeCallRequestBuilderTest {
-    private static class Builder extends MakeCallRequestBuilder<MakeCallRequestBuilder, String, Fixtures.typeEnum> {
+    private static class Builder extends MakeCallRequestBuilder<MakeCallRequestBuilder, String, CoreFixtures.typeEnum> {
         protected Builder() {
-            super(Fixtures.typeEnum.class);
+            super(CoreFixtures.typeEnum.class);
         }
     }
 
@@ -43,16 +43,16 @@ public class MakeCallRequestBuilderTest {
 
         final List<String> errors = new ArrayList<>();
         builder.setJID("jid")
-                .setInterestId(Fixtures.INTEREST_ID)
-                .setDestination(Fixtures.DESTINATION);
+                .setInterestId(CoreFixtures.INTEREST_ID)
+                .setDestination(CoreFixtures.CALLED_DESTINATION);
 
         builder.validate();
         builder.validate(errors);
 
         assertThat(errors, is(empty()));
         assertThat(builder.getJID().get(), is("jid"));
-        assertThat(builder.getInterestId().get(), is(Fixtures.INTEREST_ID));
-        assertThat(builder.getDestination().get(), is(Fixtures.DESTINATION));
+        assertThat(builder.getInterestId().get(), is(CoreFixtures.INTEREST_ID));
+        assertThat(builder.getDestination().get(), is(CoreFixtures.CALLED_DESTINATION));
     }
 
     @Test

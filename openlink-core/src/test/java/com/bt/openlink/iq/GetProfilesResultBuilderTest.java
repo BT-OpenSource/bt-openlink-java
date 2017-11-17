@@ -13,13 +13,13 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import com.bt.openlink.Fixtures;
+import com.bt.openlink.CoreFixtures;
 
 public class GetProfilesResultBuilderTest {
 
-    private static class Builder extends GetProfilesResultBuilder<Builder, String, Fixtures.typeEnum> {
+    private static class Builder extends GetProfilesResultBuilder<Builder, String, CoreFixtures.typeEnum> {
         protected Builder() {
-            super(Fixtures.typeEnum.class);
+            super(CoreFixtures.typeEnum.class);
         }
     }
 
@@ -41,13 +41,13 @@ public class GetProfilesResultBuilderTest {
     public void willValidateAPopulatedBuilder() throws Exception {
 
         final List<String> errors = new ArrayList<>();
-        builder.addProfile(Fixtures.PROFILE);
+        builder.addProfile(CoreFixtures.PROFILE);
 
         builder.validate();
         builder.validate(errors);
 
         assertThat(errors, is(empty()));
-        assertThat(builder.getProfiles(), contains(Fixtures.PROFILE));
+        assertThat(builder.getProfiles(), contains(CoreFixtures.PROFILE));
     }
 
     @Test
@@ -56,8 +56,8 @@ public class GetProfilesResultBuilderTest {
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("Each profile id must be unique - test-profile-id appears more than once");
 
-        builder.addProfile(Fixtures.PROFILE);
-        builder.addProfile(Fixtures.PROFILE);
+        builder.addProfile(CoreFixtures.PROFILE);
+        builder.addProfile(CoreFixtures.PROFILE);
 
         builder.validate();
     }
@@ -67,8 +67,8 @@ public class GetProfilesResultBuilderTest {
 
         final List<String> errors = new ArrayList<>();
 
-        builder.addProfile(Fixtures.PROFILE);
-        builder.addProfile(Fixtures.PROFILE);
+        builder.addProfile(CoreFixtures.PROFILE);
+        builder.addProfile(CoreFixtures.PROFILE);
 
         builder.validate(errors);
 

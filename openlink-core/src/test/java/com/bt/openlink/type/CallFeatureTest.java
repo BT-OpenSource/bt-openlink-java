@@ -12,7 +12,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import com.bt.openlink.Fixtures;
+import com.bt.openlink.CoreFixtures;
 
 @SuppressWarnings("ConstantConditions")
 public class CallFeatureTest {
@@ -23,7 +23,7 @@ public class CallFeatureTest {
     public void willBuildACallFeatureWithAnEnabledFlag() throws Exception {
 
         final CallFeature feature = CallFeature.Builder.start()
-                .setId(Fixtures.FEATURE_ID)
+                .setId(CoreFixtures.FEATURE_ID)
                 .setType(FeatureType.CALL_FORWARD)
                 .setLabel("test-feature-label")
                 .setEnabled(true)
@@ -37,7 +37,7 @@ public class CallFeatureTest {
     public void willBuildACallFeatureWithADeviceKey() throws Exception {
 
         final CallFeature feature = CallFeature.Builder.start()
-                .setId(Fixtures.FEATURE_ID)
+                .setId(CoreFixtures.FEATURE_ID)
                 .setType(FeatureType.CALL_FORWARD)
                 .setLabel("test-feature-label")
                 .setDeviceKey(DeviceKey.from("test-device-key").get())
@@ -54,7 +54,7 @@ public class CallFeatureTest {
         expectedException.expectMessage("The enabled flag and the device keys cannot both be set");
 
         CallFeature.Builder.start()
-                .setId(Fixtures.FEATURE_ID)
+                .setId(CoreFixtures.FEATURE_ID)
                 .setType(FeatureType.CALL_FORWARD)
                 .setLabel("test-label")
                 .setEnabled(true)
@@ -69,7 +69,7 @@ public class CallFeatureTest {
         expectedException.expectMessage("Either the enabled flag or the device keys must be set");
 
         CallFeature.Builder.start()
-                .setId(Fixtures.FEATURE_ID)
+                .setId(CoreFixtures.FEATURE_ID)
                 .setType(FeatureType.CALL_FORWARD)
                 .setLabel("test-label")
                 .build();
@@ -99,7 +99,7 @@ public class CallFeatureTest {
         final List<String> errors = new ArrayList<>();
 
         final CallFeature feature = CallFeature.Builder.start()
-                .setId(Fixtures.FEATURE_ID)
+                .setId(CoreFixtures.FEATURE_ID)
                 .setType(FeatureType.CALL_FORWARD)
                 .setLabel("test-label")
                 .setEnabled(true)

@@ -13,14 +13,14 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import com.bt.openlink.Fixtures;
+import com.bt.openlink.CoreFixtures;
 
 @SuppressWarnings("ConstantConditions")
 public class GetFeaturesResultBuilderTest {
 
-    private static class Builder extends GetFeaturesResultBuilder<Builder, String, Fixtures.typeEnum> {
+    private static class Builder extends GetFeaturesResultBuilder<Builder, String, CoreFixtures.typeEnum> {
         protected Builder() {
-            super(Fixtures.typeEnum.class);
+            super(CoreFixtures.typeEnum.class);
         }
     }
 
@@ -42,15 +42,15 @@ public class GetFeaturesResultBuilderTest {
     public void willValidateAPopulatedBuilder() throws Exception {
 
         final List<String> errors = new ArrayList<>();
-        builder.setProfileId(Fixtures.PROFILE_ID)
-                .addFeature(Fixtures.FEATURE);
+        builder.setProfileId(CoreFixtures.PROFILE_ID)
+                .addFeature(CoreFixtures.FEATURE);
 
         builder.validate();
         builder.validate(errors);
 
         assertThat(errors, is(empty()));
-        assertThat(builder.getProfileId().get(), is(Fixtures.PROFILE_ID));
-        assertThat(builder.getFeatures(), contains(Fixtures.FEATURE));
+        assertThat(builder.getProfileId().get(), is(CoreFixtures.PROFILE_ID));
+        assertThat(builder.getFeatures(), contains(CoreFixtures.FEATURE));
     }
 
     @Test
@@ -68,9 +68,9 @@ public class GetFeaturesResultBuilderTest {
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("Each feature id must be unique - test-feature-id appears more than once");
 
-        builder.setProfileId(Fixtures.PROFILE_ID)
-                .addFeature(Fixtures.FEATURE)
-                .addFeature(Fixtures.FEATURE);
+        builder.setProfileId(CoreFixtures.PROFILE_ID)
+                .addFeature(CoreFixtures.FEATURE)
+                .addFeature(CoreFixtures.FEATURE);
 
         builder.validate();
     }
@@ -80,8 +80,8 @@ public class GetFeaturesResultBuilderTest {
 
         final List<String> errors = new ArrayList<>();
 
-        builder.addFeature(Fixtures.FEATURE);
-        builder.addFeature(Fixtures.FEATURE);
+        builder.addFeature(CoreFixtures.FEATURE);
+        builder.addFeature(CoreFixtures.FEATURE);
 
         builder.validate(errors);
 

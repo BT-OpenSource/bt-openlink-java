@@ -14,14 +14,14 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import com.bt.openlink.Fixtures;
+import com.bt.openlink.CoreFixtures;
 
 @SuppressWarnings("ConstantConditions")
 public class GetFeaturesRequestBuilderTest {
 
-    private static class Builder extends GetFeaturesRequestBuilder<Builder, String, Fixtures.typeEnum> {
+    private static class Builder extends GetFeaturesRequestBuilder<Builder, String, CoreFixtures.typeEnum> {
         protected Builder() {
-            super(Fixtures.typeEnum.class);
+            super(CoreFixtures.typeEnum.class);
         }
     }
 
@@ -43,13 +43,13 @@ public class GetFeaturesRequestBuilderTest {
     public void willValidateAPopulatedBuilder() throws Exception {
 
         final List<String> errors = new ArrayList<>();
-        builder.setProfileId(Fixtures.PROFILE_ID);
+        builder.setProfileId(CoreFixtures.PROFILE_ID);
 
         builder.validate();
         builder.validate(errors);
 
         assertThat(errors, is(empty()));
-        assertThat(builder.getProfileId().get(), is(Fixtures.PROFILE_ID));
+        assertThat(builder.getProfileId().get(), is(CoreFixtures.PROFILE_ID));
     }
 
     @Test

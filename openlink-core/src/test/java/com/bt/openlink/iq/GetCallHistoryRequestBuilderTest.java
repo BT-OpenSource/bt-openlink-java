@@ -14,13 +14,13 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import com.bt.openlink.Fixtures;
+import com.bt.openlink.CoreFixtures;
 
 public class GetCallHistoryRequestBuilderTest {
 
-    private static class Builder extends GetCallHistoryRequestBuilder<Builder, String, Fixtures.typeEnum> {
+    private static class Builder extends GetCallHistoryRequestBuilder<Builder, String, CoreFixtures.typeEnum> {
         protected Builder() {
-            super(Fixtures.typeEnum.class);
+            super(CoreFixtures.typeEnum.class);
         }
     }
 

@@ -14,13 +14,13 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import com.bt.openlink.Fixtures;
+import com.bt.openlink.CoreFixtures;
 
 @SuppressWarnings("ConstantConditions")
 public class GetInterestResultBuilderTest {
-    private static class Builder extends GetInterestResultBuilder<Builder, String, Fixtures.typeEnum> {
+    private static class Builder extends GetInterestResultBuilder<Builder, String, CoreFixtures.typeEnum> {
         protected Builder() {
-            super(Fixtures.typeEnum.class);
+            super(CoreFixtures.typeEnum.class);
         }
     }
 
@@ -43,13 +43,13 @@ public class GetInterestResultBuilderTest {
     public void willValidateAPopulatedBuilder() throws Exception {
 
         final List<String> errors = new ArrayList<>();
-        builder.setInterest(Fixtures.INTEREST);
+        builder.setInterest(CoreFixtures.INTEREST);
 
         builder.validate();
         builder.validate(errors);
 
         assertThat(errors, is(empty()));
-        assertThat(builder.getInterest().get(), is(Fixtures.INTEREST));
+        assertThat(builder.getInterest().get(), is(CoreFixtures.INTEREST));
     }
 
     @Test
