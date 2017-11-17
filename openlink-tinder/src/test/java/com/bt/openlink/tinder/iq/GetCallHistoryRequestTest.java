@@ -15,61 +15,12 @@ import org.junit.rules.ExpectedException;
 import org.xmpp.packet.IQ;
 
 import com.bt.openlink.CoreFixtures;
+import com.bt.openlink.GetCallHistoryFixtures;
 import com.bt.openlink.tinder.Fixtures;
 import com.bt.openlink.type.CallType;
 
 @SuppressWarnings({ "OptionalGetWithoutIsPresent", "ConstantConditions" })
 public class GetCallHistoryRequestTest {
-
-    private static final String GET_CALL_HISTORY_REQUEST = "<iq type='set' id='" + CoreFixtures.STANZA_ID + "' to='" + Fixtures.TO_JID + "' from='" + Fixtures.FROM_JID + "'>\n" +
-            "  <command xmlns='http://jabber.org/protocol/commands' node='http://xmpp.org/protocol/openlink:01:00:00#get-call-history' action='execute'>\n" +
-            "    <iodata xmlns='urn:xmpp:tmp:io-data' type='input'>\n" +
-            "      <in>\n" +
-            "        <jid>" + Fixtures.USER_FULL_JID + "</jid>\n" +
-            "      </in>\n" +
-            "    </iodata>\n" +
-            "  </command>\n" +
-            "</iq>\n";
-
-    private static final String GET_CALL_HISTORY_REQUEST_WITH_ALL_FIELDS = "<iq type='set' id='" + CoreFixtures.STANZA_ID + "' to='" + Fixtures.TO_JID + "' from='" + Fixtures.FROM_JID + "'>\n" +
-            "  <command xmlns='http://jabber.org/protocol/commands' node='http://xmpp.org/protocol/openlink:01:00:00#get-call-history' action='execute'>\n" +
-            "    <iodata xmlns='urn:xmpp:tmp:io-data' type='input'>\n" +
-            "      <in>\n" +
-            "        <jid>" + Fixtures.USER_FULL_JID + "</jid>\n" +
-            "        <caller>from-caller</caller>\n" +
-            "        <called>to-destination</called>\n" +
-            "        <calltype>missed</calltype>\n" +
-            "        <fromdate>06/01/2016</fromdate>\n" +
-            "        <uptodate>06/29/2016</uptodate>\n" +
-            "        <start>1</start>\n" +
-            "        <count>50</count>\n" +
-            "      </in>\n" +
-            "    </iodata>\n" +
-            "  </command>\n" +
-            "</iq>\n";
-
-    private static final String GET_CALL_HISTORY_REQUEST_WITH_BAD_VALUES = "<iq type='result'>\n" +
-            "  <command xmlns='http://jabber.org/protocol/commands' node='http://xmpp.org/protocol/openlink:01:00:00#get-call-history' action='execute'>\n" +
-            "    <iodata xmlns='urn:xmpp:tmp:io-data' type='input'>\n" +
-            "      <in>\n" +
-            "        <caller>from-caller</caller>\n" +
-            "        <called>to-destination</called>\n" +
-            "        <calltype>not-a-call-type</calltype>\n" +
-            "        <fromdate>not-a-from-date</fromdate>\n" +
-            "        <uptodate>not-a-to-date</uptodate>\n" +
-            "        <start>not-a-start-number</start>\n" +
-            "        <count>not-a-count-number</count>\n" +
-            "      </in>\n" +
-            "    </iodata>\n" +
-            "  </command>\n" +
-            "</iq>\n";
-    private static final String GET_CALL_HISTORY_REQUEST_FOR_ALL_USERS = "<iq type='set' id='" + CoreFixtures.STANZA_ID + "' to='" + Fixtures.TO_JID + "' from='" + Fixtures.FROM_JID + "'>\n" +
-            "  <command xmlns='http://jabber.org/protocol/commands' action='execute' node='http://xmpp.org/protocol/openlink:01:00:00#get-call-history'>\n" +
-            "    <iodata xmlns='urn:xmpp:tmp:io-data' type='input'>\n" +
-            "      <in/>\n" +
-            "    </iodata>\n" +
-            "  </command>\n" +
-            "</iq>";
 
     @Rule public final ExpectedException expectedException = ExpectedException.none();
 
@@ -104,7 +55,7 @@ public class GetCallHistoryRequestTest {
                 .setFrom(Fixtures.FROM_JID)
                 .build();
 
-        assertThat(request.toXML(), isIdenticalTo(GET_CALL_HISTORY_REQUEST_FOR_ALL_USERS).ignoreWhitespace());
+        assertThat(request.toXML(), isIdenticalTo(GetCallHistoryFixtures.GET_CALL_HISTORY_REQUEST_FOR_ALL_USERS).ignoreWhitespace());
     }
 
     @Test
@@ -114,10 +65,10 @@ public class GetCallHistoryRequestTest {
                 .setId(CoreFixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
-                .setJID(Fixtures.USER_FULL_JID)
+                .setJID(Fixtures.USER_BARE_JID)
                 .build();
 
-        assertThat(request.toXML(), isIdenticalTo(GET_CALL_HISTORY_REQUEST).ignoreWhitespace());
+        assertThat(request.toXML(), isIdenticalTo(GetCallHistoryFixtures.GET_CALL_HISTORY_REQUEST).ignoreWhitespace());
     }
 
     @Test
@@ -127,7 +78,7 @@ public class GetCallHistoryRequestTest {
                 .setId(CoreFixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
-                .setJID(Fixtures.USER_FULL_JID)
+                .setJID(Fixtures.USER_BARE_JID)
                 .setCaller("from-caller")
                 .setCalled("to-destination")
                 .setCallType(CallType.MISSED)
@@ -137,18 +88,18 @@ public class GetCallHistoryRequestTest {
                 .setCount(50L)
                 .build();
 
-        assertThat(request.toXML(), isIdenticalTo(GET_CALL_HISTORY_REQUEST_WITH_ALL_FIELDS).ignoreWhitespace());
+        assertThat(request.toXML(), isIdenticalTo(GetCallHistoryFixtures.GET_CALL_HISTORY_REQUEST_WITH_ALL_FIELDS).ignoreWhitespace());
     }
 
     @Test
     public void willParseAnXmppStanza() throws Exception {
 
-        final GetCallHistoryRequest request = (GetCallHistoryRequest) OpenlinkIQParser.parse(Fixtures.iqFrom(GET_CALL_HISTORY_REQUEST));
+        final GetCallHistoryRequest request = (GetCallHistoryRequest) OpenlinkIQParser.parse(Fixtures.iqFrom(GetCallHistoryFixtures.GET_CALL_HISTORY_REQUEST));
         assertThat(request.getID(), CoreMatchers.is(CoreFixtures.STANZA_ID));
         assertThat(request.getTo(), CoreMatchers.is(Fixtures.TO_JID));
         assertThat(request.getFrom(), CoreMatchers.is(Fixtures.FROM_JID));
         assertThat(request.getType(), is(IQ.Type.set));
-        assertThat(request.getJID().get(), is(Fixtures.USER_FULL_JID));
+        assertThat(request.getJID().get(), is(Fixtures.USER_BARE_JID));
         assertThat(request.getCaller(), is(Optional.empty()));
         assertThat(request.getCalled(), is(Optional.empty()));
         assertThat(request.getCallType(), is(Optional.empty()));
@@ -162,7 +113,7 @@ public class GetCallHistoryRequestTest {
     @Test
     public void willParseAnXmppStanzaWithAnEmptyForJid() throws Exception {
 
-        final GetCallHistoryRequest request = (GetCallHistoryRequest) OpenlinkIQParser.parse(Fixtures.iqFrom(GET_CALL_HISTORY_REQUEST_FOR_ALL_USERS));
+        final GetCallHistoryRequest request = (GetCallHistoryRequest) OpenlinkIQParser.parse(Fixtures.iqFrom(GetCallHistoryFixtures.GET_CALL_HISTORY_REQUEST_FOR_ALL_USERS));
         assertThat(request.getID(), is(CoreFixtures.STANZA_ID));
         assertThat(request.getTo(), is(Fixtures.TO_JID));
         assertThat(request.getFrom(), is(Fixtures.FROM_JID));
@@ -181,13 +132,13 @@ public class GetCallHistoryRequestTest {
     @Test
     public void willParseAnXmppStanzaWithAllFields() throws Exception {
 
-        final GetCallHistoryRequest request = (GetCallHistoryRequest) OpenlinkIQParser.parse(Fixtures.iqFrom(GET_CALL_HISTORY_REQUEST_WITH_ALL_FIELDS));
+        final GetCallHistoryRequest request = (GetCallHistoryRequest) OpenlinkIQParser.parse(Fixtures.iqFrom(GetCallHistoryFixtures.GET_CALL_HISTORY_REQUEST_WITH_ALL_FIELDS));
 
         assertThat(request.getID(), CoreMatchers.is(CoreFixtures.STANZA_ID));
         assertThat(request.getTo(), CoreMatchers.is(Fixtures.TO_JID));
         assertThat(request.getFrom(), CoreMatchers.is(Fixtures.FROM_JID));
         assertThat(request.getType(), is(IQ.Type.set));
-        assertThat(request.getJID().get(), is(Fixtures.USER_FULL_JID));
+        assertThat(request.getJID().get(), is(Fixtures.USER_BARE_JID));
         assertThat(request.getCaller().get(), is("from-caller"));
         assertThat(request.getCalled().get(), is("to-destination"));
         assertThat(request.getCallType().get(), is(CallType.MISSED));
@@ -201,7 +152,7 @@ public class GetCallHistoryRequestTest {
     @Test
     public void willReturnParsingErrors() throws Exception {
 
-        final GetCallHistoryRequest request = GetCallHistoryRequest.from(Fixtures.iqFrom(GET_CALL_HISTORY_REQUEST_WITH_BAD_VALUES));
+        final GetCallHistoryRequest request = GetCallHistoryRequest.from(Fixtures.iqFrom(GetCallHistoryFixtures.GET_CALL_HISTORY_REQUEST_WITH_BAD_VALUES));
 
         assertThat(request.getParseErrors(), contains(
                 "Invalid get-call-history request; invalid calltype - 'not-a-call-type' should be 'in', 'out' or 'missed'",
@@ -219,7 +170,7 @@ public class GetCallHistoryRequestTest {
     @Test
     public void shouldRoundTripAStanza() throws Exception {
 
-        final IQ originalStanza = Fixtures.iqFrom(GET_CALL_HISTORY_REQUEST);
+        final IQ originalStanza = Fixtures.iqFrom(GetCallHistoryFixtures.GET_CALL_HISTORY_REQUEST);
         final GetCallHistoryRequest request = (GetCallHistoryRequest) OpenlinkIQParser.parse(originalStanza);
 
         assertThat(request.toXML(), isIdenticalTo(originalStanza.toXML()).ignoreWhitespace());
