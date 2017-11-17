@@ -85,43 +85,6 @@ public class MakeCallResultTest {
     @Test
     public void willGenerateAnXmppStanza() throws Exception {
 
-        //    TODO: (Greg 2017-09-27) Replace this with MAKE_CALL_RESULT when fully implemented
-        final String expectedXML = "<iq from='" + Fixtures.FROM_JID + "' to='" + Fixtures.TO_JID + "' id='" + CoreFixtures.STANZA_ID + "' type='result'>\n" +
-                "   <command xmlns=\"http://jabber.org/protocol/commands\" node=\"http://xmpp.org/protocol/openlink:01:00:00#make-call\" status=\"completed\">\n" +
-                "     <iodata xmlns=\"urn:xmpp:tmp:io-data\" type=\"output\">\n" +
-                "      <out>\n" +
-                "        <callstatus xmlns='http://xmpp.org/protocol/openlink:01:00:00#call-status'>\n" +
-                "          <call>\n" +
-                "            <id>" + CoreFixtures.CALL_ID + "</id>\n" +
-                "            <site default='true' id='42' type='BTSM'>test-site-name</site>" +
-                "            <profile>" + CoreFixtures.PROFILE_ID + "</profile>\n" +
-                "            <interest>" + CoreFixtures.INTEREST_ID + "</interest>\n" +
-                "            <changed>State</changed>\n" +
-                "            <state>CallOriginated</state>\n" +
-                "            <direction>Incoming</direction>\n" +
-                "            <caller>\n" +
-                "              <number e164='" + CoreFixtures.CALLER_E164_NUMBER + "'>" + CoreFixtures.CALLER_NUMBER + "</number>\n" +
-                "              <name>" + CoreFixtures.CALLER_NAME + "</name>\n" +
-                "            </caller>\n" +
-                "            <called>\n" +
-                "              <number e164='" + CoreFixtures.CALLED_E164_NUMBER + "' destination='" + CoreFixtures.CALLED_DESTINATION + "'>" + CoreFixtures.CALLED_NUMBER + "</number>\n" +
-                "              <name>" + CoreFixtures.CALLED_NAME + "</name>\n" +
-                "            </called>\n" +
-                "            <starttime>2017-10-09T08:07:00.000Z</starttime>\n" +
-                "            <duration>60000</duration>\n" +
-                "            <actions>\n" +
-                "              <AnswerCall/>\n" +
-                "            </actions>\n" +
-                "            <participants>\n" +
-                "              <participant direction='Incoming' jid='test-user@test-domain' starttime='2017-10-09T08:07:00.000Z' timestamp='Mon Oct 09 08:07:00 UTC 2017' duration='60000' type='Active'/>\n" +
-                "            </participants>\n" +
-                "          </call>\n" +
-                "        </callstatus>\n" +
-                "      </out>\n" +
-                "    </iodata>\n" +
-                "  </command>\n" +
-                "</iq>";
-
         final MakeCallResult result = MakeCallResult.Builder.start()
                 .setId(CoreFixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)

@@ -132,43 +132,6 @@ public class PubSubPublishRequestTest {
     @Test
     public void willGenerateAnXmppStanza() throws Exception {
 
-        // TODO: (Greg 2017-10-03) Implement all features, use PUBLISH_REQUEST
-        final String partRequest = "<iq type='set' id='" + CoreFixtures.STANZA_ID + "' to='" + Fixtures.TO_JID + "' from='" + Fixtures.FROM_JID + "'>\n" +
-                "   <pubsub xmlns='http://jabber.org/protocol/pubsub'>\n" +
-                "    <publish node='" + CoreFixtures.INTEREST_ID + "'>\n" +
-                "      <item>\n" +
-                "        <callstatus xmlns='http://xmpp.org/protocol/openlink:01:00:00#call-status'>\n" +
-                "          <call>\n" +
-                "            <id>" + CoreFixtures.CALL_ID + "</id>\n" +
-                "            <site default='true' id='42' type='BTSM'>test-site-name</site>\n" +
-                "            <profile>" + CoreFixtures.PROFILE_ID + "</profile>\n" +
-                "            <interest>" + CoreFixtures.INTEREST_ID + "</interest>\n" +
-                "            <changed>State</changed>\n" +
-                "            <state>CallOriginated</state>\n" +
-                "            <direction>Incoming</direction>\n" +
-                "            <caller>\n" +
-                "               <number e164='" + CoreFixtures.CALLER_E164_NUMBER + "'>" + CoreFixtures.CALLER_NUMBER + "</number>\n" +
-                "               <name>" + CoreFixtures.CALLER_NAME + "</name>\n" +
-                "            </caller>\n" +
-                "            <called>\n" +
-                "               <number destination='" + CoreFixtures.CALLED_DESTINATION + "' e164='" + CoreFixtures.CALLED_E164_NUMBER + "'>" + CoreFixtures.CALLED_NUMBER + "</number>\n" +
-                "               <name>" + CoreFixtures.CALLED_NAME + "</name>\n" +
-                "            </called>\n" +
-                "            <starttime>2017-10-09T08:07:00.000Z</starttime>\n" +
-                "            <duration>60000</duration>\n" +
-                "            <actions>\n" +
-                "              <AnswerCall/>\n" +
-                "            </actions>\n" +
-                "            <participants>\n" +
-                "              <participant direction='Incoming' jid='test-user@test-domain' starttime='2017-10-09T08:07:00.000Z' timestamp='Mon Oct 09 08:07:00 UTC 2017' duration='60000' type='Active'/>\n" +
-                "            </participants>\n" +
-                "          </call>\n" +
-                "        </callstatus>\n" +
-                "      </item>\n" +
-                "    </publish>\n" +
-                "  </pubsub>" +
-                "</iq>\n";
-
         final PubSubPublishRequest request = PubSubPublishRequest.Builder.start()
                 .setId(CoreFixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
