@@ -14,6 +14,7 @@ import org.junit.rules.ExpectedException;
 import org.xmpp.packet.IQ;
 
 import com.bt.openlink.CoreFixtures;
+import com.bt.openlink.GetInterestFixtures;
 import com.bt.openlink.tinder.Fixtures;
 
 @SuppressWarnings("ConstantConditions")
@@ -21,24 +22,6 @@ public class GetInterestRequestTest {
 
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
-
-    private static final String GET_INTEREST_REQUEST = "<iq type=\"set\" id=\"" + CoreFixtures.STANZA_ID + "\" to=\"" + Fixtures.TO_JID + "\" from=\"" + Fixtures.FROM_JID + "\">\n" +
-            "  <command xmlns=\"http://jabber.org/protocol/commands\" node=\"http://xmpp.org/protocol/openlink:01:00:00#get-interest\" action=\"execute\">\n" +
-            "    <iodata xmlns=\"urn:xmpp:tmp:io-data\" type=\"input\">\n" +
-            "      <in>\n" +
-            "        <interest>" + CoreFixtures.INTEREST_ID + "</interest>\n" +
-            "      </in>\n" +
-            "    </iodata>\n" +
-            "  </command>\n" +
-            "</iq>\n";
-
-    private static final String GET_INTEREST_REQUEST_WITH_BAD_VALUES = "<iq type='get'>\n" +
-            "  <command xmlns=\"http://jabber.org/protocol/commands\" action=\"execute\" node=\"http://xmpp.org/protocol/openlink:01:00:00#get-interest\">\n" +
-            "    <iodata xmlns=\"urn:xmpp:tmp:io-data\" type=\"input\">\n" +
-            "      <in/>\n" +
-            "    </iodata>\n" +
-            "  </command>\n" +
-            "</iq>\n";
 
     @Test
     public void canCreateAStanza() throws Exception {
@@ -66,7 +49,7 @@ public class GetInterestRequestTest {
                 .setInterestId(CoreFixtures.INTEREST_ID)
                 .build();
 
-        assertThat(request.toXML(), isIdenticalTo(GET_INTEREST_REQUEST).ignoreWhitespace());
+        assertThat(request.toXML(), isIdenticalTo(GetInterestFixtures.GET_INTEREST_REQUEST).ignoreWhitespace());
     }
 
     @Test
@@ -84,7 +67,7 @@ public class GetInterestRequestTest {
     @Test
     public void willParseAnXmppStanza() throws Exception {
 
-        final GetInterestRequest request = (GetInterestRequest) OpenlinkIQParser.parse(Fixtures.iqFrom(GET_INTEREST_REQUEST));
+        final GetInterestRequest request = (GetInterestRequest) OpenlinkIQParser.parse(Fixtures.iqFrom(GetInterestFixtures.GET_INTEREST_REQUEST));
         assertThat(request.getID(), is(CoreFixtures.STANZA_ID));
         assertThat(request.getTo(), is(Fixtures.TO_JID));
         assertThat(request.getFrom(), is(Fixtures.FROM_JID));
@@ -96,7 +79,7 @@ public class GetInterestRequestTest {
     @Test
     public void willReturnParsingErrors() throws Exception {
 
-        final GetInterestRequest request = GetInterestRequest.from(Fixtures.iqFrom(GET_INTEREST_REQUEST_WITH_BAD_VALUES));
+        final GetInterestRequest request = GetInterestRequest.from(Fixtures.iqFrom(GetInterestFixtures.GET_INTEREST_REQUEST_WITH_BAD_VALUES));
 
         assertThat(request.getParseErrors(), contains(
                 "Invalid stanza; missing 'to' attribute is mandatory",
@@ -109,9 +92,9 @@ public class GetInterestRequestTest {
     @Test
     public void willGenerateAStanzaEvenWithParsingErrors() throws Exception {
 
-        final GetInterestRequest request = GetInterestRequest.from(Fixtures.iqFrom(GET_INTEREST_REQUEST_WITH_BAD_VALUES));
+        final GetInterestRequest request = GetInterestRequest.from(Fixtures.iqFrom(GetInterestFixtures.GET_INTEREST_REQUEST_WITH_BAD_VALUES));
 
-        assertThat(request.toXML(), isIdenticalTo(Fixtures.iqFrom(GET_INTEREST_REQUEST_WITH_BAD_VALUES).toXML()).ignoreWhitespace());
+        assertThat(request.toXML(), isIdenticalTo(Fixtures.iqFrom(GetInterestFixtures.GET_INTEREST_REQUEST_WITH_BAD_VALUES).toXML()).ignoreWhitespace());
 
     }
 
