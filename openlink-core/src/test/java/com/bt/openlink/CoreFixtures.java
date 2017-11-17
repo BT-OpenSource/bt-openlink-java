@@ -33,7 +33,7 @@ import com.bt.openlink.type.Site;
 @SuppressWarnings("ConstantConditions")
 public class CoreFixtures {
 
-    private static final DateTimeFormatter ISO_8601_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+    static final DateTimeFormatter ISO_8601_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
     private static final DateTimeFormatter JAVA_UTIL_DATE_FORMATTER = DateTimeFormatter.ofPattern("EEE MMM dd HH:mm:ss zzz yyyy");
 
     public enum typeEnum {
@@ -127,6 +127,8 @@ public class CoreFixtures {
             .addParticipant(PARTICIPANT)
             .build();
 
+    public static final String START_TIME_ISO_8601 = ISO_8601_FORMATTER.format(START_TIME.atZone(ZoneOffset.UTC));
+
     public static final String CALL_STATUS_INCOMING_ORIGINATED =
             "<callstatus xmlns='http://xmpp.org/protocol/openlink:01:00:00#call-status' busy='false'>\n" +
                     "  <call>\n" +
@@ -161,7 +163,7 @@ public class CoreFixtures {
                     "      </feature>\n" +
                     "    </features>\n" +
                     "    <participants>\n" +
-                    "      <participant direction='Incoming' duration='60000' jid='test-user@test-domain' starttime='" + ISO_8601_FORMATTER.format(START_TIME.atZone(ZoneOffset.UTC)) + "' timestamp='" + JAVA_UTIL_DATE_FORMATTER.format(START_TIME.atZone(TimeZone.getTimeZone("UTC").toZoneId())) + "' type='Active'/>\n" +
+                    "      <participant direction='Incoming' duration='60000' jid='test-user@test-domain' starttime='" + START_TIME_ISO_8601 + "' timestamp='" + JAVA_UTIL_DATE_FORMATTER.format(START_TIME.atZone(TimeZone.getTimeZone("UTC").toZoneId())) + "' type='Active'/>\n" +
                     "    </participants>\n" +
                     "  </call>\n" +
                     "</callstatus>\n";
