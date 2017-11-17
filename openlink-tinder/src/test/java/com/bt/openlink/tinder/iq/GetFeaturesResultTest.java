@@ -13,6 +13,7 @@ import org.junit.rules.ExpectedException;
 import org.xmpp.packet.IQ;
 
 import com.bt.openlink.CoreFixtures;
+import com.bt.openlink.GetFeaturesFixtures;
 import com.bt.openlink.tinder.Fixtures;
 import com.bt.openlink.type.Feature;
 import com.bt.openlink.type.FeatureId;
@@ -22,31 +23,6 @@ import com.bt.openlink.type.FeatureType;
 public class GetFeaturesResultTest {
 
     @Rule public final ExpectedException expectedException = ExpectedException.none();
-
-    private static final String GET_FEATURES_RESULT = "<iq type=\"result\" id=\"" + CoreFixtures.STANZA_ID + "\" to=\"" + Fixtures.TO_JID + "\" from=\"" + Fixtures.FROM_JID + "\">\n" +
-            "  <command xmlns=\"http://jabber.org/protocol/commands\" node=\"http://xmpp.org/protocol/openlink:01:00:00#get-features\" status=\"completed\">\n" +
-            "    <iodata xmlns=\"urn:xmpp:tmp:io-data\" type=\"output\">\n" +
-            "      <out>\n" +
-            "        <profile id=\"" + CoreFixtures.PROFILE_ID + "\"/>\n" +
-            "        <features xmlns=\"http://xmpp.org/protocol/openlink:01:00:00/features\">\n" +
-            "          <feature id=\"hs_1\" type=\"Handset\" label=\"Handset 1\"/>\n" +
-            "          <feature id=\"hs_2\" type=\"Handset\" label=\"Handset 2\"/>\n" +
-            "          <feature id=\"priv_1\" type=\"Privacy\" label=\"Privacy\"/>\n" +
-            "          <feature id=\"fwd_1\" type=\"CallForward\" label=\"Call Forward\"/>\n" +
-            "        </features>\n" +
-            "      </out>\n" +
-            "    </iodata>\n" +
-            "  </command>\n" +
-            "</iq>\n";
-
-    private static final String GET_FEATURES_RESULT_WITH_BAD_VALUES = "<iq type=\"get\">\n" +
-            "  <command xmlns=\"http://jabber.org/protocol/commands\" action=\"execute\" node=\"http://xmpp.org/protocol/openlink:01:00:00#get-features\">\n" +
-            "    <iodata xmlns=\"urn:xmpp:tmp:io-data\" type=\"output\">\n" +
-            "      <out>\n" +
-            "      </out>\n" +
-            "    </iodata>\n" +
-            "  </command>\n" +
-            "</iq>\n";
 
     @Test
     public void canCreateAStanza() throws Exception {
@@ -108,9 +84,7 @@ public class GetFeaturesResultTest {
                 .addFeature(fwdFeature)
                 .build();
 
-        //        System.out.println(stanza);
-        //        System.out.println(GET_FEATURES_RESULT);
-        assertThat(result.toXML(), isIdenticalTo(GET_FEATURES_RESULT).ignoreWhitespace());
+        assertThat(result.toXML(), isIdenticalTo(GetFeaturesFixtures.GET_FEATURES_RESULT).ignoreWhitespace());
     }
 
     @Test
@@ -154,7 +128,7 @@ public class GetFeaturesResultTest {
     @Test
     public void willParseAnXmppStanza() throws Exception {
 
-        final GetFeaturesResult result = (GetFeaturesResult) OpenlinkIQParser.parse(Fixtures.iqFrom(GET_FEATURES_RESULT));
+        final GetFeaturesResult result = (GetFeaturesResult) OpenlinkIQParser.parse(Fixtures.iqFrom(GetFeaturesFixtures.GET_FEATURES_RESULT));
         assertThat(result.getID(), is(CoreFixtures.STANZA_ID));
         assertThat(result.getTo(), is(Fixtures.TO_JID));
         assertThat(result.getFrom(), is(Fixtures.FROM_JID));
@@ -172,7 +146,7 @@ public class GetFeaturesResultTest {
     @Test
     public void willReturnParsingErrors() throws Exception {
 
-        final GetFeaturesResult result = GetFeaturesResult.from(Fixtures.iqFrom(GET_FEATURES_RESULT_WITH_BAD_VALUES));
+        final GetFeaturesResult result = GetFeaturesResult.from(Fixtures.iqFrom(GetFeaturesFixtures.GET_FEATURES_RESULT_WITH_BAD_VALUES));
 
         System.out.println(result.getParseErrors());
 
