@@ -19,8 +19,8 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import com.bt.openlink.CoreFixtures;
+import com.bt.openlink.GetProfilesFixtures;
 import com.bt.openlink.OpenlinkXmppNamespace;
-import com.bt.openlink.TestStanzas;
 import com.bt.openlink.smack.Fixtures;
 
 @SuppressWarnings("ConstantConditions")
@@ -61,13 +61,13 @@ public class GetProfilesRequestTest {
                 .setJID(Fixtures.USER_BARE_JID)
                 .build();
 
-        assertThat(request.toXML().toString(), isIdenticalTo(TestStanzas.GET_PROFILES_REQUEST).ignoreWhitespace());
+        assertThat(request.toXML().toString(), isIdenticalTo(GetProfilesFixtures.GET_PROFILES_REQUEST).ignoreWhitespace());
     }
 
     @Test
     public void willParseAnXmppStanza() throws Exception {
 
-        final GetProfilesRequest request = PacketParserUtils.parseStanza(TestStanzas.GET_PROFILES_REQUEST);
+        final GetProfilesRequest request = PacketParserUtils.parseStanza(GetProfilesFixtures.GET_PROFILES_REQUEST);
 
         assertThat(request.getStanzaId(), is(CoreFixtures.STANZA_ID));
         assertThat(request.getTo(), is(Fixtures.TO_JID));
@@ -80,7 +80,7 @@ public class GetProfilesRequestTest {
     @Test
     public void willReturnParsingErrors() throws Exception {
 
-        final GetProfilesRequest request = PacketParserUtils.parseStanza(TestStanzas.GET_PROFILES_REQUEST_WITH_BAD_VALUES);
+        final GetProfilesRequest request = PacketParserUtils.parseStanza(GetProfilesFixtures.GET_PROFILES_REQUEST_WITH_BAD_VALUES);
 
         // Note; it's not possible to validate the core elements of Smack packets as the to/from/id/type are not
         // set until after the parsing is complete.
@@ -103,9 +103,9 @@ public class GetProfilesRequestTest {
     @Test
     public void willGenerateAStanzaEvenWithParsingErrors() throws Exception {
 
-        final GetProfilesRequest request = PacketParserUtils.parseStanza(TestStanzas.GET_PROFILES_REQUEST_WITH_BAD_VALUES);
+        final GetProfilesRequest request = PacketParserUtils.parseStanza(GetProfilesFixtures.GET_PROFILES_REQUEST_WITH_BAD_VALUES);
 
-        assertThat(request.toXML().toString(), isIdenticalTo(TestStanzas.GET_PROFILES_REQUEST_WITH_BAD_VALUES).ignoreWhitespace());
+        assertThat(request.toXML().toString(), isIdenticalTo(GetProfilesFixtures.GET_PROFILES_REQUEST_WITH_BAD_VALUES).ignoreWhitespace());
 
     }
 

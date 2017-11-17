@@ -16,7 +16,7 @@ import org.junit.rules.ExpectedException;
 import org.xmpp.packet.IQ;
 
 import com.bt.openlink.CoreFixtures;
-import com.bt.openlink.TestStanzas;
+import com.bt.openlink.GetProfilesFixtures;
 import com.bt.openlink.tinder.Fixtures;
 
 @SuppressWarnings({ "OptionalGetWithoutIsPresent", "ConstantConditions" })
@@ -70,7 +70,7 @@ public class GetProfilesRequestTest {
                 .setJID(Fixtures.USER_BARE_JID)
                 .build();
 
-        assertThat(request.toXML(), isIdenticalTo(TestStanzas.GET_PROFILES_REQUEST).ignoreWhitespace());
+        assertThat(request.toXML(), isIdenticalTo(GetProfilesFixtures.GET_PROFILES_REQUEST).ignoreWhitespace());
     }
 
     @Test
@@ -88,7 +88,7 @@ public class GetProfilesRequestTest {
     @Test
     public void willParseAnXmppStanza() throws Exception {
 
-        final GetProfilesRequest request = (GetProfilesRequest) OpenlinkIQParser.parse(Fixtures.iqFrom(TestStanzas.GET_PROFILES_REQUEST));
+        final GetProfilesRequest request = (GetProfilesRequest) OpenlinkIQParser.parse(Fixtures.iqFrom(GetProfilesFixtures.GET_PROFILES_REQUEST));
         assertThat(request.getID(), is(CoreFixtures.STANZA_ID));
         assertThat(request.getTo(), is(Fixtures.TO_JID));
         assertThat(request.getFrom(), is(Fixtures.FROM_JID));
@@ -100,7 +100,7 @@ public class GetProfilesRequestTest {
     @Test
     public void willReturnParsingErrors() throws Exception {
 
-        final IQ iq = Fixtures.iqFrom(TestStanzas.GET_PROFILES_REQUEST_WITH_BAD_VALUES);
+        final IQ iq = Fixtures.iqFrom(GetProfilesFixtures.GET_PROFILES_REQUEST_WITH_BAD_VALUES);
 
         final GetProfilesRequest request = GetProfilesRequest.from(iq);
 
@@ -121,7 +121,7 @@ public class GetProfilesRequestTest {
     @Test
     public void willGenerateAStanzaEvenWithParsingErrors() throws Exception {
 
-        final IQ iq = Fixtures.iqFrom(TestStanzas.GET_PROFILES_REQUEST_WITH_BAD_VALUES);
+        final IQ iq = Fixtures.iqFrom(GetProfilesFixtures.GET_PROFILES_REQUEST_WITH_BAD_VALUES);
 
         final GetProfilesRequest request = GetProfilesRequest.from(iq);
 
