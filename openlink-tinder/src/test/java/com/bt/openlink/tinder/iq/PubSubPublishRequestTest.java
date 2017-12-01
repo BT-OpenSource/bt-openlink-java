@@ -106,6 +106,7 @@ public class PubSubPublishRequestTest {
         assertThat(request.getFrom(), CoreMatchers.is(Fixtures.FROM_JID));
         assertThat(request.getType(), is(IQ.Type.set));
         assertThat(request.getPubSubNodeId().get(), is(CoreFixtures.NODE_ID));
+        assertThat(request.isCallStatusBusy().get(),is(false));
         final Collection<Call> calls = request.getCalls();
         assertThat(calls.size(), is(1));
         final Call call = calls.iterator().next();
