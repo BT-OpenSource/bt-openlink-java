@@ -67,9 +67,9 @@ public class GetProfilesResult extends OpenlinkIQ {
                 profileId.ifPresent(profileBuilder::setId);
                 final Optional<Boolean> isDefault = TinderPacketUtil.getBooleanAttribute(profileElement, ATTRIBUTE_DEFAULT, DESCRIPTION, parseErrors);
                 isDefault.ifPresent(profileBuilder::setDefault);
-                final Optional<String> device = Optional.ofNullable(TinderPacketUtil.getStringAttribute(profileElement, "device", false, DESCRIPTION, parseErrors).orElse(null));
+                final Optional<String> device = TinderPacketUtil.getStringAttribute(profileElement, "device", false, DESCRIPTION, parseErrors);
                 device.ifPresent(profileBuilder::setDevice);
-                final Optional<String> label = Optional.ofNullable(TinderPacketUtil.getStringAttribute(profileElement, ATTRIBUTE_LABEL, false, DESCRIPTION, parseErrors).orElse(null));
+                final Optional<String> label = TinderPacketUtil.getStringAttribute(profileElement, ATTRIBUTE_LABEL, false, DESCRIPTION, parseErrors);
                 label.ifPresent(profileBuilder::setLabel);
                 final Optional<Boolean> online = TinderPacketUtil.getBooleanAttribute(profileElement, "online", DESCRIPTION, parseErrors);
                 online.ifPresent(profileBuilder::setOnline);
