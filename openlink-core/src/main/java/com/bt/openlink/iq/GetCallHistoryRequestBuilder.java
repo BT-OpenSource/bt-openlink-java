@@ -11,7 +11,7 @@ import com.bt.openlink.type.CallType;
 
 public abstract class GetCallHistoryRequestBuilder<B extends GetCallHistoryRequestBuilder, J, T extends Enum<T>> extends IQBuilder<B, J, T> {
 
-    @Nullable J jid;
+    @Nullable private J jid;
     @Nullable private String caller;
     @Nullable private String called;
     @Nullable private CallType callType;
