@@ -46,10 +46,8 @@ public class MakeCallResult extends OpenlinkIQ {
         final Builder builder = Builder.start(iq);
         final Element callStatusElement = TinderPacketUtil.getChildElement(outElement, "callstatus");
         TinderPacketUtil.getBooleanAttribute(callStatusElement, "busy", "busy attribute", parseErrors).ifPresent(builder::setCallStatusBusy);
-        if (outElement != null) {
-            final List<Call> calls = TinderPacketUtil.getCalls(outElement, "make call result", parseErrors);
-            builder.addCalls(calls);
-        }
+        final List<Call> calls = TinderPacketUtil.getCalls(callStatusElement, "make call result", parseErrors);
+        builder.addCalls(calls);
         final MakeCallResult result = builder.build(parseErrors);
         result.setID(iq.getID());
         return result;

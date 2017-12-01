@@ -96,13 +96,13 @@ public class CallStatusMessage extends Message {
                 .setTo(message.getTo());
         final List<String> parseErrors = new ArrayList<>();
         final Element itemsElement = message.getChildElement("event", "http://jabber.org/protocol/pubsub#event").element("items");
-        PubSubNodeId.from(itemsElement.attributeValue("node")).ifPresent(builder::setPubSubNodeId);
         final Element itemElement = itemsElement.element("item");
-        ItemId.from(TinderPacketUtil.getNullableStringAttribute(itemElement, "id")).ifPresent(builder::setItemId);
         final Element callStatusElement = TinderPacketUtil.getChildElement(itemElement, "callstatus");
-        TinderPacketUtil.getBooleanAttribute(callStatusElement, "busy", "busy attribute", parseErrors).ifPresent(builder::setCallStatusBusy);
-        builder.addCalls(TinderPacketUtil.getCalls(itemElement, STANZA_DESCRIPTION, parseErrors));
         final Element delayElement = message.getChildElement("delay", "urn:xmpp:delay");
+        PubSubNodeId.from(itemsElement.attributeValue("node")).ifPresent(builder::setPubSubNodeId);
+        ItemId.from(TinderPacketUtil.getNullableStringAttribute(itemElement, "id")).ifPresent(builder::setItemId);
+        TinderPacketUtil.getBooleanAttribute(callStatusElement, "busy", "busy attribute", parseErrors).ifPresent(builder::setCallStatusBusy);
+        builder.addCalls(TinderPacketUtil.getCalls(callStatusElement, STANZA_DESCRIPTION, parseErrors));
         final Optional<String> stampOptional = TinderPacketUtil.getStringAttribute(delayElement, "stamp");
         if (stampOptional.isPresent()) {
             final String stamp = stampOptional.get();

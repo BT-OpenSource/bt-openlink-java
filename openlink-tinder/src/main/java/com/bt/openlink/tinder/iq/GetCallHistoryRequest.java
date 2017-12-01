@@ -58,7 +58,7 @@ public class GetCallHistoryRequest extends OpenlinkIQ {
         final Builder builder = Builder.start(iq);
         final List<String> parseErrors = new ArrayList<>();
         final Element inElement = TinderPacketUtil.getIOInElement(iq);
-        TinderPacketUtil.getJID(TinderPacketUtil.getChildElementString(inElement, "jid")).ifPresent(builder::setJID);
+        TinderPacketUtil.getJID(TinderPacketUtil.getNullableChildElementString(inElement, "jid")).ifPresent(builder::setJID);
         TinderPacketUtil.getOptionalChildElementString(inElement, "caller").ifPresent(builder::setCaller);
         TinderPacketUtil.getOptionalChildElementString(inElement, "called").ifPresent(builder::setCalled);
         final Optional<String> callTypeString = TinderPacketUtil.getOptionalChildElementString(inElement, "calltype");

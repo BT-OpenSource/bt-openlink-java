@@ -59,13 +59,10 @@ public class PubSubPublishRequest extends OpenlinkIQ {
         final List<String> parseErrors = new ArrayList<>();
         final Builder builder = Builder.start(iq);
         final Element publishElement = TinderPacketUtil.getChildElement(iq.getElement(), "pubsub", "publish");
-        if (publishElement != null) {
-            PubSubNodeId.from(TinderPacketUtil.getNullableStringAttribute(publishElement,"node")).ifPresent(builder::setPubSubNodeId);
-            final Element itemElement = publishElement.element("item");
-            final Element callStatusElement = TinderPacketUtil.getChildElement(itemElement, "callstatus");
-            TinderPacketUtil.getBooleanAttribute(callStatusElement, "busy", "busy attribute", parseErrors).ifPresent(builder::setCallStatusBusy);
-            builder.addCalls(TinderPacketUtil.getCalls(itemElement, STANZA_DESCRIPTION, parseErrors));
-        }
+        final Element callStatusElement = TinderPacketUtil.getChildElement(publishElement, "item", "callstatus");
+        PubSubNodeId.from(TinderPacketUtil.getNullableStringAttribute(publishElement, "node")).ifPresent(builder::setPubSubNodeId);
+        TinderPacketUtil.getBooleanAttribute(callStatusElement, "busy", "busy attribute", parseErrors).ifPresent(builder::setCallStatusBusy);
+        builder.addCalls(TinderPacketUtil.getCalls(callStatusElement, STANZA_DESCRIPTION, parseErrors));
         final PubSubPublishRequest request = builder.build(parseErrors);
         request.setID(iq.getID());
         return request;
