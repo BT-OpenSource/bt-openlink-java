@@ -3,7 +3,6 @@ package com.bt.openlink.tinder.iq;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -54,14 +53,10 @@ public class GetInterestsResult extends OpenlinkIQ {
             final List<Element> interestElements = interestsElement.elements("interest");
             for (final Element interestElement : interestElements) {
                 final Interest.Builder interestBuilder = Interest.Builder.start();
-                final Optional<InterestId> interestId = InterestId.from(TinderPacketUtil.getStringAttribute(interestElement, "id", false, DESCRIPTION, parseErrors).orElse(null));
-                interestId.ifPresent(interestBuilder::setId);
-                final Optional<InterestType> interestType = InterestType.from(TinderPacketUtil.getStringAttribute(interestElement, "type", false, DESCRIPTION, parseErrors).orElse(null));
-                interestType.ifPresent(interestBuilder::setType);
-                final Optional<String> label = TinderPacketUtil.getStringAttribute(interestElement, "label", false, DESCRIPTION, parseErrors);
-                label.ifPresent(interestBuilder::setLabel);
-                final Optional<Boolean> isDefault = TinderPacketUtil.getBooleanAttribute(interestElement, "default", DESCRIPTION, parseErrors);
-                isDefault.ifPresent(interestBuilder::setDefault);
+                InterestId.from(TinderPacketUtil.getNullableStringAttribute(interestElement, "id")).ifPresent(interestBuilder::setId);
+                InterestType.from(TinderPacketUtil.getNullableStringAttribute(interestElement, "type")).ifPresent(interestBuilder::setType);
+                TinderPacketUtil.getStringAttribute(interestElement, "label").ifPresent(interestBuilder::setLabel);
+                TinderPacketUtil.getBooleanAttribute(interestElement, "default", DESCRIPTION, parseErrors).ifPresent(interestBuilder::setDefault);
                 builder.addInterest(interestBuilder.build(parseErrors));
             }
         }
