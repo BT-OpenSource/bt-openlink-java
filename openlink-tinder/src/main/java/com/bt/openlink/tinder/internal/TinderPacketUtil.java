@@ -100,6 +100,11 @@ public final class TinderPacketUtil {
         }
     }
 
+    @Nonnull
+    public static Optional<String> getOptionalChildElementString(@Nullable final Element parentElement, @Nonnull final String childElementName) {
+        return Optional.ofNullable(getChildElementString(parentElement, childElementName));
+    }
+
     @Nullable
     public static String getChildElementString(@Nullable final Element parentElement, @Nonnull final String childElementName) {
         final Element childElement = getChildElement(parentElement, childElementName);
@@ -112,8 +117,8 @@ public final class TinderPacketUtil {
         return null;
     }
 
-    @Nullable
-    public static LocalDate getChildElementLocalDate(
+    @Nonnull
+    public static Optional<LocalDate> getChildElementLocalDate(
             @Nullable final Element parentElement,
             @Nonnull final String childElementName,
             @Nonnull final DateTimeFormatter dateTimeFormatter,
@@ -123,12 +128,12 @@ public final class TinderPacketUtil {
         final String dateText = getChildElementString(parentElement, childElementName);
         if (dateText != null) {
             try {
-                return LocalDate.parse(dateText, dateTimeFormatter);
+                return Optional.of(LocalDate.parse(dateText, dateTimeFormatter));
             } catch (final DateTimeParseException e) {
                 parseErrors.add(String.format("Invalid %s; invalid %s '%s'; date format is '%s'", stanzaDescription, childElementName, dateText, dateFormat));
             }
         }
-        return null;
+        return Optional.empty();
     }
 
     @Nonnull
@@ -148,8 +153,8 @@ public final class TinderPacketUtil {
         return Optional.empty();
     }
 
-    @Nullable
-    public static Long getChildElementLong(
+    @Nonnull
+    public static Optional<Long> getChildElementLong(
             @Nullable final Element parentElement,
             @Nonnull final String childElementName,
             @Nonnull final String stanzaDescription,
@@ -157,13 +162,12 @@ public final class TinderPacketUtil {
         final String childElementText = getChildElementString(parentElement, childElementName);
         if (childElementText != null) {
             try {
-                return Long.parseLong(childElementText);
+                return Optional.of(Long.parseLong(childElementText));
             } catch (final NumberFormatException ignored) {
                 parseErrors.add(String.format("Invalid %s; invalid %s '%s'; please supply an integer", stanzaDescription, childElementName, childElementText));
-                return null;
             }
         }
-        return null;
+        return Optional.empty();
     }
 
     @Nonnull
@@ -428,10 +432,9 @@ public final class TinderPacketUtil {
                             .collect(Collectors.toList());
                     callBuilder.addCalledE164Numbers(calledE164Numbers);
                 });
-                final Optional<Instant> startTime = getChildElementISO8601(callElement, ATTRIBUTE_START_TIME, description, parseErrors);
-                startTime.ifPresent(callBuilder::setStartTime);
-                final Optional<Long> duration = Optional.ofNullable(getChildElementLong(callElement, ATTRIBUTE_DURATION, description, parseErrors));
-                duration.ifPresent(millis -> callBuilder.setDuration(Duration.ofMillis(millis)));
+                getChildElementISO8601(callElement, ATTRIBUTE_START_TIME, description, parseErrors).ifPresent(callBuilder::setStartTime);
+                getChildElementLong(callElement, ATTRIBUTE_DURATION, description, parseErrors)
+                        .ifPresent(millis -> callBuilder.setDuration(Duration.ofMillis(millis)));
                 getActions(callElement, callBuilder);
                 getFeatures(callElement, callBuilder, parseErrors);
                 getParticipants(callElement, callBuilder, description, parseErrors);

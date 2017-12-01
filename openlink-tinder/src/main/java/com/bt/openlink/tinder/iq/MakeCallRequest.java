@@ -86,10 +86,7 @@ public class MakeCallRequest extends OpenlinkIQ {
         if (featuresElement != null) {
             final List<Element> featureElements = featuresElement.elements("feature");
             for (final Element featureElement : featureElements) {
-                final Element idElement = featureElement.element("id");
-                if (idElement != null) {
-                    FeatureId.from(idElement.getText()).ifPresent(builder::addFeatureId);
-                }
+                FeatureId.from(TinderPacketUtil.getChildElementString(featureElement, "id")).ifPresent(builder::addFeatureId);
             }
         }
     }
