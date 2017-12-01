@@ -14,7 +14,7 @@ public final class Profile {
     @Nullable private final String label;
     @Nullable private final Boolean online;
     @Nullable private final Site site;
-    @Nonnull final List<RequestAction> actions;
+    @Nonnull private final List<RequestAction> actions;
 
     private Profile(@Nonnull final Builder builder) {
         this.profileId = builder.profileId;

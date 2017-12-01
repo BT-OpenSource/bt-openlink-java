@@ -21,7 +21,7 @@ import com.bt.openlink.type.CallDirection;
 import com.bt.openlink.type.CallState;
 import com.bt.openlink.type.Changed;
 
-@SuppressWarnings("ConstantConditions")
+@SuppressWarnings({"ConstantConditions", "RedundantThrows"})
 public class MakeCallResultTest {
 
     @Rule public final ExpectedException expectedException = ExpectedException.none();
@@ -70,6 +70,7 @@ public class MakeCallResultTest {
         assertThat(result.getID(), is(CoreFixtures.STANZA_ID));
         assertThat(result.getTo(), is(Fixtures.TO_JID));
         assertThat(result.getFrom(), is(Fixtures.FROM_JID));
+        assertThat(result.isCallStatusBusy().get(),is(false));
         final List<Call> calls = result.getCalls();
         final Call theOnlyCall = calls.get(0);
         assertThat(theOnlyCall.getId().get(), is(CoreFixtures.CALL_ID));

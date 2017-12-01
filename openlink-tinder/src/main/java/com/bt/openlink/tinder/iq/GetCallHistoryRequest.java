@@ -55,33 +55,27 @@ public class GetCallHistoryRequest extends OpenlinkIQ {
 
     @Nonnull
     public static GetCallHistoryRequest from(@Nonnull IQ iq) {
+        final Builder builder = Builder.start(iq);
         final List<String> parseErrors = new ArrayList<>();
         final Element inElement = TinderPacketUtil.getIOInElement(iq);
-        final Optional<JID> jid = TinderPacketUtil.getJID(TinderPacketUtil.getChildElementString(inElement, "jid"));
-        final Optional<String> caller = Optional.ofNullable(TinderPacketUtil.getChildElementString(inElement, "caller"));
-        final Optional<String> called = Optional.ofNullable(TinderPacketUtil.getChildElementString(inElement, "called"));
-        final String callTypeString = TinderPacketUtil.getChildElementString(inElement, "calltype");
-        final Optional<CallType> callType = CallType.from(callTypeString);
-        if (!callType.isPresent() && callTypeString != null && !callTypeString.isEmpty()) {
-            parseErrors.add(String.format("Invalid %s; invalid calltype - '%s' should be 'in', 'out' or 'missed'", STANZA_DESCRIPTION, callTypeString));
-        }
-        final Optional<LocalDate> fromDate = Optional.ofNullable(TinderPacketUtil.getChildElementLocalDate(inElement,
-                "fromdate", DATE_FORMATTER, STANZA_DESCRIPTION, DATE_PATTERN, parseErrors));
-        final Optional<LocalDate> upToDate = Optional.ofNullable(TinderPacketUtil.getChildElementLocalDate(inElement,
-                "uptodate", DATE_FORMATTER, STANZA_DESCRIPTION, DATE_PATTERN, parseErrors));
-        final Optional<Long> start = Optional.ofNullable(TinderPacketUtil.getChildElementLong(inElement,
-                "start", STANZA_DESCRIPTION, parseErrors));
-        final Optional<Long> count = Optional.ofNullable(TinderPacketUtil.getChildElementLong(inElement,
-                "count", STANZA_DESCRIPTION, parseErrors));
-        final Builder builder = Builder.start(iq);
-        jid.ifPresent(builder::setJID);
-        caller.ifPresent(builder::setCaller);
-        called.ifPresent(builder::setCalled);
-        callType.ifPresent(builder::setCallType);
-        fromDate.ifPresent(builder::setFromDate);
-        upToDate.ifPresent(builder::setUpToDate);
-        start.ifPresent(builder::setStart);
-        count.ifPresent(builder::setCount);
+        TinderPacketUtil.getJID(TinderPacketUtil.getNullableChildElementString(inElement, "jid")).ifPresent(builder::setJID);
+        TinderPacketUtil.getOptionalChildElementString(inElement, "caller").ifPresent(builder::setCaller);
+        TinderPacketUtil.getOptionalChildElementString(inElement, "called").ifPresent(builder::setCalled);
+        final Optional<String> callTypeString = TinderPacketUtil.getOptionalChildElementString(inElement, "calltype");
+        callTypeString.ifPresent(string -> {
+            final Optional<CallType> callType = CallType.from(string);
+            if (callType.isPresent()) {
+                builder.setCallType(callType.get());
+            } else {
+                parseErrors.add(String.format("Invalid %s; invalid calltype - '%s' should be 'in', 'out' or 'missed'", STANZA_DESCRIPTION, string));
+            }
+        });
+        TinderPacketUtil.getChildElementLocalDate(inElement,"fromdate", DATE_FORMATTER, STANZA_DESCRIPTION, DATE_PATTERN, parseErrors)
+                .ifPresent(builder::setFromDate);
+        TinderPacketUtil.getChildElementLocalDate(inElement,"uptodate", DATE_FORMATTER, STANZA_DESCRIPTION, DATE_PATTERN, parseErrors)
+                .ifPresent(builder::setUpToDate);
+        TinderPacketUtil.getChildElementLong(inElement,"start", STANZA_DESCRIPTION, parseErrors).ifPresent(builder::setStart);
+        TinderPacketUtil.getChildElementLong(inElement,"count", STANZA_DESCRIPTION, parseErrors).ifPresent(builder::setCount);
         final GetCallHistoryRequest request = builder.build(parseErrors);
         request.setID(iq.getID());
         return request;

@@ -52,6 +52,7 @@ public final class TinderPacketUtil {
     private static final String ATTRIBUTE_START_TIME = "starttime";
     private static final String ATTRIBUTE_TIMESTAMP = "timestamp";
     private static final String ATTRIBUTE_DURATION = "duration";
+    private static final String ELEMENT_NUMBER = "number";
 
     private TinderPacketUtil() {
     }
@@ -99,8 +100,13 @@ public final class TinderPacketUtil {
         }
     }
 
+    @Nonnull
+    public static Optional<String> getOptionalChildElementString(@Nullable final Element parentElement, @Nonnull final String childElementName) {
+        return Optional.ofNullable(getNullableChildElementString(parentElement, childElementName));
+    }
+
     @Nullable
-    public static String getChildElementString(@Nullable final Element parentElement, @Nonnull final String childElementName) {
+    public static String getNullableChildElementString(@Nullable final Element parentElement, @Nonnull final String childElementName) {
         final Element childElement = getChildElement(parentElement, childElementName);
         if (childElement != null) {
             final String childElementText = childElement.getText().trim();
@@ -111,23 +117,23 @@ public final class TinderPacketUtil {
         return null;
     }
 
-    @Nullable
-    public static LocalDate getChildElementLocalDate(
+    @Nonnull
+    public static Optional<LocalDate> getChildElementLocalDate(
             @Nullable final Element parentElement,
             @Nonnull final String childElementName,
             @Nonnull final DateTimeFormatter dateTimeFormatter,
             final String stanzaDescription,
             @Nonnull final String dateFormat,
             final List<String> parseErrors) {
-        final String dateText = getChildElementString(parentElement, childElementName);
+        final String dateText = getNullableChildElementString(parentElement, childElementName);
         if (dateText != null) {
             try {
-                return LocalDate.parse(dateText, dateTimeFormatter);
+                return Optional.of(LocalDate.parse(dateText, dateTimeFormatter));
             } catch (final DateTimeParseException e) {
                 parseErrors.add(String.format("Invalid %s; invalid %s '%s'; date format is '%s'", stanzaDescription, childElementName, dateText, dateFormat));
             }
         }
-        return null;
+        return Optional.empty();
     }
 
     @Nonnull
@@ -136,7 +142,7 @@ public final class TinderPacketUtil {
             @Nonnull final String childElementName,
             @Nonnull final String stanzaDescription,
             @Nonnull final List<String> parseErrors) {
-        final String childElementText = getChildElementString(parentElement, childElementName);
+        final String childElementText = getNullableChildElementString(parentElement, childElementName);
         if (childElementText != null) {
             try {
                 return Optional.of(Instant.parse(childElementText));
@@ -147,31 +153,45 @@ public final class TinderPacketUtil {
         return Optional.empty();
     }
 
-    @Nullable
-    public static Long getChildElementLong(
+    @Nonnull
+    public static Optional<Long> getChildElementLong(
             @Nullable final Element parentElement,
             @Nonnull final String childElementName,
             @Nonnull final String stanzaDescription,
             @Nonnull final List<String> parseErrors) {
-        final String childElementText = getChildElementString(parentElement, childElementName);
+        final String childElementText = getNullableChildElementString(parentElement, childElementName);
         if (childElementText != null) {
             try {
-                return Long.parseLong(childElementText);
+                return Optional.of(Long.parseLong(childElementText));
             } catch (final NumberFormatException ignored) {
                 parseErrors.add(String.format("Invalid %s; invalid %s '%s'; please supply an integer", stanzaDescription, childElementName, childElementText));
-                return null;
             }
         }
-        return null;
+        return Optional.empty();
     }
 
     @Nonnull
     public static Optional<String> getStringAttribute(@Nullable final Element element, @Nonnull final String attributeName) {
-        return getStringAttribute(element, attributeName, false, "", Collections.emptyList());
+        return Optional.ofNullable(getNullableStringAttribute(element, attributeName));
+    }
+
+    @Nullable
+    public static String getNullableStringAttribute(@Nullable final Element element, @Nonnull final String attributeName) {
+        return getNullableStringAttribute(element, attributeName, false, "", Collections.emptyList());
     }
 
     @Nonnull
     public static Optional<String> getStringAttribute(
+            @Nullable final Element element,
+            @Nonnull final String attributeName,
+            final boolean isRequired,
+            @Nonnull final String stanzaDescription,
+            @Nonnull final List<String> parseErrors) {
+        return Optional.ofNullable(getNullableStringAttribute(element, attributeName, isRequired, stanzaDescription, parseErrors));
+    }
+
+    @Nullable
+    public static String getNullableStringAttribute(
             @Nullable final Element element,
             @Nonnull final String attributeName,
             final boolean isRequired,
@@ -187,12 +207,12 @@ public final class TinderPacketUtil {
         if (attributeValue == null && isRequired) {
             parseErrors.add(String.format("Invalid %s; missing '%s' attribute is mandatory", stanzaDescription, attributeName));
         }
-        return Optional.ofNullable(attributeValue);
+        return attributeValue;
     }
 
     @Nonnull
     private static Optional<Long> getLongAttribute(final Element parentElement, final String attributeName, final String description, final List<String> parseErrors) {
-        final Optional<String> stringValue = getStringAttribute(parentElement, attributeName, false, description, parseErrors);
+        final Optional<String> stringValue = getStringAttribute(parentElement, attributeName);
         try {
             return stringValue.map(Long::valueOf);
         } catch (final NumberFormatException e) {
@@ -204,31 +224,26 @@ public final class TinderPacketUtil {
     private static Optional<Instant> getISO8601Attribute(final Element parentElement, final String attributeName, final String description, final List<String> parseErrors) {
         final Optional<String> stringValue = getStringAttribute(parentElement, attributeName, false, description, parseErrors);
         try {
-            if (stringValue.isPresent()) {
-                return Optional.ofNullable(Instant.parse(stringValue.get()));
-            }
+            return stringValue.map(Instant::parse);
         } catch (final DateTimeParseException ignored) {
             parseErrors.add(String.format("Invalid %s; invalid %s '%s'; format should be compliant with XEP-0082", description, attributeName, stringValue));
+            return Optional.empty();
         }
-        return Optional.empty();
     }
 
     private static Optional<Instant> getJavaUtilDateAttribute(final Element parentElement, final String attributeName, final String description, final List<String> parseErrors) {
         final Optional<String> stringValue = getStringAttribute(parentElement, attributeName, false, description, parseErrors);
         try {
-            if (stringValue.isPresent()) {
-                return Optional.of(Instant.from(JAVA_UTIL_DATE_FORMATTER.parse(stringValue.get())));
-            }
+            return stringValue.map(string -> Instant.from(JAVA_UTIL_DATE_FORMATTER.parse(string)));
         } catch (final DateTimeParseException ignored) {
             parseErrors.add(String.format("Invalid %s; invalid %s '%s'; format should be 'dow mon dd hh:mm:ss zzz yyyy'", description, attributeName, stringValue));
+            return Optional.empty();
         }
-        return Optional.empty();
     }
 
     @Nonnull
     public static Optional<Boolean> getBooleanAttribute(final Element element, final String id, final String description, final List<String> parseErrors) {
-        final Optional<String> stringValue = getStringAttribute(element, id, false, description, parseErrors);
-        return stringValue.map(Boolean::valueOf);
+        return getBoolean(getNullableStringAttribute(element, id), description, parseErrors);
     }
 
     @Nonnull
@@ -276,20 +291,20 @@ public final class TinderPacketUtil {
             call.getState().ifPresent(state -> callElement.addElement("state").setText(state.getLabel()));
             call.getDirection().ifPresent(direction -> callElement.addElement(ATTRIBUTE_DIRECTION).setText(direction.getLabel()));
             final Element callerElement = callElement.addElement("caller");
-            final Element callerNumberElement = callerElement.addElement("number");
+            final Element callerNumberElement = callerElement.addElement(ELEMENT_NUMBER);
             call.getCallerNumber().ifPresent(callerNumber -> callerNumberElement.setText(callerNumber.value()));
-            final String callerE164Numbers =String.join(",", call.getCallerE164Numbers().stream().map(PhoneNumber::value).collect(Collectors.toList()));
-            if(!callerE164Numbers.isEmpty()) {
+            final String callerE164Numbers = String.join(",", call.getCallerE164Numbers().stream().map(PhoneNumber::value).collect(Collectors.toList()));
+            if (!callerE164Numbers.isEmpty()) {
                 callerNumberElement.addAttribute("e164", callerE164Numbers);
             }
             final Element callerNameElement = callerElement.addElement("name");
             call.getCallerName().ifPresent(callerNameElement::setText);
             final Element calledElement = callElement.addElement("called");
-            final Element calledNumberElement = calledElement.addElement("number");
+            final Element calledNumberElement = calledElement.addElement(ELEMENT_NUMBER);
             call.getCalledNumber().ifPresent(calledNumber -> calledNumberElement.setText(calledNumber.value()));
             call.getCalledDestination().ifPresent(calledDestination -> calledNumberElement.addAttribute("destination", calledDestination.value()));
-            final String calledE164Numbers =String.join(",", call.getCalledE164Numbers().stream().map(PhoneNumber::value).collect(Collectors.toList()));
-            if(!calledE164Numbers.isEmpty()) {
+            final String calledE164Numbers = String.join(",", call.getCalledE164Numbers().stream().map(PhoneNumber::value).collect(Collectors.toList()));
+            if (!calledE164Numbers.isEmpty()) {
                 calledNumberElement.addAttribute("e164", calledE164Numbers);
             }
             final Element calledNameElement = calledElement.addElement("name");
@@ -341,8 +356,8 @@ public final class TinderPacketUtil {
                     final ZonedDateTime startTimeInUTC = startTime.atZone(TimeZone.getTimeZone("UTC").toZoneId());
                     participantElement.addAttribute(ATTRIBUTE_START_TIME, ISO_8601_FORMATTER.format(startTimeInUTC));
                     // Include the legacy timestamp attribute too
-                        participantElement.addAttribute(ATTRIBUTE_TIMESTAMP, JAVA_UTIL_DATE_FORMATTER.format(startTimeInUTC));
-                    });
+                    participantElement.addAttribute(ATTRIBUTE_TIMESTAMP, JAVA_UTIL_DATE_FORMATTER.format(startTimeInUTC));
+                });
                 participant.getDuration().ifPresent(duration -> participantElement.addAttribute(ATTRIBUTE_DURATION, String.valueOf(duration.toMillis())));
             });
         }
@@ -367,72 +382,50 @@ public final class TinderPacketUtil {
         id.ifPresent(siteBuilder::setId);
         final Optional<Boolean> isDefaultSite = getBooleanAttribute(siteElement, OpenlinkXmppNamespace.TAG_DEFAULT, description, parseErrors);
         isDefaultSite.ifPresent(siteBuilder::setDefault);
-        final Optional<Site.Type> type = Site.Type.from(getStringAttribute(siteElement, "type", false, description, parseErrors).orElse(null));
+        final Optional<Site.Type> type = Site.Type.from(getNullableStringAttribute(siteElement, "type", false, description, parseErrors));
         type.ifPresent(siteBuilder::setType);
         return Optional.of(siteBuilder.build(parseErrors));
     }
 
+    private static List<PhoneNumber> getPhoneNumbers(@Nullable final Element parentElement) {
+        final Optional<String> e164String = getStringAttribute(parentElement, "e164");
+        final List<PhoneNumber> phoneNumbers = new ArrayList<>();
+        e164String.ifPresent(string -> Arrays.stream(string.split(","))
+                .map(String::trim)
+                .map(PhoneNumber::from)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .forEach(phoneNumbers::add));
+        return phoneNumbers;
+    }
+
     @SuppressWarnings("unchecked")
-    public static List<Call> getCalls(@Nullable final Element parentElement, @Nonnull final String description, @Nonnull final List<String> parseErrors) {
+    public static List<Call> getCalls(@Nullable final Element callStatusElement, @Nonnull final String description, @Nonnull final List<String> parseErrors) {
         final List<Call> calls = new ArrayList<>();
-        final Element callStatusElement = getChildElement(parentElement, "callstatus");
-        if(callStatusElement!=null) {
+        if (callStatusElement != null) {
             final List<Element> callElements = callStatusElement.elements("call");
             for (final Element callElement : callElements) {
-                final Call.Builder callBuilder = Call.Builder.start();
-                final Optional<CallId> callId = CallId.from(getChildElementString(callElement, "id"));
-                callId.ifPresent(callBuilder::setId);
-                final Optional<Site> site = getSite(callElement, description, parseErrors);
-                site.ifPresent(callBuilder::setSite);
-                final Optional<ProfileId> profileId = ProfileId.from(getChildElementString(callElement, "profile"));
-                profileId.ifPresent(callBuilder::setProfileId);
-                final Optional<InterestId> interestId = InterestId.from(getChildElementString(callElement, "interest"));
-                interestId.ifPresent(callBuilder::setInterestId);
-                final Optional<Changed> changed = Changed.from(getChildElementString(callElement, "changed"));
-                changed.ifPresent(callBuilder::setChanged);
-                final Optional<CallState> state = CallState.from(getChildElementString(callElement, "state"));
-                state.ifPresent(callBuilder::setState);
-                final Optional<CallDirection> direction = CallDirection.from(getChildElementString(callElement, ATTRIBUTE_DIRECTION));
-                direction.ifPresent(callBuilder::setDirection);
                 final Element callerElement = getChildElement(callElement, "caller");
-                final Optional<PhoneNumber> callerNumber = PhoneNumber.from(getChildElementString(callerElement, "number"));
-                callerNumber.ifPresent(callBuilder::setCallerNumber);
-                final Optional<String> callerName = Optional.ofNullable(getChildElementString(callerElement, "name"));
-                callerName.ifPresent(callBuilder::setCallerName);
-                final Optional<String> callerE164 = getStringAttribute(getChildElement(callerElement, "number"), "e164");
-                callerE164.ifPresent(e164List -> {
-                    final List<PhoneNumber> callerE164Numbers = Arrays.stream(e164List.split(","))
-                            .map(String::trim)
-                            .map(PhoneNumber::from)
-                            .filter(Optional::isPresent)
-                            .map(Optional::get)
-                            .collect(Collectors.toList());
-                    callBuilder.addCallerE164Numbers(callerE164Numbers);
-                });
                 final Element calledElement = getChildElement(callElement, "called");
-                final Optional<PhoneNumber> calledNumber = PhoneNumber.from(getChildElementString(calledElement, "number"));
-                calledNumber.ifPresent(callBuilder::setCalledNumber);
-                final Optional<String> calledName = Optional.ofNullable(getChildElementString(calledElement, "name"));
-                calledName.ifPresent(callBuilder::setCalledName);
-                final Element calledNumberElement = getChildElement(calledElement, "number");
-                final Optional<PhoneNumber> calledDestination = PhoneNumber.from(getStringAttribute(calledNumberElement, "destination").orElse(null));
-                calledDestination.ifPresent(callBuilder::setCalledDestination);
-                final Optional<String> calledE164 = getStringAttribute(calledNumberElement, "e164");
-                calledE164.ifPresent(e164List -> {
-                    final List<PhoneNumber> calledE164Numbers = Arrays.stream(e164List.split(","))
-                            .map(String::trim)
-                            .map(PhoneNumber::from)
-                            .filter(Optional::isPresent)
-                            .map(Optional::get)
-                            .collect(Collectors.toList());
-                    callBuilder.addCalledE164Numbers(calledE164Numbers);
-                });
-                final Optional<Instant> startTime = getChildElementISO8601(callElement, ATTRIBUTE_START_TIME, description, parseErrors);
-                startTime.ifPresent(callBuilder::setStartTime);
-                final Optional<Long> duration = Optional.ofNullable(getChildElementLong(callElement, ATTRIBUTE_DURATION, description, parseErrors));
-                duration.ifPresent(millis -> callBuilder.setDuration(Duration.ofMillis(millis)));
-                getActions(callElement, callBuilder);
-                getFeatures(callElement, callBuilder, parseErrors);
+                final Call.Builder callBuilder = Call.Builder.start();
+                CallId.from(getNullableChildElementString(callElement, "id")).ifPresent(callBuilder::setId);
+                getSite(callElement, description, parseErrors).ifPresent(callBuilder::setSite);
+                ProfileId.from(getNullableChildElementString(callElement, "profile")).ifPresent(callBuilder::setProfileId);
+                InterestId.from(getNullableChildElementString(callElement, "interest")).ifPresent(callBuilder::setInterestId);
+                Changed.from(getNullableChildElementString(callElement, "changed")).ifPresent(callBuilder::setChanged);
+                CallState.from(getNullableChildElementString(callElement, "state")).ifPresent(callBuilder::setState);
+                CallDirection.from(getNullableChildElementString(callElement, ATTRIBUTE_DIRECTION)).ifPresent(callBuilder::setDirection);
+                PhoneNumber.from(getNullableChildElementString(callerElement, ELEMENT_NUMBER)).ifPresent(callBuilder::setCallerNumber);
+                getOptionalChildElementString(callerElement, "name").ifPresent(callBuilder::setCallerName);
+                callBuilder.addCallerE164Numbers(getPhoneNumbers(getChildElement(callerElement, ELEMENT_NUMBER)));
+                PhoneNumber.from(getNullableChildElementString(calledElement, ELEMENT_NUMBER)).ifPresent(callBuilder::setCalledNumber);
+                getOptionalChildElementString(calledElement, "name").ifPresent(callBuilder::setCalledName);
+                PhoneNumber.from(getNullableStringAttribute(getChildElement(calledElement, ELEMENT_NUMBER), "destination")).ifPresent(callBuilder::setCalledDestination);
+                callBuilder.addCalledE164Numbers(getPhoneNumbers(getChildElement(calledElement, ELEMENT_NUMBER)));
+                getChildElementISO8601(callElement, ATTRIBUTE_START_TIME, description, parseErrors).ifPresent(callBuilder::setStartTime);
+                getChildElementLong(callElement, ATTRIBUTE_DURATION, description, parseErrors).map(Duration::ofMillis).ifPresent(callBuilder::setDuration);
+                getActions(callElement, callBuilder, description, parseErrors);
+                getFeatures(callElement, callBuilder, description, parseErrors);
                 getParticipants(callElement, callBuilder, description, parseErrors);
                 calls.add(callBuilder.build(parseErrors));
             }
@@ -441,19 +434,20 @@ public final class TinderPacketUtil {
     }
 
     @SuppressWarnings("unchecked")
-    private static void getFeatures(@Nonnull final Element callElement, @Nonnull final Call.Builder callBuilder, List<String> parseErrors) {
+    private static void getFeatures(@Nonnull final Element callElement, @Nonnull final Call.Builder callBuilder, final String description, List<String> parseErrors) {
         final Element featuresElement = callElement.element("features");
         if (featuresElement != null) {
             final List<Element> featureElements = featuresElement.elements("feature");
             for (final Element featureElement : featureElements) {
                 final CallFeature.Builder callFeatureBuilder = CallFeature.Builder.start();
+                final boolean hasChildElement = featureElement.elementIterator().hasNext();
                 FeatureId.from(featureElement.attributeValue("id")).ifPresent(callFeatureBuilder::setId);
                 Optional.ofNullable(featureElement.attributeValue("label")).ifPresent(callFeatureBuilder::setLabel);
                 FeatureType.from(featureElement.attributeValue("type")).ifPresent(callFeatureBuilder::setType);
-                getBoolean(featureElement.getText()).ifPresent(callFeatureBuilder::setEnabled);
-                final Element keyElement = getChildElement(featureElement, "devicekeys", "key");
-                if (keyElement != null) {
-                    DeviceKey.from(keyElement.getText()).ifPresent(callFeatureBuilder::setDeviceKey);
+                if (hasChildElement) {
+                    DeviceKey.from(getNullableChildElementString(getChildElement(featureElement, "devicekeys"), "key")).ifPresent(callFeatureBuilder::setDeviceKey);
+                } else {
+                    getBoolean(featureElement.getText(), description, parseErrors).ifPresent(callFeatureBuilder::setEnabled);
                 }
                 callBuilder.addFeature(callFeatureBuilder.build(parseErrors));
             }
@@ -461,14 +455,16 @@ public final class TinderPacketUtil {
     }
 
     @Nonnull
-    private static Optional<Boolean> getBoolean(@Nullable final String value) {
-        if( "true".equalsIgnoreCase(value) ) {
+    private static Optional<Boolean> getBoolean(@Nullable final String value, String description, List<String> parseErrors) {
+        if ("true".equalsIgnoreCase(value)) {
             return Optional.of(Boolean.TRUE);
-        } else if ( "false".equalsIgnoreCase(value) ) {
+        } else if ("false".equalsIgnoreCase(value)) {
             return Optional.of(Boolean.FALSE);
-        } else {
-            return Optional.empty();
         }
+        if (value != null) {
+            parseErrors.add(String.format("Invalid %s: %s is neither true or false", description, value));
+        }
+        return Optional.empty();
     }
 
     @SuppressWarnings("unchecked")
@@ -478,12 +474,9 @@ public final class TinderPacketUtil {
             final List<Element> participantElements = participantsElement.elements("participant");
             for (final Element participantElement : participantElements) {
                 final Participant.Builder participantBuilder = Participant.Builder.start();
-                final Optional<String> jid = getStringAttribute(participantElement, "jid", true, description, parseErrors);
-                jid.ifPresent(participantBuilder::setJID);
-                final Optional<ParticipantType> participantType = ParticipantType.from(getStringAttribute(participantElement, "type", true, description, parseErrors).orElse(null));
-                participantType.ifPresent(participantBuilder::setType);
-                final Optional<CallDirection> callDirection = CallDirection.from(getStringAttribute(participantElement, ATTRIBUTE_DIRECTION, true, description, parseErrors).orElse(null));
-                callDirection.ifPresent(participantBuilder::setDirection);
+                getStringAttribute(participantElement, "jid", true, description, parseErrors).ifPresent(participantBuilder::setJID);
+                ParticipantType.from(getNullableStringAttribute(participantElement, "type")).ifPresent(participantBuilder::setType);
+                CallDirection.from(getNullableStringAttribute(participantElement, ATTRIBUTE_DIRECTION)).ifPresent(participantBuilder::setDirection);
                 final Optional<Instant> participantTimestamp = getJavaUtilDateAttribute(participantElement, ATTRIBUTE_TIMESTAMP, description, parseErrors);
                 participantTimestamp.ifPresent(participantBuilder::setStartTime);
                 final Optional<Instant> participantStartTime = getISO8601Attribute(participantElement, ATTRIBUTE_START_TIME, description, parseErrors);
@@ -499,13 +492,18 @@ public final class TinderPacketUtil {
     }
 
     @SuppressWarnings("unchecked")
-    private static void getActions(@Nonnull final Element callElement, @Nonnull final Call.Builder callBuilder) {
+    private static void getActions(@Nonnull final Element callElement, @Nonnull final Call.Builder callBuilder, String description, List<String> parseErrors) {
         final Element actionsElement = callElement.element("actions");
         if (actionsElement != null) {
             final List<Element> actionElements = actionsElement.elements();
             for (final Element actionElement : actionElements) {
-                final Optional<RequestAction> action = RequestAction.from(actionElement.getName());
-                action.ifPresent(callBuilder::addAction);
+                final String actionString = actionElement.getName();
+                final Optional<RequestAction> action = RequestAction.from(actionString);
+                if (action.isPresent()) {
+                    callBuilder.addAction(action.get());
+                } else {
+                    parseErrors.add(String.format("Invalid %s: %s is not a valid action", description, actionString));
+                }
             }
         }
     }

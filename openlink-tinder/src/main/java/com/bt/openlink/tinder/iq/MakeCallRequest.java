@@ -68,12 +68,9 @@ public class MakeCallRequest extends OpenlinkIQ {
         final List<String> parseErrors = new ArrayList<>();
         final Element inElement = TinderPacketUtil.getIOInElement(iq);
         final Builder builder = Builder.start(iq);
-        final Optional<JID> jid = TinderPacketUtil.getJID(TinderPacketUtil.getChildElementString(inElement, "jid"));
-        jid.ifPresent(builder::setJID);
-        final Optional<InterestId> interestId = InterestId.from(TinderPacketUtil.getChildElementString(inElement, "interest"));
-        interestId.ifPresent(builder::setInterestId);
-        final Optional<PhoneNumber> destination = PhoneNumber.from(TinderPacketUtil.getChildElementString(inElement, "destination"));
-        destination.ifPresent(builder::setDestination);
+        TinderPacketUtil.getJID(TinderPacketUtil.getNullableChildElementString(inElement, "jid")).ifPresent(builder::setJID);
+        InterestId.from(TinderPacketUtil.getNullableChildElementString(inElement, "interest")).ifPresent(builder::setInterestId);
+        PhoneNumber.from(TinderPacketUtil.getNullableChildElementString(inElement, "destination")).ifPresent(builder::setDestination);
         getFeatures(builder, inElement);
         final MakeCallRequest request = builder.build(parseErrors);
         request.setID(iq.getID());
@@ -86,10 +83,7 @@ public class MakeCallRequest extends OpenlinkIQ {
         if (featuresElement != null) {
             final List<Element> featureElements = featuresElement.elements("feature");
             for (final Element featureElement : featureElements) {
-                final Element idElement = featureElement.element("id");
-                if (idElement != null) {
-                    FeatureId.from(idElement.getText()).ifPresent(builder::addFeatureId);
-                }
+                FeatureId.from(TinderPacketUtil.getNullableChildElementString(featureElement, "id")).ifPresent(builder::addFeatureId);
             }
         }
     }
