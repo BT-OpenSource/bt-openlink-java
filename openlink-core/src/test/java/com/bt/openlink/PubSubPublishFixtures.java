@@ -13,6 +13,4 @@ public class PubSubPublishFixtures {
                     "  </pubsub>" +
                     "</iq>\n";
 
-    // TODO: (Greg 2017-10-03) Implement all features, replace with PUBLISH_REQUEST
-    public static final String PUBLISH_REQUEST_WITH_NO_FEATURES = PUBLISH_REQUEST.replaceAll("(?s)<features>.*</features>\n", "");
 }

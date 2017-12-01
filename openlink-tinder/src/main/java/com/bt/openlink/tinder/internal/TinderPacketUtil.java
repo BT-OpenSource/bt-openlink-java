@@ -30,6 +30,9 @@ import com.bt.openlink.type.CallFeature;
 import com.bt.openlink.type.CallId;
 import com.bt.openlink.type.CallState;
 import com.bt.openlink.type.Changed;
+import com.bt.openlink.type.DeviceKey;
+import com.bt.openlink.type.FeatureId;
+import com.bt.openlink.type.FeatureType;
 import com.bt.openlink.type.InterestId;
 import com.bt.openlink.type.Participant;
 import com.bt.openlink.type.ParticipantType;
@@ -223,8 +226,8 @@ public final class TinderPacketUtil {
     }
 
     @Nonnull
-    public static Optional<Boolean> getBooleanAttribute(final Element siteElement, final String id, final String description, final List<String> parseErrors) {
-        final Optional<String> stringValue = getStringAttribute(siteElement, id, false, description, parseErrors);
+    public static Optional<Boolean> getBooleanAttribute(final Element element, final String id, final String description, final List<String> parseErrors) {
+        final Optional<String> stringValue = getStringAttribute(element, id, false, description, parseErrors);
         return stringValue.map(Boolean::valueOf);
     }
 
@@ -429,11 +432,43 @@ public final class TinderPacketUtil {
                 final Optional<Long> duration = Optional.ofNullable(getChildElementLong(callElement, ATTRIBUTE_DURATION, description, parseErrors));
                 duration.ifPresent(millis -> callBuilder.setDuration(Duration.ofMillis(millis)));
                 getActions(callElement, callBuilder);
+                getFeatures(callElement, callBuilder, parseErrors);
                 getParticipants(callElement, callBuilder, description, parseErrors);
                 calls.add(callBuilder.build(parseErrors));
             }
         }
         return calls;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static void getFeatures(@Nonnull final Element callElement, @Nonnull final Call.Builder callBuilder, List<String> parseErrors) {
+        final Element featuresElement = callElement.element("features");
+        if (featuresElement != null) {
+            final List<Element> featureElements = featuresElement.elements("feature");
+            for (final Element featureElement : featureElements) {
+                final CallFeature.Builder callFeatureBuilder = CallFeature.Builder.start();
+                FeatureId.from(featureElement.attributeValue("id")).ifPresent(callFeatureBuilder::setId);
+                Optional.ofNullable(featureElement.attributeValue("label")).ifPresent(callFeatureBuilder::setLabel);
+                FeatureType.from(featureElement.attributeValue("type")).ifPresent(callFeatureBuilder::setType);
+                getBoolean(featureElement.getText()).ifPresent(callFeatureBuilder::setEnabled);
+                final Element keyElement = getChildElement(featureElement, "devicekeys", "key");
+                if (keyElement != null) {
+                    DeviceKey.from(keyElement.getText()).ifPresent(callFeatureBuilder::setDeviceKey);
+                }
+                callBuilder.addFeature(callFeatureBuilder.build(parseErrors));
+            }
+        }
+    }
+
+    @Nonnull
+    private static Optional<Boolean> getBoolean(@Nullable final String value) {
+        if( "true".equalsIgnoreCase(value) ) {
+            return Optional.of(Boolean.TRUE);
+        } else if ( "false".equalsIgnoreCase(value) ) {
+            return Optional.of(Boolean.FALSE);
+        } else {
+            return Optional.empty();
+        }
     }
 
     @SuppressWarnings("unchecked")
