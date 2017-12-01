@@ -1,8 +1,6 @@
 package com.bt.openlink.tinder.iq;
 
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.xmlunit.matchers.CompareMatcher.isIdenticalTo;
@@ -18,11 +16,10 @@ import com.bt.openlink.CoreFixtures;
 import com.bt.openlink.MakeCallFixtures;
 import com.bt.openlink.tinder.Fixtures;
 
-@SuppressWarnings("ConstantConditions")
+@SuppressWarnings({ "ConstantConditions", "RedundantThrows" })
 public class MakeCallRequestTest {
 
-    @Rule
-    public final ExpectedException expectedException = ExpectedException.none();
+    @Rule public final ExpectedException expectedException = ExpectedException.none();
 
     @Test
     public void canCreateAStanza() throws Exception {
@@ -34,6 +31,7 @@ public class MakeCallRequestTest {
                 .setJID(Fixtures.USER_FULL_JID)
                 .setInterestId(CoreFixtures.INTEREST_ID)
                 .setDestination(CoreFixtures.CALLED_DESTINATION)
+                .addFeatureId(CoreFixtures.FEATURE_ID)
                 .build();
 
         assertThat(request.getID(), is(CoreFixtures.STANZA_ID));
@@ -42,6 +40,7 @@ public class MakeCallRequestTest {
         assertThat(request.getJID().get(), is(Fixtures.USER_FULL_JID));
         assertThat(request.getInterestId().get(), is(CoreFixtures.INTEREST_ID));
         assertThat(request.getDestination().get(), is(CoreFixtures.CALLED_DESTINATION));
+        assertThat(request.getFeatureIds(), contains(CoreFixtures.FEATURE_ID));
     }
 
     @Test
@@ -65,6 +64,7 @@ public class MakeCallRequestTest {
                 .setJID(Fixtures.USER_FULL_JID)
                 .setInterestId(CoreFixtures.INTEREST_ID)
                 .setDestination(CoreFixtures.CALLED_DESTINATION)
+                .addFeatureId(CoreFixtures.FEATURE_ID)
                 .build();
 
         assertThat(request.toXML(), isIdenticalTo(MakeCallFixtures.MAKE_CALL_REQUEST).ignoreWhitespace());
@@ -81,6 +81,7 @@ public class MakeCallRequestTest {
         assertThat(request.getJID().get(), is(Fixtures.USER_FULL_JID));
         assertThat(request.getInterestId().get(), is(CoreFixtures.INTEREST_ID));
         assertThat(request.getDestination().get(), is(CoreFixtures.CALLED_DESTINATION));
+        assertThat(request.getFeatureIds(), contains(CoreFixtures.FEATURE_ID));
         assertThat(request.getParseErrors(), is(empty()));
     }
 
@@ -103,8 +104,7 @@ public class MakeCallRequestTest {
                 "Invalid stanza; missing 'from' attribute is mandatory",
                 "Invalid stanza; missing 'id' attribute is mandatory",
                 "Invalid stanza; missing or incorrect 'type' attribute",
-                "Invalid make-call request stanza; missing or invalid 'jid'"
-        ));
+                "Invalid make-call request stanza; missing or invalid 'jid'"));
     }
 
     @Test

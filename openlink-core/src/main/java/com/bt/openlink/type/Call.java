@@ -12,7 +12,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-// TODO: (Greg 2017-09-27) Add all call related fields to this class
 public class Call {
 
     public static Optional<Boolean> oneOrMoreCallsIsBusy(final Collection<Call> calls) {

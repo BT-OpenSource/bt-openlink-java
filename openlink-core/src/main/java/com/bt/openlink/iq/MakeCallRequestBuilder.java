@@ -1,20 +1,22 @@
 package com.bt.openlink.iq;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.bt.openlink.type.FeatureId;
 import com.bt.openlink.type.InterestId;
 import com.bt.openlink.type.PhoneNumber;
 
-// TODO: (Greg 2017-10-24) Add feature support
 public abstract class MakeCallRequestBuilder<B extends MakeCallRequestBuilder, J, T extends Enum<T>> extends IQBuilder<B, J, T> {
 
     @Nullable private J jid;
     @Nullable private InterestId interestId;
     @Nullable private PhoneNumber destination;
+    @Nonnull private final List<FeatureId> featureIds = new ArrayList<>();
 
     protected MakeCallRequestBuilder(final Class<T> typeClass) {
         super(typeClass);
@@ -48,6 +50,13 @@ public abstract class MakeCallRequestBuilder<B extends MakeCallRequestBuilder, J
     }
 
     @Nonnull
+    @SuppressWarnings("unchecked")
+    public B addFeatureId(@Nonnull final FeatureId featureId) {
+        this.featureIds.add(featureId);
+        return (B) this;
+    }
+
+    @Nonnull
     public Optional<J> getJID() {
         return Optional.ofNullable(jid);
     }
@@ -60,6 +69,11 @@ public abstract class MakeCallRequestBuilder<B extends MakeCallRequestBuilder, J
     @Nonnull
     public Optional<PhoneNumber> getDestination() {
         return Optional.ofNullable(destination);
+    }
+
+    @Nonnull
+    public List<FeatureId> getFeatureIds() {
+        return featureIds;
     }
 
     @Override

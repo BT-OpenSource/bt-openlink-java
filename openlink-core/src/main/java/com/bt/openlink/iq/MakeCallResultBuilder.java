@@ -10,12 +10,10 @@ import javax.annotation.Nullable;
 
 import com.bt.openlink.type.Call;
 
-// TODO: (Greg 2017-10-24) Add feature support
 public abstract class MakeCallResultBuilder<B extends MakeCallResultBuilder, J, T extends Enum<T>> extends IQBuilder<B, J, T> {
 
     @Nullable private Boolean callStatusBusy = null;
     @Nonnull private List<Call> calls = new ArrayList<>();
-
 
     protected MakeCallResultBuilder(final Class<T> typeClass) {
         super(typeClass);

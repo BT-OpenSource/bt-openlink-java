@@ -16,7 +16,7 @@ import org.junit.rules.ExpectedException;
 
 import com.bt.openlink.CoreFixtures;
 
-@SuppressWarnings("ConstantConditions")
+@SuppressWarnings({"ConstantConditions", "RedundantThrows"})
 public class MakeCallRequestBuilderTest {
     private static class Builder extends MakeCallRequestBuilder<MakeCallRequestBuilder, String, CoreFixtures.typeEnum> {
         protected Builder() {
@@ -44,6 +44,7 @@ public class MakeCallRequestBuilderTest {
         final List<String> errors = new ArrayList<>();
         builder.setJID("jid")
                 .setInterestId(CoreFixtures.INTEREST_ID)
+                .addFeatureId(CoreFixtures.FEATURE_ID)
                 .setDestination(CoreFixtures.CALLED_DESTINATION);
 
         builder.validate();
@@ -52,6 +53,7 @@ public class MakeCallRequestBuilderTest {
         assertThat(errors, is(empty()));
         assertThat(builder.getJID().get(), is("jid"));
         assertThat(builder.getInterestId().get(), is(CoreFixtures.INTEREST_ID));
+        assertThat(builder.getFeatureIds(), contains(CoreFixtures.FEATURE_ID));
         assertThat(builder.getDestination().get(), is(CoreFixtures.CALLED_DESTINATION));
     }
 
@@ -74,6 +76,7 @@ public class MakeCallRequestBuilderTest {
         assertThat(errors, contains("Invalid make-call request stanza; missing or invalid 'jid'"));
         assertThat(builder.getJID(), is(Optional.empty()));
         assertThat(builder.getInterestId(), is(Optional.empty()));
+        assertThat(builder.getFeatureIds(), is(empty()));
         assertThat(builder.getDestination(), is(Optional.empty()));
     }
 
