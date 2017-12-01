@@ -28,12 +28,8 @@ public class PubSubUnsubscribeRequest extends OpenlinkIQ {
         this.jid = builder.getJID().orElse(null);
         final Element pubSubElement = this.getElement().addElement("pubsub", OpenlinkXmppNamespace.XMPP_PUBSUB.uri());
         final Element unsubscribeElement = pubSubElement.addElement("unsubscribe");
-        if (pubSubNodeId != null) {
-            unsubscribeElement.addAttribute("node", pubSubNodeId.value());
-        }
-        if (jid != null) {
-            unsubscribeElement.addAttribute("jid", jid.toString());
-        }
+        getPubSubNodeId().ifPresent(nodeId -> unsubscribeElement.addAttribute("node", nodeId.value()));
+        getJID().ifPresent(unsubscriber -> unsubscribeElement.addAttribute("jid", unsubscriber.toString()));
     }
 
     @Nonnull
