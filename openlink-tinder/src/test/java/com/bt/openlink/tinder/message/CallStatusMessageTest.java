@@ -1,8 +1,6 @@
 package com.bt.openlink.tinder.message;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.empty;
 import static org.junit.Assert.assertThat;
@@ -29,7 +27,7 @@ import com.bt.openlink.type.Changed;
 import com.bt.openlink.type.ItemId;
 import com.bt.openlink.type.PubSubNodeId;
 
-@SuppressWarnings("ConstantConditions")
+@SuppressWarnings({"ConstantConditions", "RedundantThrows"})
 public class CallStatusMessageTest {
 
     @Rule public final ExpectedException expectedException = ExpectedException.none();
@@ -49,6 +47,7 @@ public class CallStatusMessageTest {
         assertThat(message.getTo(), is(Fixtures.TO_JID));
         assertThat(message.getFrom(), is(Fixtures.FROM_JID));
         assertThat(message.getPubSubNodeId().get(), is(CoreFixtures.NODE_ID));
+        assertThat(message.isCallStatusBusy().get(), is(false));
         final List<Call> calls = message.getCalls();
         final Call theOnlyCall = calls.get(0);
         assertThat(theOnlyCall, is(sameInstance(CoreFixtures.CALL_INCOMING_ORIGINATED)));
@@ -157,6 +156,8 @@ public class CallStatusMessageTest {
         assertThat(message.getTo(), is(Fixtures.TO_JID));
         assertThat(message.getFrom(), is(Fixtures.FROM_JID));
         assertThat(message.getPubSubNodeId().get(), is(CoreFixtures.NODE_ID));
+        assertThat(message.getItemId().get(), is(PubSubMessageFixtures.ITEM_ID));
+        assertThat(message.isCallStatusBusy().get(), is(false));
         final List<Call> calls = message.getCalls();
         final Call theOnlyCall = calls.get(0);
         assertThat(theOnlyCall.getId().get(), is(CoreFixtures.CALL_ID));
