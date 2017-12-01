@@ -68,9 +68,9 @@ public class GetFeaturesResult extends OpenlinkIQ {
                 final Feature.Builder featureBuilder = Feature.Builder.start();
                 FeatureId.from(TinderPacketUtil.getNullableStringAttribute(featureElement, "id", true, DESCRIPTION, parseErrors)).ifPresent(featureBuilder::setId);
                 final Optional<String> featureTypeString = TinderPacketUtil.getStringAttribute(featureElement, "type", true, DESCRIPTION, parseErrors);
-                featureTypeString.ifPresent((featureType)->{
+                featureTypeString.ifPresent(featureType -> {
                     final Optional<FeatureType> type = FeatureType.from(featureType);
-                    if(type.isPresent()) {
+                    if (type.isPresent()) {
                         featureBuilder.setType(type.get());
                     } else {
                         parseErrors.add(String.format("Invalid %s; invalid feature type - '%s'", DESCRIPTION, featureType));
