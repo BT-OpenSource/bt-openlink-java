@@ -52,6 +52,7 @@ public final class TinderPacketUtil {
     private static final String ATTRIBUTE_START_TIME = "starttime";
     private static final String ATTRIBUTE_TIMESTAMP = "timestamp";
     private static final String ATTRIBUTE_DURATION = "duration";
+    private static final String ELEMENT_NUMBER = "number";
 
     private TinderPacketUtil() {
     }
@@ -276,7 +277,7 @@ public final class TinderPacketUtil {
             call.getState().ifPresent(state -> callElement.addElement("state").setText(state.getLabel()));
             call.getDirection().ifPresent(direction -> callElement.addElement(ATTRIBUTE_DIRECTION).setText(direction.getLabel()));
             final Element callerElement = callElement.addElement("caller");
-            final Element callerNumberElement = callerElement.addElement("number");
+            final Element callerNumberElement = callerElement.addElement(ELEMENT_NUMBER);
             call.getCallerNumber().ifPresent(callerNumber -> callerNumberElement.setText(callerNumber.value()));
             final String callerE164Numbers =String.join(",", call.getCallerE164Numbers().stream().map(PhoneNumber::value).collect(Collectors.toList()));
             if(!callerE164Numbers.isEmpty()) {
@@ -285,7 +286,7 @@ public final class TinderPacketUtil {
             final Element callerNameElement = callerElement.addElement("name");
             call.getCallerName().ifPresent(callerNameElement::setText);
             final Element calledElement = callElement.addElement("called");
-            final Element calledNumberElement = calledElement.addElement("number");
+            final Element calledNumberElement = calledElement.addElement(ELEMENT_NUMBER);
             call.getCalledNumber().ifPresent(calledNumber -> calledNumberElement.setText(calledNumber.value()));
             call.getCalledDestination().ifPresent(calledDestination -> calledNumberElement.addAttribute("destination", calledDestination.value()));
             final String calledE164Numbers =String.join(",", call.getCalledE164Numbers().stream().map(PhoneNumber::value).collect(Collectors.toList()));
@@ -395,11 +396,11 @@ public final class TinderPacketUtil {
                 final Optional<CallDirection> direction = CallDirection.from(getChildElementString(callElement, ATTRIBUTE_DIRECTION));
                 direction.ifPresent(callBuilder::setDirection);
                 final Element callerElement = getChildElement(callElement, "caller");
-                final Optional<PhoneNumber> callerNumber = PhoneNumber.from(getChildElementString(callerElement, "number"));
+                final Optional<PhoneNumber> callerNumber = PhoneNumber.from(getChildElementString(callerElement, ELEMENT_NUMBER));
                 callerNumber.ifPresent(callBuilder::setCallerNumber);
                 final Optional<String> callerName = Optional.ofNullable(getChildElementString(callerElement, "name"));
                 callerName.ifPresent(callBuilder::setCallerName);
-                final Optional<String> callerE164 = getStringAttribute(getChildElement(callerElement, "number"), "e164");
+                final Optional<String> callerE164 = getStringAttribute(getChildElement(callerElement, ELEMENT_NUMBER), "e164");
                 callerE164.ifPresent(e164List -> {
                     final List<PhoneNumber> callerE164Numbers = Arrays.stream(e164List.split(","))
                             .map(String::trim)
@@ -410,11 +411,11 @@ public final class TinderPacketUtil {
                     callBuilder.addCallerE164Numbers(callerE164Numbers);
                 });
                 final Element calledElement = getChildElement(callElement, "called");
-                final Optional<PhoneNumber> calledNumber = PhoneNumber.from(getChildElementString(calledElement, "number"));
+                final Optional<PhoneNumber> calledNumber = PhoneNumber.from(getChildElementString(calledElement, ELEMENT_NUMBER));
                 calledNumber.ifPresent(callBuilder::setCalledNumber);
                 final Optional<String> calledName = Optional.ofNullable(getChildElementString(calledElement, "name"));
                 calledName.ifPresent(callBuilder::setCalledName);
-                final Element calledNumberElement = getChildElement(calledElement, "number");
+                final Element calledNumberElement = getChildElement(calledElement, ELEMENT_NUMBER);
                 final Optional<PhoneNumber> calledDestination = PhoneNumber.from(getStringAttribute(calledNumberElement, "destination").orElse(null));
                 calledDestination.ifPresent(callBuilder::setCalledDestination);
                 final Optional<String> calledE164 = getStringAttribute(calledNumberElement, "e164");
