@@ -35,8 +35,7 @@ public class GetProfilesRequest extends OpenlinkIQ {
         final List<String> parseErrors = new ArrayList<>();
         final Element inElement = TinderPacketUtil.getIOInElement(iq);
         final Builder builder = Builder.start(iq);
-        final Optional<JID> jid = TinderPacketUtil.getJID(TinderPacketUtil.getChildElementString(inElement, "jid"));
-        jid.ifPresent(builder::setJID);
+        TinderPacketUtil.getJID(TinderPacketUtil.getChildElementString(inElement, "jid")).ifPresent(builder::setJID);
         final GetProfilesRequest request = builder.build(parseErrors);
         request.setID(iq.getID());
         return request;

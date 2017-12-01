@@ -68,12 +68,9 @@ public class MakeCallRequest extends OpenlinkIQ {
         final List<String> parseErrors = new ArrayList<>();
         final Element inElement = TinderPacketUtil.getIOInElement(iq);
         final Builder builder = Builder.start(iq);
-        final Optional<JID> jid = TinderPacketUtil.getJID(TinderPacketUtil.getChildElementString(inElement, "jid"));
-        jid.ifPresent(builder::setJID);
-        final Optional<InterestId> interestId = InterestId.from(TinderPacketUtil.getChildElementString(inElement, "interest"));
-        interestId.ifPresent(builder::setInterestId);
-        final Optional<PhoneNumber> destination = PhoneNumber.from(TinderPacketUtil.getChildElementString(inElement, "destination"));
-        destination.ifPresent(builder::setDestination);
+        TinderPacketUtil.getJID(TinderPacketUtil.getChildElementString(inElement, "jid")).ifPresent(builder::setJID);
+        InterestId.from(TinderPacketUtil.getChildElementString(inElement, "interest")).ifPresent(builder::setInterestId);
+        PhoneNumber.from(TinderPacketUtil.getChildElementString(inElement, "destination")).ifPresent(builder::setDestination);
         getFeatures(builder, inElement);
         final MakeCallRequest request = builder.build(parseErrors);
         request.setID(iq.getID());
