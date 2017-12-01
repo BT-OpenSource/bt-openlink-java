@@ -58,11 +58,7 @@ public class GetFeaturesResult extends OpenlinkIQ {
         final GetFeaturesResult.Builder builder = GetFeaturesResult.Builder.start(iq);
         final Element outElement = TinderPacketUtil.getIOOutElement(iq);
         final Element profileElement = TinderPacketUtil.getChildElement(outElement, "profile");
-        if (profileElement != null) {
-            final Optional<ProfileId> profileId = ProfileId.from(profileElement.attributeValue("id"));
-            profileId.ifPresent(builder::setProfileId);
-        }
-
+        ProfileId.from(TinderPacketUtil.getNullableStringAttribute(profileElement, "id")).ifPresent(builder::setProfileId);
         final Element featuresElement = TinderPacketUtil.getChildElement(outElement, "features");
         if (featuresElement == null) {
             parseErrors.add("Invalid get-features result; missing 'features' element is mandatory");
@@ -70,12 +66,17 @@ public class GetFeaturesResult extends OpenlinkIQ {
             final List<Element> featureElements = featuresElement.elements("feature");
             for (final Element featureElement : featureElements) {
                 final Feature.Builder featureBuilder = Feature.Builder.start();
-                final Optional<FeatureId> featureId = FeatureId.from(TinderPacketUtil.getStringAttribute(featureElement, "id", true, DESCRIPTION, parseErrors).orElse(null));
-                featureId.ifPresent(featureBuilder::setId);
-                final Optional<FeatureType> featureType = FeatureType.from(TinderPacketUtil.getStringAttribute(featureElement, "type", true, DESCRIPTION, parseErrors).orElse(null));
-                featureType.ifPresent(featureBuilder::setType);
-                final Optional<String> label = TinderPacketUtil.getStringAttribute(featureElement, "label", true, DESCRIPTION, parseErrors);
-                label.ifPresent(featureBuilder::setLabel);
+                FeatureId.from(TinderPacketUtil.getStringAttribute(featureElement, "id", true, DESCRIPTION, parseErrors).orElse(null)).ifPresent(featureBuilder::setId);
+                final Optional<String> featureTypeString = TinderPacketUtil.getStringAttribute(featureElement, "type", true, DESCRIPTION, parseErrors);
+                featureTypeString.ifPresent((featureType)->{
+                    final Optional<FeatureType> type = FeatureType.from(featureType);
+                    if(type.isPresent()) {
+                        featureBuilder.setType(type.get());
+                    } else {
+                        parseErrors.add(String.format("Invalid %s; invalid feature type - '%s'", DESCRIPTION, featureType));
+                    }
+                });
+                TinderPacketUtil.getStringAttribute(featureElement, "label", true, DESCRIPTION, parseErrors).ifPresent(featureBuilder::setLabel);
                 builder.addFeature(featureBuilder.build(parseErrors));
             }
         }

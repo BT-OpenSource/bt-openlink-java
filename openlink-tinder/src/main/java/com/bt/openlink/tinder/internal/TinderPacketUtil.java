@@ -172,11 +172,26 @@ public final class TinderPacketUtil {
 
     @Nonnull
     public static Optional<String> getStringAttribute(@Nullable final Element element, @Nonnull final String attributeName) {
-        return getStringAttribute(element, attributeName, false, "", Collections.emptyList());
+        return Optional.ofNullable(getNullableStringAttribute(element, attributeName));
+    }
+
+    @Nullable
+    public static String getNullableStringAttribute(@Nullable final Element element, @Nonnull final String attributeName) {
+        return getNullableStringAttribute(element, attributeName, false, "", Collections.emptyList());
     }
 
     @Nonnull
     public static Optional<String> getStringAttribute(
+            @Nullable final Element element,
+            @Nonnull final String attributeName,
+            final boolean isRequired,
+            @Nonnull final String stanzaDescription,
+            @Nonnull final List<String> parseErrors) {
+        return Optional.ofNullable(getNullableStringAttribute(element, attributeName, isRequired, stanzaDescription, parseErrors));
+    }
+
+    @Nullable
+    private static String getNullableStringAttribute(
             @Nullable final Element element,
             @Nonnull final String attributeName,
             final boolean isRequired,
@@ -192,7 +207,7 @@ public final class TinderPacketUtil {
         if (attributeValue == null && isRequired) {
             parseErrors.add(String.format("Invalid %s; missing '%s' attribute is mandatory", stanzaDescription, attributeName));
         }
-        return Optional.ofNullable(attributeValue);
+        return attributeValue;
     }
 
     @Nonnull
