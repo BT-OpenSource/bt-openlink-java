@@ -22,7 +22,7 @@ import com.bt.openlink.tinder.Fixtures;
 import com.bt.openlink.type.Call;
 import com.bt.openlink.type.PubSubNodeId;
 
-@SuppressWarnings("ConstantConditions")
+@SuppressWarnings({"ConstantConditions", "RedundantThrows"})
 public class PubSubPublishRequestTest {
     @Rule public final ExpectedException expectedException = ExpectedException.none();
 
@@ -117,10 +117,10 @@ public class PubSubPublishRequestTest {
     @Test
     public void willRoundTripAnXmppStanza() throws Exception {
 
-        final IQ originalIQ = Fixtures.iqFrom(PubSubPublishFixtures.PUBLISH_REQUEST_WITH_NO_FEATURES);
+        final IQ originalIQ = Fixtures.iqFrom(PubSubPublishFixtures.PUBLISH_REQUEST);
         final PubSubPublishRequest request = (PubSubPublishRequest) OpenlinkIQParser.parse(originalIQ);
 
-        assertThat(request.toXML(), isIdenticalTo(PubSubPublishFixtures.PUBLISH_REQUEST_WITH_NO_FEATURES).ignoreWhitespace());
+        assertThat(request.toXML(), isIdenticalTo(PubSubPublishFixtures.PUBLISH_REQUEST).ignoreWhitespace());
     }
 
 }
