@@ -54,6 +54,7 @@ public final class TinderPacketUtil {
     private static final String ATTRIBUTE_TIMESTAMP = "timestamp";
     private static final String ATTRIBUTE_DURATION = "duration";
     private static final String ELEMENT_NUMBER = "number";
+    private static final String ELEMENT_PROFILE = "profile";
 
     private TinderPacketUtil() {
     }
@@ -286,7 +287,7 @@ public final class TinderPacketUtil {
             final Element callElement = callStatusElement.addElement("call");
             call.getId().ifPresent(callId -> callElement.addElement("id").setText(callId.value()));
             call.getSite().ifPresent(site -> addSite(callElement, site));
-            call.getProfileId().ifPresent(profileId -> callElement.addElement("profile").setText(profileId.value()));
+            call.getProfileId().ifPresent(profileId -> callElement.addElement(ELEMENT_PROFILE).setText(profileId.value()));
             call.getInterestId().ifPresent(interestId -> callElement.addElement("interest").setText(interestId.value()));
             call.getChanged().ifPresent(changed -> callElement.addElement("changed").setText(changed.getId()));
             call.getState().ifPresent(state -> callElement.addElement("state").setText(state.getLabel()));
@@ -320,7 +321,7 @@ public final class TinderPacketUtil {
 
     public static void addDeviceStatus(@Nonnull final Element itemElement, @Nonnull final DeviceStatus deviceStatus) {
         final Element deviceStatusElement = itemElement.addElement("devicestatus", OpenlinkXmppNamespace.OPENLINK_DEVICE_STATUS.uri());
-        final Element profileElement = deviceStatusElement.addElement("profile");
+        final Element profileElement = deviceStatusElement.addElement(ELEMENT_PROFILE);
         deviceStatus.isOnline().ifPresent(online -> profileElement.addAttribute("online", String.valueOf(online)));
         deviceStatus.getProfileId().ifPresent(profileId->profileElement.setText(profileId.value()));
     }
@@ -418,7 +419,7 @@ public final class TinderPacketUtil {
                 final Call.Builder callBuilder = Call.Builder.start();
                 CallId.from(getNullableChildElementString(callElement, "id")).ifPresent(callBuilder::setId);
                 getSite(callElement, description, parseErrors).ifPresent(callBuilder::setSite);
-                ProfileId.from(getNullableChildElementString(callElement, "profile")).ifPresent(callBuilder::setProfileId);
+                ProfileId.from(getNullableChildElementString(callElement, ELEMENT_PROFILE)).ifPresent(callBuilder::setProfileId);
                 InterestId.from(getNullableChildElementString(callElement, "interest")).ifPresent(callBuilder::setInterestId);
                 Changed.from(getNullableChildElementString(callElement, "changed")).ifPresent(callBuilder::setChanged);
                 CallState.from(getNullableChildElementString(callElement, "state")).ifPresent(callBuilder::setState);
@@ -442,7 +443,7 @@ public final class TinderPacketUtil {
     }
 
     public static Optional<DeviceStatus> getDeviceStatus(@Nullable final Element deviceStatusElement, @Nonnull final String stanzaDescription, @Nonnull final List<String> parseErrors) {
-        final Element profileElement = getChildElement(deviceStatusElement, "profile");
+        final Element profileElement = getChildElement(deviceStatusElement, ELEMENT_PROFILE);
         if(profileElement== null) {
             return Optional.empty();
         }
@@ -450,7 +451,7 @@ public final class TinderPacketUtil {
         final DeviceStatus.Builder builder = DeviceStatus.Builder.start();
 
         getBooleanAttribute(profileElement, "online", stanzaDescription, parseErrors).ifPresent(builder::setOnline);
-        ProfileId.from(getNullableChildElementString(deviceStatusElement, "profile")).ifPresent(builder::setProfileId);
+        ProfileId.from(getNullableChildElementString(deviceStatusElement, ELEMENT_PROFILE)).ifPresent(builder::setProfileId);
 
         return Optional.of(builder.build(parseErrors));
     }
