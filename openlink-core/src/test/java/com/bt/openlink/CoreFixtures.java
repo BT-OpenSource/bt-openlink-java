@@ -28,6 +28,7 @@ import com.bt.openlink.type.PhoneNumber;
 import com.bt.openlink.type.Profile;
 import com.bt.openlink.type.ProfileId;
 import com.bt.openlink.type.RequestAction;
+import com.bt.openlink.type.RequestActionValue;
 import com.bt.openlink.type.Site;
 
 @SuppressWarnings("ConstantConditions")
@@ -171,5 +172,7 @@ public class CoreFixtures {
                     "    </participants>\n" +
                     "  </call>\n" +
                     "</callstatus>\n";
+
+    public static final RequestActionValue REQUEST_ACTION_VALUE = RequestActionValue.from("test-request-action-value").get();
 
 }
