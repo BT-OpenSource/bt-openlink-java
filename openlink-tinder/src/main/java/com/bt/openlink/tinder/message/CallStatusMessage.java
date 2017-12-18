@@ -22,26 +22,15 @@ public class CallStatusMessage extends OpenlinkPubSubMessage {
 
     @Nullable private final Boolean callStatusBusy;
     @Nonnull private final List<Call> calls;
-    @Nonnull private final List<String> parseErrors;
 
     private CallStatusMessage(@Nonnull final Builder builder, @Nullable final List<String> parseErrors) {
         super(builder, parseErrors);
         this.callStatusBusy = builder.isCallStatusBusy().orElse(null);
         this.calls = Collections.unmodifiableList(builder.getCalls());
-        if (parseErrors == null) {
-            this.parseErrors = Collections.emptyList();
-        } else {
-            this.parseErrors = Collections.unmodifiableList(parseErrors);
-        }
         final Element messageElement = getElement();
         final Element itemElement = TinderPacketUtil.addPubSubMetaData(messageElement, builder);
         TinderPacketUtil.addCallStatusCalls(itemElement, callStatusBusy, calls);
         TinderPacketUtil.addDelay(messageElement, builder);
-    }
-
-    @Nonnull
-    public List<String> getParseErrors() {
-        return parseErrors;
     }
 
     @Nonnull
