@@ -18,6 +18,7 @@ import com.bt.openlink.type.PubSubNodeId;
 import com.bt.openlink.type.SubscriptionState;
 
 public class PubSubSubscriptionRequest extends OpenlinkIQ {
+    private static final String ELEMENT_PUBSUB = "pubsub";
     @Nullable private final PubSubNodeId pubSubNodeId;
     @Nullable private final JID jid;
     @Nullable private final SubscriptionState subscriptionState;
@@ -27,7 +28,7 @@ public class PubSubSubscriptionRequest extends OpenlinkIQ {
         this.pubSubNodeId = builder.getPubSubNodeId().orElse(null);
         this.jid = builder.getJID().orElse(null);
         this.subscriptionState = builder.getSubscriptionState().orElse(null);
-        final Element pubSubElement = this.getElement().addElement("pubsub", OpenlinkXmppNamespace.XMPP_PUBSUB.uri());
+        final Element pubSubElement = this.getElement().addElement(ELEMENT_PUBSUB, OpenlinkXmppNamespace.XMPP_PUBSUB.uri());
         final Element actionElement;
         if (SubscriptionState.SUBSCRIBED == subscriptionState) {
             actionElement = pubSubElement.addElement("subscribe");
@@ -53,11 +54,11 @@ public class PubSubSubscriptionRequest extends OpenlinkIQ {
     public static PubSubSubscriptionRequest from(@Nonnull IQ iq) {
         final List<String> parseErrors = new ArrayList<>();
         final Builder builder = Builder.start(iq);
-        Element actionElement = TinderPacketUtil.getChildElement(iq.getElement(), "pubsub", "subscribe");
+        Element actionElement = TinderPacketUtil.getChildElement(iq.getElement(), ELEMENT_PUBSUB, "subscribe");
         if (actionElement != null) {
             builder.setSubscriptionState(SubscriptionState.SUBSCRIBED);
         } else {
-            actionElement = TinderPacketUtil.getChildElement(iq.getElement(), "pubsub", "unsubscribe");
+            actionElement = TinderPacketUtil.getChildElement(iq.getElement(), ELEMENT_PUBSUB, "unsubscribe");
             if (actionElement != null) {
                 builder.setSubscriptionState(SubscriptionState.NONE);
             }

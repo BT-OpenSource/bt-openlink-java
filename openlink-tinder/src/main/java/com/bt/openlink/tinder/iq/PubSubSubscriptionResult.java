@@ -18,6 +18,7 @@ import com.bt.openlink.type.PubSubNodeId;
 import com.bt.openlink.type.SubscriptionState;
 
 public class PubSubSubscriptionResult extends OpenlinkIQ {
+    private static final String ELEMENT_SUBSCRIPTION = "subscription";
     @Nullable private final PubSubNodeId pubSubNodeId;
     @Nullable private final JID jid;
     @Nullable private final SubscriptionState subscriptionState;
@@ -28,10 +29,10 @@ public class PubSubSubscriptionResult extends OpenlinkIQ {
         this.jid = builder.getJID().orElse(null);
         this.subscriptionState = builder.getSubscriptionState().orElse(null);
         final Element pubSubElement = this.getElement().addElement("pubsub", OpenlinkXmppNamespace.XMPP_PUBSUB.uri());
-        final Element subscriptionElement = pubSubElement.addElement("subscription");
+        final Element subscriptionElement = pubSubElement.addElement(ELEMENT_SUBSCRIPTION);
         getPubSubNodeId().ifPresent(nodeId -> subscriptionElement.addAttribute("node", nodeId.value()));
         getJID().ifPresent(subscriber -> subscriptionElement.addAttribute("jid", subscriber.toString()));
-        getSubscriptionState().ifPresent(subscription -> subscriptionElement.addAttribute("subscription", subscription.getId()));
+        getSubscriptionState().ifPresent(subscription -> subscriptionElement.addAttribute(ELEMENT_SUBSCRIPTION, subscription.getId()));
     }
 
     @Nonnull
@@ -49,11 +50,11 @@ public class PubSubSubscriptionResult extends OpenlinkIQ {
     public static PubSubSubscriptionResult from(@Nonnull IQ iq) {
         final List<String> parseErrors = new ArrayList<>();
         final Builder builder = Builder.start(iq);
-        Element actionElement = TinderPacketUtil.getChildElement(iq.getElement(), "pubsub", "subscription");
+        Element actionElement = TinderPacketUtil.getChildElement(iq.getElement(), "pubsub", ELEMENT_SUBSCRIPTION);
         if (actionElement != null) {
             PubSubNodeId.from(TinderPacketUtil.getNullableStringAttribute(actionElement, "node")).ifPresent(builder::setPubSubNodeId);
             TinderPacketUtil.getJID(TinderPacketUtil.getNullableStringAttribute(actionElement, "jid")).ifPresent(builder::setJID);
-            SubscriptionState.from(TinderPacketUtil.getNullableStringAttribute(actionElement, "subscription")).ifPresent(builder::setSubscriptionState);
+            SubscriptionState.from(TinderPacketUtil.getNullableStringAttribute(actionElement, ELEMENT_SUBSCRIPTION)).ifPresent(builder::setSubscriptionState);
         }
         final PubSubSubscriptionResult request = builder.build(parseErrors);
         request.setID(iq.getID());
