@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.TimeZone;
 
+import com.bt.openlink.type.DeviceStatus;
 import org.hamcrest.CoreMatchers;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -94,13 +95,13 @@ public class PubSubPublishRequestTest {
                 .addCall(CoreFixtures.CALL_INCOMING_ORIGINATED)
                 .setInterestId(CoreFixtures.INTEREST_ID)
                 .build();
-        assertThat(request.toXML(), isIdenticalTo(PubSubPublishFixtures.PUBLISH_REQUEST).ignoreWhitespace());
+        assertThat(request.toXML(), isIdenticalTo(PubSubPublishFixtures.PUBLISH_REQUEST_CALL_STATUS).ignoreWhitespace());
     }
 
     @Test
     public void willParseAnXmppStanza() throws Exception {
 
-        final PubSubPublishRequest request = (PubSubPublishRequest) OpenlinkIQParser.parse(Fixtures.iqFrom(PubSubPublishFixtures.PUBLISH_REQUEST));
+        final PubSubPublishRequest request = (PubSubPublishRequest) OpenlinkIQParser.parse(Fixtures.iqFrom(PubSubPublishFixtures.PUBLISH_REQUEST_CALL_STATUS));
         assertThat(request.getID(), CoreMatchers.is(CoreFixtures.STANZA_ID));
         assertThat(request.getTo(), CoreMatchers.is(Fixtures.TO_JID));
         assertThat(request.getFrom(), CoreMatchers.is(Fixtures.FROM_JID));
@@ -118,10 +119,53 @@ public class PubSubPublishRequestTest {
     @Test
     public void willRoundTripAnXmppStanza() throws Exception {
 
-        final IQ originalIQ = Fixtures.iqFrom(PubSubPublishFixtures.PUBLISH_REQUEST);
+        final IQ originalIQ = Fixtures.iqFrom(PubSubPublishFixtures.PUBLISH_REQUEST_CALL_STATUS);
         final PubSubPublishRequest request = (PubSubPublishRequest) OpenlinkIQParser.parse(originalIQ);
 
-        assertThat(request.toXML(), isIdenticalTo(PubSubPublishFixtures.PUBLISH_REQUEST).ignoreWhitespace());
+        assertThat(request.toXML(), isIdenticalTo(PubSubPublishFixtures.PUBLISH_REQUEST_CALL_STATUS).ignoreWhitespace());
     }
+
+    @Test
+    public void canCreateADeviceStatusStanza() throws Exception {
+
+        final PubSubPublishRequest request = PubSubPublishRequest.Builder.start()
+                .setId(CoreFixtures.STANZA_ID)
+                .setTo(Fixtures.TO_JID)
+                .setFrom(Fixtures.FROM_JID)
+                .setPubSubNodeId(CoreFixtures.NODE_ID)
+                .setDeviceStatus(CoreFixtures.DEVICE_STATUS_LOGON)
+                .build();
+
+        assertThat(request.getID(), is(CoreFixtures.STANZA_ID));
+        assertThat(request.getTo(), is(Fixtures.TO_JID));
+        assertThat(request.getFrom(), is(Fixtures.FROM_JID));
+        assertThat(request.getPubSubNodeId().get(), is(CoreFixtures.NODE_ID));
+        assertThat(request.getCalls().size(), is(0));
+        assertThat(request.getDeviceStatus().get(), is(CoreFixtures.DEVICE_STATUS_LOGON));
+    }
+
+    @Test
+    public void willGenerateADeviceStatusXmppStanza() throws Exception {
+
+        final PubSubPublishRequest request = PubSubPublishRequest.Builder.start()
+                .setId(CoreFixtures.STANZA_ID)
+                .setTo(Fixtures.TO_JID)
+                .setFrom(Fixtures.FROM_JID)
+                .setPubSubNodeId(CoreFixtures.NODE_ID)
+                .setDeviceStatus(CoreFixtures.DEVICE_STATUS_LOGON)
+                .build();
+        assertThat(request.toXML(), isIdenticalTo(PubSubPublishFixtures.PUBLISH_REQUEST_DEVICE_STATUS).ignoreWhitespace());
+    }
+
+    @Test
+    public void willParseADeviceStatusXmppStanza() throws Exception {
+
+        final PubSubPublishRequest request = (PubSubPublishRequest) OpenlinkIQParser.parse(Fixtures.iqFrom(PubSubPublishFixtures.PUBLISH_REQUEST_DEVICE_STATUS));
+
+        final DeviceStatus deviceStatus = request.getDeviceStatus().get();
+        assertThat(deviceStatus.isOnline().get(), is(true));
+        assertThat(deviceStatus.getProfileId().get(), is(CoreFixtures.PROFILE_ID));
+    }
+
 
 }

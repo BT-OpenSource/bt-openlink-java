@@ -15,6 +15,7 @@ import com.bt.openlink.type.CallId;
 import com.bt.openlink.type.CallState;
 import com.bt.openlink.type.Changed;
 import com.bt.openlink.type.DeviceKey;
+import com.bt.openlink.type.DeviceStatus;
 import com.bt.openlink.type.Feature;
 import com.bt.openlink.type.FeatureId;
 import com.bt.openlink.type.FeatureType;
@@ -128,6 +129,11 @@ public class CoreFixtures {
             .build();
 
     public static final String START_TIME_ISO_8601 = ISO_8601_FORMATTER.format(START_TIME.atZone(ZoneOffset.UTC));
+
+    public static final DeviceStatus DEVICE_STATUS_LOGON = DeviceStatus.Builder.start()
+            .setProfileId(PROFILE_ID)
+            .setOnline(true)
+            .build();
 
     public static final String CALL_STATUS_INCOMING_ORIGINATED =
             "<callstatus xmlns='http://xmpp.org/protocol/openlink:01:00:00#call-status' busy='false'>\n" +

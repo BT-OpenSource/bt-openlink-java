@@ -20,7 +20,7 @@ import com.bt.openlink.type.CallState;
 import com.bt.openlink.type.InterestId;
 import com.bt.openlink.type.RequestAction;
 
-@SuppressWarnings("ConstantConditions")
+@SuppressWarnings({"ConstantConditions", "RedundantThrows"})
 public class PubSubPublishRequestBuilderTest {
 
     private static class Builder extends PubSubPublishRequestBuilder<Builder, String, CoreFixtures.typeEnum> {
@@ -132,4 +132,36 @@ public class PubSubPublishRequestBuilderTest {
                 ));
     }
 
+    @Test
+    public void atLeastOneCallMustBePublished() {
+        expectedException.expect(IllegalStateException.class);
+        expectedException.expectMessage("Either a callstatus or a devicestatus event must be published");
+
+        builder.setInterestId(CoreFixtures.INTEREST_ID)
+                .validate();
+
+    }
+
+    @Test
+    public void willBuildADeviceStatusPublishRequest() {
+
+        builder.setInterestId(CoreFixtures.INTEREST_ID)
+                .setDeviceStatus(CoreFixtures.DEVICE_STATUS_LOGON)
+                .validate();
+
+        assertThat(builder.getDeviceStatus().get(),is(CoreFixtures.DEVICE_STATUS_LOGON));
+    }
+
+    @Test
+    public void willNotBuildARequestWithBothCallsAndDeviceStatus() {
+
+        expectedException.expect(IllegalStateException.class);
+        expectedException.expectMessage("A callstatus and a devicestatus event cannot be published in the same message");
+
+        builder.setInterestId(CoreFixtures.INTEREST_ID)
+                .addCall(CoreFixtures.CALL_INCOMING_ORIGINATED)
+                .setDeviceStatus(CoreFixtures.DEVICE_STATUS_LOGON)
+                .validate();
+
+    }
 }

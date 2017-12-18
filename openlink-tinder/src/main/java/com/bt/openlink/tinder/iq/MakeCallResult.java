@@ -26,7 +26,7 @@ public class MakeCallResult extends OpenlinkIQ {
         this.calls = Collections.unmodifiableList(builder.getCalls());
         this.callStatusBusy = builder.isCallStatusBusy().orElse(null);
         final Element outElement = TinderPacketUtil.addCommandIOOutputElement(this, OpenlinkXmppNamespace.OPENLINK_MAKE_CALL);
-        TinderPacketUtil.addItemCallStatusCalls(outElement, callStatusBusy, calls);
+        TinderPacketUtil.addCallStatusCalls(outElement, callStatusBusy, calls);
     }
 
     @Nonnull

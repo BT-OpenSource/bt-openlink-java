@@ -11,6 +11,7 @@ import javax.annotation.Nullable;
 
 import com.bt.openlink.type.Call;
 import com.bt.openlink.type.CallId;
+import com.bt.openlink.type.DeviceStatus;
 import com.bt.openlink.type.InterestId;
 import com.bt.openlink.type.PubSubNodeId;
 
@@ -19,6 +20,7 @@ public abstract class PubSubPublishRequestBuilder<B extends PubSubPublishRequest
     @Nullable private PubSubNodeId pubSubNodeId;
     @Nullable private Boolean callStatusBusy = null;
     @Nonnull private final List<Call> calls = new ArrayList<>();
+    @Nullable private DeviceStatus deviceStatus;
 
     protected PubSubPublishRequestBuilder(final Class<T> typeClass) {
         super(typeClass);
@@ -84,6 +86,19 @@ public abstract class PubSubPublishRequestBuilder<B extends PubSubPublishRequest
         return Optional.ofNullable(callStatusBusy);
     }
 
+    @SuppressWarnings("unchecked")
+    @Nonnull
+    public B setDeviceStatus(@Nonnull final DeviceStatus deviceStatus) {
+        this.deviceStatus = deviceStatus;
+        return (B) this;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Nonnull
+    public Optional<DeviceStatus> getDeviceStatus() {
+        return Optional.ofNullable(deviceStatus);
+    }
+
     @Override
     protected void validate() {
         super.validate();
@@ -97,6 +112,12 @@ public abstract class PubSubPublishRequestBuilder<B extends PubSubPublishRequest
             throw new IllegalStateException("The call with id " + call.getId().orElse(null) + " is on interest " + call.getInterestId().orElse(null) + " which differs from the pub-sub node id " + pubSubNodeId);
         });
         Call.oneOrMoreCallsIsBusy(calls).ifPresent(this::setCallStatusBusy);
+        if (calls.isEmpty() && deviceStatus == null) {
+            throw new IllegalStateException("Either a callstatus or a devicestatus event must be published");
+        }
+        if (!calls.isEmpty() && deviceStatus != null) {
+            throw new IllegalStateException("A callstatus and a devicestatus event cannot be published in the same message");
+        }
     }
 
     private void validateUniqueness(final Consumer<CallId> errorConsumer) {
@@ -139,4 +160,5 @@ public abstract class PubSubPublishRequestBuilder<B extends PubSubPublishRequest
         validateCallsAreOnTheCorrectInterest(call -> errors.add("Invalid pub-sub publish request stanza; the call with id " + call.getId().orElse(null) + " is on interest " + call.getInterestId().orElse(null)
                 + " which differs from the pub-sub node id " + pubSubNodeId));
     }
+
 }

@@ -54,7 +54,7 @@ public class CallStatusMessage extends Message {
         getPubSubNodeId().ifPresent(nodeId -> itemsElement.addAttribute("node", nodeId.value()));
         final Element itemElement = itemsElement.addElement("item");
         getItemId().ifPresent(id -> itemElement.addAttribute("id", id.value()));
-        TinderPacketUtil.addItemCallStatusCalls(itemElement, callStatusBusy, calls);
+        TinderPacketUtil.addCallStatusCalls(itemElement, callStatusBusy, calls);
         getDelay().ifPresent(stamp -> messageElement.addElement("delay", "urn:xmpp:delay").addAttribute("stamp", stamp.toString()));
     }
 

@@ -17,6 +17,7 @@ import com.bt.openlink.OpenlinkXmppNamespace;
 import com.bt.openlink.iq.PubSubPublishRequestBuilder;
 import com.bt.openlink.tinder.internal.TinderPacketUtil;
 import com.bt.openlink.type.Call;
+import com.bt.openlink.type.DeviceStatus;
 import com.bt.openlink.type.PubSubNodeId;
 
 public class PubSubPublishRequest extends OpenlinkIQ {
@@ -25,17 +26,22 @@ public class PubSubPublishRequest extends OpenlinkIQ {
     @Nullable private final PubSubNodeId pubSubNodeId;
     @Nullable private final Boolean callStatusBusy;
     @Nonnull private final Collection<Call> calls;
+    @Nullable private final DeviceStatus deviceStatus;
 
     private PubSubPublishRequest(@Nonnull Builder builder, @Nullable List<String> parseErrors) {
         super(builder, parseErrors);
         this.pubSubNodeId = builder.getPubSubNodeId().orElse(null);
         this.calls = Collections.unmodifiableCollection(builder.getCalls());
         this.callStatusBusy = builder.isCallStatusBusy().orElse(null);
+        this.deviceStatus = builder.getDeviceStatus().orElse(null);
         final Element pubSubElement = this.getElement().addElement("pubsub", OpenlinkXmppNamespace.XMPP_PUBSUB.uri());
         final Element publishElement = pubSubElement.addElement("publish");
         getPubSubNodeId().ifPresent(nodeId -> publishElement.addAttribute("node", nodeId.value()));
         final Element itemElement = publishElement.addElement("item");
-        TinderPacketUtil.addItemCallStatusCalls(itemElement, callStatusBusy, calls);
+        if (!calls.isEmpty()) {
+            TinderPacketUtil.addCallStatusCalls(itemElement, callStatusBusy, calls);
+        }
+        getDeviceStatus().ifPresent(status -> TinderPacketUtil.addDeviceStatus(itemElement, status));
     }
 
     @Nonnull
@@ -53,16 +59,24 @@ public class PubSubPublishRequest extends OpenlinkIQ {
         return calls;
     }
 
+    @Nonnull
+    public Optional<DeviceStatus> getDeviceStatus() {
+        return Optional.ofNullable(deviceStatus);
+    }
+
     @SuppressWarnings("unchecked")
     @Nonnull
     public static PubSubPublishRequest from(@Nonnull IQ iq) {
         final List<String> parseErrors = new ArrayList<>();
         final Builder builder = Builder.start(iq);
         final Element publishElement = TinderPacketUtil.getChildElement(iq.getElement(), "pubsub", "publish");
-        final Element callStatusElement = TinderPacketUtil.getChildElement(publishElement, "item", "callstatus");
+        final Element itemElement = TinderPacketUtil.getChildElement(publishElement, "item");
+        final Element callStatusElement = TinderPacketUtil.getChildElement(itemElement, "callstatus");
         PubSubNodeId.from(TinderPacketUtil.getNullableStringAttribute(publishElement, "node")).ifPresent(builder::setPubSubNodeId);
         TinderPacketUtil.getBooleanAttribute(callStatusElement, "busy", "busy attribute", parseErrors).ifPresent(builder::setCallStatusBusy);
         builder.addCalls(TinderPacketUtil.getCalls(callStatusElement, STANZA_DESCRIPTION, parseErrors));
+        final Element deviceStatusElement = TinderPacketUtil.getChildElement(itemElement, "devicestatus");
+        TinderPacketUtil.getDeviceStatus(deviceStatusElement, STANZA_DESCRIPTION, parseErrors).ifPresent(builder::setDeviceStatus);
         final PubSubPublishRequest request = builder.build(parseErrors);
         request.setID(iq.getID());
         return request;
