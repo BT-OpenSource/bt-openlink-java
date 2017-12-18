@@ -13,6 +13,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import com.bt.openlink.CoreFixtures;
+import com.bt.openlink.PubSubMessageFixtures;
 import com.bt.openlink.type.DeviceStatus;
 
 @SuppressWarnings("ConstantConditions")
@@ -30,10 +31,11 @@ public class DeviceStatusMessageBuilderTest {
 
         builder = new Builder();
 
-        builder.setTo("to");
-        builder.setFrom("from");
-        builder.setId("id");
-        builder.setPubSubNodeId(CoreFixtures.INTEREST_ID);
+        builder.setTo("to")
+                .setFrom("from")
+                .setId("id")
+                .setPubSubNodeId(CoreFixtures.INTEREST_ID)
+                .setItemId(PubSubMessageFixtures.ITEM_ID);
     }
 
     @Test

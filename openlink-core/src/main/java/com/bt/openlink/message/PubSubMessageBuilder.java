@@ -12,7 +12,7 @@ import com.bt.openlink.type.InterestId;
 import com.bt.openlink.type.ItemId;
 import com.bt.openlink.type.PubSubNodeId;
 
-public abstract class MessageBuilder<B extends MessageBuilder, J> extends StanzaBuilder<B, J> {
+public abstract class PubSubMessageBuilder<B extends PubSubMessageBuilder, J> extends StanzaBuilder<B, J> {
 
     @Nullable private Instant delay;
     @Nullable private PubSubNodeId pubSubNodeId;
@@ -69,6 +69,9 @@ public abstract class MessageBuilder<B extends MessageBuilder, J> extends Stanza
         // Note; not necessary to validate id/type as these can be automatically set
         if (pubSubNodeId == null) {
             throw new IllegalStateException("The stanza 'pubSubNodeId' has not been set");
+        }
+        if (itemId == null) {
+            throw new IllegalStateException("The stanza 'itemId' has not been set");
         }
     }
 

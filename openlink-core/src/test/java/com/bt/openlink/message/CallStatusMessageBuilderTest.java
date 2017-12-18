@@ -2,7 +2,6 @@ package com.bt.openlink.message;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.Assert.assertThat;
 
 import java.time.Instant;
@@ -37,6 +36,8 @@ public class CallStatusMessageBuilderTest {
         builder.setTo("to");
         builder.setFrom("from");
         builder.setId("id");
+        builder.setPubSubNodeId(CoreFixtures.INTEREST_ID);
+        builder.setItemId(PubSubMessageFixtures.ITEM_ID);
     }
 
     @Test
@@ -45,8 +46,6 @@ public class CallStatusMessageBuilderTest {
         final Instant delayedFrom = Instant.now();
 
         builder.setDelay(delayedFrom)
-                .setPubSubNodeId(CoreFixtures.INTEREST_ID)
-                .setItemId(PubSubMessageFixtures.ITEM_ID)
                 .addCall(CoreFixtures.CALL_INCOMING_ORIGINATED)
                 .validate();
 
@@ -60,25 +59,12 @@ public class CallStatusMessageBuilderTest {
     }
 
     @Test
-    public void willNotValidateABuilderWithoutAPubSubNodeId() {
-
-        expectedException.expect(IllegalStateException.class);
-        expectedException.expectMessage("The stanza 'pubSubNodeId' has not been set");
-
-        builder.setItemId(PubSubMessageFixtures.ITEM_ID)
-                .addCall(CoreFixtures.CALL_INCOMING_ORIGINATED)
-                .validate();
-    }
-
-    @Test
     public void willNotValidateABuilderWithoutAnyCalls() {
 
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("The callstatus message has no calls");
 
-        builder.setPubSubNodeId(CoreFixtures.INTEREST_ID)
-                .setItemId(PubSubMessageFixtures.ITEM_ID)
-                .validate();
+        builder.validate();
     }
 
     @Test
@@ -106,27 +92,11 @@ public class CallStatusMessageBuilderTest {
     }
 
     @Test
-    public void willCheckAnUnpopulatedBuilder() {
-
-        final List<String> errors = new ArrayList<>();
-
-        builder.validate(errors);
-
-        assertThat(errors, containsInAnyOrder(
-                "Invalid callstatus message stanza; missing or invalid calls",
-                "Invalid callstatus message stanza; the 'pubSubNodeId' has not been set"
-        ));
-
-    }
-
-    @Test
     public void willCheckCallUniqueness() {
 
         final List<String> errors = new ArrayList<>();
 
-        builder.setPubSubNodeId(CoreFixtures.INTEREST_ID)
-                .setItemId(PubSubMessageFixtures.ITEM_ID)
-                .addCall(CoreFixtures.CALL_INCOMING_ORIGINATED)
+        builder.addCall(CoreFixtures.CALL_INCOMING_ORIGINATED)
                 .addCall(CoreFixtures.CALL_INCOMING_ORIGINATED)
                 .validate(errors);
 

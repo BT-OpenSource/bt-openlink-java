@@ -12,7 +12,7 @@ import javax.annotation.Nullable;
 import org.xmpp.packet.JID;
 import org.xmpp.packet.Message;
 
-import com.bt.openlink.message.MessageBuilder;
+import com.bt.openlink.message.PubSubMessageBuilder;
 import com.bt.openlink.type.ItemId;
 import com.bt.openlink.type.PubSubNodeId;
 
@@ -25,7 +25,7 @@ public class OpenlinkPubSubMessage extends Message {
     @Nonnull
     private List<String> parseErrors;
 
-    OpenlinkPubSubMessage(@Nonnull final MessageBuilder<?, JID> builder, @Nullable final List<String> parseErrors) {
+    OpenlinkPubSubMessage(@Nonnull final PubSubMessageBuilder<?, JID> builder, @Nullable final List<String> parseErrors) {
         builder.getTo().ifPresent(this::setTo);
         builder.getFrom().ifPresent(this::setFrom);
         builder.getId().ifPresent(this::setID);

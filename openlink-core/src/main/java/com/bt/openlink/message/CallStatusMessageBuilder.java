@@ -13,7 +13,7 @@ import com.bt.openlink.type.CallId;
 import com.bt.openlink.type.InterestId;
 import com.bt.openlink.type.PubSubNodeId;
 
-public abstract class CallStatusMessageBuilder<B extends CallStatusMessageBuilder, J> extends MessageBuilder<B, J> {
+public abstract class CallStatusMessageBuilder<B extends CallStatusMessageBuilder, J> extends PubSubMessageBuilder<B, J> {
 
     @Nullable private Boolean callStatusBusy;
     @Nonnull private List<Call> calls = new ArrayList<>();

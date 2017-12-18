@@ -8,7 +8,7 @@ import javax.annotation.Nullable;
 
 import com.bt.openlink.type.DeviceStatus;
 
-public abstract class DeviceStatusMessageBuilder<B extends DeviceStatusMessageBuilder, J> extends MessageBuilder<B, J> {
+public abstract class DeviceStatusMessageBuilder<B extends DeviceStatusMessageBuilder, J> extends PubSubMessageBuilder<B, J> {
 
     @Nullable private DeviceStatus deviceStatus;
 

@@ -38,6 +38,7 @@ public class CallStatusMessageTest {
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
                 .setPubSubNodeId(CoreFixtures.CALL_INCOMING_ORIGINATED.getInterestId().get())
+                .setItemId(PubSubMessageFixtures.ITEM_ID)
                 .addCall(CoreFixtures.CALL_INCOMING_ORIGINATED)
                 .build();
 

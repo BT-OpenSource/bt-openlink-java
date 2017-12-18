@@ -22,8 +22,10 @@ import javax.annotation.Nullable;
 import org.dom4j.Element;
 import org.xmpp.packet.IQ;
 import org.xmpp.packet.JID;
+import org.xmpp.packet.Message;
 
 import com.bt.openlink.OpenlinkXmppNamespace;
+import com.bt.openlink.message.PubSubMessageBuilder;
 import com.bt.openlink.type.Call;
 import com.bt.openlink.type.CallDirection;
 import com.bt.openlink.type.CallFeature;
@@ -35,10 +37,12 @@ import com.bt.openlink.type.DeviceStatus;
 import com.bt.openlink.type.FeatureId;
 import com.bt.openlink.type.FeatureType;
 import com.bt.openlink.type.InterestId;
+import com.bt.openlink.type.ItemId;
 import com.bt.openlink.type.Participant;
 import com.bt.openlink.type.ParticipantType;
 import com.bt.openlink.type.PhoneNumber;
 import com.bt.openlink.type.ProfileId;
+import com.bt.openlink.type.PubSubNodeId;
 import com.bt.openlink.type.RequestAction;
 import com.bt.openlink.type.Site;
 
@@ -515,7 +519,7 @@ public final class TinderPacketUtil {
     }
 
     @SuppressWarnings("unchecked")
-    private static void getActions(@Nonnull final Element callElement, @Nonnull final Call.Builder callBuilder, String description, List<String> parseErrors) {
+    private static void getActions(@Nonnull final Element callElement, @Nonnull final Call.Builder callBuilder, @Nonnull final String description, @Nonnull final List<String> parseErrors) {
         final Element actionsElement = callElement.element("actions");
         if (actionsElement != null) {
             final List<Element> actionElements = actionsElement.elements();
@@ -531,4 +535,43 @@ public final class TinderPacketUtil {
         }
     }
 
+    @Nonnull
+    public static Element addPubSubMetaData(@Nonnull final Element messageElement, @Nonnull final PubSubMessageBuilder<?, ?> builder) {
+        final Element eventElement = messageElement.addElement("event", OpenlinkXmppNamespace.XMPP_PUBSUB_EVENT.uri());
+        final Element itemsElement = eventElement.addElement("items");
+        builder.getPubSubNodeId().ifPresent(nodeId -> itemsElement.addAttribute("node", nodeId.value()));
+        final Element itemElement = itemsElement.addElement("item");
+        builder.getItemId().ifPresent(id -> itemElement.addAttribute("id", id.value()));
+        return itemElement;
+    }
+
+    public static void addDelay(@Nonnull final Element messageElement, @Nonnull final PubSubMessageBuilder<?, ?> builder) {
+        builder.getDelay().ifPresent(stamp -> messageElement.addElement("delay", "urn:xmpp:delay").addAttribute("stamp", stamp.toString()));
+    }
+
+    @Nullable
+    public static Element setPubSubMetaData(
+            @Nonnull final Message message,
+            @Nonnull PubSubMessageBuilder<?, JID> builder,
+            @Nonnull final String description,
+            @Nonnull final List<String> parseErrors) {
+        builder.setId(message.getID());
+        builder.setFrom(message.getFrom());
+        builder.setTo(message.getTo());
+        final Element itemsElement = message.getChildElement("event", "http://jabber.org/protocol/pubsub#event").element("items");
+        final Element itemElement = itemsElement.element("item");
+        final Element delayElement = message.getChildElement("delay", "urn:xmpp:delay");
+        PubSubNodeId.from(itemsElement.attributeValue("node")).ifPresent(builder::setPubSubNodeId);
+        ItemId.from(TinderPacketUtil.getNullableStringAttribute(itemElement, "id")).ifPresent(builder::setItemId);
+        final Optional<String> stampOptional = TinderPacketUtil.getStringAttribute(delayElement, "stamp");
+        if (stampOptional.isPresent()) {
+            final String stamp = stampOptional.get();
+            try {
+                builder.setDelay(Instant.parse(stamp));
+            } catch (final DateTimeParseException e) {
+                parseErrors.add(String.format("Invalid %s; invalid timestamp '%s'; format should be compliant with XEP-0082", description, stamp));
+            }
+        }
+        return itemElement;
+    }
 }
