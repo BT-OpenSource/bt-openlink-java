@@ -27,7 +27,7 @@ public class CallTest {
     @Rule public final ExpectedException expectedException = ExpectedException.none();
 
     @Test
-    public void willCreateACall() throws Exception {
+    public void willCreateACall() {
 
         final Call call = Call.Builder.start()
                 .setId(CoreFixtures.CALL_ID)
@@ -71,10 +71,14 @@ public class CallTest {
         assertThat(call.getActions(), contains(RequestAction.ANSWER_CALL));
         assertThat(call.getFeatures(), contains(CoreFixtures.CALL_FEATURE));
         assertThat(call.getParticipants(), contains(CoreFixtures.PARTICIPANT));
+        assertThat(call.getActiveHandset(),is(Optional.empty()));
+        assertThat(call.getActiveSpeakerChannel(),is(Optional.empty()));
+        assertThat(call.isPrivate(),is(Optional.empty()));
+        assertThat(call.isPublic(),is(Optional.empty()));
     }
 
     @Test
-    public void willNotCreateACallWithoutAnId() throws Exception {
+    public void willNotCreateACallWithoutAnId() {
 
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("The call id has not been set");
@@ -92,7 +96,7 @@ public class CallTest {
     }
 
     @Test
-    public void willNotCreateACallWithoutASite() throws Exception {
+    public void willNotCreateACallWithoutASite() {
 
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("The call site has not been set");
@@ -110,7 +114,7 @@ public class CallTest {
     }
 
     @Test
-    public void willNotCreateACallWithoutAProfileId() throws Exception {
+    public void willNotCreateACallWithoutAProfileId() {
 
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("The profile id has not been set");
@@ -128,7 +132,7 @@ public class CallTest {
     }
 
     @Test
-    public void willNotCreateACallWithoutAnInterestId() throws Exception {
+    public void willNotCreateACallWithoutAnInterestId() {
 
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("The interest id has not been set");
@@ -147,7 +151,7 @@ public class CallTest {
     }
 
     @Test
-    public void willNotCreateACallWithoutAState() throws Exception {
+    public void willNotCreateACallWithoutAState() {
 
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("The call state has not been set");
@@ -165,7 +169,7 @@ public class CallTest {
     }
 
     @Test
-    public void willNotCreateACallWithoutADirection() throws Exception {
+    public void willNotCreateACallWithoutADirection() {
 
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("The call direction has not been set");
@@ -183,7 +187,7 @@ public class CallTest {
     }
 
     @Test
-    public void willNotCreateACallWithoutAStartTime() throws Exception {
+    public void willNotCreateACallWithoutAStartTime() {
 
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("The call start time has not been set");
@@ -203,7 +207,7 @@ public class CallTest {
     }
 
     @Test
-    public void willNotCreateACallWithoutADuration() throws Exception {
+    public void willNotCreateACallWithoutADuration() {
 
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("The call duration has not been set");
@@ -221,7 +225,7 @@ public class CallTest {
     }
 
     @Test
-    public void willCreateACallWithoutMandatoryFields() throws Exception {
+    public void willCreateACallWithoutMandatoryFields() {
         final List<String> errors = new ArrayList<>();
 
         final Call call = Call.Builder.start()
@@ -256,7 +260,103 @@ public class CallTest {
                 "Invalid call status; missing call direction is mandatory",
                 "Invalid call status; missing call start time is mandatory",
                 "Invalid call status; missing call duration is mandatory"
-        ));
+                ));
+    }
 
+    @Test
+    public void aCallHasAnActiveHandset() {
+        final Optional<FeatureId> activeHS = FeatureId.from("HS1");
+        final Call call = Call.Builder.start()
+                .setId(CoreFixtures.CALL_ID)
+                .setSite(CoreFixtures.SITE)
+                .setProfileId(CoreFixtures.PROFILE_ID)
+                .setInterestId(CoreFixtures.INTEREST_ID)
+                .setChanged(Changed.STATE)
+                .setState(CallState.CALL_ORIGINATED)
+                .setDirection(CallDirection.INCOMING)
+                .setStartTime(startTime)
+                .setDuration(Duration.ZERO)
+                .addFeature(CallFeature.Builder.start()
+                        .setType(FeatureType.HANDSET)
+                        .setEnabled(true)
+                        .setLabel("Handset 1")
+                        .setId(activeHS.get())
+                        .build())
+                .build();
+
+        assertThat(call.getActiveHandset(), is(activeHS));
+
+    }
+
+    @Test
+    public void aCallHasAnActiveSpeakerChannel() {
+        final Optional<FeatureId> activeSpeaker = FeatureId.from("Channel 1");
+        final Call call = Call.Builder.start()
+                .setId(CoreFixtures.CALL_ID)
+                .setSite(CoreFixtures.SITE)
+                .setProfileId(CoreFixtures.PROFILE_ID)
+                .setInterestId(CoreFixtures.INTEREST_ID)
+                .setChanged(Changed.STATE)
+                .setState(CallState.CALL_ORIGINATED)
+                .setDirection(CallDirection.INCOMING)
+                .setStartTime(startTime)
+                .setDuration(Duration.ZERO)
+                .addFeature(CallFeature.Builder.start()
+                        .setType(FeatureType.SPEAKER_CHANNEL)
+                        .setEnabled(true)
+                        .setLabel("Speaker channel number 1")
+                        .setId(activeSpeaker.get())
+                        .build())
+                .build();
+
+        assertThat(call.getActiveSpeakerChannel(), is(activeSpeaker));
+    }
+
+    @Test
+    public void aCallIsPrivate() {
+        final Call call = Call.Builder.start()
+                .setId(CoreFixtures.CALL_ID)
+                .setSite(CoreFixtures.SITE)
+                .setProfileId(CoreFixtures.PROFILE_ID)
+                .setInterestId(CoreFixtures.INTEREST_ID)
+                .setChanged(Changed.STATE)
+                .setState(CallState.CALL_ORIGINATED)
+                .setDirection(CallDirection.INCOMING)
+                .setStartTime(startTime)
+                .setDuration(Duration.ZERO)
+                .addFeature(CallFeature.Builder.start()
+                        .setType(FeatureType.PRIVACY)
+                        .setEnabled(true)
+                        .setId(FeatureId.from("Privacy").get())
+                        .setLabel("Privacy")
+                        .build())
+                .build();
+
+        assertThat(call.isPrivate().get(), is(true));
+        assertThat(call.isPublic().get(), is(false));
+    }
+
+    @Test
+    public void aCallIsPublic() {
+        final Call call = Call.Builder.start()
+                .setId(CoreFixtures.CALL_ID)
+                .setSite(CoreFixtures.SITE)
+                .setProfileId(CoreFixtures.PROFILE_ID)
+                .setInterestId(CoreFixtures.INTEREST_ID)
+                .setChanged(Changed.STATE)
+                .setState(CallState.CALL_ORIGINATED)
+                .setDirection(CallDirection.INCOMING)
+                .setStartTime(startTime)
+                .setDuration(Duration.ZERO)
+                .addFeature(CallFeature.Builder.start()
+                        .setType(FeatureType.PRIVACY)
+                        .setEnabled(false)
+                        .setId(FeatureId.from("Privacy").get())
+                        .setLabel("Privacy")
+                        .build())
+                .build();
+
+        assertThat(call.isPrivate().get(), is(false));
+        assertThat(call.isPublic().get(), is(true));
     }
 }

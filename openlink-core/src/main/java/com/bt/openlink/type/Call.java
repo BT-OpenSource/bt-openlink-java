@@ -25,14 +25,13 @@ public class Call {
             }
         })));
 
-        if(callBusySet.get()) {
+        if (callBusySet.get()) {
             return Optional.of(aCallIsBusy.get());
         } else {
             return Optional.empty();
         }
 
     }
-
 
     @Nullable private final CallId callId;
     @Nullable private final Site site;
@@ -171,6 +170,72 @@ public class Call {
         return participants;
     }
 
+    /**
+     * Determines the id, if any, of the active handset. Note, if two or more handsets are active, one of them is
+     * selected in a nondeterministic manner.
+     * 
+     * @return the id of an active handset
+     */
+    @Nonnull
+    public Optional<FeatureId> getActiveHandset() {
+        return getFeatures().stream()
+                .filter(feature -> {
+                    final Optional<FeatureType> type = feature.getType();
+                    final Optional<Boolean> enabled = feature.isEnabled();
+                    return type.isPresent() && type.get() == FeatureType.HANDSET &&
+                            enabled.isPresent() && enabled.get();
+                })
+                .findAny()
+                .flatMap(Feature::getId);
+    }
+
+    /**
+     * Determines the id, if any, of the active speaker. Note, if two or more speakers are active, one of them is
+     * selected in a nondeterministic manner.
+     * 
+     * @return the id of an active speaker
+     */
+    @Nonnull
+    public Optional<FeatureId> getActiveSpeakerChannel() {
+        return getFeatures().stream()
+                .filter(feature -> {
+                    final Optional<FeatureType> type = feature.getType();
+                    final Optional<Boolean> enabled = feature.isEnabled();
+                    return type.isPresent() && type.get() == FeatureType.SPEAKER_CHANNEL &&
+                            enabled.isPresent() && enabled.get();
+                })
+                .findAny()
+                .flatMap(Feature::getId);
+    }
+
+    /**
+     * Indicates if the call is public or private.
+     *
+     * @return {@code empty} if there is no privacy indication, otherwise {@code true} or {@code false}.
+     */
+    @Nonnull
+    public Optional<Boolean> isPrivate() {
+        return getFeatures().stream()
+                .filter(feature -> {
+                    final Optional<FeatureType> type = feature.getType();
+                    final Optional<Boolean> enabled = feature.isEnabled();
+                    return type.isPresent() && type.get() == FeatureType.PRIVACY &&
+                            enabled.isPresent();
+                })
+                .findAny()
+                .flatMap(CallFeature::isEnabled);
+    }
+
+    /**
+     * Indicates if the call is public or private.
+     *
+     * @return {@code empty} if there is no privacy indication, otherwise {@code true} or {@code false}.
+     */
+    @Nonnull
+    public Optional<Boolean> isPublic() {
+        return isPrivate().map(isPrivate -> !isPrivate);
+    }
+
     public boolean isParticipating() {
         return state != null && direction != null && state.isParticipating(direction);
     }
@@ -231,7 +296,7 @@ public class Call {
                 throw new IllegalStateException("The call duration has not been set");
             }
 
-            return  new Call(this);
+            return new Call(this);
         }
 
         @Nonnull

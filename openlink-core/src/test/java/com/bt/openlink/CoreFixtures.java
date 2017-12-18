@@ -90,9 +90,9 @@ public class CoreFixtures {
             .setLabel("Privacy")
             .build();
     public static final CallFeature CALL_FEATURE = CallFeature.Builder.start()
-            .setType(FeatureType.PRIVACY)
+            .setType(FeatureType.CALL_BACK)
             .setId(FEATURE_ID)
-            .setLabel("Privacy")
+            .setLabel("Call Back")
             .setEnabled(true)
             .build();
     public static final Interest INTEREST = Interest.Builder.start()
