@@ -90,9 +90,8 @@ public final class OpenlinkIQParser {
         final Element childElement = (Element) pubSubElement.elements().get(0);
         switch (childElement.getName()) {
         case "subscribe":
-            return PubSubSubscribeRequest.from(iq);
         case "unsubscribe":
-            return PubSubUnsubscribeRequest.from(iq);
+            return PubSubSubscriptionRequest.from(iq);
         case "publish":
             return PubSubPublishRequest.from(iq);
         default:

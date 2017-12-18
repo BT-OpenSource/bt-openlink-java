@@ -8,13 +8,15 @@ import javax.annotation.Nullable;
 
 import com.bt.openlink.type.InterestId;
 import com.bt.openlink.type.PubSubNodeId;
+import com.bt.openlink.type.SubscriptionState;
 
-public abstract class PubSubSubscribeUnSubscribeRequestBuilder<B extends PubSubSubscribeUnSubscribeRequestBuilder, J, T extends Enum<T>> extends IQBuilder<B, J, T> {
+public abstract class PubSubSubscriptionRequestBuilder<B extends PubSubSubscriptionRequestBuilder, J, T extends Enum<T>> extends IQBuilder<B, J, T> {
 
     @Nullable private PubSubNodeId pubSubNodeId;
     @Nullable private J jid;
+    @Nullable private SubscriptionState subscriptionState;
 
-    protected PubSubSubscribeUnSubscribeRequestBuilder(final Class<T> typeClass) {
+    protected PubSubSubscriptionRequestBuilder(final Class<T> typeClass) {
         super(typeClass);
     }
 
@@ -59,6 +61,18 @@ public abstract class PubSubSubscribeUnSubscribeRequestBuilder<B extends PubSubS
         return Optional.ofNullable(jid);
     }
 
+    @Nonnull
+    @SuppressWarnings("unchecked")
+    public B setSubscriptionState(@Nonnull final SubscriptionState subscriptionState) {
+        this.subscriptionState = subscriptionState;
+        return (B) this;
+    }
+
+    @Nonnull
+    public Optional<SubscriptionState> getSubscriptionState() {
+        return Optional.ofNullable(subscriptionState);
+    }
+
     @Override
     protected void validate() {
         super.validate();
@@ -67,6 +81,12 @@ public abstract class PubSubSubscribeUnSubscribeRequestBuilder<B extends PubSubS
         }
         if (jid == null) {
             throw new IllegalStateException("The stanza 'jid' has not been set");
+        }
+        if (subscriptionState == null) {
+            throw new IllegalStateException("The stanza 'subscriptionState' has not been set");
+        }
+        if (subscriptionState != SubscriptionState.SUBSCRIBED && subscriptionState != SubscriptionState.NONE) {
+            throw new IllegalStateException("The only supported requests states are 'subscribed' and 'none'");
         }
     }
 
@@ -84,6 +104,11 @@ public abstract class PubSubSubscribeUnSubscribeRequestBuilder<B extends PubSubS
         }
         if (jid == null) {
             errors.add("Invalid pub-sub subscription request stanza; missing jid");
+        }
+        if (subscriptionState == null) {
+            errors.add("Invalid pub-sub subscription request stanza; missing subscriptionState");
+        } else if (subscriptionState != SubscriptionState.SUBSCRIBED && subscriptionState != SubscriptionState.NONE) {
+            errors.add("Invalid pub-sub subscription request stanza; subscriptionState should only be subscribed or none");
         }
     }
 }
