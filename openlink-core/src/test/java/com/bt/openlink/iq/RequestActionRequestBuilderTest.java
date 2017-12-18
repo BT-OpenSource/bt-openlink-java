@@ -12,8 +12,8 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import com.bt.openlink.CoreFixtures;
+import com.bt.openlink.RequestActionFixtures;
 import com.bt.openlink.type.RequestAction;
-import com.bt.openlink.type.RequestActionValue;
 
 @SuppressWarnings("ConstantConditions")
 public class RequestActionRequestBuilderTest {
@@ -40,19 +40,18 @@ public class RequestActionRequestBuilderTest {
     @Test
     public void willValidateAZeroValueBuilder() {
 
-        final RequestActionValue actionValue2 = RequestActionValue.from("test-request-action-value-2").get();
         builder.setInterestId(CoreFixtures.INTEREST_ID)
                 .setAction(RequestAction.START_VOICE_DROP)
                 .setCallId(CoreFixtures.CALL_ID)
-                .setValue1(CoreFixtures.REQUEST_ACTION_VALUE)
-                .setValue2(actionValue2)
+                .setValue1(RequestActionFixtures.REQUEST_ACTION_VALUE_1)
+                .setValue2(RequestActionFixtures.REQUEST_ACTION_VALUE_2)
                 .validate();
 
         assertThat(builder.getInterestId().get(), is(CoreFixtures.INTEREST_ID));
         assertThat(builder.getAction().get(), is(RequestAction.START_VOICE_DROP));
         assertThat(builder.getCallId().get(), is(CoreFixtures.CALL_ID));
-        assertThat(builder.getValue1().get(), is(CoreFixtures.REQUEST_ACTION_VALUE));
-        assertThat(builder.getValue2().get(), is(actionValue2));
+        assertThat(builder.getValue1().get(), is(RequestActionFixtures.REQUEST_ACTION_VALUE_1));
+        assertThat(builder.getValue2().get(), is(RequestActionFixtures.REQUEST_ACTION_VALUE_2));
     }
 
     @Test
@@ -97,7 +96,7 @@ public class RequestActionRequestBuilderTest {
         builder.setInterestId(CoreFixtures.INTEREST_ID)
                 .setAction(RequestAction.CLEAR_CALL)
                 .setCallId(CoreFixtures.CALL_ID)
-                .setValue2(CoreFixtures.REQUEST_ACTION_VALUE)
+                .setValue2(RequestActionFixtures.REQUEST_ACTION_VALUE_2)
                 .validate();
     }
 
@@ -122,7 +121,7 @@ public class RequestActionRequestBuilderTest {
         builder.setInterestId(CoreFixtures.INTEREST_ID)
                 .setAction(RequestAction.START_VOICE_DROP)
                 .setCallId(CoreFixtures.CALL_ID)
-                .setValue1(CoreFixtures.REQUEST_ACTION_VALUE)
+                .setValue1(RequestActionFixtures.REQUEST_ACTION_VALUE_1)
                 .validate();
     }
 
@@ -134,7 +133,7 @@ public class RequestActionRequestBuilderTest {
 
         builder.setInterestId(CoreFixtures.INTEREST_ID)
                 .setAction(RequestAction.CLEAR_CONFERENCE)
-                .setValue1(CoreFixtures.REQUEST_ACTION_VALUE)
+                .setValue1(RequestActionFixtures.REQUEST_ACTION_VALUE_1)
                 .setCallId(CoreFixtures.CALL_ID)
                 .validate();
     }
@@ -148,8 +147,8 @@ public class RequestActionRequestBuilderTest {
         builder.setInterestId(CoreFixtures.INTEREST_ID)
                 .setAction(RequestAction.ANSWER_CALL)
                 .setCallId(CoreFixtures.CALL_ID)
-                .setValue1(CoreFixtures.REQUEST_ACTION_VALUE)
-                .setValue2(CoreFixtures.REQUEST_ACTION_VALUE)
+                .setValue1(RequestActionFixtures.REQUEST_ACTION_VALUE_1)
+                .setValue2(RequestActionFixtures.REQUEST_ACTION_VALUE_2)
                 .validate();
     }
 
@@ -158,7 +157,7 @@ public class RequestActionRequestBuilderTest {
 
         final ArrayList<String> errors = new ArrayList<>();
 
-        builder.setValue2(CoreFixtures.REQUEST_ACTION_VALUE)
+        builder.setValue2(RequestActionFixtures.REQUEST_ACTION_VALUE_1)
                 .validate(errors);
 
         assertThat(errors, containsInAnyOrder(
@@ -191,7 +190,7 @@ public class RequestActionRequestBuilderTest {
         builder.setInterestId(CoreFixtures.INTEREST_ID)
                 .setAction(RequestAction.START_VOICE_DROP)
                 .setCallId(CoreFixtures.CALL_ID)
-                .setValue1(CoreFixtures.REQUEST_ACTION_VALUE)
+                .setValue1(RequestActionFixtures.REQUEST_ACTION_VALUE_1)
                 .validate(errors);
 
         assertThat(errors, containsInAnyOrder("Invalid request-action stanza; the action 'StartVoiceDrop' requires value2 to be set"));
@@ -204,7 +203,7 @@ public class RequestActionRequestBuilderTest {
 
         builder.setInterestId(CoreFixtures.INTEREST_ID)
                 .setAction(RequestAction.CLEAR_CONFERENCE)
-                .setValue1(CoreFixtures.REQUEST_ACTION_VALUE)
+                .setValue1(RequestActionFixtures.REQUEST_ACTION_VALUE_1)
                 .setCallId(CoreFixtures.CALL_ID)
                 .validate(errors);
 
@@ -219,8 +218,8 @@ public class RequestActionRequestBuilderTest {
         builder.setInterestId(CoreFixtures.INTEREST_ID)
                 .setAction(RequestAction.ANSWER_CALL)
                 .setCallId(CoreFixtures.CALL_ID)
-                .setValue1(CoreFixtures.REQUEST_ACTION_VALUE)
-                .setValue2(CoreFixtures.REQUEST_ACTION_VALUE)
+                .setValue1(RequestActionFixtures.REQUEST_ACTION_VALUE_1)
+                .setValue2(RequestActionFixtures.REQUEST_ACTION_VALUE_2)
                 .validate(errors);
 
         assertThat(errors, containsInAnyOrder("Invalid request-action stanza; the action 'AnswerCall' does not require value2 to be set"));
