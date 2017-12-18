@@ -33,8 +33,11 @@ public final class OpenlinkMessageParser {
     @Nonnull
     private static Message parsePubSubEvent(final Message message) {
         final Element callStatusElement = TinderPacketUtil.getChildElement(message.getElement(), "event", "items", "item", "callstatus");
+        final Element deviceStatusElement = TinderPacketUtil.getChildElement(message.getElement(), "event", "items", "item", "devicestatus");
         if (callStatusElement != null) {
             return CallStatusMessage.from(message);
+        } else if (deviceStatusElement != null) {
+            return DeviceStatusMessage.from(message);
         } else {
             return message;
         }

@@ -1,6 +1,5 @@
 package com.bt.openlink.message;
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -12,57 +11,12 @@ import javax.annotation.Nullable;
 import com.bt.openlink.type.Call;
 import com.bt.openlink.type.CallId;
 import com.bt.openlink.type.InterestId;
-import com.bt.openlink.type.ItemId;
 import com.bt.openlink.type.PubSubNodeId;
 
 public abstract class CallStatusMessageBuilder<B extends CallStatusMessageBuilder, J> extends MessageBuilder<B, J> {
 
-    @Nullable private Instant delay;
-    @Nullable private PubSubNodeId pubSubNodeId;
-    @Nullable private ItemId itemId;
     @Nullable private Boolean callStatusBusy;
     @Nonnull private List<Call> calls = new ArrayList<>();
-
-    @SuppressWarnings("unchecked")
-    @Nonnull
-    public B setDelay(@Nonnull Instant delay) {
-        this.delay = delay;
-        return (B) this;
-    }
-
-    @Nonnull
-    public Optional<Instant> getDelay() {
-        return Optional.ofNullable(delay);
-    }
-
-    @Nonnull
-    public B setPubSubNodeId(@Nonnull final InterestId interestId) {
-        return setPubSubNodeId(interestId.toPubSubNodeId());
-    }
-
-    @SuppressWarnings("unchecked")
-    @Nonnull
-    public B setPubSubNodeId(@Nonnull final PubSubNodeId pubSubNodeId) {
-        this.pubSubNodeId = pubSubNodeId;
-        return (B) this;
-    }
-
-    @Nonnull
-    public Optional<PubSubNodeId> getPubSubNodeId() {
-        return Optional.ofNullable(pubSubNodeId);
-    }
-
-    @SuppressWarnings("unchecked")
-    @Nonnull
-    public B setItemId(@Nonnull final ItemId itemId) {
-        this.itemId = itemId;
-        return (B) this;
-    }
-
-    @Nonnull
-    public Optional<ItemId> getItemId() {
-        return Optional.ofNullable(itemId);
-    }
 
     @SuppressWarnings("unchecked")
     @Nonnull
@@ -101,14 +55,12 @@ public abstract class CallStatusMessageBuilder<B extends CallStatusMessageBuilde
         if (calls.isEmpty()) {
             throw new IllegalStateException("The callstatus message has no calls");
         }
-        if (pubSubNodeId == null) {
-            throw new IllegalStateException("The stanza 'pubSubNodeId' has not been set");
-        }
         validateUniqueness(callId -> {
             throw new IllegalStateException("Each call id must be unique - " + callId + " appears more than once");
         });
-        validateCallsAreOnTheCorrectInterest(call -> {
-            throw new IllegalStateException("The call with id " + call.getId().orElse(null) + " is on interest " + call.getInterestId().orElse(null) + " which differs from the pub-sub node id " + pubSubNodeId);
+        final PubSubNodeId nodeId = getPubSubNodeId().orElse(null);
+        validateCallsAreOnTheCorrectInterest(nodeId, call -> {
+            throw new IllegalStateException("The call with id " + call.getId().orElse(null) + " is on interest " + call.getInterestId().orElse(null) + " which differs from the pub-sub node id " + nodeId);
         });
         Call.oneOrMoreCallsIsBusy(calls).ifPresent(this::setCallStatusBusy);
     }
@@ -125,11 +77,9 @@ public abstract class CallStatusMessageBuilder<B extends CallStatusMessageBuilde
         if (calls.isEmpty()) {
             errors.add("Invalid callstatus message stanza; missing or invalid calls");
         }
-        if (pubSubNodeId == null) {
-            errors.add("Invalid callstatus message stanza; the 'pubSubNodeId' has not been set");
-        }
         validateUniqueness(callId -> errors.add("Invalid callstatus message stanza; each call id must be unique - " + callId + " appears more than once"));
-        validateCallsAreOnTheCorrectInterest(call -> errors.add("Invalid callstatus message stanza; the call with id " + call.getId().orElse(null) + " is on interest " + call.getInterestId().orElse(null) + " which differs from the pub-sub node id " + pubSubNodeId));
+        final PubSubNodeId nodeId = getPubSubNodeId().orElse(null);
+        validateCallsAreOnTheCorrectInterest(nodeId, call -> errors.add("Invalid callstatus message stanza; the call with id " + call.getId().orElse(null) + " is on interest " + call.getInterestId().orElse(null) + " which differs from the pub-sub node id " + nodeId));
     }
 
     private void validateUniqueness(final Consumer<CallId> errorConsumer) {
@@ -145,11 +95,11 @@ public abstract class CallStatusMessageBuilder<B extends CallStatusMessageBuilde
         }
     }
 
-    private void validateCallsAreOnTheCorrectInterest(final Consumer<Call> errorConsumer) {
-        if (pubSubNodeId != null) {
+    private void validateCallsAreOnTheCorrectInterest(final PubSubNodeId nodeId, final Consumer<Call> errorConsumer) {
+        if (nodeId != null) {
             calls.forEach(call -> {
                 final Optional<InterestId> interestId = call.getInterestId();
-                if (interestId.isPresent() && !interestId.get().toPubSubNodeId().equals(pubSubNodeId)) {
+                if (interestId.isPresent() && !interestId.get().toPubSubNodeId().equals(nodeId)) {
                     errorConsumer.accept(call);
                 }
             });

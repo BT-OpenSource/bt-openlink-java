@@ -3,7 +3,6 @@ package com.bt.openlink.tinder.message;
 import java.time.Instant;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,77 +14,33 @@ import org.xmpp.packet.JID;
 import org.xmpp.packet.Message;
 
 import com.bt.openlink.OpenlinkXmppNamespace;
-import com.bt.openlink.message.CallStatusMessageBuilder;
+import com.bt.openlink.message.DeviceStatusMessageBuilder;
 import com.bt.openlink.tinder.internal.TinderPacketUtil;
-import com.bt.openlink.type.Call;
+import com.bt.openlink.type.DeviceStatus;
 import com.bt.openlink.type.ItemId;
 import com.bt.openlink.type.PubSubNodeId;
 
-public class CallStatusMessage extends OpenlinkPubSubMessage {
+public class DeviceStatusMessage extends OpenlinkPubSubMessage {
 
-    private static final String STANZA_DESCRIPTION = "call status";
+    private static final String STANZA_DESCRIPTION = "device status";
 
-    @Nullable private final Instant delay;
-    @Nullable private final PubSubNodeId pubSubNodeId;
-    @Nullable private final ItemId itemId;
-    @Nullable private final Boolean callStatusBusy;
-    @Nonnull private final List<Call> calls;
-    @Nonnull private final List<String> parseErrors;
+    @Nullable private final DeviceStatus deviceStatus;
 
-    private CallStatusMessage(@Nonnull final Builder builder, @Nullable final List<String> parseErrors) {
+    private DeviceStatusMessage(@Nonnull final Builder builder, @Nullable final List<String> parseErrors) {
         super(builder, parseErrors);
-        this.delay = builder.getDelay().orElse(null);
-        this.pubSubNodeId = builder.getPubSubNodeId().orElse(null);
-        this.itemId = builder.getItemId().orElse(null);
-        this.callStatusBusy = builder.isCallStatusBusy().orElse(null);
-        this.calls = Collections.unmodifiableList(builder.getCalls());
-        if (parseErrors == null) {
-            this.parseErrors = Collections.emptyList();
-        } else {
-            this.parseErrors = Collections.unmodifiableList(parseErrors);
-        }
+        this.deviceStatus = builder.getDeviceStatus().orElse(null);
         final Element messageElement = getElement();
         final Element eventElement = messageElement.addElement("event", OpenlinkXmppNamespace.XMPP_PUBSUB_EVENT.uri());
         final Element itemsElement = eventElement.addElement("items");
         getPubSubNodeId().ifPresent(nodeId -> itemsElement.addAttribute("node", nodeId.value()));
         final Element itemElement = itemsElement.addElement("item");
         getItemId().ifPresent(id -> itemElement.addAttribute("id", id.value()));
-        TinderPacketUtil.addCallStatusCalls(itemElement, callStatusBusy, calls);
+        getDeviceStatus().ifPresent(status -> TinderPacketUtil.addDeviceStatus(itemElement, status));
         getDelay().ifPresent(stamp -> messageElement.addElement("delay", "urn:xmpp:delay").addAttribute("stamp", stamp.toString()));
     }
 
     @Nonnull
-    public List<String> getParseErrors() {
-        return parseErrors;
-    }
-
-    @Nonnull
-    public Optional<Instant> getDelay() {
-        return Optional.ofNullable(delay);
-    }
-
-    @Nonnull
-    public Optional<PubSubNodeId> getPubSubNodeId() {
-        return Optional.ofNullable(pubSubNodeId);
-    }
-
-    @Nonnull
-    public Optional<ItemId> getItemId() {
-        return Optional.ofNullable(itemId);
-    }
-
-    @Nonnull
-    public Optional<Boolean> isCallStatusBusy() {
-        return Optional.ofNullable(callStatusBusy);
-    }
-
-    @Nonnull
-    public List<Call> getCalls() {
-        return calls;
-    }
-
-    @Nonnull
-    public static CallStatusMessage from(@Nonnull final Message message) {
+    public static DeviceStatusMessage from(@Nonnull final Message message) {
         final Builder builder = Builder.start()
                 .setId(message.getID())
                 .setFrom(message.getFrom())
@@ -93,12 +48,11 @@ public class CallStatusMessage extends OpenlinkPubSubMessage {
         final List<String> parseErrors = new ArrayList<>();
         final Element itemsElement = message.getChildElement("event", "http://jabber.org/protocol/pubsub#event").element("items");
         final Element itemElement = itemsElement.element("item");
-        final Element callStatusElement = TinderPacketUtil.getChildElement(itemElement, "callstatus");
+        final Element deviceStatusElement = TinderPacketUtil.getChildElement(itemElement, "devicestatus");
         final Element delayElement = message.getChildElement("delay", "urn:xmpp:delay");
         PubSubNodeId.from(itemsElement.attributeValue("node")).ifPresent(builder::setPubSubNodeId);
         ItemId.from(TinderPacketUtil.getNullableStringAttribute(itemElement, "id")).ifPresent(builder::setItemId);
-        TinderPacketUtil.getBooleanAttribute(callStatusElement, "busy", "busy attribute", parseErrors).ifPresent(builder::setCallStatusBusy);
-        builder.addCalls(TinderPacketUtil.getCalls(callStatusElement, STANZA_DESCRIPTION, parseErrors));
+        TinderPacketUtil.getDeviceStatus(deviceStatusElement, STANZA_DESCRIPTION, parseErrors).ifPresent(builder::setDeviceStatus);
         final Optional<String> stampOptional = TinderPacketUtil.getStringAttribute(delayElement, "stamp");
         if (stampOptional.isPresent()) {
             final String stamp = stampOptional.get();
@@ -111,7 +65,12 @@ public class CallStatusMessage extends OpenlinkPubSubMessage {
         return builder.build(parseErrors);
     }
 
-    public static final class Builder extends CallStatusMessageBuilder<Builder, JID> {
+    @Nonnull
+    public Optional<DeviceStatus> getDeviceStatus() {
+        return Optional.ofNullable(deviceStatus);
+    }
+
+    public static final class Builder extends DeviceStatusMessageBuilder<Builder, JID> {
 
         private Builder() {
         }
@@ -122,15 +81,15 @@ public class CallStatusMessage extends OpenlinkPubSubMessage {
         }
 
         @Nonnull
-        public CallStatusMessage build() {
+        public DeviceStatusMessage build() {
             super.validate();
-            return new CallStatusMessage(this, null);
+            return new DeviceStatusMessage(this, null);
         }
 
         @Nonnull
-        protected CallStatusMessage build(final List<String> parseErrors) {
+        protected DeviceStatusMessage build(final List<String> parseErrors) {
             super.validate(parseErrors, true);
-            return new CallStatusMessage(this, parseErrors);
+            return new DeviceStatusMessage(this, parseErrors);
         }
     }
 }

@@ -107,7 +107,7 @@ public class CallStatusMessageTest {
     @Test
     public void willReturnOriginalMessageForADeviceStatusEvent() {
 
-        final Message stanza = Fixtures.messageFrom(PubSubMessageFixtures.DEVICE_STATUS_EVENT);
+        final Message stanza = Fixtures.messageFrom(PubSubMessageFixtures.ARBITRARY_PUBSUB_MESSAGE);
 
         assertThat(OpenlinkMessageParser.parse(stanza), is(sameInstance(stanza)));
     }
