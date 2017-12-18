@@ -11,10 +11,10 @@ import javax.annotation.Nullable;
  */
 public enum SubscriptionState {
 
-    NONE("None"),
-    PENDING("Pending"),
-    UNCONFIGURED("Unconfigured"),
-    SUBSCRIBED("Subscribed");
+    NONE("none"),
+    PENDING("pending"),
+    UNCONFIGURED("unconfigured"),
+    SUBSCRIBED("subscribed");
 
     @Nonnull private final String id;
 
