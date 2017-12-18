@@ -4,16 +4,18 @@ import java.time.Instant;
 import java.time.ZoneOffset;
 
 import com.bt.openlink.type.ItemId;
+import com.bt.openlink.type.PubSubNodeId;
 
 @SuppressWarnings("ConstantConditions")
 public class PubSubMessageFixtures {
 
     public static final ItemId ITEM_ID = ItemId.from("test-item-id").get();
+    public static final PubSubNodeId NODE_ID = CoreFixtures.INTEREST_ID.toPubSubNodeId();
 
     public static final String CALL_STATUS_MESSAGE =
             "<message from='" + CoreFixtures.FROM_JID_STRING + "' to='" + CoreFixtures.TO_JID_STRING + "' id='" + CoreFixtures.STANZA_ID + "'>\n" +
                     "  <event xmlns='http://jabber.org/protocol/pubsub#event'>\n" +
-                    "    <items node='" + CoreFixtures.NODE_ID + "'>\n" +
+                    "    <items node='" + NODE_ID + "'>\n" +
                     "      <item id='" + ITEM_ID + "'>\n" +
                     CoreFixtures.CALL_STATUS_INCOMING_ORIGINATED +
                     "      </item>\n" +

@@ -1,14 +1,13 @@
 package com.bt.openlink.tinder.message;
 
-import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.empty;
 import static org.junit.Assert.assertThat;
 import static org.xmlunit.matchers.CompareMatcher.isIdenticalTo;
 
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,15 +24,14 @@ import com.bt.openlink.type.CallDirection;
 import com.bt.openlink.type.CallState;
 import com.bt.openlink.type.Changed;
 import com.bt.openlink.type.ItemId;
-import com.bt.openlink.type.PubSubNodeId;
 
-@SuppressWarnings({"ConstantConditions", "RedundantThrows"})
+@SuppressWarnings({ "ConstantConditions" })
 public class CallStatusMessageTest {
 
     @Rule public final ExpectedException expectedException = ExpectedException.none();
 
     @Test
-    public void canCreateAStanza() throws Exception {
+    public void canCreateAStanza() {
 
         final CallStatusMessage message = CallStatusMessage.Builder.start()
                 .setId(CoreFixtures.STANZA_ID)
@@ -46,7 +44,7 @@ public class CallStatusMessageTest {
         assertThat(message.getID(), is(CoreFixtures.STANZA_ID));
         assertThat(message.getTo(), is(Fixtures.TO_JID));
         assertThat(message.getFrom(), is(Fixtures.FROM_JID));
-        assertThat(message.getPubSubNodeId().get(), is(CoreFixtures.NODE_ID));
+        assertThat(message.getPubSubNodeId().get(), is(PubSubMessageFixtures.NODE_ID));
         assertThat(message.isCallStatusBusy().get(), is(false));
         final List<Call> calls = message.getCalls();
         final Call theOnlyCall = calls.get(0);
@@ -55,73 +53,7 @@ public class CallStatusMessageTest {
     }
 
     @Test
-    public void canCreateAStanzaWithANullId() throws Exception {
-
-        final CallStatusMessage message = CallStatusMessage.Builder.start()
-                .setTo(Fixtures.TO_JID)
-                .setFrom(Fixtures.FROM_JID)
-                .setPubSubNodeId(CoreFixtures.CALL_INCOMING_ORIGINATED.getInterestId().get())
-                .addCalls(Collections.singletonList(CoreFixtures.CALL_INCOMING_ORIGINATED))
-                .build();
-
-        assertThat(message.getID(), is(nullValue()));
-    }
-
-    @Test
-    public void cannotCreateAStanzaWithoutAToField() throws Exception {
-
-        expectedException.expect(IllegalStateException.class);
-        expectedException.expectMessage("The stanza 'to' has not been set");
-        CallStatusMessage.Builder.start()
-                .setId(CoreFixtures.STANZA_ID)
-                .setFrom(Fixtures.FROM_JID)
-                .setPubSubNodeId(CoreFixtures.CALL_INCOMING_ORIGINATED.getInterestId().get())
-                .addCall(CoreFixtures.CALL_INCOMING_ORIGINATED)
-                .build();
-    }
-
-    @Test
-    public void cannotCreateAStanzaWithoutAnPubSubNodeIdField() throws Exception {
-
-        expectedException.expect(IllegalStateException.class);
-        expectedException.expectMessage("The stanza 'pubSubNodeId' has not been set");
-        CallStatusMessage.Builder.start()
-                .setId(CoreFixtures.STANZA_ID)
-                .setTo(Fixtures.TO_JID)
-                .setFrom(Fixtures.FROM_JID)
-                .addCall(CoreFixtures.CALL_INCOMING_ORIGINATED)
-                .build();
-    }
-
-    @Test
-    public void cannotCreateAMessageWithACallOnADifferentNode() throws Exception {
-
-        expectedException.expect(IllegalStateException.class);
-        expectedException.expectMessage("The call with id 'test-call-id' is not on this pubsub node");
-        CallStatusMessage.Builder.start()
-                .setId(CoreFixtures.STANZA_ID)
-                .setTo(Fixtures.TO_JID)
-                .setFrom(Fixtures.FROM_JID)
-                .setPubSubNodeId(PubSubNodeId.from("not-" + CoreFixtures.INTEREST_ID).get())
-                .addCall(CoreFixtures.CALL_INCOMING_ORIGINATED)
-                .build();
-    }
-
-    @Test
-    public void canCreateAStanzaWithMissingFields() throws Exception {
-
-        final CallStatusMessage message = CallStatusMessage.Builder.start()
-                .build(new ArrayList<>());
-
-        assertThat(message.getID(), is(nullValue()));
-        assertThat(message.getTo(), is(nullValue()));
-        assertThat(message.getFrom(), is(nullValue()));
-        assertThat(message.getCalls(), is(empty()));
-        assertThat(message.getDelay(), is(Optional.empty()));
-    }
-
-    @Test
-    public void willGenerateAnXmppStanza() throws Exception {
+    public void willGenerateAnXmppStanza() {
 
         final CallStatusMessage message = CallStatusMessage.Builder.start()
                 .setId(CoreFixtures.STANZA_ID)
@@ -137,7 +69,7 @@ public class CallStatusMessageTest {
     }
 
     @Test
-    public void willCreateAStanzaWithoutMandatoryFields() throws Exception {
+    public void willCreateAStanzaWithoutMandatoryFields() {
 
         final CallStatusMessage message = CallStatusMessage.Builder.start()
                 .build(new ArrayList<>());
@@ -146,7 +78,7 @@ public class CallStatusMessageTest {
     }
 
     @Test
-    public void willParseAnXmppStanza() throws Exception {
+    public void willParseAnXmppStanza() {
 
         final Message stanza = Fixtures.messageFrom(PubSubMessageFixtures.CALL_STATUS_MESSAGE);
 
@@ -155,7 +87,7 @@ public class CallStatusMessageTest {
         assertThat(message.getID(), is(CoreFixtures.STANZA_ID));
         assertThat(message.getTo(), is(Fixtures.TO_JID));
         assertThat(message.getFrom(), is(Fixtures.FROM_JID));
-        assertThat(message.getPubSubNodeId().get(), is(CoreFixtures.NODE_ID));
+        assertThat(message.getPubSubNodeId().get(), is(PubSubMessageFixtures.NODE_ID));
         assertThat(message.getItemId().get(), is(PubSubMessageFixtures.ITEM_ID));
         assertThat(message.isCallStatusBusy().get(), is(false));
         final List<Call> calls = message.getCalls();
@@ -173,7 +105,7 @@ public class CallStatusMessageTest {
     }
 
     @Test
-    public void willReturnOriginalMessageForADeviceStatusEvent() throws Exception {
+    public void willReturnOriginalMessageForADeviceStatusEvent() {
 
         final Message stanza = Fixtures.messageFrom(PubSubMessageFixtures.DEVICE_STATUS_EVENT);
 
@@ -181,7 +113,7 @@ public class CallStatusMessageTest {
     }
 
     @Test
-    public void willBuildAMessageWithADelay() throws Exception {
+    public void willBuildAMessageWithADelay() {
 
         final CallStatusMessage message = CallStatusMessage.Builder.start()
                 .setId(CoreFixtures.STANZA_ID)
@@ -197,7 +129,7 @@ public class CallStatusMessageTest {
     }
 
     @Test
-    public void willParseAMessageWithADelay() throws Exception {
+    public void willParseAMessageWithADelay() {
         final Message stanza = Fixtures.messageFrom(PubSubMessageFixtures.CALL_STATUS_MESSAGE_DELAYED);
 
         final CallStatusMessage message = (CallStatusMessage) OpenlinkMessageParser.parse(stanza);
@@ -205,7 +137,7 @@ public class CallStatusMessageTest {
     }
 
     @Test
-    public void willParseAMessageWithBadFields() throws Exception {
+    public void willParseAMessageWithBadFields() {
         final Message stanza = Fixtures.messageFrom(PubSubMessageFixtures.CALL_STATUS_MESSAGE_DELAYED_WITH_BAD_TIMESTAMP);
 
         final CallStatusMessage message = (CallStatusMessage) OpenlinkMessageParser.parse(stanza);
@@ -216,7 +148,7 @@ public class CallStatusMessageTest {
     }
 
     @Test
-    public void willParseAMessageWithALegacyTimestamp() throws Exception {
+    public void willParseAMessageWithALegacyTimestamp() {
         final Message stanza = Fixtures.messageFrom(PubSubMessageFixtures.CALL_STATUS_MESSAGE_WITH_LEGACY_TIMESTAMP_ONLY);
 
         final CallStatusMessage message = (CallStatusMessage) OpenlinkMessageParser.parse(stanza);
@@ -225,7 +157,7 @@ public class CallStatusMessageTest {
     }
 
     @Test
-    public void theLegacyTimestampShouldMatchTheStartTime() throws Exception {
+    public void theLegacyTimestampShouldMatchTheStartTime() {
         final Message stanza = Fixtures.messageFrom(PubSubMessageFixtures.CALL_STATUS_MESSAGE_WITH_MISMATCHED_TIMESTAMPS);
 
         final CallStatusMessage message = (CallStatusMessage) OpenlinkMessageParser.parse(stanza);

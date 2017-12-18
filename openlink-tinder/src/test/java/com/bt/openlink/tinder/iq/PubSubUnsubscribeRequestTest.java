@@ -11,6 +11,7 @@ import org.junit.rules.ExpectedException;
 import org.xmpp.packet.IQ;
 
 import com.bt.openlink.CoreFixtures;
+import com.bt.openlink.PubSubMessageFixtures;
 import com.bt.openlink.PubSubSubscribeFixtures;
 import com.bt.openlink.tinder.Fixtures;
 
@@ -21,25 +22,25 @@ public class PubSubUnsubscribeRequestTest {
     public final ExpectedException expectedException = ExpectedException.none();
 
     @Test
-    public void canCreateAStanza() throws Exception {
+    public void canCreateAStanza() {
 
         final PubSubUnsubscribeRequest request = PubSubUnsubscribeRequest.Builder.start()
                 .setId(CoreFixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
-                .setPubSubNodeId(CoreFixtures.NODE_ID)
+                .setPubSubNodeId(PubSubMessageFixtures.NODE_ID)
                 .setJID(Fixtures.USER_FULL_JID)
                 .build();
 
         assertThat(request.getID(), is(CoreFixtures.STANZA_ID));
         assertThat(request.getTo(), is(Fixtures.TO_JID));
         assertThat(request.getFrom(), is(Fixtures.FROM_JID));
-        assertThat(request.getPubSubNodeId().get(), is(CoreFixtures.NODE_ID));
+        assertThat(request.getPubSubNodeId().get(), is(PubSubMessageFixtures.NODE_ID));
         assertThat(request.getJID().get(), is(Fixtures.USER_FULL_JID));
     }
 
     @Test
-    public void willGenerateAnXmppStanza() throws Exception {
+    public void willGenerateAnXmppStanza() {
 
         final PubSubUnsubscribeRequest request = PubSubUnsubscribeRequest.Builder.start()
                 .setId(CoreFixtures.STANZA_ID)
@@ -53,20 +54,20 @@ public class PubSubUnsubscribeRequestTest {
     }
 
     @Test
-    public void willParseAnXmppStanza() throws Exception {
+    public void willParseAnXmppStanza() {
 
         final PubSubUnsubscribeRequest request = (PubSubUnsubscribeRequest) OpenlinkIQParser.parse(Fixtures.iqFrom(PubSubSubscribeFixtures.UNSUBSCRIBE_REQUEST));
         assertThat(request.getID(), CoreMatchers.is(CoreFixtures.STANZA_ID));
         assertThat(request.getTo(), CoreMatchers.is(Fixtures.TO_JID));
         assertThat(request.getFrom(), CoreMatchers.is(Fixtures.FROM_JID));
         assertThat(request.getType(), is(IQ.Type.set));
-        assertThat(request.getPubSubNodeId().get(), is(CoreFixtures.NODE_ID));
+        assertThat(request.getPubSubNodeId().get(), is(PubSubMessageFixtures.NODE_ID));
         assertThat(request.getJID().get(), is(Fixtures.USER_FULL_JID));
         assertThat(request.getParseErrors().size(), is(0));
     }
 
     @Test
-    public void willRoundTripAnXmppStanza() throws Exception {
+    public void willRoundTripAnXmppStanza() {
 
         final IQ originalIQ = Fixtures.iqFrom(PubSubSubscribeFixtures.UNSUBSCRIBE_REQUEST);
         final PubSubUnsubscribeRequest request = (PubSubUnsubscribeRequest) OpenlinkIQParser.parse(originalIQ);

@@ -15,13 +15,13 @@ import org.xmpp.packet.JID;
 import org.xmpp.packet.Message;
 
 import com.bt.openlink.OpenlinkXmppNamespace;
+import com.bt.openlink.message.CallStatusMessageBuilder;
 import com.bt.openlink.tinder.internal.TinderPacketUtil;
 import com.bt.openlink.type.Call;
-import com.bt.openlink.type.InterestId;
 import com.bt.openlink.type.ItemId;
 import com.bt.openlink.type.PubSubNodeId;
 
-public class CallStatusMessage extends Message {
+public class CallStatusMessage extends OpenlinkMessage {
 
     private static final String STANZA_DESCRIPTION = "call status";
 
@@ -33,16 +33,12 @@ public class CallStatusMessage extends Message {
     @Nonnull private final List<String> parseErrors;
 
     private CallStatusMessage(@Nonnull final Builder builder, @Nullable final List<String> parseErrors) {
-        setTo(builder.to);
-        setFrom(builder.from);
-        if (builder.id != null) {
-            setID(builder.id);
-        }
-        this.delay = builder.delay;
-        this.pubSubNodeId = builder.pubSubNodeId;
-        this.itemId = builder.itemId;
-        this.callStatusBusy = builder.callStatusBusy;
-        this.calls = Collections.unmodifiableList(builder.calls);
+        super(builder, parseErrors);
+        this.delay = builder.getDelay().orElse(null);
+        this.pubSubNodeId = builder.getPubSubNodeId().orElse(null);
+        this.itemId = builder.getItemId().orElse(null);
+        this.callStatusBusy = builder.isCallStatusBusy().orElse(null);
+        this.calls = Collections.unmodifiableList(builder.getCalls());
         if (parseErrors == null) {
             this.parseErrors = Collections.emptyList();
         } else {
@@ -115,16 +111,7 @@ public class CallStatusMessage extends Message {
         return builder.build(parseErrors);
     }
 
-    public static final class Builder {
-
-        @Nullable JID to;
-        @Nullable JID from;
-        @Nullable String id;
-        @Nullable private Instant delay;
-        @Nullable private PubSubNodeId pubSubNodeId;
-        @Nullable private ItemId itemId;
-        @Nullable private Boolean callStatusBusy;
-        @Nonnull private List<Call> calls = new ArrayList<>();
+    public static final class Builder extends CallStatusMessageBuilder<Builder, JID> {
 
         private Builder() {
         }
@@ -136,80 +123,14 @@ public class CallStatusMessage extends Message {
 
         @Nonnull
         public CallStatusMessage build() {
-            if (to == null) {
-                throw new IllegalStateException("The stanza 'to' has not been set");
-            }
-            if (pubSubNodeId == null) {
-                throw new IllegalStateException("The stanza 'pubSubNodeId' has not been set");
-            }
-            calls.forEach(call -> {
-                if (call.getInterestId().isPresent() && !call.getInterestId().get().toPubSubNodeId().equals(pubSubNodeId)) {
-                    throw new IllegalStateException(String.format("The call with id '%s' is not on this pubsub node", call.getId().orElse(null)));
-                }
-            });
-            Call.oneOrMoreCallsIsBusy(calls).ifPresent(this::setCallStatusBusy);
-            return build(null);
+            super.validate();
+            return new CallStatusMessage(this, null);
         }
 
         @Nonnull
         protected CallStatusMessage build(final List<String> parseErrors) {
+            super.validate(parseErrors, true);
             return new CallStatusMessage(this, parseErrors);
-        }
-
-        public Builder setTo(@Nullable JID to) {
-            this.to = to;
-            return this;
-        }
-
-        public Builder setFrom(@Nullable JID from) {
-            this.from = from;
-            return this;
-        }
-
-        public Builder setId(@Nullable String id) {
-            this.id = id;
-            return this;
-        }
-
-        @Nonnull
-        public Builder setDelay(@Nonnull Instant delay) {
-            this.delay = delay;
-            return this;
-        }
-
-        @Nonnull
-        public Builder setPubSubNodeId(@Nonnull final InterestId interestId) {
-            return setPubSubNodeId(interestId.toPubSubNodeId());
-        }
-
-        @Nonnull
-        public Builder setPubSubNodeId(@Nonnull final PubSubNodeId pubSubNodeId) {
-            this.pubSubNodeId = pubSubNodeId;
-            return this;
-        }
-
-        @Nonnull
-        public Builder setItemId(@Nonnull final ItemId itemId) {
-            this.itemId = itemId;
-            return this;
-        }
-
-        @Nonnull
-        public Builder setCallStatusBusy(final boolean callStatusBusy) {
-            this.callStatusBusy = callStatusBusy;
-            return this;
-        }
-
-        @Nonnull
-        public Builder addCall(@Nonnull final Call call) {
-            calls.add(call);
-            return this;
-        }
-
-        @Nonnull
-        public Builder addCalls(final List<Call> calls) {
-            this.calls.addAll(calls);
-            return this;
         }
     }
 }

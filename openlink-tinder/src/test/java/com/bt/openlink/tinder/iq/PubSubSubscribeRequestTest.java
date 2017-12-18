@@ -11,6 +11,7 @@ import org.junit.rules.ExpectedException;
 import org.xmpp.packet.IQ;
 
 import com.bt.openlink.CoreFixtures;
+import com.bt.openlink.PubSubMessageFixtures;
 import com.bt.openlink.PubSubSubscribeFixtures;
 import com.bt.openlink.tinder.Fixtures;
 
@@ -20,37 +21,37 @@ public class PubSubSubscribeRequestTest {
     @Rule public final ExpectedException expectedException = ExpectedException.none();
 
     @Test
-    public void canCreateAStanza() throws Exception {
+    public void canCreateAStanza() {
 
         final PubSubSubscribeRequest request = PubSubSubscribeRequest.Builder.start()
                 .setId(CoreFixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
                 .setJID(Fixtures.USER_FULL_JID)
-                .setPubSubNodeId(CoreFixtures.NODE_ID)
+                .setPubSubNodeId(PubSubMessageFixtures.NODE_ID)
                 .build();
 
         assertThat(request.getID(), is(CoreFixtures.STANZA_ID));
         assertThat(request.getTo(), is(Fixtures.TO_JID));
         assertThat(request.getFrom(), is(Fixtures.FROM_JID));
         assertThat(request.getJID().get(), is(Fixtures.USER_FULL_JID));
-        assertThat(request.getPubSubNodeId().get(), is(CoreFixtures.NODE_ID));
+        assertThat(request.getPubSubNodeId().get(), is(PubSubMessageFixtures.NODE_ID));
     }
 
     @Test
-    public void cannotCreateAStanzaWithoutAForUserField() throws Exception {
+    public void cannotCreateAStanzaWithoutAForUserField() {
 
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("The stanza 'jid' has not been set");
         PubSubSubscribeRequest.Builder.start()
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
-                .setPubSubNodeId(CoreFixtures.NODE_ID)
+                .setPubSubNodeId(PubSubMessageFixtures.NODE_ID)
                 .build();
     }
 
     @Test
-    public void willGenerateAnXmppStanza() throws Exception {
+    public void willGenerateAnXmppStanza() {
 
         final PubSubSubscribeRequest request = PubSubSubscribeRequest.Builder.start()
                 .setId(CoreFixtures.STANZA_ID)
@@ -64,20 +65,20 @@ public class PubSubSubscribeRequestTest {
     }
 
     @Test
-    public void willParseAnXmppStanza() throws Exception {
+    public void willParseAnXmppStanza() {
 
         final PubSubSubscribeRequest request = (PubSubSubscribeRequest) OpenlinkIQParser.parse(Fixtures.iqFrom(PubSubSubscribeFixtures.SUBSCRIBE_REQUEST));
         assertThat(request.getID(), CoreMatchers.is(CoreFixtures.STANZA_ID));
         assertThat(request.getTo(), CoreMatchers.is(Fixtures.TO_JID));
         assertThat(request.getFrom(), CoreMatchers.is(Fixtures.FROM_JID));
         assertThat(request.getType(), is(IQ.Type.set));
-        assertThat(request.getPubSubNodeId().get(), is(CoreFixtures.NODE_ID));
+        assertThat(request.getPubSubNodeId().get(), is(PubSubMessageFixtures.NODE_ID));
         assertThat(request.getJID().get(), is(Fixtures.USER_FULL_JID));
         assertThat(request.getParseErrors().size(), is(0));
     }
 
     @Test
-    public void willRoundTripAnXmppStanza() throws Exception {
+    public void willRoundTripAnXmppStanza() {
 
         final IQ originalIQ = Fixtures.iqFrom(PubSubSubscribeFixtures.SUBSCRIBE_REQUEST);
         final PubSubSubscribeRequest request = (PubSubSubscribeRequest) OpenlinkIQParser.parse(originalIQ);

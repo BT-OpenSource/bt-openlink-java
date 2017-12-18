@@ -27,7 +27,6 @@ import com.bt.openlink.type.ParticipantType;
 import com.bt.openlink.type.PhoneNumber;
 import com.bt.openlink.type.Profile;
 import com.bt.openlink.type.ProfileId;
-import com.bt.openlink.type.PubSubNodeId;
 import com.bt.openlink.type.RequestAction;
 import com.bt.openlink.type.Site;
 
@@ -56,7 +55,6 @@ public class CoreFixtures {
     public static final CallId CALL_ID = CallId.from("test-call-id").get();
     public static final ProfileId PROFILE_ID = ProfileId.from("test-profile-id").get();
     public static final InterestId INTEREST_ID = InterestId.from("test-interest-id").get();
-    public static final PubSubNodeId NODE_ID = INTEREST_ID.toPubSubNodeId();
     public static final InterestType INTEREST_TYPE = InterestType.from("test-interest-type").get();
     public static final FeatureId FEATURE_ID = FeatureId.from("test-feature-id").get();
     public static final PhoneNumber CALLER_NUMBER = PhoneNumber.from("test-caller-number").get();
