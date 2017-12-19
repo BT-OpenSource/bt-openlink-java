@@ -77,7 +77,7 @@ public class PubSubSubscriptionResultTest {
         assertThat(request.getID(), CoreMatchers.is(CoreFixtures.STANZA_ID));
         assertThat(request.getTo(), CoreMatchers.is(Fixtures.TO_JID));
         assertThat(request.getFrom(), CoreMatchers.is(Fixtures.FROM_JID));
-        assertThat(request.getType(), is(IQ.Type.set));
+        assertThat(request.getType(), is(IQ.Type.result));
         assertThat(request.getPubSubNodeId().get(), is(PubSubMessageFixtures.NODE_ID));
         assertThat(request.getJID().get(), is(Fixtures.USER_FULL_JID));
         assertThat(request.getSubscriptionState().get(), is(SubscriptionState.SUBSCRIBED));
@@ -91,7 +91,7 @@ public class PubSubSubscriptionResultTest {
         assertThat(request.getID(), CoreMatchers.is(CoreFixtures.STANZA_ID));
         assertThat(request.getTo(), CoreMatchers.is(Fixtures.TO_JID));
         assertThat(request.getFrom(), CoreMatchers.is(Fixtures.FROM_JID));
-        assertThat(request.getType(), is(IQ.Type.set));
+        assertThat(request.getType(), is(IQ.Type.result));
         assertThat(request.getPubSubNodeId().get(), is(PubSubMessageFixtures.NODE_ID));
         assertThat(request.getJID().get(), is(Fixtures.USER_FULL_JID));
         assertThat(request.getSubscriptionState().get(), is(SubscriptionState.NONE));

@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import javax.annotation.Nonnull;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -18,10 +20,17 @@ import com.bt.openlink.CoreFixtures;
 import com.bt.openlink.type.SubscriptionState;
 
 @SuppressWarnings("ConstantConditions")
-public class PubSubSubscriptionRequestBuilderTest {
-    private static class Builder extends PubSubSubscriptionRequestBuilder<Builder, String, CoreFixtures.typeEnum> {
+public class PubSubSubscriptionRequestResultBuilderTest {
+    private static class Builder extends PubSubSubscriptionRequestResultBuilder<Builder, String, CoreFixtures.typeEnum> {
         protected Builder() {
             super(CoreFixtures.typeEnum.class);
+        }
+
+
+        @Nonnull
+        @Override
+        public String getExpectedIQType() {
+            return "set";
         }
     }
 

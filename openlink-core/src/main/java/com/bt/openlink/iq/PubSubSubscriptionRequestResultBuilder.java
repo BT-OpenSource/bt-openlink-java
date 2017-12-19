@@ -10,20 +10,14 @@ import com.bt.openlink.type.InterestId;
 import com.bt.openlink.type.PubSubNodeId;
 import com.bt.openlink.type.SubscriptionState;
 
-public abstract class PubSubSubscriptionRequestBuilder<B extends PubSubSubscriptionRequestBuilder, J, T extends Enum<T>> extends IQBuilder<B, J, T> {
+public abstract class PubSubSubscriptionRequestResultBuilder<B extends PubSubSubscriptionRequestResultBuilder, J, T extends Enum<T>> extends IQBuilder<B, J, T> {
 
     @Nullable private PubSubNodeId pubSubNodeId;
     @Nullable private J jid;
     @Nullable private SubscriptionState subscriptionState;
 
-    protected PubSubSubscriptionRequestBuilder(final Class<T> typeClass) {
+    protected PubSubSubscriptionRequestResultBuilder(final Class<T> typeClass) {
         super(typeClass);
-    }
-
-    @Nonnull
-    @Override
-    public String getExpectedIQType() {
-        return "set";
     }
 
     @Nonnull
