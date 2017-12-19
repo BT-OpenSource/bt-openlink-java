@@ -71,7 +71,7 @@ public abstract class PubSubMessageBuilder<B extends PubSubMessageBuilder, J> ex
             throw new IllegalStateException("The stanza 'pubSubNodeId' has not been set");
         }
         if (itemId == null) {
-            throw new IllegalStateException("The stanza 'itemId' has not been set");
+            itemId = ItemId.random();
         }
     }
 

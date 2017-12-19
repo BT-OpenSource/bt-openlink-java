@@ -48,7 +48,6 @@ public class PubSubMessageBuilderTest {
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("The stanza 'to' has not been set");
 
-
         builder = new Builder();
         builder.setFrom(CoreFixtures.FROM_JID_STRING)
                 .setPubSubNodeId(CoreFixtures.INTEREST_ID)
@@ -61,7 +60,6 @@ public class PubSubMessageBuilderTest {
 
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("The stanza 'from' has not been set");
-
 
         builder = new Builder();
         builder.setTo(CoreFixtures.TO_JID_STRING)
@@ -76,7 +74,6 @@ public class PubSubMessageBuilderTest {
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("The stanza 'pubSubNodeId' has not been set");
 
-
         builder = new Builder();
         builder.setTo(CoreFixtures.TO_JID_STRING)
                 .setFrom(CoreFixtures.FROM_JID_STRING)
@@ -85,16 +82,14 @@ public class PubSubMessageBuilderTest {
     }
 
     @Test
-    public void willValidateItemIsSet() {
-
-        expectedException.expect(IllegalStateException.class);
-        expectedException.expectMessage("The stanza 'itemId' has not been set");
-
+    public void willSetARandomItemId() {
 
         builder = new Builder();
         builder.setTo(CoreFixtures.TO_JID_STRING)
                 .setFrom(CoreFixtures.FROM_JID_STRING)
                 .setPubSubNodeId(CoreFixtures.INTEREST_ID)
                 .validate();
+
+        assertThat(builder.getItemId().isPresent(), is(true));
     }
 }
