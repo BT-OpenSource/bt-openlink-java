@@ -38,9 +38,9 @@ public class PubSubMessageFixtures {
                     "  </event>\n" +
                     "</message>";
 
-    public static final String CALL_STATUS_MESSAGE_WITH_LEGACY_TIMESTAMP_ONLY = CALL_STATUS_MESSAGE.replace(" starttime='" + CoreFixtures.START_TIME_ISO_8601 + "'", "");
+    public static final String CALL_STATUS_MESSAGE_WITH_LEGACY_TIMESTAMP_ONLY = CALL_STATUS_MESSAGE.replace(" start='" + CoreFixtures.START_TIME_ISO_8601 + "'", "");
 
-    public static final String CALL_STATUS_MESSAGE_WITH_MISMATCHED_TIMESTAMPS = CALL_STATUS_MESSAGE.replace(" starttime='" + CoreFixtures.START_TIME_ISO_8601 + "'", " starttime='" + CoreFixtures.ISO_8601_FORMATTER.format(CoreFixtures.START_TIME.plusSeconds(60).atZone(ZoneOffset.UTC)) + "'");
+    public static final String CALL_STATUS_MESSAGE_WITH_MISMATCHED_TIMESTAMPS = CALL_STATUS_MESSAGE.replace(" start='" + CoreFixtures.START_TIME_ISO_8601 + "'", " start='" + CoreFixtures.ISO_8601_FORMATTER.format(CoreFixtures.START_TIME.plusSeconds(60).atZone(ZoneOffset.UTC)) + "'");
 
     public static final String CALL_STATUS_MESSAGE_WITH_NO_FIELDS =
             "<message>\n" +

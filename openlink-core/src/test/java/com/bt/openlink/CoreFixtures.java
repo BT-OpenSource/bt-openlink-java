@@ -151,7 +151,7 @@ public class CoreFixtures {
                     "      <number e164='" + CoreFixtures.CALLED_E164_NUMBER + "' destination='" + CoreFixtures.CALLED_DESTINATION + "'>" + CoreFixtures.CALLED_NUMBER + "</number>\n" +
                     "      <name>" + CoreFixtures.CALLED_NAME + "</name>\n" +
                     "    </called>\n" +
-                    "    <starttime>" + ISO_8601_FORMATTER.format(START_TIME.atZone(ZoneOffset.UTC)) + "</starttime>\n" +
+                    "    <start>" + ISO_8601_FORMATTER.format(START_TIME.atZone(ZoneOffset.UTC)) + "</start>\n" +
                     "    <duration>60000</duration>\n" +
                     "    <actions>\n" +
                     "      <AnswerCall/>\n" +
@@ -167,7 +167,7 @@ public class CoreFixtures {
                     "      </feature>\n" +
                     "    </features>\n" +
                     "    <participants>\n" +
-                    "      <participant direction='Incoming' duration='60000' jid='test-user@test-domain' starttime='" + START_TIME_ISO_8601 + "' timestamp='" + JAVA_UTIL_DATE_FORMATTER.format(START_TIME.atZone(TimeZone.getTimeZone("UTC").toZoneId())) + "' type='Active'/>\n" +
+                    "      <participant direction='Incoming' jid='test-user@test-domain' start='" + START_TIME_ISO_8601 + "' timestamp='" + JAVA_UTIL_DATE_FORMATTER.format(START_TIME.atZone(TimeZone.getTimeZone("UTC").toZoneId())) + "' duration='60000' type='Active'/>\n" +
                     "    </participants>\n" +
                     "  </call>\n" +
                     "</callstatus>\n";
