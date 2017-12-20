@@ -34,6 +34,7 @@ public class Call {
     }
 
     @Nullable private final CallId callId;
+    @Nullable private final ConferenceId conferenceId;
     @Nullable private final Site site;
     @Nullable private final ProfileId profileId;
     @Nullable private final UserId userId;
@@ -56,6 +57,7 @@ public class Call {
 
     private Call(@Nonnull final Builder builder) {
         this.callId = builder.callId;
+        this.conferenceId = builder.conferenceId;
         this.site = builder.site;
         this.profileId = builder.profileId;
         this.userId = builder.userId;
@@ -80,6 +82,11 @@ public class Call {
     @Nonnull
     public Optional<CallId> getId() {
         return Optional.ofNullable(callId);
+    }
+
+    @Nonnull
+    public Optional<ConferenceId> getConferenceId() {
+        return Optional.ofNullable(conferenceId);
     }
 
     @Nonnull
@@ -249,6 +256,7 @@ public class Call {
 
     public static final class Builder {
         @Nullable private CallId callId;
+        @Nullable private ConferenceId conferenceId;
         @Nullable private Site site;
         @Nullable private ProfileId profileId;
         @Nullable private UserId userId;
@@ -339,6 +347,12 @@ public class Call {
         @Nonnull
         public Builder setId(@Nonnull final CallId callId) {
             this.callId = callId;
+            return this;
+        }
+
+        @Nonnull
+        public Builder setConferenceId(@Nonnull final ConferenceId conferenceId) {
+            this.conferenceId = conferenceId;
             return this;
         }
 

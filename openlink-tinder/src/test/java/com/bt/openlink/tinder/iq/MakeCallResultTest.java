@@ -74,7 +74,9 @@ public class MakeCallResultTest {
         final List<Call> calls = result.getCalls();
         final Call theOnlyCall = calls.get(0);
         assertThat(theOnlyCall.getId().get(), is(CoreFixtures.CALL_ID));
+        assertThat(theOnlyCall.getConferenceId().get(), is(CoreFixtures.CONFERENCE_ID));
         assertThat(theOnlyCall.getProfileId().get(), is(CoreFixtures.PROFILE_ID));
+        assertThat(theOnlyCall.getUserId().get(), is(CoreFixtures.USER_ID));
         assertThat(theOnlyCall.getInterestId().get(), is(CoreFixtures.INTEREST_ID));
         assertThat(theOnlyCall.getChanged().get(), is(Changed.STATE));
         assertThat(theOnlyCall.getState().get(), is(CallState.CALL_ORIGINATED));

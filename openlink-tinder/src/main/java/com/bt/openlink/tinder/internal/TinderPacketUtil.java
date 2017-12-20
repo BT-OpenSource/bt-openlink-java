@@ -32,6 +32,7 @@ import com.bt.openlink.type.CallFeature;
 import com.bt.openlink.type.CallId;
 import com.bt.openlink.type.CallState;
 import com.bt.openlink.type.Changed;
+import com.bt.openlink.type.ConferenceId;
 import com.bt.openlink.type.DeviceKey;
 import com.bt.openlink.type.DeviceStatus;
 import com.bt.openlink.type.FeatureId;
@@ -291,6 +292,7 @@ public final class TinderPacketUtil {
         calls.forEach(call -> {
             final Element callElement = callStatusElement.addElement("call");
             call.getId().ifPresent(callId -> callElement.addElement("id").setText(callId.value()));
+            call.getConferenceId().ifPresent(conferenceId -> callElement.addElement("conference").setText(conferenceId.value()));
             call.getSite().ifPresent(site -> addSite(callElement, site));
             call.getProfileId().ifPresent(profileId -> callElement.addElement(ELEMENT_PROFILE).setText(profileId.value()));
             call.getUserId().ifPresent(userId -> callElement.addElement("user").setText(userId.value()));
@@ -424,6 +426,7 @@ public final class TinderPacketUtil {
                 final Element calledElement = getChildElement(callElement, "called");
                 final Call.Builder callBuilder = Call.Builder.start();
                 CallId.from(getNullableChildElementString(callElement, "id")).ifPresent(callBuilder::setId);
+                ConferenceId.from(getNullableChildElementString(callElement, "conference")).ifPresent(callBuilder::setConferenceId);
                 getSite(callElement, description, parseErrors).ifPresent(callBuilder::setSite);
                 ProfileId.from(getNullableChildElementString(callElement, ELEMENT_PROFILE)).ifPresent(callBuilder::setProfileId);
                 UserId.from(getNullableChildElementString(callElement, "user")).ifPresent(callBuilder::setUserId);

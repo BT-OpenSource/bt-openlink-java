@@ -14,6 +14,7 @@ import com.bt.openlink.type.CallFeature;
 import com.bt.openlink.type.CallId;
 import com.bt.openlink.type.CallState;
 import com.bt.openlink.type.Changed;
+import com.bt.openlink.type.ConferenceId;
 import com.bt.openlink.type.DeviceKey;
 import com.bt.openlink.type.DeviceStatus;
 import com.bt.openlink.type.Feature;
@@ -54,6 +55,7 @@ public class CoreFixtures {
     public static final Instant START_TIME = LocalDateTime.parse("2017-10-09T08:07:00").atZone(ZoneId.of("UTC")).toInstant();
     public static final Duration DURATION = Duration.ofMinutes(1);
     public static final CallId CALL_ID = CallId.from("test-call-id").get();
+    public static final ConferenceId CONFERENCE_ID = ConferenceId.from("test-conference-id").get();
     public static final ProfileId PROFILE_ID = ProfileId.from("test-profile-id").get();
     public static final UserId USER_ID = UserId.from("test-user-id").get();
     public static final InterestId INTEREST_ID = InterestId.from("test-interest-id").get();
@@ -105,6 +107,7 @@ public class CoreFixtures {
             .build();
     public static final Call CALL_INCOMING_ORIGINATED = Call.Builder.start()
             .setId(CALL_ID)
+            .setConferenceId(CONFERENCE_ID)
             .setSite(SITE)
             .setProfileId(PROFILE_ID)
             .setUserId(USER_ID)
@@ -140,6 +143,7 @@ public class CoreFixtures {
             "<callstatus xmlns='http://xmpp.org/protocol/openlink:01:00:00#call-status' busy='false'>\n" +
                     "  <call>\n" +
                     "    <id>" + CoreFixtures.CALL_ID + "</id>\n" +
+                    "    <conference>" + CoreFixtures.CONFERENCE_ID + "</conference>\n" +
                     "    <site id='42' type='BTSM' default='true'>test site name</site>\n" +
                     "    <profile>" + CoreFixtures.PROFILE_ID + "</profile>\n" +
                     "    <user>" + CoreFixtures.USER_ID + "</user>\n" +
