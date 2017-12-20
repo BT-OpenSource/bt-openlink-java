@@ -45,6 +45,7 @@ import com.bt.openlink.type.ProfileId;
 import com.bt.openlink.type.PubSubNodeId;
 import com.bt.openlink.type.RequestAction;
 import com.bt.openlink.type.Site;
+import com.bt.openlink.type.UserId;
 
 /**
  * This class is for internal use by the library only; users of the API should not access this class directly.
@@ -292,6 +293,7 @@ public final class TinderPacketUtil {
             call.getId().ifPresent(callId -> callElement.addElement("id").setText(callId.value()));
             call.getSite().ifPresent(site -> addSite(callElement, site));
             call.getProfileId().ifPresent(profileId -> callElement.addElement(ELEMENT_PROFILE).setText(profileId.value()));
+            call.getUserId().ifPresent(userId -> callElement.addElement("user").setText(userId.value()));
             call.getInterestId().ifPresent(interestId -> callElement.addElement("interest").setText(interestId.value()));
             call.getChanged().ifPresent(changed -> callElement.addElement("changed").setText(changed.getId()));
             call.getState().ifPresent(state -> callElement.addElement("state").setText(state.getLabel()));
@@ -424,6 +426,7 @@ public final class TinderPacketUtil {
                 CallId.from(getNullableChildElementString(callElement, "id")).ifPresent(callBuilder::setId);
                 getSite(callElement, description, parseErrors).ifPresent(callBuilder::setSite);
                 ProfileId.from(getNullableChildElementString(callElement, ELEMENT_PROFILE)).ifPresent(callBuilder::setProfileId);
+                UserId.from(getNullableChildElementString(callElement, "user")).ifPresent(callBuilder::setUserId);
                 InterestId.from(getNullableChildElementString(callElement, "interest")).ifPresent(callBuilder::setInterestId);
                 Changed.from(getNullableChildElementString(callElement, "changed")).ifPresent(callBuilder::setChanged);
                 CallState.from(getNullableChildElementString(callElement, "state")).ifPresent(callBuilder::setState);

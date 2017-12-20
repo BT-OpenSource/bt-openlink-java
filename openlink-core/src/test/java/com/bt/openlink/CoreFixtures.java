@@ -29,6 +29,7 @@ import com.bt.openlink.type.Profile;
 import com.bt.openlink.type.ProfileId;
 import com.bt.openlink.type.RequestAction;
 import com.bt.openlink.type.Site;
+import com.bt.openlink.type.UserId;
 
 @SuppressWarnings("ConstantConditions")
 public class CoreFixtures {
@@ -42,10 +43,10 @@ public class CoreFixtures {
         MY_UNEXPECTED_TYPE
     }
 
-    private static final String USER_ID = "test-user";
+    private static final String USER_NAME = "test-user";
     private static final String DOMAIN = "test-domain";
     private static final String RESOURCE = "test-resource";
-    public static final String USER_BARE_JID_STRING = String.format("%s@%s", USER_ID, DOMAIN);
+    public static final String USER_BARE_JID_STRING = String.format("%s@%s", USER_NAME, DOMAIN);
     public static final String USER_FULL_JID_STRING = String.format("%s/%s", USER_BARE_JID_STRING, RESOURCE);
     public static final String TO_JID_STRING = String.format("test-to-user@%s/%s", DOMAIN, RESOURCE);
     public static final String FROM_JID_STRING = String.format("test-from-user@%s/%s", DOMAIN, RESOURCE);
@@ -54,6 +55,7 @@ public class CoreFixtures {
     public static final Duration DURATION = Duration.ofMinutes(1);
     public static final CallId CALL_ID = CallId.from("test-call-id").get();
     public static final ProfileId PROFILE_ID = ProfileId.from("test-profile-id").get();
+    public static final UserId USER_ID = UserId.from("test-user-id").get();
     public static final InterestId INTEREST_ID = InterestId.from("test-interest-id").get();
     public static final InterestType INTEREST_TYPE = InterestType.from("test-interest-type").get();
     public static final FeatureId FEATURE_ID = FeatureId.from("test-feature-id").get();
@@ -105,6 +107,7 @@ public class CoreFixtures {
             .setId(CALL_ID)
             .setSite(SITE)
             .setProfileId(PROFILE_ID)
+            .setUserId(USER_ID)
             .setInterestId(INTEREST_ID)
             .setChanged(Changed.STATE)
             .setState(CallState.CALL_ORIGINATED)
@@ -139,6 +142,7 @@ public class CoreFixtures {
                     "    <id>" + CoreFixtures.CALL_ID + "</id>\n" +
                     "    <site id='42' type='BTSM' default='true'>test site name</site>\n" +
                     "    <profile>" + CoreFixtures.PROFILE_ID + "</profile>\n" +
+                    "    <user>" + CoreFixtures.USER_ID + "</user>\n" +
                     "    <interest>" + CoreFixtures.INTEREST_ID + "</interest>\n" +
                     "    <changed>State</changed>\n" +
                     "    <state>CallOriginated</state>\n" +
