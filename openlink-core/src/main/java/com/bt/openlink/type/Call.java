@@ -49,6 +49,7 @@ public class Call {
     @Nullable private String calledName;
     @Nullable private PhoneNumber calledDestination;
     @Nonnull private final List<PhoneNumber> calledE164Numbers;
+    @Nonnull private List<OriginatorReference> originatorReferences;
     @Nullable private final Instant startTime;
     @Nullable private final Duration duration;
     @Nonnull private final List<RequestAction> actions;
@@ -72,6 +73,7 @@ public class Call {
         this.calledName = builder.calledName;
         this.calledDestination = builder.calledDestination;
         this.calledE164Numbers = Collections.unmodifiableList(builder.calledE164Numbers);
+        this.originatorReferences = Collections.unmodifiableList(builder.originatorReferences);
         this.startTime = builder.startTime;
         this.duration = builder.duration;
         this.actions = Collections.unmodifiableList(builder.actions);
@@ -157,6 +159,11 @@ public class Call {
     @Nonnull
     public List<PhoneNumber> getCalledE164Numbers() {
         return calledE164Numbers;
+    }
+
+    @Nonnull
+    public List<OriginatorReference> getOriginatorReferences() {
+        return originatorReferences;
     }
 
     @Nonnull
@@ -271,6 +278,7 @@ public class Call {
         @Nullable private String calledName;
         @Nullable private PhoneNumber calledDestination;
         @Nonnull private final List<PhoneNumber> calledE164Numbers = new ArrayList<>();
+        @Nonnull private final List<OriginatorReference> originatorReferences = new ArrayList<>();
         @Nullable private Instant startTime;
         @Nullable private Duration duration;
         @Nonnull private final List<RequestAction> actions = new ArrayList<>();
@@ -405,61 +413,68 @@ public class Call {
         }
 
         @Nonnull
-        public Builder setCallerNumber(final PhoneNumber callerNumber) {
+        public Builder setCallerNumber(@Nonnull final PhoneNumber callerNumber) {
             this.callerNumber = callerNumber;
             return this;
         }
 
         @Nonnull
-        public Builder setCallerName(final String callerName) {
+        public Builder setCallerName(@Nonnull final String callerName) {
             this.callerName = callerName;
             return this;
         }
 
         @Nonnull
-        public Builder addCallerE164Number(final PhoneNumber callerE164Number) {
+        public Builder addCallerE164Number(@Nonnull final PhoneNumber callerE164Number) {
             this.callerE164Numbers.add(callerE164Number);
             return this;
         }
 
         @Nonnull
-        public Builder addCallerE164Numbers(final List<PhoneNumber> callerE164Numbers) {
+        public Builder addCallerE164Numbers(@Nonnull final List<PhoneNumber> callerE164Numbers) {
             this.callerE164Numbers.addAll(callerE164Numbers);
             return this;
         }
 
         @Nonnull
-        public Builder setCalledNumber(final PhoneNumber calledNumber) {
+        public Builder setCalledNumber(@Nonnull final PhoneNumber calledNumber) {
             this.calledNumber = calledNumber;
             return this;
         }
 
         @Nonnull
-        public Builder setCalledDestination(final PhoneNumber calledDestination) {
+        public Builder setCalledDestination(@Nonnull final PhoneNumber calledDestination) {
             this.calledDestination = calledDestination;
             return this;
         }
 
         @Nonnull
-        public Builder setCalledName(final String calledName) {
+        public Builder setCalledName(@Nonnull final String calledName) {
             this.calledName = calledName;
             return this;
         }
 
         @Nonnull
-        public Builder addCalledE164Number(final PhoneNumber calledE164Number) {
+        public Builder addCalledE164Number(@Nonnull final PhoneNumber calledE164Number) {
             this.calledE164Numbers.add(calledE164Number);
             return this;
         }
 
         @Nonnull
-        public Builder addCalledE164Numbers(final List<PhoneNumber> calledE164Numbers) {
+        public Builder addCalledE164Numbers(@Nonnull final List<PhoneNumber> calledE164Numbers) {
             this.calledE164Numbers.addAll(calledE164Numbers);
             return this;
         }
 
+
         @Nonnull
-        public Builder setDuration(final Duration duration) {
+        public Builder addOriginatorReference(@Nonnull final String key, @Nonnull final String value) {
+            this.originatorReferences.add(new OriginatorReference(key, value));
+            return this;
+        }
+
+        @Nonnull
+        public Builder setDuration(@Nonnull final Duration duration) {
             this.duration = duration;
             return this;
         }

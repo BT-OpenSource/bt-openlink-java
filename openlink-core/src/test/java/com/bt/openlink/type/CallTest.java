@@ -46,6 +46,8 @@ public class CallTest {
                 .setCalledName(CoreFixtures.CALLED_NAME)
                 .setCalledDestination(CoreFixtures.CALLED_DESTINATION)
                 .addCalledE164Number(CoreFixtures.CALLED_E164_NUMBER)
+                .addOriginatorReference("key1", "value1")
+                .addOriginatorReference("key2", "value2")
                 .setStartTime(startTime)
                 .setDuration(duration)
                 .addAction(RequestAction.ANSWER_CALL)
@@ -69,6 +71,10 @@ public class CallTest {
         assertThat(call.getCalledName().get(), is(CoreFixtures.CALLED_NAME));
         assertThat(call.getCalledDestination().get(), is(CoreFixtures.CALLED_DESTINATION));
         assertThat(call.getCalledE164Numbers(), is(Collections.singletonList(CoreFixtures.CALLED_E164_NUMBER)));
+        assertThat(call.getOriginatorReferences().get(0).getKey(),is("key1"));
+        assertThat(call.getOriginatorReferences().get(0).getValue(),is("value1"));
+        assertThat(call.getOriginatorReferences().get(1).getKey(),is("key2"));
+        assertThat(call.getOriginatorReferences().get(1).getValue(),is("value2"));
         assertThat(call.getStartTime().get(), is(startTime));
         assertThat(call.getDuration().get(), is(duration));
         assertThat(call.isParticipating(), is(false));
@@ -251,6 +257,7 @@ public class CallTest {
         assertThat(call.getCalledName(), is(Optional.empty()));
         assertThat(call.getCalledDestination(), is(Optional.empty()));
         assertThat(call.getCalledE164Numbers(), is(empty()));
+        assertThat(call.getOriginatorReferences(), is(empty()));
         assertThat(call.getStartTime(), is(Optional.empty()));
         assertThat(call.getDuration(), is(Optional.empty()));
         assertThat(call.isParticipating(), is(false));

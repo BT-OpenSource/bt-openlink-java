@@ -88,6 +88,10 @@ public class MakeCallResultTest {
         assertThat(theOnlyCall.getCalledName().get(), is(CoreFixtures.CALLED_NAME));
         assertThat(theOnlyCall.getCalledDestination().get(), is(CoreFixtures.CALLED_DESTINATION));
         assertThat(theOnlyCall.getCalledE164Numbers(), is(Collections.singletonList(CoreFixtures.CALLED_E164_NUMBER)));
+        assertThat(theOnlyCall.getOriginatorReferences().get(0).getKey(),is("key1"));
+        assertThat(theOnlyCall.getOriginatorReferences().get(0).getValue(),is("value1"));
+        assertThat(theOnlyCall.getOriginatorReferences().get(1).getKey(),is("key2"));
+        assertThat(theOnlyCall.getOriginatorReferences().get(1).getValue(),is("value2"));
         assertThat(theOnlyCall.getStartTime().get(), is(CoreFixtures.START_TIME));
         assertThat(theOnlyCall.getDuration().get(), is(Duration.ofMinutes(1)));
         assertThat(calls.size(), is(1));

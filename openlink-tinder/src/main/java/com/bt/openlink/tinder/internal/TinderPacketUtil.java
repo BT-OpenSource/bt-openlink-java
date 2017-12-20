@@ -39,6 +39,7 @@ import com.bt.openlink.type.FeatureId;
 import com.bt.openlink.type.FeatureType;
 import com.bt.openlink.type.InterestId;
 import com.bt.openlink.type.ItemId;
+import com.bt.openlink.type.OriginatorReference;
 import com.bt.openlink.type.Participant;
 import com.bt.openlink.type.ParticipantType;
 import com.bt.openlink.type.PhoneNumber;
@@ -317,6 +318,15 @@ public final class TinderPacketUtil {
             if (!calledE164Numbers.isEmpty()) {
                 calledNumberElement.addAttribute("e164", calledE164Numbers);
             }
+            final List<OriginatorReference> originatorReferences = call.getOriginatorReferences();
+            if (!originatorReferences.isEmpty()) {
+                final Element originatorRefElement = callElement.addElement("originator-ref");
+                originatorReferences.forEach(originatorReference -> {
+                    final Element propertyElement = originatorRefElement.addElement("property").addAttribute("id", originatorReference.getKey());
+                    propertyElement.addElement("value").setText(originatorReference.getValue());
+
+                });
+            }
             final Element calledNameElement = calledElement.addElement("name");
             call.getCalledName().ifPresent(calledNameElement::setText);
             call.getStartTime().ifPresent(startTime -> callElement.addElement(ATTRIBUTE_START_TIME).setText(ISO_8601_FORMATTER.format(startTime.atZone(ZoneOffset.UTC))));
@@ -331,7 +341,7 @@ public final class TinderPacketUtil {
         final Element deviceStatusElement = itemElement.addElement("devicestatus", OpenlinkXmppNamespace.OPENLINK_DEVICE_STATUS.uri());
         final Element profileElement = deviceStatusElement.addElement(ELEMENT_PROFILE);
         deviceStatus.isOnline().ifPresent(online -> profileElement.addAttribute("online", String.valueOf(online)));
-        deviceStatus.getProfileId().ifPresent(profileId->profileElement.setText(profileId.value()));
+        deviceStatus.getProfileId().ifPresent(profileId -> profileElement.setText(profileId.value()));
     }
 
     private static void addFeatures(@Nonnull final Call call, @Nonnull final Element callElement) {
@@ -441,6 +451,7 @@ public final class TinderPacketUtil {
                 getOptionalChildElementString(calledElement, "name").ifPresent(callBuilder::setCalledName);
                 PhoneNumber.from(getNullableStringAttribute(getChildElement(calledElement, ELEMENT_NUMBER), "destination")).ifPresent(callBuilder::setCalledDestination);
                 callBuilder.addCalledE164Numbers(getPhoneNumbers(getChildElement(calledElement, ELEMENT_NUMBER)));
+                getOriginatorReferences(callElement, callBuilder);
                 getChildElementISO8601(callElement, ATTRIBUTE_START_TIME, description, parseErrors).ifPresent(callBuilder::setStartTime);
                 getChildElementLong(callElement, ATTRIBUTE_DURATION, description, parseErrors).map(Duration::ofMillis).ifPresent(callBuilder::setDuration);
                 getActions(callElement, callBuilder, description, parseErrors);
@@ -452,9 +463,25 @@ public final class TinderPacketUtil {
         return calls;
     }
 
+    @SuppressWarnings("unchecked")
+    private static void getOriginatorReferences(final Element callElement, final Call.Builder callBuilder) {
+
+        final Element originatorRefElement = getChildElement(callElement, "originator-ref");
+        if(originatorRefElement==null) {
+            return;
+        }
+
+        final List<Element> propertyElements = originatorRefElement.elements("property");
+        propertyElements.forEach(propertyElement -> {
+            final String key = getStringAttribute(propertyElement, "id").orElse("");
+            final String value = getOptionalChildElementString(propertyElement, "value").orElse("");
+            callBuilder.addOriginatorReference(key, value);
+        });
+    }
+
     public static Optional<DeviceStatus> getDeviceStatus(@Nullable final Element deviceStatusElement, @Nonnull final String stanzaDescription, @Nonnull final List<String> parseErrors) {
         final Element profileElement = getChildElement(deviceStatusElement, ELEMENT_PROFILE);
-        if(profileElement== null) {
+        if (profileElement == null) {
             return Optional.empty();
         }
 

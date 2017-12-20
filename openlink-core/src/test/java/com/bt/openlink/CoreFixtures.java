@@ -122,6 +122,8 @@ public class CoreFixtures {
             .setCalledName(CALLED_NAME)
             .addCalledE164Number(CALLED_E164_NUMBER)
             .setCalledDestination(CALLED_DESTINATION)
+            .addOriginatorReference("key1", "value1")
+            .addOriginatorReference("key2", "value2")
             .setStartTime(START_TIME)
             .setDuration(DURATION)
             .addAction(RequestAction.ANSWER_CALL)
@@ -159,6 +161,14 @@ public class CoreFixtures {
                     "      <number e164='" + CoreFixtures.CALLED_E164_NUMBER + "' destination='" + CoreFixtures.CALLED_DESTINATION + "'>" + CoreFixtures.CALLED_NUMBER + "</number>\n" +
                     "      <name>" + CoreFixtures.CALLED_NAME + "</name>\n" +
                     "    </called>\n" +
+                    "    <originator-ref>\n" +
+                    "      <property id='key1'>\n" +
+                    "        <value>value1</value>\n" +
+                    "      </property>\n" +
+                    "      <property id='key2'>\n" +
+                    "        <value>value2</value>\n" +
+                    "      </property>\n" +
+                    "    </originator-ref>\n" +
                     "    <start>" + ISO_8601_FORMATTER.format(START_TIME.atZone(ZoneOffset.UTC)) + "</start>\n" +
                     "    <duration>60000</duration>\n" +
                     "    <actions>\n" +
