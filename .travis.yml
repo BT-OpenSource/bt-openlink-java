@@ -8,6 +8,9 @@ addons:
   sonarcloud:
     organization: "bt-openlink"
 
+git:
+  depth: 99999
+
 script:
   - ./gradlew sonarqube
   - ./gradlew bintrayUpload
