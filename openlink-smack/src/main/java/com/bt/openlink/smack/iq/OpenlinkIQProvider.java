@@ -42,7 +42,8 @@ public class OpenlinkIQProvider extends IQProvider<IQ> {
     private static final List<IQMatcher> STANZA_TYPE_MATCHER_LIST = Arrays.asList(
             new IQMatcher(OpenlinkXmppNamespace.OPENLINK_GET_PROFILES, "action", "execute", GetProfilesRequest::from),
             new IQMatcher(OpenlinkXmppNamespace.OPENLINK_GET_PROFILES, "status","completed", GetProfilesResult::from),
-            new IQMatcher(OpenlinkXmppNamespace.OPENLINK_GET_INTERESTS, "action", "execute", GetInterestsRequest::from)
+            new IQMatcher(OpenlinkXmppNamespace.OPENLINK_GET_INTERESTS, "action", "execute", GetInterestsRequest::from),
+            new IQMatcher(OpenlinkXmppNamespace.OPENLINK_GET_INTERESTS, "status","completed", GetInterestsResult::from)
             );
 
     @Override
