@@ -7,7 +7,8 @@ import javax.annotation.Nullable;
 
 /**
  * List of recommended feature types.<br>
- * Reference: Openlink Specification xep-xxx-openlink_15-12, section 4.5.2
+ * Reference: Openlink Specification xep-xxx-openlink_15-12, section 4.5.2<br>
+ * Note; FeatureType.HEADSET is not part of the spec. Refer to bt-openlink-extensions<br>
  */
 public enum FeatureType {
 
@@ -25,6 +26,7 @@ public enum FeatureType {
     VOICE_BRIDGE("VoiceBridge"),
     PRIVACY("Privacy"),
     HANDSET("Handset"),
+    HEADSET("Headset"),
     DO_NOT_DISTURN("DoNotDisturb"),
     CALL_FORWARD("CallForward"),
     CALL_BACK("CallBack"),
