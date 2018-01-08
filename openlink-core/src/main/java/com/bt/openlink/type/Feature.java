@@ -32,7 +32,7 @@ public class Feature {
         return Optional.ofNullable(label);
     }
 
-    protected abstract static class AbstractFeatureBuilder<B extends AbstractFeatureBuilder> {
+    public abstract static class AbstractFeatureBuilder<B extends AbstractFeatureBuilder> {
 
         @Nullable private FeatureId featureId = null;
         @Nullable private FeatureType featureType = null;
@@ -79,6 +79,12 @@ public class Feature {
             this.label = featureLabel;
             return (B) this;
         }
+
+        @Nullable
+        public String getLabel() {
+            return label;
+        }
+
     }
 
     public static final class Builder extends AbstractFeatureBuilder<Builder> {

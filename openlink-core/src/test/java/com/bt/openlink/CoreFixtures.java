@@ -11,6 +11,9 @@ import java.util.TimeZone;
 import com.bt.openlink.type.Call;
 import com.bt.openlink.type.CallDirection;
 import com.bt.openlink.type.CallFeature;
+import com.bt.openlink.type.CallFeatureBoolean;
+import com.bt.openlink.type.CallFeatureDeviceKey;
+import com.bt.openlink.type.CallFeatureSpeakerChannel;
 import com.bt.openlink.type.CallId;
 import com.bt.openlink.type.CallState;
 import com.bt.openlink.type.Changed;
@@ -61,6 +64,8 @@ public class CoreFixtures {
     public static final InterestId INTEREST_ID = InterestId.from("test-interest-id").get();
     public static final InterestType INTEREST_TYPE = InterestType.from("test-interest-type").get();
     public static final FeatureId FEATURE_ID = FeatureId.from("test-feature-id").get();
+    public static final FeatureId SPEAKER_CHANNEL_ID = FeatureId.from("test-speaker-id").get();
+    public static final long SPEAKER_CHANNEL_NUMBER = 42;
     public static final PhoneNumber CALLER_NUMBER = PhoneNumber.from("test-caller-number").get();
     public static final String CALLER_NAME = "test-caller-name";
     public static final PhoneNumber CALLER_E164_NUMBER = PhoneNumber.from("test-caller-e164-number").get();
@@ -93,11 +98,17 @@ public class CoreFixtures {
             .setId(FEATURE_ID)
             .setLabel("Privacy")
             .build();
-    public static final CallFeature CALL_FEATURE = CallFeature.Builder.start()
+    public static final CallFeature CALL_FEATURE = CallFeatureBoolean.Builder.start()
             .setType(FeatureType.CALL_BACK)
             .setId(FEATURE_ID)
             .setLabel("Call Back")
             .setEnabled(true)
+            .build();
+    public static final CallFeatureSpeakerChannel SPEAKER_FEATURE = CallFeatureSpeakerChannel.Builder.start()
+            .setId(SPEAKER_CHANNEL_ID)
+            .setChannel(SPEAKER_CHANNEL_NUMBER)
+            .setMicrophoneActive(true)
+            .setMuteRequested(true)
             .build();
     public static final Interest INTEREST = Interest.Builder.start()
             .setType(INTEREST_TYPE)
@@ -127,10 +138,11 @@ public class CoreFixtures {
             .setStartTime(START_TIME)
             .setDuration(DURATION)
             .addAction(RequestAction.ANSWER_CALL)
-            .addFeature(CallFeature.Builder.start().setId(FeatureId.from("hs_1").get()).setType(FeatureType.HANDSET).setLabel("Handset 1").setEnabled(false).build())
-            .addFeature(CallFeature.Builder.start().setId(FeatureId.from("hs_2").get()).setType(FeatureType.HANDSET).setLabel("Handset 2").setEnabled(false).build())
-            .addFeature(CallFeature.Builder.start().setId(FeatureId.from("priv_1").get()).setType(FeatureType.PRIVACY).setLabel("Privacy").setEnabled(false).build())
-            .addFeature(CallFeature.Builder.start().setId(FeatureId.from("NetrixHiTouch_sales1").get()).setType(FeatureType.DEVICE_KEYS).setLabel("NetrixHiTouch").setDeviceKey(DeviceKey.from("key_1:1:1").get()).build())
+            .addFeature(CallFeatureBoolean.Builder.start().setId(FeatureId.from("hs_1").get()).setType(FeatureType.HANDSET).setLabel("Handset 1").setEnabled(false).build())
+            .addFeature(CallFeatureBoolean.Builder.start().setId(FeatureId.from("hs_2").get()).setType(FeatureType.HANDSET).setLabel("Handset 2").setEnabled(false).build())
+            .addFeature(CallFeatureBoolean.Builder.start().setId(FeatureId.from("priv_1").get()).setType(FeatureType.PRIVACY).setLabel("Privacy").setEnabled(false).build())
+            .addFeature(CallFeatureDeviceKey.Builder.start().setId(FeatureId.from("NetrixHiTouch_sales1").get()).setType(FeatureType.DEVICE_KEYS).setLabel("NetrixHiTouch").setDeviceKey(DeviceKey.from("key_1:1:1").get()).build())
+            .addFeature(SPEAKER_FEATURE)
             .addParticipant(PARTICIPANT)
             .build();
 
@@ -182,6 +194,13 @@ public class CoreFixtures {
                     "        <devicekeys xmlns='http://xmpp.org/protocol/openlink:01:00:00/features#device-keys'>\n" +
                     "          <key>key_1:1:1</key>\n" +
                     "        </devicekeys>\n" +
+                    "      </feature>\n" +
+                    "      <feature id='" + SPEAKER_CHANNEL_ID + "' type='SpeakerChannel'>\n" +
+                    "        <speakerchannel xmlns='http://xmpp.org/protocol/openlink:01:00:00/features#speaker-channel'>\n" +
+                    "          <channel>" + SPEAKER_CHANNEL_NUMBER + "</channel>\n" +
+                    "          <microphone>true</microphone>\n" +
+                    "          <mute>true</mute>\n" +
+                    "        </speakerchannel>\n" +
                     "      </feature>\n" +
                     "    </features>\n" +
                     "    <participants>\n" +

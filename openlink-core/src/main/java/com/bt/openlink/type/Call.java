@@ -200,11 +200,11 @@ public class Call {
     @Nonnull
     public Optional<FeatureId> getActiveHandset() {
         return getFeatures().stream()
+                .filter(feature -> feature instanceof CallFeatureBoolean)
+                .map(feature -> (CallFeatureBoolean) feature)
                 .filter(feature -> {
                     final Optional<FeatureType> type = feature.getType();
-                    final Optional<Boolean> enabled = feature.isEnabled();
-                    return type.isPresent() && type.get() == FeatureType.HANDSET &&
-                            enabled.isPresent() && enabled.get();
+                    return type.isPresent() && type.get() == FeatureType.HANDSET && feature.isEnabled().orElse(false);
                 })
                 .findAny()
                 .flatMap(Feature::getId);
@@ -219,11 +219,11 @@ public class Call {
     @Nonnull
     public Optional<FeatureId> getActiveSpeakerChannel() {
         return getFeatures().stream()
+                .filter(feature -> feature instanceof CallFeatureBoolean)
+                .map(feature -> (CallFeatureBoolean) feature)
                 .filter(feature -> {
                     final Optional<FeatureType> type = feature.getType();
-                    final Optional<Boolean> enabled = feature.isEnabled();
-                    return type.isPresent() && type.get() == FeatureType.SPEAKER_CHANNEL &&
-                            enabled.isPresent() && enabled.get();
+                    return type.isPresent() && type.get() == FeatureType.SPEAKER_CHANNEL && feature.isEnabled().orElse(false);
                 })
                 .findAny()
                 .flatMap(Feature::getId);
@@ -237,14 +237,14 @@ public class Call {
     @Nonnull
     public Optional<Boolean> isPrivate() {
         return getFeatures().stream()
+                .filter(feature->feature instanceof CallFeatureBoolean)
+                .map(feature->(CallFeatureBoolean)feature)
                 .filter(feature -> {
                     final Optional<FeatureType> type = feature.getType();
-                    final Optional<Boolean> enabled = feature.isEnabled();
-                    return type.isPresent() && type.get() == FeatureType.PRIVACY &&
-                            enabled.isPresent();
+                    return type.isPresent() && type.get() == FeatureType.PRIVACY && feature.isEnabled().isPresent();
                 })
                 .findAny()
-                .flatMap(CallFeature::isEnabled);
+                .flatMap(CallFeatureBoolean::isEnabled);
     }
 
     /**
