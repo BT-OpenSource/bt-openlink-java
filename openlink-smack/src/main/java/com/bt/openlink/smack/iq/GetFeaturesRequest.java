@@ -34,7 +34,7 @@ public class GetFeaturesRequest extends OpenlinkIQ {
 	    @Nonnull
 	    static IQ from(XmlPullParser parser) throws IOException, XmlPullParserException {
 
-	        moveToStartOfTag(parser, OpenlinkXmppNamespace.TAG_IODATA, OpenlinkXmppNamespace.TAG_IN, "profile");
+	        moveToStartOfTag(parser, OpenlinkXmppNamespace.TAG_IODATA, OpenlinkXmppNamespace.TAG_IN, OpenlinkXmppNamespace.TAG_PROFILE);
 	        final String profileIdString;
 	        if ("profile".equals(parser.getName())) {
 	        	profileIdString = parser.nextText();
