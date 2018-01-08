@@ -4,10 +4,11 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.xmlunit.matchers.CompareMatcher.isIdenticalTo;
 
-import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.TimeZone;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.hamcrest.CoreMatchers;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -109,12 +110,11 @@ public class PubSubPublishRequestTest {
         assertThat(request.getType(), is(IQ.Type.set));
         assertThat(request.getPubSubNodeId().get(), is(PubSubMessageFixtures.NODE_ID));
         assertThat(request.isCallStatusBusy().get(),is(false));
-        final Collection<Call> calls = request.getCalls();
+        final List<Call> calls = request.getCalls();
+        final Call theOnlyCall = calls.get(0);
+        assertThat(EqualsBuilder.reflectionEquals(CoreFixtures.CALL_INCOMING_ORIGINATED, theOnlyCall, false, null, true), is(true));
         assertThat(calls.size(), is(1));
-        final Call call = calls.iterator().next();
-        assertThat(call.getId().get(), is(CoreFixtures.CALL_ID));
-        assertThat(call.getInterestId().get(), is(CoreFixtures.INTEREST_ID));
-        assertThat(call.getProfileId().get(), is(CoreFixtures.PROFILE_ID));
+        assertThat(request.getParseErrors().size(), is(0));
     }
 
     @Test

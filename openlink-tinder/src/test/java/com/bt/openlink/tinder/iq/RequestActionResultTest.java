@@ -5,10 +5,10 @@ import static org.hamcrest.Matchers.contains;
 import static org.junit.Assert.assertThat;
 import static org.xmlunit.matchers.CompareMatcher.isIdenticalTo;
 
-import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -18,9 +18,6 @@ import com.bt.openlink.MakeCallFixtures;
 import com.bt.openlink.RequestActionFixtures;
 import com.bt.openlink.tinder.Fixtures;
 import com.bt.openlink.type.Call;
-import com.bt.openlink.type.CallDirection;
-import com.bt.openlink.type.CallState;
-import com.bt.openlink.type.Changed;
 
 @SuppressWarnings("ConstantConditions")
 public class RequestActionResultTest {
@@ -75,21 +72,7 @@ public class RequestActionResultTest {
         assertThat(result.isCallStatusBusy().get(),is(false));
         final List<Call> calls = result.getCalls();
         final Call theOnlyCall = calls.get(0);
-        assertThat(theOnlyCall.getId().get(), is(CoreFixtures.CALL_ID));
-        assertThat(theOnlyCall.getProfileId().get(), is(CoreFixtures.PROFILE_ID));
-        assertThat(theOnlyCall.getInterestId().get(), is(CoreFixtures.INTEREST_ID));
-        assertThat(theOnlyCall.getChanged().get(), is(Changed.STATE));
-        assertThat(theOnlyCall.getState().get(), is(CallState.CALL_ORIGINATED));
-        assertThat(theOnlyCall.getDirection().get(), is(CallDirection.INCOMING));
-        assertThat(theOnlyCall.getCallerNumber().get(), is(CoreFixtures.CALLER_NUMBER));
-        assertThat(theOnlyCall.getCallerName().get(), is(CoreFixtures.CALLER_NAME));
-        assertThat(theOnlyCall.getCallerE164Numbers(), is(Collections.singletonList(CoreFixtures.CALLER_E164_NUMBER)));
-        assertThat(theOnlyCall.getCalledNumber().get(), is(CoreFixtures.CALLED_NUMBER));
-        assertThat(theOnlyCall.getCalledName().get(), is(CoreFixtures.CALLED_NAME));
-        assertThat(theOnlyCall.getCalledDestination().get(), is(CoreFixtures.CALLED_DESTINATION));
-        assertThat(theOnlyCall.getCalledE164Numbers(), is(Collections.singletonList(CoreFixtures.CALLED_E164_NUMBER)));
-        assertThat(theOnlyCall.getStartTime().get(), is(CoreFixtures.START_TIME));
-        assertThat(theOnlyCall.getDuration().get(), is(Duration.ofMinutes(1)));
+        assertThat(EqualsBuilder.reflectionEquals(CoreFixtures.CALL_INCOMING_ORIGINATED, theOnlyCall, false, null, true), is(true));
         assertThat(calls.size(), is(1));
         assertThat(result.getParseErrors().size(), is(0));
     }

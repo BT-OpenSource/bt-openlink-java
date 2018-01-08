@@ -6,11 +6,11 @@ import static org.hamcrest.Matchers.contains;
 import static org.junit.Assert.assertThat;
 import static org.xmlunit.matchers.CompareMatcher.isIdenticalTo;
 
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -20,9 +20,6 @@ import com.bt.openlink.CoreFixtures;
 import com.bt.openlink.PubSubMessageFixtures;
 import com.bt.openlink.tinder.Fixtures;
 import com.bt.openlink.type.Call;
-import com.bt.openlink.type.CallDirection;
-import com.bt.openlink.type.CallState;
-import com.bt.openlink.type.Changed;
 import com.bt.openlink.type.ItemId;
 
 @SuppressWarnings({ "ConstantConditions" })
@@ -93,14 +90,7 @@ public class CallStatusMessageTest {
         assertThat(message.isCallStatusBusy().get(), is(false));
         final List<Call> calls = message.getCalls();
         final Call theOnlyCall = calls.get(0);
-        assertThat(theOnlyCall.getId().get(), is(CoreFixtures.CALL_ID));
-        assertThat(theOnlyCall.getProfileId().get(), is(CoreFixtures.PROFILE_ID));
-        assertThat(theOnlyCall.getInterestId().get(), is(CoreFixtures.INTEREST_ID));
-        assertThat(theOnlyCall.getChanged().get(), is(Changed.STATE));
-        assertThat(theOnlyCall.getState().get(), is(CallState.CALL_ORIGINATED));
-        assertThat(theOnlyCall.getDirection().get(), is(CallDirection.INCOMING));
-        assertThat(theOnlyCall.getStartTime().get(), is(CoreFixtures.START_TIME));
-        assertThat(theOnlyCall.getDuration().get(), is(Duration.ofMinutes(1)));
+        assertThat(EqualsBuilder.reflectionEquals(CoreFixtures.CALL_INCOMING_ORIGINATED, theOnlyCall, false, null, true), is(true));
         assertThat(calls.size(), is(1));
         assertThat(message.getParseErrors().size(), is(0));
     }

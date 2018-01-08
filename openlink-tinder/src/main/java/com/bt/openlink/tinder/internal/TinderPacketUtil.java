@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.TimeZone;
@@ -29,6 +30,9 @@ import com.bt.openlink.message.PubSubMessageBuilder;
 import com.bt.openlink.type.Call;
 import com.bt.openlink.type.CallDirection;
 import com.bt.openlink.type.CallFeature;
+import com.bt.openlink.type.CallFeatureBoolean;
+import com.bt.openlink.type.CallFeatureDeviceKey;
+import com.bt.openlink.type.CallFeatureSpeakerChannel;
 import com.bt.openlink.type.CallId;
 import com.bt.openlink.type.CallState;
 import com.bt.openlink.type.Changed;
@@ -177,6 +181,16 @@ public final class TinderPacketUtil {
             }
         }
         return Optional.empty();
+    }
+
+    @Nonnull
+    public static Optional<Boolean> getChildElementBoolean(
+            @Nullable final Element parentElement,
+            @Nonnull final String childElementName,
+            @Nonnull final String stanzaDescription,
+            @Nonnull final List<String> parseErrors) {
+        final String childElementText = getNullableChildElementString(parentElement, childElementName);
+        return getBoolean(childElementText, stanzaDescription, parseErrors);
     }
 
     @Nonnull
@@ -345,19 +359,34 @@ public final class TinderPacketUtil {
     }
 
     private static void addFeatures(@Nonnull final Call call, @Nonnull final Element callElement) {
-        final List<CallFeature> features = call.getFeatures();
-        if (!features.isEmpty()) {
+        final List<CallFeature> callFeatures = call.getFeatures();
+        if (!callFeatures.isEmpty()) {
             final Element featuresElement = callElement.addElement("features");
-            features.forEach(feature -> {
+            callFeatures.forEach(feature -> {
                 final Element featureElement = featuresElement.addElement("feature");
                 feature.getId().ifPresent(id -> featureElement.addAttribute("id", id.value()));
-                feature.getLabel().ifPresent(label -> featureElement.addAttribute("label", label));
                 feature.getType().ifPresent(type -> featureElement.addAttribute("type", type.getId()));
-                feature.isEnabled().ifPresent(enabled -> featureElement.setText(String.valueOf(enabled)));
-                feature.getDeviceKey().ifPresent(deviceKey -> {
-                    final Element deviceKeysElement = featureElement.addElement("devicekeys", "http://xmpp.org/protocol/openlink:01:00:00/features#device-keys");
-                    deviceKeysElement.addElement("key").setText(deviceKey.value());
-                });
+                final Optional<String> featureLabel;
+                if (feature instanceof CallFeatureBoolean) {
+                    final CallFeatureBoolean callFeatureBoolean = (CallFeatureBoolean) feature;
+                    callFeatureBoolean.isEnabled().ifPresent(enabled -> featureElement.setText(String.valueOf(enabled)));
+                    featureLabel = feature.getLabel();
+                } else if (feature instanceof CallFeatureDeviceKey) {
+                    final CallFeatureDeviceKey callFeatureDeviceKey = (CallFeatureDeviceKey) feature;
+                    final Element deviceKeysElement = featureElement.addElement("devicekeys", OpenlinkXmppNamespace.OPENLINK_DEVICE_KEY.uri());
+                    callFeatureDeviceKey.getDeviceKey().ifPresent(deviceKey -> deviceKeysElement.addElement("key").setText(deviceKey.value()));
+                    featureLabel = feature.getLabel();
+                } else if (feature instanceof CallFeatureSpeakerChannel) {
+                    final CallFeatureSpeakerChannel callFeatureSpeakerChannel = (CallFeatureSpeakerChannel) feature;
+                    final Element speakerChannelElement = featureElement.addElement("speakerchannel", OpenlinkXmppNamespace.OPENLINK_SPEAKER_CHANNEL.uri());
+                    callFeatureSpeakerChannel.getChannel().ifPresent(channelNumber -> speakerChannelElement.addElement("channel").setText(String.valueOf(channelNumber)));
+                    callFeatureSpeakerChannel.isMicrophoneActive().ifPresent(microphoneActive -> speakerChannelElement.addElement("microphone").setText(String.valueOf(microphoneActive)));
+                    callFeatureSpeakerChannel.isMuteRequested().ifPresent(muteRequested -> speakerChannelElement.addElement("mute").setText(String.valueOf(muteRequested)));
+                    featureLabel = Optional.empty();
+                } else {
+                    featureLabel = feature.getLabel();
+                }
+                featureLabel.ifPresent(label -> featureElement.addAttribute("label", label));
             });
         }
     }
@@ -383,8 +412,8 @@ public final class TinderPacketUtil {
                     final ZonedDateTime startTimeInUTC = startTime.atZone(TimeZone.getTimeZone("UTC").toZoneId());
                     participantElement.addAttribute(ATTRIBUTE_START_TIME, ISO_8601_FORMATTER.format(startTimeInUTC));
                     // Include the legacy timestamp attribute too
-                    participantElement.addAttribute(ATTRIBUTE_TIMESTAMP, JAVA_UTIL_DATE_FORMATTER.format(startTimeInUTC));
-                });
+                        participantElement.addAttribute(ATTRIBUTE_TIMESTAMP, JAVA_UTIL_DATE_FORMATTER.format(startTimeInUTC));
+                    });
                 participant.getDuration().ifPresent(duration -> participantElement.addAttribute(ATTRIBUTE_DURATION, String.valueOf(duration.toMillis())));
             });
         }
@@ -467,7 +496,7 @@ public final class TinderPacketUtil {
     private static void getOriginatorReferences(final Element callElement, final Call.Builder callBuilder) {
 
         final Element originatorRefElement = getChildElement(callElement, "originator-ref");
-        if(originatorRefElement==null) {
+        if (originatorRefElement == null) {
             return;
         }
 
@@ -499,16 +528,42 @@ public final class TinderPacketUtil {
         if (featuresElement != null) {
             final List<Element> featureElements = featuresElement.elements("feature");
             for (final Element featureElement : featureElements) {
-                final CallFeature.Builder callFeatureBuilder = CallFeature.Builder.start();
-                final boolean hasChildElement = featureElement.elementIterator().hasNext();
-                FeatureId.from(featureElement.attributeValue("id")).ifPresent(callFeatureBuilder::setId);
-                Optional.ofNullable(featureElement.attributeValue("label")).ifPresent(callFeatureBuilder::setLabel);
-                FeatureType.from(featureElement.attributeValue("type")).ifPresent(callFeatureBuilder::setType);
+                final Optional<FeatureId> featureId = FeatureId.from(featureElement.attributeValue("id"));
+                Optional<String> label = Optional.ofNullable(featureElement.attributeValue("label"));
+                final Optional<FeatureType> featureType = FeatureType.from(featureElement.attributeValue("type"));
+                final Iterator<Element> elementIterator = featureElement.elementIterator();
+                final boolean hasChildElement = elementIterator.hasNext();
+                final CallFeature.AbstractCallFeatureBuilder callFeatureBuilder;
                 if (hasChildElement) {
-                    DeviceKey.from(getNullableChildElementString(getChildElement(featureElement, "devicekeys"), "key")).ifPresent(callFeatureBuilder::setDeviceKey);
+                    final Element childElement = elementIterator.next();
+                    final String childElementName = childElement.getName();
+                    switch (childElementName) {
+                    case "devicekeys":
+                        final CallFeatureDeviceKey.Builder deviceKeyBuilder = CallFeatureDeviceKey.Builder.start();
+                        DeviceKey.from(getNullableChildElementString(childElement, "key")).ifPresent(deviceKeyBuilder::setDeviceKey);
+                        callFeatureBuilder = deviceKeyBuilder;
+                        break;
+                    case "speakerchannel":
+                        final CallFeatureSpeakerChannel.Builder speakerChannelBuilder = CallFeatureSpeakerChannel.Builder.start();
+                        getChildElementLong(childElement, "channel", description, parseErrors).ifPresent(speakerChannelBuilder::setChannel);
+                        getChildElementBoolean(childElement, "microphone", description, parseErrors).ifPresent(speakerChannelBuilder::setMicrophoneActive);
+                        getChildElementBoolean(childElement, "mute", description, parseErrors).ifPresent(speakerChannelBuilder::setMuteRequested);
+                        callFeatureBuilder = speakerChannelBuilder;
+                        break;
+                    default:
+                        // Assume it's a simple true/false call feature
+                        callFeatureBuilder = CallFeatureBoolean.Builder.start();
+                        break;
+                    }
                 } else {
-                    getBoolean(featureElement.getText(), description, parseErrors).ifPresent(callFeatureBuilder::setEnabled);
+                    // It's a simple true/false call feature
+                    final CallFeatureBoolean.Builder booleanBuilder = CallFeatureBoolean.Builder.start();
+                    getBoolean(featureElement.getText(), description, parseErrors).ifPresent(booleanBuilder::setEnabled);
+                    callFeatureBuilder = booleanBuilder;
                 }
+                featureId.ifPresent(callFeatureBuilder::setId);
+                label.ifPresent(callFeatureBuilder::setLabel);
+                featureType.ifPresent(callFeatureBuilder::setType);
                 callBuilder.addFeature(callFeatureBuilder.build(parseErrors));
             }
         }

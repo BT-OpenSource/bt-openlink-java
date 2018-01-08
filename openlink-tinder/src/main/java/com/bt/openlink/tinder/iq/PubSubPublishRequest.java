@@ -1,7 +1,6 @@
 package com.bt.openlink.tinder.iq;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -25,13 +24,13 @@ public class PubSubPublishRequest extends OpenlinkIQ {
 
     @Nullable private final PubSubNodeId pubSubNodeId;
     @Nullable private final Boolean callStatusBusy;
-    @Nonnull private final Collection<Call> calls;
+    @Nonnull private final List<Call> calls;
     @Nullable private final DeviceStatus deviceStatus;
 
     private PubSubPublishRequest(@Nonnull Builder builder, @Nullable List<String> parseErrors) {
         super(builder, parseErrors);
         this.pubSubNodeId = builder.getPubSubNodeId().orElse(null);
-        this.calls = Collections.unmodifiableCollection(builder.getCalls());
+        this.calls = Collections.unmodifiableList(builder.getCalls());
         this.callStatusBusy = builder.isCallStatusBusy().orElse(null);
         this.deviceStatus = builder.getDeviceStatus().orElse(null);
         final Element pubSubElement = this.getElement().addElement("pubsub", OpenlinkXmppNamespace.XMPP_PUBSUB.uri());
@@ -55,7 +54,7 @@ public class PubSubPublishRequest extends OpenlinkIQ {
     }
 
     @Nonnull
-    public Collection<Call> getCalls() {
+    public List<Call> getCalls() {
         return calls;
     }
 
