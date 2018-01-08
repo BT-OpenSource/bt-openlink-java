@@ -40,7 +40,7 @@ public class GetFeaturesFixtures {
                     "</iq>\n";
 
     public static final String GET_FEATURES_RESULT_WITH_BAD_VALUES =
-            "<iq type='result'>\n" +
+            "<iq type='get'>\n" +
                     "  <command xmlns='http://jabber.org/protocol/commands' node='http://xmpp.org/protocol/openlink:01:00:00#get-features' status='completed'>\n" +
                     "    <iodata xmlns='urn:xmpp:tmp:io-data' type='output'>\n" +
                     "      <out>\n" +
