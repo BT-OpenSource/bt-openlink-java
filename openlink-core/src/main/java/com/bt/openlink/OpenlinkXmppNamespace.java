@@ -41,6 +41,8 @@ public enum OpenlinkXmppNamespace {
     public static final String TAG_ACTION = "action";
     public static final String TAG_INTERESTS = "interests";
     public static final String TAG_INTEREST = "interest";
+    public static final String TAG_FEATURES = "features";
+    public static final String TAG_FEATURE = "feature";
 
     private final String uri;
     private final String label;
