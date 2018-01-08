@@ -25,6 +25,16 @@ abstract class OpenlinkIQ extends IQ {
             }
         }
     }
+    
+    static void endPreviousTagAndStartNextTag(final XmlPullParser parser) throws XmlPullParserException, IOException 
+    {
+		if(parser.getEventType() == 2)
+		{
+			parser.nextTag(); //  end of current tag
+			if(parser.getEventType() == 3)
+			parser.nextTag(); // start of next tag
+		}
+    }
 
     @Nonnull private List<String> parseErrors;
 
