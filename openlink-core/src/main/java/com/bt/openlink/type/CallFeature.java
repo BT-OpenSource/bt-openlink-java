@@ -10,7 +10,7 @@ public abstract class CallFeature extends Feature {
         super(builder);
     }
 
-    public static abstract class AbstractCallFeatureBuilder<B extends AbstractCallFeatureBuilder>  extends AbstractFeatureBuilder<B> {
+    public abstract static class AbstractCallFeatureBuilder<B extends AbstractCallFeatureBuilder> extends AbstractFeatureBuilder<B> {
         public abstract CallFeature build(final List<String> parseErrors);
     }
 
