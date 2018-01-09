@@ -211,22 +211,18 @@ public class Call {
     }
 
     /**
-     * Determines the id, if any, of the active speaker. Note, if two or more speakers are active, one of them is
+     * Determines the channel, if any, of the active speaker. Note, if two or more speakers are active, one of them is
      * selected in a nondeterministic manner.
      * 
      * @return the id of an active speaker
      */
     @Nonnull
-    public Optional<FeatureId> getActiveSpeakerChannel() {
+    public Optional<Long> getActiveSpeakerChannel() {
         return getFeatures().stream()
-                .filter(feature -> feature instanceof CallFeatureBoolean)
-                .map(feature -> (CallFeatureBoolean) feature)
-                .filter(feature -> {
-                    final Optional<FeatureType> type = feature.getType();
-                    return type.isPresent() && type.get() == FeatureType.SPEAKER_CHANNEL && feature.isEnabled().orElse(false);
-                })
+                .filter(feature -> feature instanceof CallFeatureSpeakerChannel)
+                .map(feature -> (CallFeatureSpeakerChannel) feature)
                 .findAny()
-                .flatMap(Feature::getId);
+                .flatMap(CallFeatureSpeakerChannel::getChannel);
     }
 
     /**

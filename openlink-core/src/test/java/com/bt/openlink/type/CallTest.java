@@ -303,7 +303,6 @@ public class CallTest {
 
     @Test
     public void aCallHasAnActiveSpeakerChannel() {
-        final Optional<FeatureId> activeSpeaker = FeatureId.from("Channel 1");
         final Call call = Call.Builder.start()
                 .setId(CoreFixtures.CALL_ID)
                 .setSite(CoreFixtures.SITE)
@@ -314,15 +313,10 @@ public class CallTest {
                 .setDirection(CallDirection.INCOMING)
                 .setStartTime(startTime)
                 .setDuration(Duration.ZERO)
-                .addFeature(CallFeatureBoolean.Builder.start()
-                        .setType(FeatureType.SPEAKER_CHANNEL)
-                        .setEnabled(true)
-                        .setLabel("Speaker channel number 1")
-                        .setId(activeSpeaker.get())
-                        .build())
+                .addFeature(CoreFixtures.SPEAKER_FEATURE)
                 .build();
 
-        assertThat(call.getActiveSpeakerChannel(), is(activeSpeaker));
+        assertThat(call.getActiveSpeakerChannel().get(), is(CoreFixtures.SPEAKER_CHANNEL_NUMBER));
     }
 
     @Test
