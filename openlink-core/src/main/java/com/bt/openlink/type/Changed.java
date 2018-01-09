@@ -8,7 +8,7 @@ import javax.annotation.Nullable;
 /**
  * List of recommended "Changed" values.<br>
  * Reference: Openlink Specification xep-xxx-openlink_15-12, section 4.7.2<br>
- * Note 1: Changed.Microphone is not part of the spec. Refer to bt-openlink-extensions<br>
+ * Note 1: Changed.MICROPHONE, Changed.HANDSET is not part of the spec. Refer to bt-openlink-extensions<br>
  * Note 2: the order of the enum is as listed in the specification<br>
  * Note 3: The lower the number, the higher the priority to publish. So for example, if a call changes state
  * (CallEstablished to CallConferenced) and changes participant (the new conference participant), then the Changed.State
@@ -23,7 +23,8 @@ public enum Changed {
     CALLED("Called", 3),
     PRIVACY("Privacy", 4),
     VOICE_MESSAGE("VoiceMessage", 7),
-    MICROPHONE("Microphone", 8);
+    MICROPHONE("Microphone", 8),
+    HANDSET("Handset", 9);
 
     @Nonnull private final String id;
     private final int priority;
