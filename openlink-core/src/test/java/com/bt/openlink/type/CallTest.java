@@ -302,6 +302,30 @@ public class CallTest {
     }
 
     @Test
+    public void aCallHasAnActiveHeadset() {
+        final Optional<FeatureId> activeHD = FeatureId.from("HD1");
+        final Call call = Call.Builder.start()
+                .setId(CoreFixtures.CALL_ID)
+                .setSite(CoreFixtures.SITE)
+                .setProfileId(CoreFixtures.PROFILE_ID)
+                .setInterestId(CoreFixtures.INTEREST_ID)
+                .setChanged(Changed.STATE)
+                .setState(CallState.CALL_ORIGINATED)
+                .setDirection(CallDirection.INCOMING)
+                .setStartTime(startTime)
+                .setDuration(Duration.ZERO)
+                .addFeature(CallFeatureBoolean.Builder.start()
+                        .setType(FeatureType.HEADSET)
+                        .setEnabled(true)
+                        .setLabel("Headset 1")
+                        .setId(activeHD.get())
+                        .build())
+                .build();
+
+        assertThat(call.getActiveHeadset(), is(activeHD));
+    }
+
+    @Test
     public void aCallHasAnActiveSpeakerChannel() {
         final Call call = Call.Builder.start()
                 .setId(CoreFixtures.CALL_ID)

@@ -211,6 +211,25 @@ public class Call {
     }
 
     /**
+     * Determines the id, if any, of the active headset. Note, if two or more headsets are active, one of them is
+     * selected in a nondeterministic manner.
+     *
+     * @return the id of an active handset
+     */
+    @Nonnull
+    public Optional<FeatureId> getActiveHeadset() {
+        return getFeatures().stream()
+                .filter(feature -> feature instanceof CallFeatureBoolean)
+                .map(feature -> (CallFeatureBoolean) feature)
+                .filter(feature -> {
+                    final Optional<FeatureType> type = feature.getType();
+                    return type.isPresent() && type.get() == FeatureType.HEADSET && feature.isEnabled().orElse(false);
+                })
+                .findAny()
+                .flatMap(Feature::getId);
+    }
+
+    /**
      * Determines the channel, if any, of the active speaker. Note, if two or more speakers are active, one of them is
      * selected in a nondeterministic manner.
      * 
