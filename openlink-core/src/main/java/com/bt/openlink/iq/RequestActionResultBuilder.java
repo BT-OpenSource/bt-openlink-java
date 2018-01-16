@@ -60,7 +60,7 @@ public abstract class RequestActionResultBuilder<B extends RequestActionResultBu
     protected void validate() {
         super.validate();
         if (calls.isEmpty()) {
-            throw new IllegalStateException("The make-call result has no calls");
+            throw new IllegalStateException("The request-action result has no calls");
         }
         Call.oneOrMoreCallsIsBusy(calls).ifPresent(this::setCallStatusBusy);
     }
@@ -75,7 +75,7 @@ public abstract class RequestActionResultBuilder<B extends RequestActionResultBu
             super.validate(errors);
         }
         if (calls.isEmpty()) {
-            errors.add("Invalid make-call result stanza; missing or invalid calls");
+            errors.add("Invalid request-action result stanza; missing or invalid calls");
         }
     }
 }

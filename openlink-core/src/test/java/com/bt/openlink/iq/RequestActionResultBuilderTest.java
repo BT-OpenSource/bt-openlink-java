@@ -67,7 +67,7 @@ public class RequestActionResultBuilderTest {
     public void willValidateTheCallIsSet() {
 
         expectedException.expect(IllegalStateException.class);
-        expectedException.expectMessage("The make-call result has no calls");
+        expectedException.expectMessage("The request-action result has no calls");
 
         builder.validate();
     }
@@ -79,7 +79,7 @@ public class RequestActionResultBuilderTest {
 
         builder.validate(errors);
 
-        assertThat(errors, contains("Invalid make-call result stanza; missing or invalid calls"));
+        assertThat(errors, contains("Invalid request-action result stanza; missing or invalid calls"));
         assertThat(builder.getCalls(), is(empty()));
     }
 
