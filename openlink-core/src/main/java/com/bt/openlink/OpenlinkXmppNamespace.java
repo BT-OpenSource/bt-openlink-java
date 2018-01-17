@@ -35,6 +35,7 @@ public enum OpenlinkXmppNamespace {
     public static final String TAG_IODATA = "iodata";
     public static final String TAG_IN = "in";
     public static final String TAG_OUT = "out";
+    public static final String TAG_JID = "jid";
     public static final String TAG_PROFILES = "profiles";
     public static final String TAG_PROFILE = "profile";
     public static final String TAG_DEFAULT = "default";
