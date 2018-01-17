@@ -41,7 +41,7 @@ public class MakeCallFixtures {
             "</iq>";
 
     public static final String MAKE_CALL_RESULT_WITH_BAD_VALUES =
-            "<iq type='result'>\n" +
+            "<iq type='get'>\n" +
             "   <command xmlns='http://jabber.org/protocol/commands' node='http://xmpp.org/protocol/openlink:01:00:00#make-call' status='completed'>\n" +
             "     <iodata xmlns='urn:xmpp:tmp:io-data' type='output'>\n" +
             "      <out>\n" +
