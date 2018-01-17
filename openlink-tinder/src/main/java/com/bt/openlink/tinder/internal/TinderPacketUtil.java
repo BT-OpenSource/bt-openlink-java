@@ -552,7 +552,9 @@ public final class TinderPacketUtil {
                         break;
                     default:
                         // Assume it's a simple true/false call feature
-                        callFeatureBuilder = CallFeatureBoolean.Builder.start();
+                        final CallFeatureBoolean.Builder booleanBuilder = CallFeatureBoolean.Builder.start();
+                        getBoolean(featureElement.getText(), description, parseErrors).ifPresent(booleanBuilder::setEnabled);
+                        callFeatureBuilder = booleanBuilder;
                         break;
                     }
                 } else {

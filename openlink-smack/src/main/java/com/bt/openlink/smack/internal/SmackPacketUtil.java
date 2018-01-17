@@ -30,6 +30,9 @@ import com.bt.openlink.OpenlinkXmppNamespace;
 import com.bt.openlink.type.Call;
 import com.bt.openlink.type.CallDirection;
 import com.bt.openlink.type.CallFeature;
+import com.bt.openlink.type.CallFeatureBoolean;
+import com.bt.openlink.type.CallFeatureDeviceKey;
+import com.bt.openlink.type.CallFeatureSpeakerChannel;
 import com.bt.openlink.type.CallId;
 import com.bt.openlink.type.CallState;
 import com.bt.openlink.type.Changed;
@@ -199,28 +202,7 @@ public final class SmackPacketUtil {
 				xml.closeElement("actions");
 			}
 
-			final List<CallFeature> features = call.getFeatures();
-			if (!features.isEmpty()) {
-				xml.openElement("features");
-				features.forEach(feature -> {
-					xml.halfOpenElement("feature");
-					xml.attribute("id", feature.getId().get().value());
-					xml.attribute("label", feature.getLabel().get());
-					xml.attribute("type", feature.getType().get().getId());
-					xml.rightAngleBracket();
-					feature.getDeviceKey().ifPresent(deviceKey -> {
-						xml.halfOpenElement("devicekeys")
-								.attribute("xmlns", "http://xmpp.org/protocol/openlink:01:00:00/features#device-keys")
-								.rightAngleBracket();
-						xml.optElement("key", deviceKey.value());
-						xml.closeElement("devicekeys");
-					});
-					if(feature.isEnabled().isPresent())
-					xml.escape(String.valueOf(feature.isEnabled().get()));
-					xml.closeElement("feature");
-				});
-				xml.closeElement("features");
-			}
+			addFeatures(call, xml);
 
 			final List<Participant> participants = call.getParticipants();
 			if (!participants.isEmpty()) {
@@ -250,7 +232,65 @@ public final class SmackPacketUtil {
 		xml.closeElement(OpenlinkXmppNamespace.TAG_IODATA);
 		return xml;
 	}
-    
+
+	private static void addFeatures(final Call call, final IQChildElementXmlStringBuilder xml) {
+		final List<CallFeature> features = call.getFeatures();
+		if (!features.isEmpty()) {
+            xml.openElement("features");
+            features.forEach(feature -> {
+                xml.halfOpenElement("feature");
+                xml.attribute("id", feature.getId().get().value());
+                xml.attribute("type", feature.getType().get().getId());
+				if (feature instanceof CallFeatureBoolean) {
+					feature.getLabel().ifPresent(label -> xml.attribute("label", label));
+					xml.rightAngleBracket();
+					final CallFeatureBoolean callFeatureBoolean = (CallFeatureBoolean) feature;
+					callFeatureBoolean.isEnabled().ifPresent(enabled -> xml.escape(String.valueOf(enabled)));
+				} else if (feature instanceof CallFeatureDeviceKey) {
+					feature.getLabel().ifPresent(label -> xml.attribute("label", label));
+					xml.rightAngleBracket();
+					final CallFeatureDeviceKey callFeatureDeviceKey = (CallFeatureDeviceKey) feature;
+					xml.halfOpenElement("devicekeys");
+					xml.attribute("xmlns", OpenlinkXmppNamespace.OPENLINK_DEVICE_KEY.uri());
+					xml.rightAngleBracket();
+					callFeatureDeviceKey.getDeviceKey().ifPresent(deviceKey -> {
+						xml.openElement("key");
+						xml.escape(deviceKey.value());
+						xml.closeElement("key");
+					});
+					xml.closeElement("devicekeys");
+				} else if (feature instanceof CallFeatureSpeakerChannel) {
+					xml.rightAngleBracket();
+					final CallFeatureSpeakerChannel callFeatureSpeakerChannel = (CallFeatureSpeakerChannel) feature;
+					xml.halfOpenElement("speakerchannel");
+					xml.attribute("xmlns", OpenlinkXmppNamespace.OPENLINK_SPEAKER_CHANNEL.uri());
+					xml.rightAngleBracket();
+					callFeatureSpeakerChannel.getChannel().ifPresent(channel->{
+						xml.openElement("channel");
+						xml.escape(String.valueOf(channel));
+						xml.closeElement("channel");
+					});
+					callFeatureSpeakerChannel.isMicrophoneActive().ifPresent(microphone->{
+						xml.openElement("microphone");
+						xml.escape(String.valueOf(microphone));
+						xml.closeElement("microphone");
+					});
+					callFeatureSpeakerChannel.isMuteRequested().ifPresent(muteRequested->{
+						xml.openElement("mute");
+						xml.escape(String.valueOf(muteRequested));
+						xml.closeElement("mute");
+					});
+					xml.closeElement("speakerchannel");
+				} else {
+					feature.getLabel().ifPresent(label -> xml.attribute("label", label));
+					xml.rightAngleBracket();
+				}
+                xml.closeElement("feature");
+            });
+            xml.closeElement("features");
+        }
+	}
+
 	@SuppressWarnings("unchecked")
 	public static List<Call> getCalls(final XmlPullParser parser, final List<String> errors)
 			throws IOException, XmlPullParserException {
@@ -459,11 +499,48 @@ public final class SmackPacketUtil {
 
 			parser.nextTag();
 			while (OpenlinkXmppNamespace.TAG_FEATURE.equals(parser.getName())) {
-				final CallFeature.Builder callFeatureBuilder = CallFeature.Builder.start();
+				final CallFeature.AbstractCallFeatureBuilder callFeatureBuilder;
 
 				final Optional<FeatureId> featureId = FeatureId.from(parser.getAttributeValue("", "id"));
-				featureId.ifPresent(callFeatureBuilder::setId);
 				final Optional<String> featureTypeString = SmackPacketUtil.getStringAttribute(parser, "type");
+				final Optional<String> label = SmackPacketUtil.getStringAttribute(parser, OpenlinkXmppNamespace.TAG_LABEL);
+				String text = "";
+				while(parser.next() == XmlPullParser.TEXT) {
+					text = parser.getText();
+				}
+				if(parser.getEventType() == XmlPullParser.START_TAG) {
+					switch (parser.getName()) {
+						case "devicekeys":
+							final CallFeatureDeviceKey.Builder deviceKeyBuilder = CallFeatureDeviceKey.Builder.start();
+							if (parser.nextTag() == XmlPullParser.START_TAG && "key".equals(parser.getName())) {
+								DeviceKey.from(parser.nextText()).ifPresent(deviceKeyBuilder::setDeviceKey);
+							}
+							callFeatureBuilder = deviceKeyBuilder;
+							break;
+
+						case "speakerchannel":
+							final CallFeatureSpeakerChannel.Builder speakerChannelBuilder = CallFeatureSpeakerChannel.Builder.start();
+							getChildElementLong("channel", parser, parseErrors).ifPresent(speakerChannelBuilder::setChannel);
+							getChildElementBoolean("microphone", parser, parseErrors).ifPresent(speakerChannelBuilder::setMicrophoneActive);
+							getChildElementBoolean("mute", parser, parseErrors).ifPresent(speakerChannelBuilder::setMuteRequested);
+							callFeatureBuilder = speakerChannelBuilder;
+							break;
+
+						default:
+							// Assume a simple true/false feature
+							final CallFeatureBoolean.Builder booleanBuilder = CallFeatureBoolean.Builder.start();
+							getBoolean(text).ifPresent(booleanBuilder::setEnabled);
+							callFeatureBuilder = booleanBuilder;
+							break;
+					}
+				} else {
+					// Assume a simple true/false feature
+					final CallFeatureBoolean.Builder booleanBuilder = CallFeatureBoolean.Builder.start();
+					getBoolean(text).ifPresent(booleanBuilder::setEnabled);
+					callFeatureBuilder = booleanBuilder;
+					break;
+				}
+				featureId.ifPresent(callFeatureBuilder::setId);
 				featureTypeString.ifPresent(featureType -> {
 					final Optional<FeatureType> type = FeatureType.from(featureType);
 					if (type.isPresent())
@@ -471,30 +548,7 @@ public final class SmackPacketUtil {
 					else
 						parseErrors.add("Invalid %s; invalid feature type - '%s'");
 				});
-				final Optional<String> label = SmackPacketUtil.getStringAttribute(parser,
-						OpenlinkXmppNamespace.TAG_LABEL);
 				label.ifPresent(callFeatureBuilder::setLabel);
-
-				parser.next();
-				String featureText = parser.getText();
-				parser.nextTag();
-				if (parser.getName().equals("devicekeys")) {
-					parser.nextTag();
-					final String keyString;
-					featureText=null;
-					if (parser.getName().equals("key")) {
-						keyString = parser.nextText().trim();
-						if (!keyString.isEmpty()) {
-							DeviceKey.from(keyString).ifPresent(callFeatureBuilder::setDeviceKey);
-						}
-						parser.nextTag(); // ends key tag
-					}
-					parser.nextTag(); // ends devicekey tag
-
-				} else {
-					getBoolean(featureText).ifPresent(callFeatureBuilder::setEnabled);
-				}
-
 				callBuilder.addFeature(callFeatureBuilder.build(parseErrors));
 				ParserUtils.forwardToEndTagOfDepth(parser, parser.getDepth());
 				parser.nextTag();
@@ -560,6 +614,21 @@ public final class SmackPacketUtil {
 		if (parser.getName().equals(childElementName)) {
 			try {
 				return Optional.of(Long.parseLong(parser.nextText()));
+			} catch (final NumberFormatException ignored) {
+				parseErrors
+						.add(String.format("Invalid %s; invalid %s '%s'; please supply an integer", childElementName));
+			}
+		}
+		return Optional.empty();
+	}
+
+	@Nonnull
+	public static Optional<Boolean> getChildElementBoolean(@Nonnull final String childElementName, final XmlPullParser parser,
+			@Nonnull final List<String> parseErrors) throws XmlPullParserException, IOException {
+		parser.nextTag();
+		if (parser.getName().equals(childElementName)) {
+			try {
+				return getBoolean(parser.nextText());
 			} catch (final NumberFormatException ignored) {
 				parseErrors
 						.add(String.format("Invalid %s; invalid %s '%s'; please supply an integer", childElementName));
