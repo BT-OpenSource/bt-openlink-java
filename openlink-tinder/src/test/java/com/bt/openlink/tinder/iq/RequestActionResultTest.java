@@ -54,7 +54,7 @@ public class RequestActionResultTest {
     public void willEnsureTheStanzaHasACall() {
 
         expectedException.expect(IllegalStateException.class);
-        expectedException.expectMessage("The make-call result has no calls");
+        expectedException.expectMessage("The request-action result has no calls");
         RequestActionResult.Builder.start()
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
