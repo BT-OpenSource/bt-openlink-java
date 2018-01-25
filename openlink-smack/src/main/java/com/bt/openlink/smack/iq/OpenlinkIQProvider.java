@@ -1,6 +1,12 @@
 package com.bt.openlink.smack.iq;
 
-import com.bt.openlink.OpenlinkXmppNamespace;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.packet.UnparsedIQ;
 import org.jivesoftware.smack.provider.IQProvider;
@@ -8,11 +14,7 @@ import org.jivesoftware.smack.util.PacketParserUtils;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
+import com.bt.openlink.OpenlinkXmppNamespace;
 
 public class OpenlinkIQProvider extends IQProvider<IQ> {
 
@@ -39,17 +41,21 @@ public class OpenlinkIQProvider extends IQProvider<IQ> {
         }
     }
 
+    private static final String ATTRIBUTE_ACTION = "action";
+    private static final String ATTRIBUTE_STATUS = "status";
+    private static final String ACTION_EXECUTE = "execute";
+    private static final String ACTION_COMPLETED = "completed";
     private static final List<IQMatcher> STANZA_TYPE_MATCHER_LIST = Arrays.asList(
-            new IQMatcher(OpenlinkXmppNamespace.OPENLINK_GET_PROFILES, "action", "execute", GetProfilesRequest::from),
-            new IQMatcher(OpenlinkXmppNamespace.OPENLINK_GET_PROFILES, "status","completed", GetProfilesResult::from),
-            new IQMatcher(OpenlinkXmppNamespace.OPENLINK_GET_INTERESTS, "action", "execute", GetInterestsRequest::from),
-            new IQMatcher(OpenlinkXmppNamespace.OPENLINK_GET_INTERESTS, "status","completed", GetInterestsResult::from),
-            new IQMatcher(OpenlinkXmppNamespace.OPENLINK_GET_INTEREST, "action", "execute", GetInterestRequest::from),
-            new IQMatcher(OpenlinkXmppNamespace.OPENLINK_GET_INTEREST, "status","completed", GetInterestResult::from),
-            new IQMatcher(OpenlinkXmppNamespace.OPENLINK_GET_FEATURES, "action", "execute", GetFeaturesRequest::from),
-            new IQMatcher(OpenlinkXmppNamespace.OPENLINK_GET_FEATURES, "status","completed", GetFeaturesResult::from),
-            new IQMatcher(OpenlinkXmppNamespace.OPENLINK_MAKE_CALL, "action", "execute", MakeCallRequest::from),
-            new IQMatcher(OpenlinkXmppNamespace.OPENLINK_MAKE_CALL, "status","completed", MakeCallResult::from)
+            new IQMatcher(OpenlinkXmppNamespace.OPENLINK_GET_PROFILES, ATTRIBUTE_ACTION, ACTION_EXECUTE, GetProfilesRequest::from),
+            new IQMatcher(OpenlinkXmppNamespace.OPENLINK_GET_PROFILES, ATTRIBUTE_STATUS, ACTION_COMPLETED, GetProfilesResult::from),
+            new IQMatcher(OpenlinkXmppNamespace.OPENLINK_GET_INTERESTS, ATTRIBUTE_ACTION, ACTION_EXECUTE, GetInterestsRequest::from),
+            new IQMatcher(OpenlinkXmppNamespace.OPENLINK_GET_INTERESTS, ATTRIBUTE_STATUS, ACTION_COMPLETED, GetInterestsResult::from),
+            new IQMatcher(OpenlinkXmppNamespace.OPENLINK_GET_INTEREST, ATTRIBUTE_ACTION, ACTION_EXECUTE, GetInterestRequest::from),
+            new IQMatcher(OpenlinkXmppNamespace.OPENLINK_GET_INTEREST, ATTRIBUTE_STATUS, ACTION_COMPLETED, GetInterestResult::from),
+            new IQMatcher(OpenlinkXmppNamespace.OPENLINK_GET_FEATURES, ATTRIBUTE_ACTION, ACTION_EXECUTE, GetFeaturesRequest::from),
+            new IQMatcher(OpenlinkXmppNamespace.OPENLINK_GET_FEATURES, ATTRIBUTE_STATUS, ACTION_COMPLETED, GetFeaturesResult::from),
+            new IQMatcher(OpenlinkXmppNamespace.OPENLINK_MAKE_CALL, ATTRIBUTE_ACTION, ACTION_EXECUTE, MakeCallRequest::from),
+            new IQMatcher(OpenlinkXmppNamespace.OPENLINK_MAKE_CALL, ATTRIBUTE_STATUS, ACTION_COMPLETED, MakeCallResult::from)
             );
 
     @Override

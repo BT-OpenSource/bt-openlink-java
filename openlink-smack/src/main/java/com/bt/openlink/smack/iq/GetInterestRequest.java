@@ -18,8 +18,9 @@ import com.bt.openlink.iq.GetInterestRequestBuilder;
 import com.bt.openlink.type.InterestId;
 
 public class GetInterestRequest extends OpenlinkIQ{
-	
-	@Nullable private final InterestId interestId;
+
+    private static final String ELEMENT_INTEREST = "interest";
+    @Nullable private final InterestId interestId;
 	
 	private GetInterestRequest(@Nonnull Builder builder, @Nullable List<String> parseErrors) {
         super("command", OpenlinkXmppNamespace.XMPP_COMMANDS.uri(), builder, parseErrors);
@@ -34,9 +35,9 @@ public class GetInterestRequest extends OpenlinkIQ{
     @Nonnull
     static IQ from(XmlPullParser parser) throws IOException, XmlPullParserException {
 
-        moveToStartOfTag(parser, OpenlinkXmppNamespace.TAG_IODATA, OpenlinkXmppNamespace.TAG_IN, "interest");
+        moveToStartOfTag(parser, OpenlinkXmppNamespace.TAG_IODATA, OpenlinkXmppNamespace.TAG_IN, ELEMENT_INTEREST);
         final String interestIdString;
-        if ("interest".equals(parser.getName())) {
+        if (ELEMENT_INTEREST.equals(parser.getName())) {
         	interestIdString = parser.nextText();
         } else {
         	interestIdString = null;
@@ -58,7 +59,7 @@ public class GetInterestRequest extends OpenlinkIQ{
                 .attribute("type", "input")
                 .rightAngleBracket();
         xml.halfOpenElement(OpenlinkXmppNamespace.TAG_IN).rightAngleBracket();
-        xml.optElement("interest", interestId); 
+        xml.optElement(ELEMENT_INTEREST, interestId);
         xml.closeElement(OpenlinkXmppNamespace.TAG_IN);
         xml.closeElement(OpenlinkXmppNamespace.TAG_IODATA);
         return xml;

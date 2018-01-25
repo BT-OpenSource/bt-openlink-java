@@ -18,7 +18,8 @@ import com.bt.openlink.iq.GetInterestsRequestBuilder;
 import com.bt.openlink.type.ProfileId;
 
 public class GetInterestsRequest extends OpenlinkIQ {
-	@Nullable private final ProfileId profileId;
+    private static final String ELEMENT_PROFILE = "profile";
+    @Nullable private final ProfileId profileId;
 
     private GetInterestsRequest(@Nonnull Builder builder, @Nullable List<String> parseErrors) {
         super("command", OpenlinkXmppNamespace.XMPP_COMMANDS.uri(), builder, parseErrors);
@@ -34,9 +35,9 @@ public class GetInterestsRequest extends OpenlinkIQ {
     @Nonnull
     static IQ from(XmlPullParser parser) throws IOException, XmlPullParserException {
 
-        moveToStartOfTag(parser, OpenlinkXmppNamespace.TAG_IODATA, OpenlinkXmppNamespace.TAG_IN, "profile");
+        moveToStartOfTag(parser, OpenlinkXmppNamespace.TAG_IODATA, OpenlinkXmppNamespace.TAG_IN, ELEMENT_PROFILE);
         final String profileIdString;
-        if ("profile".equals(parser.getName())) {
+        if (ELEMENT_PROFILE.equals(parser.getName())) {
         	profileIdString = parser.nextText();
         } else {
         	profileIdString = null;
@@ -58,7 +59,7 @@ public class GetInterestsRequest extends OpenlinkIQ {
                 .attribute("type", "input")
                 .rightAngleBracket();
         xml.halfOpenElement(OpenlinkXmppNamespace.TAG_IN).rightAngleBracket();
-        xml.optElement("profile", profileId); //edited
+        xml.optElement(ELEMENT_PROFILE, profileId); //edited
         xml.closeElement(OpenlinkXmppNamespace.TAG_IN);
         xml.closeElement(OpenlinkXmppNamespace.TAG_IODATA);
         return xml;

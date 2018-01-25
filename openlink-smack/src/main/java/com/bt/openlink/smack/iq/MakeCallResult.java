@@ -20,6 +20,7 @@ import com.bt.openlink.smack.internal.SmackPacketUtil;
 import com.bt.openlink.type.Call;
 
 public class MakeCallResult extends OpenlinkIQ {
+    private static final String ELEMENT_CALLSTATUS = "callstatus";
     @Nullable private final Boolean callStatusBusy;
     @Nonnull private final List<Call> calls;
 
@@ -42,11 +43,11 @@ public class MakeCallResult extends OpenlinkIQ {
     @Nonnull
     static IQ from(XmlPullParser parser) throws IOException, XmlPullParserException {
 
-        moveToStartOfTag(parser, OpenlinkXmppNamespace.TAG_IODATA, OpenlinkXmppNamespace.TAG_OUT, "callstatus");
+        moveToStartOfTag(parser, OpenlinkXmppNamespace.TAG_IODATA, OpenlinkXmppNamespace.TAG_OUT, ELEMENT_CALLSTATUS);
 
         final Builder builder = Builder.start();
         final List<String> parseErrors = new ArrayList<>();
-        if (parser.getName().equals("callstatus")) {
+        if (parser.getName().equals(ELEMENT_CALLSTATUS)) {
             final Optional<Boolean> callBusy = SmackPacketUtil.getBooleanAttribute(parser, "busy");
             callBusy.ifPresent(builder::setCallStatusBusy);
             parser.nextTag();
@@ -66,7 +67,7 @@ public class MakeCallResult extends OpenlinkIQ {
                 .rightAngleBracket();
         xml.halfOpenElement(OpenlinkXmppNamespace.TAG_OUT)
                 .rightAngleBracket();
-        xml.halfOpenElement("callstatus")
+        xml.halfOpenElement(ELEMENT_CALLSTATUS)
                 .attribute("xmlns", "http://xmpp.org/protocol/openlink:01:00:00#call-status")
                 .attribute("busy", String.valueOf(callStatusBusy))
                 .rightAngleBracket();
