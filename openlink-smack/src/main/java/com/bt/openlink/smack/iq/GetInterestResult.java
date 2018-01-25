@@ -20,13 +20,12 @@ import com.bt.openlink.type.Interest;
 import com.bt.openlink.type.InterestId;
 import com.bt.openlink.type.InterestType;
 
-public class GetInterestResult extends OpenlinkIQ{
+public class GetInterestResult extends OpenlinkIQ {
 
     @Nullable private final Interest interest;
 
     private GetInterestResult(@Nonnull Builder builder, @Nullable List<String> parseErrors) {
         super("command", OpenlinkXmppNamespace.XMPP_COMMANDS.uri(), builder, parseErrors);
-       // this.interest = Collections.unmodifiableList(builder.getInterest());
         this.interest = builder.getInterest().orElse(null);
     }
 
@@ -35,56 +34,55 @@ public class GetInterestResult extends OpenlinkIQ{
         return Optional.ofNullable(interest);
     }
 
-    
-	@Nonnull
-	static IQ from(XmlPullParser parser) throws IOException, XmlPullParserException {
+    @Nonnull
+    static IQ from(XmlPullParser parser) throws IOException, XmlPullParserException {
 
-		moveToStartOfTag(parser, OpenlinkXmppNamespace.TAG_IODATA, OpenlinkXmppNamespace.TAG_OUT,
-				OpenlinkXmppNamespace.TAG_INTERESTS, OpenlinkXmppNamespace.TAG_INTEREST);
+        moveToStartOfTag(parser, OpenlinkXmppNamespace.TAG_IODATA, OpenlinkXmppNamespace.TAG_OUT, OpenlinkXmppNamespace.TAG_INTERESTS, OpenlinkXmppNamespace.TAG_INTEREST);
 
-		final Builder builder = Builder.start();
+        final Builder builder = Builder.start();
 
-		final List<String> parseErrors = new ArrayList<>();
+        final List<String> parseErrors = new ArrayList<>();
 
-		final Interest.Builder interestBuilder = Interest.Builder.start();
-		final Optional<InterestId> interestId = InterestId.from(parser.getAttributeValue("", "id"));
-		interestId.ifPresent(interestBuilder::setId);
-		final Optional<InterestType> interestType = InterestType.from(parser.getAttributeValue("", "type"));
-		interestType.ifPresent(interestBuilder::setType);
-		final Optional<String> label = SmackPacketUtil.getStringAttribute(parser, OpenlinkXmppNamespace.TAG_LABEL);
-		label.ifPresent(interestBuilder::setLabel);
-		final Optional<Boolean> isDefaultInterest = SmackPacketUtil.getBooleanAttribute(parser,
-				OpenlinkXmppNamespace.TAG_DEFAULT);
-		isDefaultInterest.ifPresent(interestBuilder::setDefault);
+        final Interest.Builder interestBuilder = Interest.Builder.start();
+        final Optional<InterestId> interestId = InterestId.from(parser.getAttributeValue("", "id"));
+        interestId.ifPresent(interestBuilder::setId);
+        final Optional<InterestType> interestType = InterestType.from(parser.getAttributeValue("", "type"));
+        interestType.ifPresent(interestBuilder::setType);
+        final Optional<String> label = SmackPacketUtil.getStringAttribute(parser, OpenlinkXmppNamespace.TAG_LABEL);
+        label.ifPresent(interestBuilder::setLabel);
+        final Optional<Boolean> isDefaultInterest = SmackPacketUtil.getBooleanAttribute(parser, OpenlinkXmppNamespace.TAG_DEFAULT);
+        isDefaultInterest.ifPresent(interestBuilder::setDefault);
 
-		builder.setInterest(interestBuilder.build(parseErrors));
+        builder.setInterest(interestBuilder.build(parseErrors));
 
-		return builder.build(parseErrors);
-	}
-    
+        return builder.build(parseErrors);
+    }
+
     @Override
-	protected IQChildElementXmlStringBuilder getIQChildElementBuilder(IQChildElementXmlStringBuilder xml) {
-		xml.attribute("status", "completed").attribute("node", OpenlinkXmppNamespace.OPENLINK_GET_INTEREST.uri())
-				.rightAngleBracket();
-		xml.halfOpenElement(OpenlinkXmppNamespace.TAG_IODATA)
-				.attribute("xmlns", OpenlinkXmppNamespace.XMPP_IO_DATA.uri()).attribute("type", "output")
-				.rightAngleBracket();
-		xml.halfOpenElement(OpenlinkXmppNamespace.TAG_OUT).rightAngleBracket();
-		xml.halfOpenElement(OpenlinkXmppNamespace.TAG_INTERESTS)
-				.attribute("xmlns", "http://xmpp.org/protocol/openlink:01:00:00/interests").rightAngleBracket();
-		xml.halfOpenElement(OpenlinkXmppNamespace.TAG_INTEREST);
-		interest.getId().ifPresent(interestId -> xml.attribute("id", interestId.value()));
-		interest.getType().ifPresent(interestType -> xml.attribute("type", interestType.value()));
-		interest.getLabel().ifPresent(label -> xml.attribute(OpenlinkXmppNamespace.TAG_LABEL, label));
-		interest.isDefaultInterest().ifPresent(isDefault -> xml.attribute("default", String.valueOf(isDefault)));
-		xml.rightAngleBracket();
-		xml.closeElement(OpenlinkXmppNamespace.TAG_INTEREST);
+    protected IQChildElementXmlStringBuilder getIQChildElementBuilder(IQChildElementXmlStringBuilder xml) {
+        xml.attribute("status", "completed").attribute("node", OpenlinkXmppNamespace.OPENLINK_GET_INTEREST.uri())
+                .rightAngleBracket();
+        xml.halfOpenElement(OpenlinkXmppNamespace.TAG_IODATA)
+                .attribute("xmlns", OpenlinkXmppNamespace.XMPP_IO_DATA.uri()).attribute("type", "output")
+                .rightAngleBracket();
+        xml.halfOpenElement(OpenlinkXmppNamespace.TAG_OUT).rightAngleBracket();
+        xml.halfOpenElement(OpenlinkXmppNamespace.TAG_INTERESTS)
+                .attribute("xmlns", "http://xmpp.org/protocol/openlink:01:00:00/interests").rightAngleBracket();
+        xml.halfOpenElement(OpenlinkXmppNamespace.TAG_INTEREST);
+        if (interest != null) {
+            interest.getId().ifPresent(interestId -> xml.attribute("id", interestId.value()));
+            interest.getType().ifPresent(interestType -> xml.attribute("type", interestType.value()));
+            interest.getLabel().ifPresent(label -> xml.attribute(OpenlinkXmppNamespace.TAG_LABEL, label));
+            interest.isDefaultInterest().ifPresent(isDefault -> xml.attribute("default", String.valueOf(isDefault)));
+        }
+        xml.rightAngleBracket();
+        xml.closeElement(OpenlinkXmppNamespace.TAG_INTEREST);
 
-		xml.closeElement(OpenlinkXmppNamespace.TAG_INTERESTS);
-		xml.closeElement(OpenlinkXmppNamespace.TAG_OUT);
-		xml.closeElement(OpenlinkXmppNamespace.TAG_IODATA);
-		return xml;
-	}
+        xml.closeElement(OpenlinkXmppNamespace.TAG_INTERESTS);
+        xml.closeElement(OpenlinkXmppNamespace.TAG_OUT);
+        xml.closeElement(OpenlinkXmppNamespace.TAG_IODATA);
+        return xml;
+    }
 
     public static final class Builder extends GetInterestResultBuilder<Builder, Jid, IQ.Type> {
 

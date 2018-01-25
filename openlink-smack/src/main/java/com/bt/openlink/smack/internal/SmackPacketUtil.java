@@ -59,7 +59,7 @@ public final class SmackPacketUtil {
     private static final String ATTRIBUTE_TIMESTAMP = "timestamp";
     private static final String ATTRIBUTE_DURATION = "duration";
     private static final String ATTRIBUTE_LABEL = "label";
-    private static final String ATTRIBUTE_DEVICEKEYS = "devicekeys";
+    private static final String ELEMENT_DEVICEKEYS = "devicekeys";
     private static final String ELEMENT_NUMBER = "number";
     private static final String ELEMENT_CALLER = "caller";
     private static final String ELEMENT_CALLED = "called";
@@ -170,7 +170,7 @@ public final class SmackPacketUtil {
             call.getCalledNumber().ifPresent(calledNumber -> xml.escape(calledNumber.value()));
             xml.closeElement(ELEMENT_NUMBER);
             call.getCalledName().ifPresent(callerName -> xml.optElement("name", callerName));
-            xml.closeElement("called");
+            xml.closeElement(ELEMENT_CALLED);
 
             final List<OriginatorReference> originatorReferences = call.getOriginatorReferences();
             if (!originatorReferences.isEmpty()) {
@@ -205,13 +205,13 @@ public final class SmackPacketUtil {
                     xml.halfOpenElement(ELEMENT_PARTICIPANT);
                     participant.getJID().ifPresent(jid -> xml.attribute("jid", jid));
                     participant.getType().ifPresent(type -> xml.attribute("type", type.getId()));
-                    participant.getDirection().ifPresent(direction -> xml.attribute("direction", direction.getLabel()));
+                    participant.getDirection().ifPresent(direction -> xml.attribute(ATTRIBUTE_DIRECTION, direction.getLabel()));
                     participant.getStartTime().ifPresent(startTime -> {
                         final ZonedDateTime startTimeInUTC = startTime.atZone(TimeZone.getTimeZone("UTC").toZoneId());
                         xml.attribute(ATTRIBUTE_START_TIME, ISO_8601_FORMATTER.format(startTimeInUTC));
                         xml.attribute(ATTRIBUTE_TIMESTAMP, JAVA_UTIL_DATE_FORMATTER.format(startTimeInUTC));
                     });
-                    participant.getDuration().ifPresent(duration -> xml.attribute("duration", String.valueOf(duration.toMillis())));
+                    participant.getDuration().ifPresent(duration -> xml.attribute(ATTRIBUTE_DURATION, String.valueOf(duration.toMillis())));
                     xml.rightAngleBracket();
                     xml.closeElement(ELEMENT_PARTICIPANT);
                 });
@@ -243,7 +243,7 @@ public final class SmackPacketUtil {
                     feature.getLabel().ifPresent(label -> xml.attribute(ATTRIBUTE_LABEL, label));
                     xml.rightAngleBracket();
                     final CallFeatureDeviceKey callFeatureDeviceKey = (CallFeatureDeviceKey) feature;
-                    xml.halfOpenElement(ATTRIBUTE_DEVICEKEYS);
+                    xml.halfOpenElement(ELEMENT_DEVICEKEYS);
                     xml.attribute("xmlns", OpenlinkXmppNamespace.OPENLINK_DEVICE_KEY.uri());
                     xml.rightAngleBracket();
                     callFeatureDeviceKey.getDeviceKey().ifPresent(deviceKey -> {
@@ -251,7 +251,7 @@ public final class SmackPacketUtil {
                         xml.escape(deviceKey.value());
                         xml.closeElement("key");
                     });
-                    xml.closeElement(ATTRIBUTE_DEVICEKEYS);
+                    xml.closeElement(ELEMENT_DEVICEKEYS);
                 } else if (feature instanceof CallFeatureSpeakerChannel) {
                     xml.rightAngleBracket();
                     final CallFeatureSpeakerChannel callFeatureSpeakerChannel = (CallFeatureSpeakerChannel) feature;
@@ -512,7 +512,7 @@ public final class SmackPacketUtil {
                 }
                 if (parser.getEventType() == XmlPullParser.START_TAG) {
                     switch (parser.getName()) {
-                    case ATTRIBUTE_DEVICEKEYS:
+                    case ELEMENT_DEVICEKEYS:
                         final CallFeatureDeviceKey.Builder deviceKeyBuilder = CallFeatureDeviceKey.Builder.start();
                         if (parser.nextTag() == XmlPullParser.START_TAG && "key".equals(parser.getName())) {
                             DeviceKey.from(parser.nextText()).ifPresent(deviceKeyBuilder::setDeviceKey);
@@ -520,7 +520,7 @@ public final class SmackPacketUtil {
                         callFeatureBuilder = deviceKeyBuilder;
                         break;
 
-                    case "speakerchannel":
+                    case ELEMENT_SPEAKERCHANNEL:
                         final CallFeatureSpeakerChannel.Builder speakerChannelBuilder = CallFeatureSpeakerChannel.Builder.start();
                         getChildElementLong(ELEMENT_CHANNEL, parser, description, parseErrors).ifPresent(speakerChannelBuilder::setChannel);
                         getChildElementBoolean(ELEMENT_MICROPHONE, parser, description, parseErrors).ifPresent(speakerChannelBuilder::setMicrophoneActive);
@@ -573,7 +573,6 @@ public final class SmackPacketUtil {
     private static void getOriginatorReferences(final XmlPullParser parser, final Call.Builder callBuilder)
             throws XmlPullParserException, IOException {
 
-        //parser.nextTag();
         if (!parser.getName().equals(ELEMENT_ORIGINATOR_REF)) {
             return;
         }
