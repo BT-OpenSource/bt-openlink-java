@@ -57,20 +57,13 @@ public class GetProfilesResult extends OpenlinkIQ {
             do {
                 switch (parser.getName()) {
                     case "site":
-                        final Optional<Site> site = SmackPacketUtil.getSite(parser, parseErrors);
-                        site.ifPresent(profileBuilder::setSite);
+                        addSiteToBuilder(parser, parseErrors, profileBuilder);
                         break;
                     case OpenlinkXmppNamespace.TAG_ACTIONS:
-                        if(!parser.isEmptyElementTag()) {
-                            do {
-                                parser.nextTag();
-                                if (parser.getName().equals(OpenlinkXmppNamespace.TAG_ACTION)) {
-                                    final Optional<RequestAction> requestAction = RequestAction.from(SmackPacketUtil.getStringAttribute(parser, "id").orElse(null));
-                                    requestAction.ifPresent(profileBuilder::addAction);
-                                }
-                                ParserUtils.forwardToEndTagOfDepth(parser, parser.getDepth());
-                            } while (parser.getName().equals(OpenlinkXmppNamespace.TAG_ACTION));
-                        }
+                        addActionsToBuilder(parser, profileBuilder);
+                        break;
+                    default:
+                        parseErrors.add("Unrecognised tag: " + parser.getName());
                         break;
                 }
                 ParserUtils.forwardToEndTagOfDepth(parser, profileDepth+1);
@@ -82,6 +75,24 @@ public class GetProfilesResult extends OpenlinkIQ {
             parser.nextTag();
         }
         return builder.build(parseErrors);
+    }
+
+    private static void addActionsToBuilder(final XmlPullParser parser, final Profile.Builder profileBuilder) throws XmlPullParserException, IOException {
+        if(!parser.isEmptyElementTag()) {
+            do {
+                parser.nextTag();
+                if (parser.getName().equals(OpenlinkXmppNamespace.TAG_ACTION)) {
+                    final Optional<RequestAction> requestAction = RequestAction.from(SmackPacketUtil.getStringAttribute(parser, "id").orElse(null));
+                    requestAction.ifPresent(profileBuilder::addAction);
+                }
+                ParserUtils.forwardToEndTagOfDepth(parser, parser.getDepth());
+            } while (parser.getName().equals(OpenlinkXmppNamespace.TAG_ACTION));
+        }
+    }
+
+    private static void addSiteToBuilder(final XmlPullParser parser, final List<String> parseErrors, final Profile.Builder profileBuilder) throws IOException, XmlPullParserException {
+        final Optional<Site> site = SmackPacketUtil.getSite(parser, parseErrors);
+        site.ifPresent(profileBuilder::setSite);
     }
 
     private GetProfilesResult(@Nonnull Builder builder, @Nullable List<String> parseErrors) {
