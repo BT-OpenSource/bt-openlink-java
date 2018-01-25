@@ -1,10 +1,12 @@
 package com.bt.openlink.type;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 import javax.annotation.Nonnull;
 
-public class AbstractType<T> {
+public class AbstractType<T> implements Serializable {
+    private static final long serialVersionUID = 1777241541299084888L;
     @Nonnull private final T value;
 
     protected AbstractType(@Nonnull final T value) {

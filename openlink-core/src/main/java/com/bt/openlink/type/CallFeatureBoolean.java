@@ -7,6 +7,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class CallFeatureBoolean extends CallFeature {
+    private static final long serialVersionUID = -4379867654145924237L;
     @Nullable private final Boolean enabled;
 
     protected CallFeatureBoolean(@Nonnull final Builder builder) {

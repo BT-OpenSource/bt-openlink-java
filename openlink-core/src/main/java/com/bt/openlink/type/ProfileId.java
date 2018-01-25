@@ -1,10 +1,13 @@
 package com.bt.openlink.type;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.Optional;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 public final class ProfileId extends AbstractType<String> {
+
+    private static final long serialVersionUID = -6290647936596360454L;
 
     private ProfileId(final String value) {
         super(value);

@@ -1,12 +1,14 @@
 package com.bt.openlink.type;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class Feature {
+public class Feature implements Serializable {
+    private static final long serialVersionUID = -4239954843382409358L;
     @Nullable private final FeatureId featureId;
     @Nullable private final FeatureType featureType;
     @Nullable private final String label;

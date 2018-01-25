@@ -1,12 +1,15 @@
 package com.bt.openlink.type;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class Site {
+public class Site implements Serializable {
+
+    private static final long serialVersionUID = -5504996561253140171L;
 
     public enum Type {
         BTSM, CISCO, IPT, ITS;

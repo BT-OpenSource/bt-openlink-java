@@ -7,6 +7,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class CallFeatureDeviceKey extends CallFeature {
+    private static final long serialVersionUID = -1837276539059039203L;
     @Nullable private final DeviceKey deviceKey;
 
     protected CallFeatureDeviceKey(@Nonnull final Builder builder) {

@@ -1,5 +1,6 @@
 package com.bt.openlink.type;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -7,7 +8,8 @@ import java.util.Optional;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public final class Profile {
+public final class Profile implements Serializable {
+    private static final long serialVersionUID = -2429079888059635951L;
     @Nullable private final ProfileId profileId;
     @Nullable private final Boolean isDefault;
     @Nullable private final String device;

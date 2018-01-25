@@ -1,12 +1,14 @@
 package com.bt.openlink.type;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public final class Interest {
+public final class Interest implements Serializable {
+    private static final long serialVersionUID = -542840983239765814L;
     @Nullable private final InterestId interestId;
     @Nullable private final InterestType interestType;
     @Nullable private final String label;

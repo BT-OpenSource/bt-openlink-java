@@ -7,6 +7,8 @@ import javax.annotation.Nullable;
 
 public final class DeviceKey extends AbstractType<String> {
 
+    private static final long serialVersionUID = 1909201076526681103L;
+
     private DeviceKey(final String value) {
         super(value);
     }

@@ -1,11 +1,13 @@
 package com.bt.openlink.type;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 import javax.annotation.Nonnull;
 
-public final class OriginatorReference {
+public final class OriginatorReference implements Serializable {
 
+    private static final long serialVersionUID = -7760726364861459213L;
     @Nonnull private final String key;
     @Nonnull private final String value;
 

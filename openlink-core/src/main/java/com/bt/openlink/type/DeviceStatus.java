@@ -1,11 +1,14 @@
 package com.bt.openlink.type;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
 
-public final class DeviceStatus {
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
+public final class DeviceStatus implements Serializable {
+    private static final long serialVersionUID = -4817479046901684980L;
     @Nullable private final Boolean online;
     @Nullable private final ProfileId profileId;
 

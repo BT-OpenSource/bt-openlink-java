@@ -8,6 +8,8 @@ import javax.annotation.Nullable;
 
 public final class ItemId extends AbstractType<String> {
 
+    private static final long serialVersionUID = -7254784162238934557L;
+
     private ItemId(final String value) {
         super(value);
     }

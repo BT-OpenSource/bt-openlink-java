@@ -1,5 +1,6 @@
 package com.bt.openlink.type;
 
+import java.io.Serializable;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
@@ -8,7 +9,8 @@ import java.util.Optional;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public final class Participant {
+public final class Participant implements Serializable {
+    private static final long serialVersionUID = 8143091859904009327L;
     @Nullable private final String jid;
     @Nullable private final ParticipantType participantType;
     @Nullable private final CallDirection direction;

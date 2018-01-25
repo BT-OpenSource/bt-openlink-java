@@ -7,6 +7,8 @@ import javax.annotation.Nullable;
 
 public final class FeatureId extends AbstractType<String> {
 
+    private static final long serialVersionUID = 5497927667925440552L;
+
     private FeatureId(final String value) {
         super(value);
     }

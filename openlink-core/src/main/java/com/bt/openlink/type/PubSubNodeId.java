@@ -7,6 +7,8 @@ import javax.annotation.Nullable;
 
 public final class PubSubNodeId extends AbstractType<String> {
 
+    private static final long serialVersionUID = -6588884016630727265L;
+
     private PubSubNodeId(final String value) {
         super(value);
     }

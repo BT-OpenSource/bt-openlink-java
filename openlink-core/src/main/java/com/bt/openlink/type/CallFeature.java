@@ -6,6 +6,8 @@ import javax.annotation.Nonnull;
 
 public abstract class CallFeature extends Feature {
 
+    private static final long serialVersionUID = 8051006650246959083L;
+
     protected CallFeature(@Nonnull final AbstractFeatureBuilder builder) {
         super(builder);
     }

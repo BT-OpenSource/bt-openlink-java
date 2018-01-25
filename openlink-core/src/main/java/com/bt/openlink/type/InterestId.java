@@ -6,6 +6,8 @@ import javax.annotation.Nonnull;
 
 public final class InterestId extends AbstractType<String> {
 
+    private static final long serialVersionUID = 943539393503149322L;
+
     private InterestId(final String value) {
         super(value);
     }

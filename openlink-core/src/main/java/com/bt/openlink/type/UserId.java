@@ -7,6 +7,8 @@ import javax.annotation.Nullable;
 
 public final class UserId extends AbstractType<String> {
 
+    private static final long serialVersionUID = -7009406919567090609L;
+
     private UserId(final String value) {
         super(value);
     }

@@ -1,5 +1,6 @@
 package com.bt.openlink.type;
 
+import java.io.Serializable;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -12,7 +13,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class Call {
+public class Call implements Serializable {
+
+    private static final long serialVersionUID = -1434746928588613056L;
 
     public static Optional<Boolean> oneOrMoreCallsIsBusy(final Collection<Call> calls) {
         final AtomicBoolean callBusySet = new AtomicBoolean(false);

@@ -8,6 +8,7 @@ import javax.annotation.Nullable;
 
 public final class CallFeatureSpeakerChannel extends CallFeature {
 
+    private static final long serialVersionUID = -5212589376734455893L;
     @Nullable private final Long channel;
     @Nullable private final Boolean microphoneActive;
     @Nullable private final Boolean muteRequested;

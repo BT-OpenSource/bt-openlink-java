@@ -7,6 +7,8 @@ import javax.annotation.Nullable;
 
 public final class ConferenceId extends AbstractType<String> {
 
+    private static final long serialVersionUID = -5482504626000600223L;
+
     private ConferenceId(final String value) {
         super(value);
     }
