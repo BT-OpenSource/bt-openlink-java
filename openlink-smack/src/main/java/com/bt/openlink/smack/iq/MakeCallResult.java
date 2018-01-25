@@ -1,7 +1,6 @@
 package com.bt.openlink.smack.iq;
 
 import java.io.IOException;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -21,82 +20,83 @@ import com.bt.openlink.smack.internal.SmackPacketUtil;
 import com.bt.openlink.type.Call;
 
 public class MakeCallResult extends OpenlinkIQ {
-	 @Nullable private final Boolean callStatusBusy;
-	    @Nonnull private final List<Call> calls;
+    @Nullable private final Boolean callStatusBusy;
+    @Nonnull private final List<Call> calls;
 
-	    private MakeCallResult(@Nonnull Builder builder, @Nullable List<String> parseErrors) {
-	    	 super("command", OpenlinkXmppNamespace.XMPP_COMMANDS.uri(), builder, parseErrors);
-	        this.calls = Collections.unmodifiableList(builder.getCalls());
-	        this.callStatusBusy = builder.isCallStatusBusy().orElse(null);
-	    }
+    private MakeCallResult(@Nonnull Builder builder, @Nullable List<String> parseErrors) {
+        super("command", OpenlinkXmppNamespace.XMPP_COMMANDS.uri(), builder, parseErrors);
+        this.calls = Collections.unmodifiableList(builder.getCalls());
+        this.callStatusBusy = builder.isCallStatusBusy().orElse(null);
+    }
 
-	    @Nonnull
-	    public List<Call> getCalls() {
-	        return calls;
-	    }
+    @Nonnull
+    public List<Call> getCalls() {
+        return calls;
+    }
 
-	    @Nonnull
-	    public Optional<Boolean> isCallStatusBusy() {
-	        return Optional.ofNullable(callStatusBusy);
-	    }
-	    
-		@Nonnull
-		static IQ from(XmlPullParser parser) throws IOException, XmlPullParserException {
+    @Nonnull
+    public Optional<Boolean> isCallStatusBusy() {
+        return Optional.ofNullable(callStatusBusy);
+    }
 
-			moveToStartOfTag(parser, OpenlinkXmppNamespace.TAG_IODATA, OpenlinkXmppNamespace.TAG_OUT,
-					"callstatus");
+    @Nonnull
+    static IQ from(XmlPullParser parser) throws IOException, XmlPullParserException {
 
-			final Builder builder = Builder.start();
-			final List<String> parseErrors = new ArrayList<>();
-			if(parser.getName().equals("callstatus"))
-			{
-			final Optional<Boolean> callBusy = SmackPacketUtil.getBooleanAttribute(parser,"busy");
-			callBusy.ifPresent(builder::setCallStatusBusy);
-			parser.nextTag();
-			 final List<Call> calls = SmackPacketUtil.getCalls(parser, parseErrors);
+        moveToStartOfTag(parser, OpenlinkXmppNamespace.TAG_IODATA, OpenlinkXmppNamespace.TAG_OUT, "callstatus");
+
+        final Builder builder = Builder.start();
+        final List<String> parseErrors = new ArrayList<>();
+        if (parser.getName().equals("callstatus")) {
+            final Optional<Boolean> callBusy = SmackPacketUtil.getBooleanAttribute(parser, "busy");
+            callBusy.ifPresent(builder::setCallStatusBusy);
+            parser.nextTag();
+            final List<Call> calls = SmackPacketUtil.getCalls(parser, "make call result", parseErrors);
             builder.addCalls(calls);
-			}
-			return builder.build(parseErrors);
-		}
-			    
-	    @Override
-	protected IQChildElementXmlStringBuilder getIQChildElementBuilder(IQChildElementXmlStringBuilder xml) {
-		xml.attribute("status", "completed").attribute("node", OpenlinkXmppNamespace.OPENLINK_MAKE_CALL.uri())
-				.rightAngleBracket();
-		xml.halfOpenElement(OpenlinkXmppNamespace.TAG_IODATA)
-				.attribute("xmlns", OpenlinkXmppNamespace.XMPP_IO_DATA.uri()).attribute("type", "output")
-				.rightAngleBracket();
-		xml.halfOpenElement(OpenlinkXmppNamespace.TAG_OUT).rightAngleBracket();
-		xml.halfOpenElement("callstatus").attribute("xmlns", "http://xmpp.org/protocol/openlink:01:00:00#call-status")
-				.attribute("busy", String.valueOf(callStatusBusy)).rightAngleBracket();
+        }
+        return builder.build(parseErrors);
+    }
 
-		return SmackPacketUtil.addCalls(xml, calls);
-	}
+    @Override
+    protected IQChildElementXmlStringBuilder getIQChildElementBuilder(IQChildElementXmlStringBuilder xml) {
+        xml.attribute("status", "completed")
+                .attribute("node", OpenlinkXmppNamespace.OPENLINK_MAKE_CALL.uri())
+                .rightAngleBracket();
+        xml.halfOpenElement(OpenlinkXmppNamespace.TAG_IODATA)
+                .attribute("xmlns", OpenlinkXmppNamespace.XMPP_IO_DATA.uri()).attribute("type", "output")
+                .rightAngleBracket();
+        xml.halfOpenElement(OpenlinkXmppNamespace.TAG_OUT)
+                .rightAngleBracket();
+        xml.halfOpenElement("callstatus")
+                .attribute("xmlns", "http://xmpp.org/protocol/openlink:01:00:00#call-status")
+                .attribute("busy", String.valueOf(callStatusBusy))
+                .rightAngleBracket();
 
-	    public static final class Builder extends MakeCallResultBuilder<Builder, Jid, IQ.Type> {
+        return SmackPacketUtil.addCalls(xml, calls);
+    }
 
-	        @Nonnull
-	        public static Builder start() {
-	            return new Builder();
-	        }
+    public static final class Builder extends MakeCallResultBuilder<Builder, Jid, IQ.Type> {
 
-	        private Builder() {
-	            super(Type.class);
-	        }
+        @Nonnull
+        public static Builder start() {
+            return new Builder();
+        }
 
-	        @Nonnull
-	        public MakeCallResult build() {
-	            super.validate();
-	            return new MakeCallResult(this, null);
-	        }
+        private Builder() {
+            super(Type.class);
+        }
 
-	        @Nonnull
-	        public MakeCallResult build(@Nonnull final List<String> errors) {
-	            super.validate(errors, false);
-	            return new MakeCallResult(this, errors);
-	        }
+        @Nonnull
+        public MakeCallResult build() {
+            super.validate();
+            return new MakeCallResult(this, null);
+        }
 
-	    }
+        @Nonnull
+        public MakeCallResult build(@Nonnull final List<String> errors) {
+            super.validate(errors, false);
+            return new MakeCallResult(this, errors);
+        }
 
+    }
 
 }

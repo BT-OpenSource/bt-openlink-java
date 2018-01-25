@@ -51,7 +51,7 @@ import com.bt.openlink.type.Site;
 import com.bt.openlink.type.UserId;
 
 public final class SmackPacketUtil {
-	
+
     private static final String ATTRIBUTE_DIRECTION = "direction";
     private static final String ATTRIBUTE_START_TIME = "start";
     private static final String ATTRIBUTE_TIMESTAMP = "timestamp";
@@ -75,13 +75,7 @@ public final class SmackPacketUtil {
     @Nonnull
     public static Optional<Boolean> getBooleanAttribute(@Nonnull final XmlPullParser parser, @Nonnull final String attributeName) {
         final String attributeValue = parser.getAttributeValue("", attributeName);
-        if ("true".equals(attributeValue)) {
-            return Optional.of(Boolean.TRUE);
-        } else if ("false".equals(attributeValue)) {
-            return Optional.of(Boolean.FALSE);
-        } else {
-            return Optional.empty();
-        }
+        return getBoolean(attributeValue);
     }
 
     @Nonnull
@@ -121,519 +115,524 @@ public final class SmackPacketUtil {
             return Optional.empty();
         }
     }
-    
-    public static IQChildElementXmlStringBuilder addCalls(IQChildElementXmlStringBuilder xml,  @Nonnull final Collection<Call> calls) {
-		xml.openElement("call");
-		for (final Call call : calls) {
-			xml.optElement("id", call.getId().orElse(null));
-			xml.optElement("conference", call.getConferenceId().orElse(null));
-			call.getSite().ifPresent(site -> {
-				xml.halfOpenElement("site");
-				site.getId().ifPresent(id -> xml.attribute("id", String.valueOf(id)));
-				site.isDefault().ifPresent(
-						isDefault -> xml.attribute(OpenlinkXmppNamespace.TAG_DEFAULT, String.valueOf(isDefault)));
-				site.getType().ifPresent(type -> xml.attribute("type", type.name()));
-				xml.rightAngleBracket();
-				site.getName().ifPresent(xml::escape);
-				xml.closeElement("site");
 
-			});
-			xml.optElement("profile", call.getProfileId().orElse(null));
-			xml.optElement("user", call.getUserId().orElse(null));
-			xml.optElement("interest", call.getInterestId().orElse(null));
-			String changed=null;
-			if(call.getChanged().isPresent())
-				changed = call.getChanged().get().getId();
-			xml.optElement("changed", changed);
-			
-			String state=null;
-			if(call.getState().isPresent())
-				state =  call.getState().get().getLabel();
-			xml.optElement("state", state);
-			
-			String direction=null;
-			if(call.getDirection().isPresent())
-				direction = call.getDirection().get().getLabel();
-			xml.optElement("direction", direction);
+    public static IQChildElementXmlStringBuilder addCalls(IQChildElementXmlStringBuilder xml, @Nonnull final Collection<Call> calls) {
+        xml.openElement("call");
+        for (final Call call : calls) {
+            xml.optElement("id", call.getId().orElse(null));
+            xml.optElement("conference", call.getConferenceId().orElse(null));
+            call.getSite().ifPresent(site -> {
+                xml.halfOpenElement("site");
+                site.getId().ifPresent(id -> xml.attribute("id", String.valueOf(id)));
+                site.isDefault().ifPresent(isDefault -> xml.attribute(OpenlinkXmppNamespace.TAG_DEFAULT, String.valueOf(isDefault)));
+                site.getType().ifPresent(type -> xml.attribute("type", type.name()));
+                xml.rightAngleBracket();
+                site.getName().ifPresent(xml::escape);
+                xml.closeElement("site");
+            });
+            xml.optElement("profile", call.getProfileId().orElse(null));
+            xml.optElement("user", call.getUserId().orElse(null));
+            xml.optElement("interest", call.getInterestId().orElse(null));
+            call.getChanged().ifPresent(changed -> xml.optElement("changed", changed.getId()));
+            call.getState().ifPresent(changed -> xml.optElement("state", changed.getLabel()));
+            call.getDirection().ifPresent(changed -> xml.optElement("direction", changed.getLabel()));
 
-			xml.openElement("caller");
-			xml.halfOpenElement("number");
-			final String callerE164Numbers = String.join(",",
-					call.getCallerE164Numbers().stream().map(PhoneNumber::value).collect(Collectors.toList()));
-			xml.attribute("e164", callerE164Numbers);
-			xml.rightAngleBracket();
-			xml.escape(call.getCallerNumber().get().value());
-			xml.closeElement("number");
-			xml.optElement("name", call.getCallerName().get());
-			xml.closeElement("caller");
+            xml.openElement("caller");
+            xml.halfOpenElement("number");
+            final String callerE164Numbers = String.join(",", call.getCallerE164Numbers().stream().map(PhoneNumber::value).collect(Collectors.toList()));
+            xml.attribute("e164", callerE164Numbers);
+            xml.rightAngleBracket();
+            call.getCallerNumber().ifPresent(callerNumber -> xml.escape(callerNumber.value()));
+            xml.closeElement("number");
+            call.getCallerName().ifPresent(callerName -> xml.optElement("name", callerName));
+            xml.closeElement("caller");
 
-			xml.openElement("called");
-			xml.halfOpenElement("number");
-			xml.attribute("destination", call.getCalledDestination().get().value());
-			final String calledE164Numbers = String.join(",",
-					call.getCalledE164Numbers().stream().map(PhoneNumber::value).collect(Collectors.toList()));
-			xml.attribute("e164", calledE164Numbers);
-			xml.rightAngleBracket();
-			xml.escape(call.getCalledNumber().get().value());
-			xml.closeElement("number");
-			xml.optElement("name", call.getCalledName().get());
-			xml.closeElement("called");
+            xml.openElement("called");
+            xml.halfOpenElement("number");
+            call.getCalledDestination().ifPresent(destination -> xml.attribute("destination", destination.value()));
+            final String calledE164Numbers = String.join(",", call.getCalledE164Numbers().stream().map(PhoneNumber::value).collect(Collectors.toList()));
+            xml.attribute("e164", calledE164Numbers);
+            xml.rightAngleBracket();
+            call.getCalledNumber().ifPresent(calledNumber -> xml.escape(calledNumber.value()));
+            xml.closeElement("number");
+            call.getCalledName().ifPresent(callerName -> xml.optElement("name", callerName));
+            xml.closeElement("called");
 
-			final List<OriginatorReference> originatorReferences = call.getOriginatorReferences();
-			if (!originatorReferences.isEmpty()) {
-				xml.openElement("originator-ref");
-				originatorReferences.forEach(originatorReference -> {
-					xml.halfOpenElement("property").attribute("id", originatorReference.getKey()).rightAngleBracket();
-					xml.optElement("value", originatorReference.getValue());
-					xml.closeElement("property");
-				});
-				xml.closeElement("originator-ref");
-			}
+            final List<OriginatorReference> originatorReferences = call.getOriginatorReferences();
+            if (!originatorReferences.isEmpty()) {
+                xml.openElement("originator-ref");
+                originatorReferences.forEach(originatorReference -> {
+                    xml.halfOpenElement("property").attribute("id", originatorReference.getKey()).rightAngleBracket();
+                    xml.optElement("value", originatorReference.getValue());
+                    xml.closeElement("property");
+                });
+                xml.closeElement("originator-ref");
+            }
 
-			xml.optElement("start", (ISO_8601_FORMATTER.format(call.getStartTime().get().atZone(ZoneOffset.UTC))));
-			xml.optElement("duration", String.valueOf(call.getDuration().get().toMillis()));
+            call.getStartTime().ifPresent(startTime -> xml.optElement("start", (ISO_8601_FORMATTER.format(startTime.atZone(ZoneOffset.UTC)))));
+            call.getDuration().ifPresent(duration -> xml.optElement("duration", String.valueOf(duration.toMillis())));
 
-			final Collection<RequestAction> actions = call.getActions();
-			if (!actions.isEmpty()) {
-				xml.openElement("actions");
-				actions.forEach(action -> {xml.halfOpenElement(action.getId()).rightAngleBracket();
-				xml.closeElement(action.getId());
-				});
-				xml.closeElement("actions");
-			}
+            final Collection<RequestAction> actions = call.getActions();
+            if (!actions.isEmpty()) {
+                xml.openElement("actions");
+                actions.forEach(action -> {
+                    xml.halfOpenElement(action.getId()).rightAngleBracket();
+                    xml.closeElement(action.getId());
+                });
+                xml.closeElement("actions");
+            }
 
-			addFeatures(call, xml);
+            addFeatures(call, xml);
 
-			final List<Participant> participants = call.getParticipants();
-			if (!participants.isEmpty()) {
-				xml.openElement("participants");
-				participants.forEach(participant -> {
-					xml.halfOpenElement("participant");
-					xml.attribute("jid", participant.getJID().get());
-					xml.attribute("type", participant.getType().get().getId());
-					xml.attribute("direction", participant.getDirection().get().getLabel());
-					participant.getStartTime().ifPresent(startTime -> {
-						final ZonedDateTime startTimeInUTC = startTime.atZone(TimeZone.getTimeZone("UTC").toZoneId());
-						xml.attribute("start", ISO_8601_FORMATTER.format(startTimeInUTC));
-						// Include the legacy timestamp attribute too
-						xml.attribute("timestamp", JAVA_UTIL_DATE_FORMATTER.format(startTimeInUTC));
-					});
-					xml.attribute("duration", String.valueOf(participant.getDuration().get().toMillis()));
-					xml.rightAngleBracket();
-					xml.closeElement("participant");
-				});
-				xml.closeElement("participants");
-			}
+            final List<Participant> participants = call.getParticipants();
+            if (!participants.isEmpty()) {
+                xml.openElement("participants");
+                participants.forEach(participant -> {
+                    xml.halfOpenElement("participant");
+                    participant.getJID().ifPresent(jid -> xml.attribute("jid", jid));
+                    participant.getType().ifPresent(type -> xml.attribute("type", type.getId()));
+                    participant.getDirection().ifPresent(direction -> xml.attribute("direction", direction.getLabel()));
+                    participant.getStartTime().ifPresent(startTime -> {
+                        final ZonedDateTime startTimeInUTC = startTime.atZone(TimeZone.getTimeZone("UTC").toZoneId());
+                        xml.attribute("start", ISO_8601_FORMATTER.format(startTimeInUTC));
+                        // Include the legacy timestamp attribute too
+                            xml.attribute("timestamp", JAVA_UTIL_DATE_FORMATTER.format(startTimeInUTC));
+                        });
+                    participant.getDuration().ifPresent(duration -> xml.attribute("duration", String.valueOf(duration.toMillis())));
+                    xml.rightAngleBracket();
+                    xml.closeElement("participant");
+                });
+                xml.closeElement("participants");
+            }
 
-		}
-		xml.closeElement("call");
-		xml.closeElement("callstatus");
-		xml.closeElement(OpenlinkXmppNamespace.TAG_OUT);
-		xml.closeElement(OpenlinkXmppNamespace.TAG_IODATA);
-		return xml;
-	}
+        }
+        xml.closeElement("call");
+        xml.closeElement("callstatus");
+        xml.closeElement(OpenlinkXmppNamespace.TAG_OUT);
+        xml.closeElement(OpenlinkXmppNamespace.TAG_IODATA);
+        return xml;
+    }
 
-	private static void addFeatures(final Call call, final IQChildElementXmlStringBuilder xml) {
-		final List<CallFeature> features = call.getFeatures();
-		if (!features.isEmpty()) {
+    private static void addFeatures(final Call call, final IQChildElementXmlStringBuilder xml) {
+        final List<CallFeature> features = call.getFeatures();
+        if (!features.isEmpty()) {
             xml.openElement("features");
             features.forEach(feature -> {
                 xml.halfOpenElement("feature");
-                xml.attribute("id", feature.getId().get().value());
-                xml.attribute("type", feature.getType().get().getId());
-				if (feature instanceof CallFeatureBoolean) {
-					feature.getLabel().ifPresent(label -> xml.attribute("label", label));
-					xml.rightAngleBracket();
-					final CallFeatureBoolean callFeatureBoolean = (CallFeatureBoolean) feature;
-					callFeatureBoolean.isEnabled().ifPresent(enabled -> xml.escape(String.valueOf(enabled)));
-				} else if (feature instanceof CallFeatureDeviceKey) {
-					feature.getLabel().ifPresent(label -> xml.attribute("label", label));
-					xml.rightAngleBracket();
-					final CallFeatureDeviceKey callFeatureDeviceKey = (CallFeatureDeviceKey) feature;
-					xml.halfOpenElement("devicekeys");
-					xml.attribute("xmlns", OpenlinkXmppNamespace.OPENLINK_DEVICE_KEY.uri());
-					xml.rightAngleBracket();
-					callFeatureDeviceKey.getDeviceKey().ifPresent(deviceKey -> {
-						xml.openElement("key");
-						xml.escape(deviceKey.value());
-						xml.closeElement("key");
-					});
-					xml.closeElement("devicekeys");
-				} else if (feature instanceof CallFeatureSpeakerChannel) {
-					xml.rightAngleBracket();
-					final CallFeatureSpeakerChannel callFeatureSpeakerChannel = (CallFeatureSpeakerChannel) feature;
-					xml.halfOpenElement("speakerchannel");
-					xml.attribute("xmlns", OpenlinkXmppNamespace.OPENLINK_SPEAKER_CHANNEL.uri());
-					xml.rightAngleBracket();
-					callFeatureSpeakerChannel.getChannel().ifPresent(channel->{
-						xml.openElement("channel");
-						xml.escape(String.valueOf(channel));
-						xml.closeElement("channel");
-					});
-					callFeatureSpeakerChannel.isMicrophoneActive().ifPresent(microphone->{
-						xml.openElement("microphone");
-						xml.escape(String.valueOf(microphone));
-						xml.closeElement("microphone");
-					});
-					callFeatureSpeakerChannel.isMuteRequested().ifPresent(muteRequested->{
-						xml.openElement("mute");
-						xml.escape(String.valueOf(muteRequested));
-						xml.closeElement("mute");
-					});
-					xml.closeElement("speakerchannel");
-				} else {
-					feature.getLabel().ifPresent(label -> xml.attribute("label", label));
-					xml.rightAngleBracket();
-				}
+                feature.getId().ifPresent(id -> xml.attribute("id", id.value()));
+                feature.getType().ifPresent(type -> xml.attribute("type", type.getId()));
+                if (feature instanceof CallFeatureBoolean) {
+                    feature.getLabel().ifPresent(label -> xml.attribute("label", label));
+                    xml.rightAngleBracket();
+                    final CallFeatureBoolean callFeatureBoolean = (CallFeatureBoolean) feature;
+                    callFeatureBoolean.isEnabled().ifPresent(enabled -> xml.escape(String.valueOf(enabled)));
+                } else if (feature instanceof CallFeatureDeviceKey) {
+                    feature.getLabel().ifPresent(label -> xml.attribute("label", label));
+                    xml.rightAngleBracket();
+                    final CallFeatureDeviceKey callFeatureDeviceKey = (CallFeatureDeviceKey) feature;
+                    xml.halfOpenElement("devicekeys");
+                    xml.attribute("xmlns", OpenlinkXmppNamespace.OPENLINK_DEVICE_KEY.uri());
+                    xml.rightAngleBracket();
+                    callFeatureDeviceKey.getDeviceKey().ifPresent(deviceKey -> {
+                        xml.openElement("key");
+                        xml.escape(deviceKey.value());
+                        xml.closeElement("key");
+                    });
+                    xml.closeElement("devicekeys");
+                } else if (feature instanceof CallFeatureSpeakerChannel) {
+                    xml.rightAngleBracket();
+                    final CallFeatureSpeakerChannel callFeatureSpeakerChannel = (CallFeatureSpeakerChannel) feature;
+                    xml.halfOpenElement("speakerchannel");
+                    xml.attribute("xmlns", OpenlinkXmppNamespace.OPENLINK_SPEAKER_CHANNEL.uri());
+                    xml.rightAngleBracket();
+                    callFeatureSpeakerChannel.getChannel().ifPresent(channel -> {
+                        xml.openElement("channel");
+                        xml.escape(String.valueOf(channel));
+                        xml.closeElement("channel");
+                    });
+                    callFeatureSpeakerChannel.isMicrophoneActive().ifPresent(microphone -> {
+                        xml.openElement("microphone");
+                        xml.escape(String.valueOf(microphone));
+                        xml.closeElement("microphone");
+                    });
+                    callFeatureSpeakerChannel.isMuteRequested().ifPresent(muteRequested -> {
+                        xml.openElement("mute");
+                        xml.escape(String.valueOf(muteRequested));
+                        xml.closeElement("mute");
+                    });
+                    xml.closeElement("speakerchannel");
+                } else {
+                    feature.getLabel().ifPresent(label -> xml.attribute("label", label));
+                    xml.rightAngleBracket();
+                }
                 xml.closeElement("feature");
             });
             xml.closeElement("features");
         }
-	}
+    }
 
-	@SuppressWarnings("unchecked")
-	public static List<Call> getCalls(final XmlPullParser parser, final List<String> errors)
-			throws IOException, XmlPullParserException {
-		final List<Call> calls = new ArrayList<>();
-		final Call.Builder callBuilder = Call.Builder.start();
-		if (parser.getName().equals("call")) {
-			parser.nextTag();
-			if (parser.getName().equals("id")) {
-				final String callIdString = parser.nextText();
-				final Optional<CallId> callIdOptional = CallId.from(callIdString);
-				callIdOptional.ifPresent(callBuilder::setId);
-				parser.nextTag();
-			}
-			if (parser.getName().equals("conference")) {
-				final String conferenceIdString = parser.nextText();
-				final Optional<ConferenceId> conferenceIdOptional = ConferenceId.from(conferenceIdString);
-				conferenceIdOptional.ifPresent(callBuilder::setConferenceId);
-				parser.nextTag();
-			}
-			
-			    Optional<Site> site = getSite(parser, errors);			
-				site.ifPresent(callBuilder::setSite);
+    @SuppressWarnings("unchecked")
+    public static List<Call> getCalls(
+            @Nonnull final XmlPullParser parser,
+            @Nonnull final String description,
+            @Nonnull final List<String> errors)
+            throws IOException, XmlPullParserException {
+        final List<Call> calls = new ArrayList<>();
+        final Call.Builder callBuilder = Call.Builder.start();
+        if (parser.getName().equals("call")) {
+            parser.nextTag();
+            if (parser.getName().equals("id")) {
+                final String callIdString = parser.nextText();
+                final Optional<CallId> callIdOptional = CallId.from(callIdString);
+                callIdOptional.ifPresent(callBuilder::setId);
+                parser.nextTag();
+            }
+            if (parser.getName().equals("conference")) {
+                final String conferenceIdString = parser.nextText();
+                final Optional<ConferenceId> conferenceIdOptional = ConferenceId.from(conferenceIdString);
+                conferenceIdOptional.ifPresent(callBuilder::setConferenceId);
+                parser.nextTag();
+            }
 
-			
-			if (parser.getName().equals("profile")) {
-				final String profileIdString = parser.nextText();
-				final Optional<ProfileId> profileIdOptional = ProfileId.from(profileIdString);
-				profileIdOptional.ifPresent(callBuilder::setProfileId);
-				parser.nextTag();
-			}
-			if (parser.getName().equals("user")) {
-				final String userIdString = parser.nextText();
-				final Optional<UserId> userIdOptional = UserId.from(userIdString);
-				userIdOptional.ifPresent(callBuilder::setUserId);
-				parser.nextTag();
-			}
-			if (parser.getName().equals("interest")) {
-				final String interestIdString = parser.nextText();
-				final Optional<InterestId> interestIdOptional = InterestId.from(interestIdString);
-				interestIdOptional.ifPresent(callBuilder::setInterestId);
-				parser.nextTag();
-			}
-			if (parser.getName().equals("changed")) {
-				final String changedString = parser.nextText();
-				final Optional<Changed> changedOptional = Changed.from(changedString);
-				changedOptional.ifPresent(callBuilder::setChanged);
-				parser.nextTag();
-			}
-			if (parser.getName().equals("state")) {
-				final String callStateString = parser.nextText();
-				final Optional<CallState> callStateOptional = CallState.from(callStateString);
-				callStateOptional.ifPresent(callBuilder::setState);
-				parser.nextTag();
-			}
-			if (parser.getName().equals(ATTRIBUTE_DIRECTION)) {
-				final String callDirectionString = parser.nextText();
-				final Optional<CallDirection> callDirectionOptional = CallDirection.from(callDirectionString);
-				callDirectionOptional.ifPresent(callBuilder::setDirection);
-				parser.nextTag();
-			}
-			if (parser.getName().equals("caller")) {
-				parser.nextTag();
-				if (parser.getName().equals(ELEMENT_NUMBER)) {
-					callBuilder.addCallerE164Numbers(getPhoneNumbers(parser));
-					final String callerNumberString = parser.nextText();
-					final Optional<PhoneNumber> callerNumberOptional = PhoneNumber.from(callerNumberString);
-					callerNumberOptional.ifPresent(callBuilder::setCallerNumber);
-					parser.nextTag();
-				}
-				if (parser.getName().equals("name")) {
-					final Optional<String> callerName = Optional.ofNullable(parser.nextText());
-					callerName.ifPresent(callBuilder::setCallerName);
-					parser.nextTag(); // moves to end of caller tag
-					parser.nextTag(); // moves to start of next tag
-				}
-			}
-			if (parser.getName().equals("called")) {
-				parser.nextTag();
-				if (parser.getName().equals(ELEMENT_NUMBER)) {
-					callBuilder.addCalledE164Numbers(getPhoneNumbers(parser));
-					final Optional<PhoneNumber> destination = PhoneNumber.from(SmackPacketUtil.getStringAttribute(parser, "destination").get());
-					destination.ifPresent(callBuilder::setCalledDestination);	
-					final String calledNumberString = parser.nextText();
-					final Optional<PhoneNumber> calledNumberOptional = PhoneNumber.from(calledNumberString);
-					calledNumberOptional.ifPresent(callBuilder::setCalledNumber);				 
-					parser.nextTag();
-				}
-				if (parser.getName().equals("name")) {
-					final Optional<String> callerName = Optional.ofNullable(parser.nextText());
-					callerName.ifPresent(callBuilder::setCalledName);
-					parser.nextTag();  // moves to end of caller tag
-					parser.nextTag();  // moves to start of next tag
-				}
-			}
+            Optional<Site> site = getSite(parser, errors);
+            site.ifPresent(callBuilder::setSite);
 
-			getOriginatorReferences(parser, callBuilder);
-			getChildElementISO8601(ATTRIBUTE_START_TIME, parser, errors).ifPresent(callBuilder::setStartTime);
-			getChildElementLong(ATTRIBUTE_DURATION, parser, errors).map(Duration::ofMillis)
-					.ifPresent(callBuilder::setDuration);
-			getActions(callBuilder, parser, errors);
-			getFeatures(callBuilder, parser, errors);
-			getParticipants(callBuilder, parser, errors);
-			calls.add(callBuilder.build(errors));
-		}
+            if (parser.getName().equals("profile")) {
+                final String profileIdString = parser.nextText();
+                final Optional<ProfileId> profileIdOptional = ProfileId.from(profileIdString);
+                profileIdOptional.ifPresent(callBuilder::setProfileId);
+                parser.nextTag();
+            }
+            if (parser.getName().equals("user")) {
+                final String userIdString = parser.nextText();
+                final Optional<UserId> userIdOptional = UserId.from(userIdString);
+                userIdOptional.ifPresent(callBuilder::setUserId);
+                parser.nextTag();
+            }
+            if (parser.getName().equals("interest")) {
+                final String interestIdString = parser.nextText();
+                final Optional<InterestId> interestIdOptional = InterestId.from(interestIdString);
+                interestIdOptional.ifPresent(callBuilder::setInterestId);
+                parser.nextTag();
+            }
+            if (parser.getName().equals("changed")) {
+                final String changedString = parser.nextText();
+                final Optional<Changed> changedOptional = Changed.from(changedString);
+                changedOptional.ifPresent(callBuilder::setChanged);
+                parser.nextTag();
+            }
+            if (parser.getName().equals("state")) {
+                final String callStateString = parser.nextText();
+                final Optional<CallState> callStateOptional = CallState.from(callStateString);
+                callStateOptional.ifPresent(callBuilder::setState);
+                parser.nextTag();
+            }
+            if (parser.getName().equals(ATTRIBUTE_DIRECTION)) {
+                final String callDirectionString = parser.nextText();
+                final Optional<CallDirection> callDirectionOptional = CallDirection.from(callDirectionString);
+                callDirectionOptional.ifPresent(callBuilder::setDirection);
+                parser.nextTag();
+            }
+            if (parser.getName().equals("caller")) {
+                parser.nextTag();
+                if (parser.getName().equals(ELEMENT_NUMBER)) {
+                    callBuilder.addCallerE164Numbers(getPhoneNumbers(parser));
+                    final String callerNumberString = parser.nextText();
+                    final Optional<PhoneNumber> callerNumberOptional = PhoneNumber.from(callerNumberString);
+                    callerNumberOptional.ifPresent(callBuilder::setCallerNumber);
+                    parser.nextTag();
+                }
+                if (parser.getName().equals("name")) {
+                    final Optional<String> callerName = Optional.ofNullable(parser.nextText());
+                    callerName.ifPresent(callBuilder::setCallerName);
+                    parser.nextTag(); // moves to end of caller tag
+                    parser.nextTag(); // moves to start of next tag
+                }
+            }
+            if (parser.getName().equals("called")) {
+                parser.nextTag();
+                if (parser.getName().equals(ELEMENT_NUMBER)) {
+                    callBuilder.addCalledE164Numbers(getPhoneNumbers(parser));
+                    final Optional<PhoneNumber> destination = PhoneNumber.from(SmackPacketUtil.getStringAttribute(parser, "destination").orElse(null));
+                    destination.ifPresent(callBuilder::setCalledDestination);
+                    final String calledNumberString = parser.nextText();
+                    final Optional<PhoneNumber> calledNumberOptional = PhoneNumber.from(calledNumberString);
+                    calledNumberOptional.ifPresent(callBuilder::setCalledNumber);
+                    parser.nextTag();
+                }
+                if (parser.getName().equals("name")) {
+                    final Optional<String> callerName = Optional.ofNullable(parser.nextText());
+                    callerName.ifPresent(callBuilder::setCalledName);
+                    parser.nextTag(); // moves to end of caller tag
+                    parser.nextTag(); // moves to start of next tag
+                }
+            }
 
-		return calls;
-	}
+            getOriginatorReferences(parser, callBuilder);
+            getChildElementISO8601(ATTRIBUTE_START_TIME, parser, description, errors).ifPresent(callBuilder::setStartTime);
+            getChildElementLong(ATTRIBUTE_DURATION, parser, description, errors).map(Duration::ofMillis).ifPresent(callBuilder::setDuration);
+            getActions(callBuilder, parser, errors);
+            getFeatures(callBuilder, parser, description, errors);
+            getParticipants(callBuilder, parser, description, errors);
+            calls.add(callBuilder.build(errors));
+        }
 
-	private static List<PhoneNumber> getPhoneNumbers(final XmlPullParser parser) {
-		final Optional<String> e164String = SmackPacketUtil.getStringAttribute(parser, "e164");
-		final List<PhoneNumber> phoneNumbers = new ArrayList<>();
-		e164String.ifPresent(string -> Arrays.stream(string.split(",")).map(String::trim).map(PhoneNumber::from)
-				.filter(Optional::isPresent).map(Optional::get).forEach(phoneNumbers::add));
-		return phoneNumbers;
-	}
+        return calls;
+    }
 
-	@SuppressWarnings("unchecked")
-	private static void getParticipants(@Nonnull final Call.Builder callBuilder, final XmlPullParser parser,
-			@Nonnull final List<String> parseErrors) throws IOException, XmlPullParserException {
+    private static List<PhoneNumber> getPhoneNumbers(final XmlPullParser parser) {
+        final Optional<String> e164String = SmackPacketUtil.getStringAttribute(parser, "e164");
+        final List<PhoneNumber> phoneNumbers = new ArrayList<>();
+        e164String.ifPresent(string -> Arrays.stream(string.split(",")).map(String::trim).map(PhoneNumber::from)
+                .filter(Optional::isPresent).map(Optional::get).forEach(phoneNumbers::add));
+        return phoneNumbers;
+    }
 
-		parser.nextTag();
-		if (parser.getName().equals("participants")) {
-			parser.nextTag();
-			while (parser.getName().equals("participant")) {
-				final Participant.Builder participantBuilder = Participant.Builder.start();
-				SmackPacketUtil.getStringAttribute(parser, "jid").ifPresent(participantBuilder::setJID);
-				ParticipantType.from(SmackPacketUtil.getStringAttribute(parser, "type").orElse(null))
-						.ifPresent(participantBuilder::setType);
-				CallDirection.from(SmackPacketUtil.getStringAttribute(parser, ATTRIBUTE_DIRECTION).orElse(null))
-						.ifPresent(participantBuilder::setDirection);
-				final Optional<Instant> participantTimestamp = getJavaUtilDateAttribute(parser, ATTRIBUTE_TIMESTAMP,
-						parseErrors);
-				participantTimestamp.ifPresent(participantBuilder::setStartTime);
-				final Optional<Instant> participantStartTime = getISO8601Attribute(parser, ATTRIBUTE_START_TIME,
-						parseErrors);
-				participantStartTime.ifPresent(participantBuilder::setStartTime);
-				if (participantStartTime.isPresent() && participantTimestamp.isPresent()
-						&& !participantStartTime.equals(participantTimestamp)) {
-					parseErrors
-							.add("Invalid participant; the legacy timestamp field does not match the start time field");
-				}
-				final Optional<Long> participantDuration = SmackPacketUtil.getLongAttribute(parser, ATTRIBUTE_DURATION);
-				participantDuration.ifPresent(millis -> participantBuilder.setDuration(Duration.ofMillis(millis)));
-				callBuilder.addParticipant(participantBuilder.build(parseErrors));
-				ParserUtils.forwardToEndTagOfDepth(parser, parser.getDepth());
-				parser.nextTag();
-			}
-		}
-	}
+    @SuppressWarnings("unchecked")
+    private static void getParticipants(
+            @Nonnull final Call.Builder callBuilder,
+            @Nonnull final XmlPullParser parser,
+            @Nonnull final String description,
+            @Nonnull final List<String> parseErrors) throws IOException, XmlPullParserException {
 
-	private static Optional<Instant> getJavaUtilDateAttribute(final XmlPullParser parser, final String attributeName,
-			final List<String> parseErrors) {
-		final Optional<String> stringValue = SmackPacketUtil.getStringAttribute(parser, attributeName);
-		try {
-			return stringValue.map(string -> Instant.from(JAVA_UTIL_DATE_FORMATTER.parse(string)));
-		} catch (final DateTimeParseException ignored) {
-			parseErrors.add(String.format(
-					"Invalid %s; invalid %s '%s'; format should be 'dow mon dd hh:mm:ss zzz yyyy'", attributeName));
-			return Optional.empty();
-		}
-	}
+        parser.nextTag();
+        if (parser.getName().equals("participants")) {
+            parser.nextTag();
+            while (parser.getName().equals("participant")) {
+                final Participant.Builder participantBuilder = Participant.Builder.start();
+                SmackPacketUtil.getStringAttribute(parser, "jid").ifPresent(participantBuilder::setJID);
+                ParticipantType.from(SmackPacketUtil.getStringAttribute(parser, "type").orElse(null))
+                        .ifPresent(participantBuilder::setType);
+                CallDirection.from(SmackPacketUtil.getStringAttribute(parser, ATTRIBUTE_DIRECTION).orElse(null))
+                        .ifPresent(participantBuilder::setDirection);
+                final Optional<Instant> participantTimestamp = getJavaUtilDateAttribute(parser, ATTRIBUTE_TIMESTAMP, description, parseErrors);
+                participantTimestamp.ifPresent(participantBuilder::setStartTime);
+                final Optional<Instant> participantStartTime = getISO8601Attribute(parser, ATTRIBUTE_START_TIME, description, parseErrors);
+                participantStartTime.ifPresent(participantBuilder::setStartTime);
+                if (participantStartTime.isPresent() && participantTimestamp.isPresent()
+                        && !participantStartTime.equals(participantTimestamp)) {
+                    parseErrors
+                            .add("Invalid participant; the legacy timestamp field does not match the start time field");
+                }
+                final Optional<Long> participantDuration = SmackPacketUtil.getLongAttribute(parser, ATTRIBUTE_DURATION);
+                participantDuration.ifPresent(millis -> participantBuilder.setDuration(Duration.ofMillis(millis)));
+                callBuilder.addParticipant(participantBuilder.build(parseErrors));
+                ParserUtils.forwardToEndTagOfDepth(parser, parser.getDepth());
+                parser.nextTag();
+            }
+        }
+    }
 
-	private static Optional<Instant> getISO8601Attribute(final XmlPullParser parser, final String attributeName,
-			@Nonnull final List<String> parseErrors) {
+    private static Optional<Instant> getJavaUtilDateAttribute(
+            final XmlPullParser parser,
+            final String attributeName,
+            final String description,
+            final List<String> parseErrors) {
+        final Optional<String> stringValue = SmackPacketUtil.getStringAttribute(parser, attributeName);
+        try {
+            return stringValue.map(string -> Instant.from(JAVA_UTIL_DATE_FORMATTER.parse(string)));
+        } catch (final DateTimeParseException ignored) {
+            parseErrors.add(String.format("Invalid %s; invalid %s '%s'; format should be 'dow mon dd hh:mm:ss zzz yyyy'", description, attributeName, stringValue));
+            return Optional.empty();
+        }
+    }
 
-		final Optional<String> stringValue = SmackPacketUtil.getStringAttribute(parser, attributeName);
-		try {
-			return stringValue.map(Instant::parse);
-		} catch (final DateTimeParseException ignored) {
-			parseErrors.add(String.format("Invalid %s; invalid %s '%s'; format should be compliant with XEP-0082",
-					attributeName));
-			return Optional.empty();
-		}
-	}
+    private static Optional<Instant> getISO8601Attribute(
+            @Nonnull final XmlPullParser parser,
+            @Nonnull final String attributeName,
+            @Nonnull final String description,
+            @Nonnull final List<String> parseErrors) {
 
-	@SuppressWarnings("unchecked")
-	private static void getActions(@Nonnull final Call.Builder callBuilder, final XmlPullParser parser,
-			@Nonnull final List<String> parseErrors) throws IOException, XmlPullParserException {
-		parser.nextTag();
-		if (parser.getName().equals("actions")) {
-			do {
-				parser.nextTag();
-				if (parser.getName().equals(OpenlinkXmppNamespace.TAG_ACTION)) {
-					final String actionString = parser.nextText();
-					final Optional<RequestAction> requestAction = RequestAction.from(actionString);
-					if (requestAction.isPresent()) {
-						callBuilder.addAction(requestAction.get());
-					} else {
-						parseErrors.add("Invalid %s: %s is not a valid action");
-					}
-				}
-				ParserUtils.forwardToEndTagOfDepth(parser, parser.getDepth());
-			} while (parser.getName().equals(OpenlinkXmppNamespace.TAG_ACTION));
-			ParserUtils.forwardToEndTagOfDepth(parser, parser.getDepth());
-			parser.nextTag();
+        final Optional<String> stringValue = SmackPacketUtil.getStringAttribute(parser, attributeName);
+        try {
+            return stringValue.map(Instant::parse);
+        } catch (final DateTimeParseException ignored) {
+            parseErrors.add(String.format("Invalid %s; invalid %s '%s'; format should be compliant with XEP-0082", description, attributeName, stringValue));
+            return Optional.empty();
+        }
+    }
 
-		}
-	}
+    @SuppressWarnings("unchecked")
+    private static void getActions(@Nonnull final Call.Builder callBuilder, final XmlPullParser parser,
+            @Nonnull final List<String> parseErrors) throws IOException, XmlPullParserException {
+        parser.nextTag();
+        if (parser.getName().equals("actions")) {
+            do {
+                parser.nextTag();
+                if (parser.getName().equals(OpenlinkXmppNamespace.TAG_ACTION)) {
+                    final String actionString = parser.nextText();
+                    final Optional<RequestAction> requestAction = RequestAction.from(actionString);
+                    if (requestAction.isPresent()) {
+                        callBuilder.addAction(requestAction.get());
+                    } else {
+                        parseErrors.add("Invalid %s: %s is not a valid action");
+                    }
+                }
+                ParserUtils.forwardToEndTagOfDepth(parser, parser.getDepth());
+            } while (parser.getName().equals(OpenlinkXmppNamespace.TAG_ACTION));
+            ParserUtils.forwardToEndTagOfDepth(parser, parser.getDepth());
+            parser.nextTag();
 
-	@SuppressWarnings("unchecked")
-	private static void getFeatures(@Nonnull final Call.Builder callBuilder, final XmlPullParser parser,
-			@Nonnull final List<String> parseErrors) throws IOException, XmlPullParserException {
-		parser.nextTag();
+        }
+    }
 
-		if (parser.getName().equals("features")) {
+    @SuppressWarnings("unchecked")
+    private static void getFeatures(
+            @Nonnull final Call.Builder callBuilder,
+            @Nonnull final XmlPullParser parser,
+            @Nonnull final String description,
+            @Nonnull final List<String> parseErrors) throws IOException, XmlPullParserException {
+        parser.nextTag();
 
-			parser.nextTag();
-			while (OpenlinkXmppNamespace.TAG_FEATURE.equals(parser.getName())) {
-				final CallFeature.AbstractCallFeatureBuilder callFeatureBuilder;
+        if (parser.getName().equals("features")) {
 
-				final Optional<FeatureId> featureId = FeatureId.from(parser.getAttributeValue("", "id"));
-				final Optional<String> featureTypeString = SmackPacketUtil.getStringAttribute(parser, "type");
-				final Optional<String> label = SmackPacketUtil.getStringAttribute(parser, OpenlinkXmppNamespace.TAG_LABEL);
-				String text = "";
-				while(parser.next() == XmlPullParser.TEXT) {
-					text = parser.getText();
-				}
-				if(parser.getEventType() == XmlPullParser.START_TAG) {
-					switch (parser.getName()) {
-						case "devicekeys":
-							final CallFeatureDeviceKey.Builder deviceKeyBuilder = CallFeatureDeviceKey.Builder.start();
-							if (parser.nextTag() == XmlPullParser.START_TAG && "key".equals(parser.getName())) {
-								DeviceKey.from(parser.nextText()).ifPresent(deviceKeyBuilder::setDeviceKey);
-							}
-							callFeatureBuilder = deviceKeyBuilder;
-							break;
+            parser.nextTag();
+            while (OpenlinkXmppNamespace.TAG_FEATURE.equals(parser.getName())) {
+                final CallFeature.AbstractCallFeatureBuilder callFeatureBuilder;
 
-						case "speakerchannel":
-							final CallFeatureSpeakerChannel.Builder speakerChannelBuilder = CallFeatureSpeakerChannel.Builder.start();
-							getChildElementLong("channel", parser, parseErrors).ifPresent(speakerChannelBuilder::setChannel);
-							getChildElementBoolean("microphone", parser, parseErrors).ifPresent(speakerChannelBuilder::setMicrophoneActive);
-							getChildElementBoolean("mute", parser, parseErrors).ifPresent(speakerChannelBuilder::setMuteRequested);
-							callFeatureBuilder = speakerChannelBuilder;
-							break;
+                final Optional<FeatureId> featureId = FeatureId.from(parser.getAttributeValue("", "id"));
+                final Optional<String> featureTypeString = SmackPacketUtil.getStringAttribute(parser, "type");
+                final Optional<String> label = SmackPacketUtil.getStringAttribute(parser, OpenlinkXmppNamespace.TAG_LABEL);
+                String text = "";
+                while (parser.next() == XmlPullParser.TEXT) {
+                    text = parser.getText();
+                }
+                if (parser.getEventType() == XmlPullParser.START_TAG) {
+                    switch (parser.getName()) {
+                    case "devicekeys":
+                        final CallFeatureDeviceKey.Builder deviceKeyBuilder = CallFeatureDeviceKey.Builder.start();
+                        if (parser.nextTag() == XmlPullParser.START_TAG && "key".equals(parser.getName())) {
+                            DeviceKey.from(parser.nextText()).ifPresent(deviceKeyBuilder::setDeviceKey);
+                        }
+                        callFeatureBuilder = deviceKeyBuilder;
+                        break;
 
-						default:
-							// Assume a simple true/false feature
-							final CallFeatureBoolean.Builder booleanBuilder = CallFeatureBoolean.Builder.start();
-							getBoolean(text).ifPresent(booleanBuilder::setEnabled);
-							callFeatureBuilder = booleanBuilder;
-							break;
-					}
-				} else {
-					// Assume a simple true/false feature
-					final CallFeatureBoolean.Builder booleanBuilder = CallFeatureBoolean.Builder.start();
-					getBoolean(text).ifPresent(booleanBuilder::setEnabled);
-					callFeatureBuilder = booleanBuilder;
-					break;
-				}
-				featureId.ifPresent(callFeatureBuilder::setId);
-				featureTypeString.ifPresent(featureType -> {
-					final Optional<FeatureType> type = FeatureType.from(featureType);
-					if (type.isPresent())
-						callFeatureBuilder.setType(type.get());
-					else
-						parseErrors.add("Invalid %s; invalid feature type - '%s'");
-				});
-				label.ifPresent(callFeatureBuilder::setLabel);
-				callBuilder.addFeature(callFeatureBuilder.build(parseErrors));
-				ParserUtils.forwardToEndTagOfDepth(parser, parser.getDepth());
-				parser.nextTag();
-			}
+                    case "speakerchannel":
+                        final CallFeatureSpeakerChannel.Builder speakerChannelBuilder = CallFeatureSpeakerChannel.Builder.start();
+                        getChildElementLong("channel", parser, description, parseErrors).ifPresent(speakerChannelBuilder::setChannel);
+                        getChildElementBoolean("microphone", parser, description, parseErrors).ifPresent(speakerChannelBuilder::setMicrophoneActive);
+                        getChildElementBoolean("mute", parser, description, parseErrors).ifPresent(speakerChannelBuilder::setMuteRequested);
+                        callFeatureBuilder = speakerChannelBuilder;
+                        break;
 
-		}
-	}
+                    default:
+                        // Assume a simple true/false feature
+                        final CallFeatureBoolean.Builder booleanBuilder = CallFeatureBoolean.Builder.start();
+                        getBoolean(text).ifPresent(booleanBuilder::setEnabled);
+                        callFeatureBuilder = booleanBuilder;
+                        break;
+                    }
+                } else {
+                    // Assume a simple true/false feature
+                    final CallFeatureBoolean.Builder booleanBuilder = CallFeatureBoolean.Builder.start();
+                    getBoolean(text).ifPresent(booleanBuilder::setEnabled);
+                    callFeatureBuilder = booleanBuilder;
+                }
+                featureId.ifPresent(callFeatureBuilder::setId);
+                featureTypeString.ifPresent(featureType -> {
+                    final Optional<FeatureType> type = FeatureType.from(featureType);
+                    if (type.isPresent()) {
+                        callFeatureBuilder.setType(type.get());
+                    } else {
+                        parseErrors.add("Invalid %s; invalid feature type - '%s'");
+                    }
+                });
+                label.ifPresent(callFeatureBuilder::setLabel);
+                callBuilder.addFeature(callFeatureBuilder.build(parseErrors));
+                ParserUtils.forwardToEndTagOfDepth(parser, parser.getDepth());
+                parser.nextTag();
+            }
 
-	private static Optional<Boolean> getBoolean(String featureText) {
-		if ("true".equals(featureText)) {
-			return Optional.of(Boolean.TRUE);
-		} else if ("false".equals(featureText)) {
-			return Optional.of(Boolean.FALSE);
-		} else {
-			return Optional.empty();
-		}
-	}
+        }
+    }
 
-	@SuppressWarnings("unchecked")
-	private static void getOriginatorReferences(final XmlPullParser parser, final Call.Builder callBuilder)
-			throws XmlPullParserException, IOException {
+    private static Optional<Boolean> getBoolean(String featureText) {
+        if ("true".equals(featureText)) {
+            return Optional.of(Boolean.TRUE);
+        } else if ("false".equals(featureText)) {
+            return Optional.of(Boolean.FALSE);
+        } else {
+            return Optional.empty();
+        }
+    }
 
-		//parser.nextTag();
-		if (!parser.getName().equals("originator-ref")) {
-			return;
-		}
-		parser.nextTag();
+    @SuppressWarnings("unchecked")
+    private static void getOriginatorReferences(final XmlPullParser parser, final Call.Builder callBuilder)
+            throws XmlPullParserException, IOException {
 
-		while (parser.getName().equals("property")) {
-			final String key = SmackPacketUtil.getStringAttribute(parser, "id").orElse("");
-			parser.nextTag();
-			String value = "";
-			if (parser.getName().equals("value"))
-				value = parser.nextText();
-			callBuilder.addOriginatorReference(key, value);
-			ParserUtils.forwardToEndTagOfDepth(parser, parser.getDepth());
-			parser.nextTag();  // end of property tag
-			parser.nextTag();  // start of next tag
-		}
+        //parser.nextTag();
+        if (!parser.getName().equals("originator-ref")) {
+            return;
+        }
+        parser.nextTag();
 
-	}
+        while (parser.getName().equals("property")) {
+            final String key = SmackPacketUtil.getStringAttribute(parser, "id").orElse("");
+            parser.nextTag();
+            String value = "";
+            if (parser.getName().equals("value"))
+                value = parser.nextText();
+            callBuilder.addOriginatorReference(key, value);
+            ParserUtils.forwardToEndTagOfDepth(parser, parser.getDepth());
+            parser.nextTag(); // end of property tag
+            parser.nextTag(); // start of next tag
+        }
 
-	@Nonnull
-	private static Optional<Instant> getChildElementISO8601(@Nonnull final String childElementName,
-			final XmlPullParser parser, @Nonnull final List<String> parseErrors)
-			throws XmlPullParserException, IOException {
-		parser.nextTag();
-		if (parser.getName().equals(childElementName)) {
-			try {
-				return Optional.of(Instant.parse(parser.nextText()));
-			} catch (final DateTimeParseException ignored) {
-				parseErrors.add(String.format("Invalid %s; invalid %s '%s'; format should be compliant with XEP-0082",
-						childElementName));
-			}
-		}
-		return Optional.empty();
-	}
+    }
 
-	@Nonnull
-	public static Optional<Long> getChildElementLong(@Nonnull final String childElementName, final XmlPullParser parser,
-			@Nonnull final List<String> parseErrors) throws XmlPullParserException, IOException {
-		parser.nextTag();
-		if (parser.getName().equals(childElementName)) {
-			try {
-				return Optional.of(Long.parseLong(parser.nextText()));
-			} catch (final NumberFormatException ignored) {
-				parseErrors
-						.add(String.format("Invalid %s; invalid %s '%s'; please supply an integer", childElementName));
-			}
-		}
-		return Optional.empty();
-	}
+    @Nonnull
+    private static Optional<Instant> getChildElementISO8601(
+            @Nonnull final String childElementName,
+            @Nonnull final XmlPullParser parser,
+            @Nonnull final String description,
+            @Nonnull final List<String> parseErrors)
+            throws XmlPullParserException, IOException {
+        parser.nextTag();
+        if (parser.getName().equals(childElementName)) {
+            final String childElementText = parser.nextText();
+            try {
+                return Optional.of(Instant.parse(childElementText));
+            } catch (final DateTimeParseException ignored) {
+                parseErrors.add(String.format("Invalid %s; invalid %s '%s'; format should be compliant with XEP-0082", description, childElementName, childElementText));
+            }
+        }
+        return Optional.empty();
+    }
 
-	@Nonnull
-	public static Optional<Boolean> getChildElementBoolean(@Nonnull final String childElementName, final XmlPullParser parser,
-			@Nonnull final List<String> parseErrors) throws XmlPullParserException, IOException {
-		parser.nextTag();
-		if (parser.getName().equals(childElementName)) {
-			try {
-				return getBoolean(parser.nextText());
-			} catch (final NumberFormatException ignored) {
-				parseErrors
-						.add(String.format("Invalid %s; invalid %s '%s'; please supply an integer", childElementName));
-			}
-		}
-		return Optional.empty();
-	}
+    @Nonnull
+    public static Optional<Long> getChildElementLong(
+            @Nonnull final String childElementName,
+            @Nonnull final XmlPullParser parser,
+            @Nonnull final String stanzaDescription,
+            @Nonnull final List<String> parseErrors)
+            throws XmlPullParserException, IOException {
+        parser.nextTag();
+        if (parser.getName().equals(childElementName)) {
+            final String childElementText = parser.nextText();
+            try {
+                return Optional.of(Long.parseLong(childElementText));
+            } catch (final NumberFormatException ignored) {
+                parseErrors.add(String.format("Invalid %s; invalid %s '%s'; please supply an integer", stanzaDescription, childElementName, childElementText));
+            }
+        }
+        return Optional.empty();
+    }
+
+    @Nonnull
+    public static Optional<Boolean> getChildElementBoolean(
+            @Nonnull final String childElementName,
+            @Nonnull final XmlPullParser parser,
+            @Nonnull final String description,
+            @Nonnull final List<String> parseErrors) throws XmlPullParserException, IOException {
+        parser.nextTag();
+        if (parser.getName().equals(childElementName)) {
+            final String value = parser.nextText();
+            try {
+                return getBoolean(value);
+            } catch (final NumberFormatException ignored) {
+                parseErrors.add(String.format("Invalid %s: %s is neither true or false", description, value));
+            }
+        }
+        return Optional.empty();
+    }
 }
