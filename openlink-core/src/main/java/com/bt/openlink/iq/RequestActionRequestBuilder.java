@@ -134,24 +134,28 @@ public abstract class RequestActionRequestBuilder<B extends RequestActionRequest
         if (requestAction == null) {
             errors.add("Invalid request-action stanza; missing or invalid 'requestAction'");
         } else {
-            if (requestAction.getMinValueCount() > 0 && value1 == null) {
-                errors.add(String.format("Invalid request-action stanza; the action '%s' requires value1 to be set", requestAction.getId()));
-            }
-            if (requestAction.getMinValueCount() > 1 && value2 == null) {
-                errors.add(String.format("Invalid request-action stanza; the action '%s' requires value2 to be set", requestAction.getId()));
-            }
-            if (requestAction.getMaxValueCount() < 1 && value1 != null) {
-                errors.add(String.format("Invalid request-action stanza; the action '%s' does not require value1 to be set", requestAction.getId()));
-            }
-            if (requestAction.getMaxValueCount() < 2 && value2 != null) {
-                errors.add(String.format("Invalid request-action stanza; the action '%s' does not require value2 to be set", requestAction.getId()));
-            }
+            checkValuesArePResent(requestAction, errors);
         }
         if (callId == null) {
             errors.add("Invalid request-action stanza; missing 'callId'");
         }
         if (value1 == null && value2 != null) {
             errors.add("Invalid request-action stanza; value2 cannot be set without value1");
+        }
+    }
+
+    private void checkValuesArePResent(@Nonnull final RequestAction requestActionToCheck, final List<String> errors) {
+        if (requestActionToCheck.getMinValueCount() > 0 && value1 == null) {
+            errors.add(String.format("Invalid request-action stanza; the action '%s' requires value1 to be set", requestActionToCheck.getId()));
+        }
+        if (requestActionToCheck.getMinValueCount() > 1 && value2 == null) {
+            errors.add(String.format("Invalid request-action stanza; the action '%s' requires value2 to be set", requestActionToCheck.getId()));
+        }
+        if (requestActionToCheck.getMaxValueCount() < 1 && value1 != null) {
+            errors.add(String.format("Invalid request-action stanza; the action '%s' does not require value1 to be set", requestActionToCheck.getId()));
+        }
+        if (requestActionToCheck.getMaxValueCount() < 2 && value2 != null) {
+            errors.add(String.format("Invalid request-action stanza; the action '%s' does not require value2 to be set", requestActionToCheck.getId()));
         }
     }
 }

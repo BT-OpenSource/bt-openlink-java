@@ -577,33 +577,21 @@ public final class SmackPacketUtil {
                 if (parser.getEventType() == XmlPullParser.START_TAG) {
                     switch (parser.getName()) {
                     case ELEMENT_DEVICEKEYS:
-                        final CallFeatureDeviceKey.Builder deviceKeyBuilder = CallFeatureDeviceKey.Builder.start();
-                        if (parser.nextTag() == XmlPullParser.START_TAG && "key".equals(parser.getName())) {
-                            DeviceKey.from(parser.nextText()).ifPresent(deviceKeyBuilder::setDeviceKey);
-                        }
-                        callFeatureBuilder = deviceKeyBuilder;
+                        callFeatureBuilder = getDeviceKeyFeatureBuilder(parser);
                         break;
 
                     case ELEMENT_SPEAKERCHANNEL:
-                        final CallFeatureSpeakerChannel.Builder speakerChannelBuilder = CallFeatureSpeakerChannel.Builder.start();
-                        getChildElementLong(ELEMENT_CHANNEL, parser, description, parseErrors).ifPresent(speakerChannelBuilder::setChannel);
-                        getChildElementBoolean(ELEMENT_MICROPHONE, parser, description, parseErrors).ifPresent(speakerChannelBuilder::setMicrophoneActive);
-                        getChildElementBoolean(ELEMENT_MUTE, parser, description, parseErrors).ifPresent(speakerChannelBuilder::setMuteRequested);
-                        callFeatureBuilder = speakerChannelBuilder;
+                        callFeatureBuilder = getSpeakerChannelFeatureBuilder(parser, description, parseErrors);
                         break;
 
                     default:
                         // Assume a simple true/false feature
-                        final CallFeatureBoolean.Builder booleanBuilder = CallFeatureBoolean.Builder.start();
-                        getBoolean(text).ifPresent(booleanBuilder::setEnabled);
-                        callFeatureBuilder = booleanBuilder;
+                        callFeatureBuilder = getBooleanFeatureBuilder(text);
                         break;
                     }
                 } else {
                     // Assume a simple true/false feature
-                    final CallFeatureBoolean.Builder booleanBuilder = CallFeatureBoolean.Builder.start();
-                    getBoolean(text).ifPresent(booleanBuilder::setEnabled);
-                    callFeatureBuilder = booleanBuilder;
+                    callFeatureBuilder = getBooleanFeatureBuilder(text);
                     parser.nextTag();
                 }
                 featureId.ifPresent(callFeatureBuilder::setId);
@@ -620,6 +608,37 @@ public final class SmackPacketUtil {
             }
             ParserUtils.forwardToEndTagOfDepth(parser, featuresDepth);
         }
+    }
+
+    @Nonnull
+    private static CallFeature.AbstractCallFeatureBuilder getBooleanFeatureBuilder(@Nullable final String text) {
+        final CallFeature.AbstractCallFeatureBuilder callFeatureBuilder;
+        final CallFeatureBoolean.Builder booleanBuilder = CallFeatureBoolean.Builder.start();
+        getBoolean(text).ifPresent(booleanBuilder::setEnabled);
+        callFeatureBuilder = booleanBuilder;
+        return callFeatureBuilder;
+    }
+
+    @Nonnull
+    private static CallFeature.AbstractCallFeatureBuilder getSpeakerChannelFeatureBuilder(@Nonnull final XmlPullParser parser, @Nonnull final String description, @Nonnull final List<String> parseErrors) throws XmlPullParserException, IOException {
+        final CallFeature.AbstractCallFeatureBuilder callFeatureBuilder;
+        final CallFeatureSpeakerChannel.Builder speakerChannelBuilder = CallFeatureSpeakerChannel.Builder.start();
+        getChildElementLong(ELEMENT_CHANNEL, parser, description, parseErrors).ifPresent(speakerChannelBuilder::setChannel);
+        getChildElementBoolean(ELEMENT_MICROPHONE, parser, description, parseErrors).ifPresent(speakerChannelBuilder::setMicrophoneActive);
+        getChildElementBoolean(ELEMENT_MUTE, parser, description, parseErrors).ifPresent(speakerChannelBuilder::setMuteRequested);
+        callFeatureBuilder = speakerChannelBuilder;
+        return callFeatureBuilder;
+    }
+
+    @Nonnull
+    private static CallFeature.AbstractCallFeatureBuilder getDeviceKeyFeatureBuilder(@Nonnull final XmlPullParser parser) throws XmlPullParserException, IOException {
+        final CallFeature.AbstractCallFeatureBuilder callFeatureBuilder;
+        final CallFeatureDeviceKey.Builder deviceKeyBuilder = CallFeatureDeviceKey.Builder.start();
+        if (parser.nextTag() == XmlPullParser.START_TAG && "key".equals(parser.getName())) {
+            DeviceKey.from(parser.nextText()).ifPresent(deviceKeyBuilder::setDeviceKey);
+        }
+        callFeatureBuilder = deviceKeyBuilder;
+        return callFeatureBuilder;
     }
 
     private static Optional<Boolean> getBoolean(String featureText) {
