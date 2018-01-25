@@ -82,8 +82,9 @@ public class GetProfilesResult extends OpenlinkIQ {
             do {
                 parser.nextTag();
                 if (parser.getName().equals(OpenlinkXmppNamespace.TAG_ACTION)) {
-                    final Optional<RequestAction> requestAction = RequestAction.from(SmackPacketUtil.getStringAttribute(parser, "id").orElse(null));
-                    requestAction.ifPresent(profileBuilder::addAction);
+                    SmackPacketUtil.getStringAttribute(parser, "id")
+                            .flatMap(RequestAction::from)
+                            .ifPresent(profileBuilder::addAction);
                 }
                 ParserUtils.forwardToEndTagOfDepth(parser, parser.getDepth());
             } while (parser.getName().equals(OpenlinkXmppNamespace.TAG_ACTION));
@@ -119,16 +120,7 @@ public class GetProfilesResult extends OpenlinkIQ {
             profile.getLabel().ifPresent(label -> xml.attribute(OpenlinkXmppNamespace.TAG_LABEL, label));
             profile.isOnline().ifPresent(online -> xml.attribute("online", online));
             xml.rightAngleBracket();
-            profile.getSite().ifPresent(site -> {
-                xml.halfOpenElement("site");
-                site.getId().ifPresent(id -> xml.attribute("id", String.valueOf(id)));
-                site.isDefault().ifPresent(isDefault -> xml.attribute(OpenlinkXmppNamespace.TAG_DEFAULT, String.valueOf(isDefault)));
-                site.getType().ifPresent(type -> xml.attribute("type", type.name()));
-                xml.rightAngleBracket();
-                site.getName().ifPresent(xml::escape);
-                xml.closeElement("site");
-
-            });
+            profile.getSite().ifPresent(site -> SmackPacketUtil.addSiteXML(xml, site));
             final List<RequestAction> actions = profile.getActions();
             if (!actions.isEmpty()) {
                 xml.openElement(OpenlinkXmppNamespace.TAG_ACTIONS);
