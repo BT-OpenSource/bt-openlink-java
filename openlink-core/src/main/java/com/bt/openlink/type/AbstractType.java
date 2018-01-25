@@ -5,7 +5,7 @@ import java.util.Objects;
 
 import javax.annotation.Nonnull;
 
-public class AbstractType<T> implements Serializable {
+public class AbstractType<T extends Serializable> implements Serializable {
     private static final long serialVersionUID = 1777241541299084888L;
     @Nonnull private final T value;
 

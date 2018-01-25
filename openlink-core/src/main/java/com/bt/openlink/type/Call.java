@@ -53,8 +53,8 @@ public class Call implements Serializable {
     @Nullable private PhoneNumber calledDestination;
     @Nonnull private final List<PhoneNumber> calledE164Numbers;
     @Nonnull private List<OriginatorReference> originatorReferences;
-    @Nullable private final Instant startTime;
-    @Nullable private final Duration duration;
+    @SuppressWarnings("squid:S3437") @Nullable private final Instant startTime;
+    @SuppressWarnings("squid:S3437") @Nullable private final Duration duration;
     @Nonnull private final List<RequestAction> actions;
     @Nonnull private final List<CallFeature> features;
     @Nonnull private final List<Participant> participants;

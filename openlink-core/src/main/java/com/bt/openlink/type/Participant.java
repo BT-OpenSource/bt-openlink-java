@@ -14,8 +14,8 @@ public final class Participant implements Serializable {
     @Nullable private final String jid;
     @Nullable private final ParticipantType participantType;
     @Nullable private final CallDirection direction;
-    @Nullable private final Instant startTime;
-    @Nullable private final Duration duration;
+    @SuppressWarnings("squid:S3437") @Nullable private final Instant startTime;
+    @SuppressWarnings("squid:S3437") @Nullable private final Duration duration;
 
     private Participant(@Nonnull final Builder builder) {
         this.jid = builder.jid;
