@@ -584,8 +584,6 @@ public final class SmackPacketUtil {
             final int featuresDepth = parser.getDepth();
             parser.nextTag();
             while (OpenlinkXmppNamespace.TAG_FEATURE.equals(parser.getName())) {
-                final CallFeature.AbstractCallFeatureBuilder callFeatureBuilder;
-
                 final Optional<FeatureId> featureId = FeatureId.from(parser.getAttributeValue("", "id"));
                 final Optional<String> featureTypeString = SmackPacketUtil.getStringAttribute(parser, "type");
                 final Optional<String> label = SmackPacketUtil.getStringAttribute(parser, OpenlinkXmppNamespace.TAG_LABEL);
@@ -593,27 +591,9 @@ public final class SmackPacketUtil {
                 while (parser.next() == XmlPullParser.TEXT) {
                     text = parser.getText();
                 }
-                if (parser.getEventType() == XmlPullParser.START_TAG) {
-                    switch (parser.getName()) {
-                    case ELEMENT_DEVICEKEYS:
-                        callFeatureBuilder = getDeviceKeyFeatureBuilder(parser);
-                        break;
-
-                    case ELEMENT_SPEAKERCHANNEL:
-                        callFeatureBuilder = getSpeakerChannelFeatureBuilder(parser, description, parseErrors);
-                        break;
-
-                    default:
-                        // Assume a simple true/false feature
-                        callFeatureBuilder = getBooleanFeatureBuilder(text);
-                        break;
-                    }
-                } else {
-                    // Assume a simple true/false feature
-                    callFeatureBuilder = getBooleanFeatureBuilder(text);
-                    parser.nextTag();
-                }
+                final CallFeature.AbstractCallFeatureBuilder callFeatureBuilder = getCallFeatureBuilder(parser, description, parseErrors, text);
                 featureId.ifPresent(callFeatureBuilder::setId);
+                label.ifPresent(callFeatureBuilder::setLabel);
                 featureTypeString.ifPresent(featureType -> {
                     final Optional<FeatureType> type = FeatureType.from(featureType);
                     if (type.isPresent()) {
@@ -622,11 +602,36 @@ public final class SmackPacketUtil {
                         parseErrors.add("Invalid %s; invalid feature type - '%s'");
                     }
                 });
-                label.ifPresent(callFeatureBuilder::setLabel);
                 callBuilder.addFeature(callFeatureBuilder.build(parseErrors));
             }
             ParserUtils.forwardToEndTagOfDepth(parser, featuresDepth);
         }
+    }
+
+    @Nonnull
+    private static CallFeature.AbstractCallFeatureBuilder getCallFeatureBuilder(@Nonnull final XmlPullParser parser, @Nonnull final String description, @Nonnull final List<String> parseErrors, @Nonnull final String text) throws XmlPullParserException, IOException {
+        final CallFeature.AbstractCallFeatureBuilder callFeatureBuilder;
+        if (parser.getEventType() == XmlPullParser.START_TAG) {
+            switch (parser.getName()) {
+            case ELEMENT_DEVICEKEYS:
+                callFeatureBuilder = getDeviceKeyFeatureBuilder(parser);
+                break;
+
+            case ELEMENT_SPEAKERCHANNEL:
+                callFeatureBuilder = getSpeakerChannelFeatureBuilder(parser, description, parseErrors);
+                break;
+
+            default:
+                // Assume a simple true/false feature
+                callFeatureBuilder = getBooleanFeatureBuilder(text);
+                break;
+            }
+        } else {
+            // Assume a simple true/false feature
+            callFeatureBuilder = getBooleanFeatureBuilder(text);
+            parser.nextTag();
+        }
+        return callFeatureBuilder;
     }
 
     @Nonnull
