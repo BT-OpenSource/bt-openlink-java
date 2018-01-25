@@ -73,6 +73,7 @@ public final class SmackPacketUtil {
     private static final String ELEMENT_CHANNEL = "channel";
     private static final String ELEMENT_MICROPHONE = "microphone";
     private static final String ELEMENT_MUTE = "mute";
+    private static final String ELEMENT_NAME = "name";
 
     private SmackPacketUtil() {
     }
@@ -122,8 +123,6 @@ public final class SmackPacketUtil {
             parser.next();
             final Optional<String> siteName = Optional.ofNullable(parser.getText());
             siteName.ifPresent(siteBuilder::setName);
-            ParserUtils.forwardToEndTagOfDepth(parser, parser.getDepth());
-            parser.nextTag();
             return Optional.of(siteBuilder.build(errors));
         } else {
             return Optional.empty();
@@ -158,7 +157,7 @@ public final class SmackPacketUtil {
             xml.rightAngleBracket();
             call.getCallerNumber().ifPresent(callerNumber -> xml.escape(callerNumber.value()));
             xml.closeElement(ELEMENT_NUMBER);
-            call.getCallerName().ifPresent(callerName -> xml.optElement("name", callerName));
+            call.getCallerName().ifPresent(callerName -> xml.optElement(ELEMENT_NAME, callerName));
             xml.closeElement(ELEMENT_CALLER);
 
             xml.openElement(ELEMENT_CALLED);
@@ -169,7 +168,7 @@ public final class SmackPacketUtil {
             xml.rightAngleBracket();
             call.getCalledNumber().ifPresent(calledNumber -> xml.escape(calledNumber.value()));
             xml.closeElement(ELEMENT_NUMBER);
-            call.getCalledName().ifPresent(callerName -> xml.optElement("name", callerName));
+            call.getCalledName().ifPresent(callerName -> xml.optElement(ELEMENT_NAME, callerName));
             xml.closeElement(ELEMENT_CALLED);
 
             final List<OriginatorReference> originatorReferences = call.getOriginatorReferences();
@@ -293,100 +292,120 @@ public final class SmackPacketUtil {
         final List<Call> calls = new ArrayList<>();
         final Call.Builder callBuilder = Call.Builder.start();
         if (parser.getName().equals("call")) {
+            final int callDepth = parser.getDepth();
             parser.nextTag();
-            if (parser.getName().equals("id")) {
-                final String callIdString = parser.nextText();
-                final Optional<CallId> callIdOptional = CallId.from(callIdString);
-                callIdOptional.ifPresent(callBuilder::setId);
-                parser.nextTag();
-            }
-            if (parser.getName().equals("conference")) {
-                final String conferenceIdString = parser.nextText();
-                final Optional<ConferenceId> conferenceIdOptional = ConferenceId.from(conferenceIdString);
-                conferenceIdOptional.ifPresent(callBuilder::setConferenceId);
-                parser.nextTag();
-            }
-
-            Optional<Site> site = getSite(parser, errors);
-            site.ifPresent(callBuilder::setSite);
-
-            if (parser.getName().equals("profile")) {
-                final String profileIdString = parser.nextText();
-                final Optional<ProfileId> profileIdOptional = ProfileId.from(profileIdString);
-                profileIdOptional.ifPresent(callBuilder::setProfileId);
-                parser.nextTag();
-            }
-            if (parser.getName().equals("user")) {
-                final String userIdString = parser.nextText();
-                final Optional<UserId> userIdOptional = UserId.from(userIdString);
-                userIdOptional.ifPresent(callBuilder::setUserId);
-                parser.nextTag();
-            }
-            if (parser.getName().equals("interest")) {
-                final String interestIdString = parser.nextText();
-                final Optional<InterestId> interestIdOptional = InterestId.from(interestIdString);
-                interestIdOptional.ifPresent(callBuilder::setInterestId);
-                parser.nextTag();
-            }
-            if (parser.getName().equals("changed")) {
-                final String changedString = parser.nextText();
-                final Optional<Changed> changedOptional = Changed.from(changedString);
-                changedOptional.ifPresent(callBuilder::setChanged);
-                parser.nextTag();
-            }
-            if (parser.getName().equals("state")) {
-                final String callStateString = parser.nextText();
-                final Optional<CallState> callStateOptional = CallState.from(callStateString);
-                callStateOptional.ifPresent(callBuilder::setState);
-                parser.nextTag();
-            }
-            if (parser.getName().equals(ATTRIBUTE_DIRECTION)) {
-                final String callDirectionString = parser.nextText();
-                final Optional<CallDirection> callDirectionOptional = CallDirection.from(callDirectionString);
-                callDirectionOptional.ifPresent(callBuilder::setDirection);
-                parser.nextTag();
-            }
-            if (parser.getName().equals(ELEMENT_CALLER)) {
-                parser.nextTag();
-                if (parser.getName().equals(ELEMENT_NUMBER)) {
-                    callBuilder.addCallerE164Numbers(getPhoneNumbers(parser));
-                    final String callerNumberString = parser.nextText();
-                    final Optional<PhoneNumber> callerNumberOptional = PhoneNumber.from(callerNumberString);
-                    callerNumberOptional.ifPresent(callBuilder::setCallerNumber);
-                    parser.nextTag();
+            do {
+                switch (parser.getName()) {
+                    case "id":
+                        final String callIdString = parser.nextText();
+                        final Optional<CallId> callIdOptional = CallId.from(callIdString);
+                        callIdOptional.ifPresent(callBuilder::setId);
+                        break;
+                    case "conference":
+                        final String conferenceIdString = parser.nextText();
+                        final Optional<ConferenceId> conferenceIdOptional = ConferenceId.from(conferenceIdString);
+                        conferenceIdOptional.ifPresent(callBuilder::setConferenceId);
+                        break;
+                    case "site":
+                        Optional<Site> site = getSite(parser, errors);
+                        site.ifPresent(callBuilder::setSite);
+                        break;
+                    case "profile":
+                        final String profileIdString = parser.nextText();
+                        final Optional<ProfileId> profileIdOptional = ProfileId.from(profileIdString);
+                        profileIdOptional.ifPresent(callBuilder::setProfileId);
+                        break;
+                    case "user":
+                        final String userIdString = parser.nextText();
+                        final Optional<UserId> userIdOptional = UserId.from(userIdString);
+                        userIdOptional.ifPresent(callBuilder::setUserId);
+                        break;
+                    case "interest":
+                        final String interestIdString = parser.nextText();
+                        final Optional<InterestId> interestIdOptional = InterestId.from(interestIdString);
+                        interestIdOptional.ifPresent(callBuilder::setInterestId);
+                        break;
+                    case "changed":
+                        final String changedString = parser.nextText();
+                        final Optional<Changed> changedOptional = Changed.from(changedString);
+                        changedOptional.ifPresent(callBuilder::setChanged);
+                        break;
+                    case "state":
+                        final String callStateString = parser.nextText();
+                        final Optional<CallState> callStateOptional = CallState.from(callStateString);
+                        callStateOptional.ifPresent(callBuilder::setState);
+                        break;
+                    case ATTRIBUTE_DIRECTION:
+                        final String callDirectionString = parser.nextText();
+                        final Optional<CallDirection> callDirectionOptional = CallDirection.from(callDirectionString);
+                        callDirectionOptional.ifPresent(callBuilder::setDirection);
+                        break;
+                    case ELEMENT_CALLER:
+                        parser.nextTag();
+                        if (parser.getName().equals(ELEMENT_NUMBER)) {
+                            callBuilder.addCallerE164Numbers(getPhoneNumbers(parser));
+                            final String callerNumberString = parser.nextText();
+                            final Optional<PhoneNumber> callerNumberOptional = PhoneNumber.from(callerNumberString);
+                            callerNumberOptional.ifPresent(callBuilder::setCallerNumber);
+                            parser.nextTag();
+                        }
+                        if (parser.getName().equals(ELEMENT_NAME)) {
+                            final Optional<String> callerName = Optional.ofNullable(parser.nextText());
+                            callerName.ifPresent(callBuilder::setCallerName);
+                            parser.nextTag(); // moves to end of caller tag
+                        }
+                        break;
+                    case ELEMENT_CALLED:
+                        parser.nextTag();
+                        if (parser.getName().equals(ELEMENT_NUMBER)) {
+                            callBuilder.addCalledE164Numbers(getPhoneNumbers(parser));
+                            final Optional<PhoneNumber> destination = PhoneNumber.from(SmackPacketUtil.getStringAttribute(parser, "destination").orElse(null));
+                            destination.ifPresent(callBuilder::setCalledDestination);
+                            final String calledNumberString = parser.nextText();
+                            final Optional<PhoneNumber> calledNumberOptional = PhoneNumber.from(calledNumberString);
+                            calledNumberOptional.ifPresent(callBuilder::setCalledNumber);
+                            parser.nextTag();
+                        }
+                        if (parser.getName().equals(ELEMENT_NAME)) {
+                            final Optional<String> callerName = Optional.ofNullable(parser.nextText());
+                            callerName.ifPresent(callBuilder::setCalledName);
+                            parser.nextTag(); // moves to end of caller tag
+                        }
+                        break;
+                    case ELEMENT_ORIGINATOR_REF:
+                        parser.nextTag();
+                        while (parser.getName().equals(ELEMENT_PROPERTY)) {
+                            final int propertyDepth = parser.getDepth();
+                            final String key = SmackPacketUtil.getStringAttribute(parser, "id").orElse("");
+                            parser.nextTag();
+                            String value = "";
+                            if (parser.getName().equals("value")) {
+                                value = parser.nextText();
+                            }
+                            callBuilder.addOriginatorReference(key, value);
+                            ParserUtils.forwardToEndTagOfDepth(parser, propertyDepth);
+                            parser.nextTag(); // end of property tag
+                        }
+                        break;
+                    case ATTRIBUTE_START_TIME:
+                        getChildElementISO8601(ATTRIBUTE_START_TIME, parser, description, errors).ifPresent(callBuilder::setStartTime);
+                        break;
+                    case ATTRIBUTE_DURATION:
+                        getChildElementLong(ATTRIBUTE_DURATION, parser, description, errors).map(Duration::ofMillis).ifPresent(callBuilder::setDuration);
+                        break;
+                    case ELEMENT_ACTIONS:
+                        getActions(callBuilder, parser, errors);
+                        break;
+                    case ELEMENT_FEATURES:
+                        getFeatures(callBuilder, parser, description, errors);
+                        break;
+                    case ELEMENT_PARTICIPANTS:
+                        getParticipants(callBuilder, parser, description, errors);
+                        break;
                 }
-                if (parser.getName().equals("name")) {
-                    final Optional<String> callerName = Optional.ofNullable(parser.nextText());
-                    callerName.ifPresent(callBuilder::setCallerName);
-                    parser.nextTag(); // moves to end of caller tag
-                    parser.nextTag(); // moves to start of next tag
-                }
-            }
-            if (parser.getName().equals("called")) {
+                ParserUtils.forwardToEndTagOfDepth(parser, callDepth+1);
                 parser.nextTag();
-                if (parser.getName().equals(ELEMENT_NUMBER)) {
-                    callBuilder.addCalledE164Numbers(getPhoneNumbers(parser));
-                    final Optional<PhoneNumber> destination = PhoneNumber.from(SmackPacketUtil.getStringAttribute(parser, "destination").orElse(null));
-                    destination.ifPresent(callBuilder::setCalledDestination);
-                    final String calledNumberString = parser.nextText();
-                    final Optional<PhoneNumber> calledNumberOptional = PhoneNumber.from(calledNumberString);
-                    calledNumberOptional.ifPresent(callBuilder::setCalledNumber);
-                    parser.nextTag();
-                }
-                if (parser.getName().equals("name")) {
-                    final Optional<String> callerName = Optional.ofNullable(parser.nextText());
-                    callerName.ifPresent(callBuilder::setCalledName);
-                    parser.nextTag(); // moves to end of caller tag
-                    parser.nextTag(); // moves to start of next tag
-                }
-            }
-
-            getOriginatorReferences(parser, callBuilder);
-            getChildElementISO8601(ATTRIBUTE_START_TIME, parser, description, errors).ifPresent(callBuilder::setStartTime);
-            getChildElementLong(ATTRIBUTE_DURATION, parser, description, errors).map(Duration::ofMillis).ifPresent(callBuilder::setDuration);
-            getActions(callBuilder, parser, errors);
-            getFeatures(callBuilder, parser, description, errors);
-            getParticipants(callBuilder, parser, description, errors);
+            } while( callDepth != parser.getDepth());
             calls.add(callBuilder.build(errors));
         }
 
@@ -408,7 +427,6 @@ public final class SmackPacketUtil {
             @Nonnull final String description,
             @Nonnull final List<String> parseErrors) throws IOException, XmlPullParserException {
 
-        parser.nextTag();
         if (parser.getName().equals(ELEMENT_PARTICIPANTS)) {
             parser.nextTag();
             while (parser.getName().equals(ELEMENT_PARTICIPANT)) {
@@ -468,24 +486,20 @@ public final class SmackPacketUtil {
     @SuppressWarnings("unchecked")
     private static void getActions(@Nonnull final Call.Builder callBuilder, final XmlPullParser parser,
             @Nonnull final List<String> parseErrors) throws IOException, XmlPullParserException {
-        parser.nextTag();
         if (parser.getName().equals(ELEMENT_ACTIONS)) {
-            do {
-                parser.nextTag();
-                if (parser.getName().equals(OpenlinkXmppNamespace.TAG_ACTION)) {
-                    final String actionString = parser.nextText();
-                    final Optional<RequestAction> requestAction = RequestAction.from(actionString);
-                    if (requestAction.isPresent()) {
-                        callBuilder.addAction(requestAction.get());
-                    } else {
-                        parseErrors.add("Invalid %s: %s is not a valid action");
-                    }
-                }
-                ParserUtils.forwardToEndTagOfDepth(parser, parser.getDepth());
-            } while (parser.getName().equals(OpenlinkXmppNamespace.TAG_ACTION));
-            ParserUtils.forwardToEndTagOfDepth(parser, parser.getDepth());
+            final int actionsDepth = parser.getDepth();
             parser.nextTag();
-
+            while(parser.getDepth() > actionsDepth && parser.isEmptyElementTag()) {
+                final Optional<RequestAction> requestAction = RequestAction.from(parser.getName());
+                if (requestAction.isPresent()) {
+                    callBuilder.addAction(requestAction.get());
+                } else {
+                    parseErrors.add("Invalid %s: %s is not a valid action");
+                }
+                parser.nextTag();
+                parser.nextTag();
+            }
+            ParserUtils.forwardToEndTagOfDepth(parser, actionsDepth);
         }
     }
 
@@ -495,10 +509,9 @@ public final class SmackPacketUtil {
             @Nonnull final XmlPullParser parser,
             @Nonnull final String description,
             @Nonnull final List<String> parseErrors) throws IOException, XmlPullParserException {
-        parser.nextTag();
 
         if (parser.getName().equals(ELEMENT_FEATURES)) {
-
+            final int featuresDepth = parser.getDepth();
             parser.nextTag();
             while (OpenlinkXmppNamespace.TAG_FEATURE.equals(parser.getName())) {
                 final CallFeature.AbstractCallFeatureBuilder callFeatureBuilder;
@@ -540,6 +553,7 @@ public final class SmackPacketUtil {
                     final CallFeatureBoolean.Builder booleanBuilder = CallFeatureBoolean.Builder.start();
                     getBoolean(text).ifPresent(booleanBuilder::setEnabled);
                     callFeatureBuilder = booleanBuilder;
+                    parser.nextTag();
                 }
                 featureId.ifPresent(callFeatureBuilder::setId);
                 featureTypeString.ifPresent(featureType -> {
@@ -552,10 +566,8 @@ public final class SmackPacketUtil {
                 });
                 label.ifPresent(callFeatureBuilder::setLabel);
                 callBuilder.addFeature(callFeatureBuilder.build(parseErrors));
-                ParserUtils.forwardToEndTagOfDepth(parser, parser.getDepth());
-                parser.nextTag();
             }
-
+            ParserUtils.forwardToEndTagOfDepth(parser, featuresDepth);
         }
     }
 
@@ -569,29 +581,6 @@ public final class SmackPacketUtil {
         }
     }
 
-    @SuppressWarnings("unchecked")
-    private static void getOriginatorReferences(final XmlPullParser parser, final Call.Builder callBuilder)
-            throws XmlPullParserException, IOException {
-
-        if (!parser.getName().equals(ELEMENT_ORIGINATOR_REF)) {
-            return;
-        }
-        parser.nextTag();
-
-        while (parser.getName().equals(ELEMENT_PROPERTY)) {
-            final String key = SmackPacketUtil.getStringAttribute(parser, "id").orElse("");
-            parser.nextTag();
-            String value = "";
-            if (parser.getName().equals("value"))
-                value = parser.nextText();
-            callBuilder.addOriginatorReference(key, value);
-            ParserUtils.forwardToEndTagOfDepth(parser, parser.getDepth());
-            parser.nextTag(); // end of property tag
-            parser.nextTag(); // start of next tag
-        }
-
-    }
-
     @Nonnull
     private static Optional<Instant> getChildElementISO8601(
             @Nonnull final String childElementName,
@@ -599,7 +588,6 @@ public final class SmackPacketUtil {
             @Nonnull final String description,
             @Nonnull final List<String> parseErrors)
             throws XmlPullParserException, IOException {
-        parser.nextTag();
         if (parser.getName().equals(childElementName)) {
             final String childElementText = parser.nextText();
             try {
@@ -618,7 +606,6 @@ public final class SmackPacketUtil {
             @Nonnull final String stanzaDescription,
             @Nonnull final List<String> parseErrors)
             throws XmlPullParserException, IOException {
-        parser.nextTag();
         if (parser.getName().equals(childElementName)) {
             final String childElementText = parser.nextText();
             try {

@@ -33,17 +33,17 @@ public class GetProfilesResultTest {
     @Rule public final ExpectedException expectedException = ExpectedException.none();
 
     @BeforeClass
-    public static void setUpClass() throws Exception {
+    public static void setUpClass() {
         ProviderManager.addIQProvider("command", OpenlinkXmppNamespace.XMPP_COMMANDS.uri(), new OpenlinkIQProvider());
     }
 
     @AfterClass
-    public static void tearDownClass() throws Exception {
+    public static void tearDownClass() {
         ProviderManager.removeIQProvider("command", OpenlinkXmppNamespace.XMPP_COMMANDS.uri());
     }
 
     @Test
-    public void canCreateAStanza() throws Exception {
+    public void canCreateAStanza() {
 
         final GetProfilesResult result = GetProfilesResult.Builder.start()
                 .setId(CoreFixtures.STANZA_ID)
@@ -58,7 +58,7 @@ public class GetProfilesResultTest {
     }
 
     @Test
-    public void willGenerateAnXmppStanza() throws Exception {
+    public void willGenerateAnXmppStanza() {
 
         final GetProfilesResult result = GetProfilesResult.Builder.start()
                 .setId(CoreFixtures.STANZA_ID)
@@ -132,7 +132,7 @@ public class GetProfilesResultTest {
     }
 
     @Test
-    public void willBuildAResultFromARequest() throws Exception {
+    public void willBuildAResultFromARequest() {
 
         final GetProfilesRequest request = GetProfilesRequest.Builder.start()
                 .setTo(Fixtures.TO_JID)

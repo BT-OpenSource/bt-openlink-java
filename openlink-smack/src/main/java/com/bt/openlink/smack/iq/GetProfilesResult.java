@@ -39,7 +39,7 @@ public class GetProfilesResult extends OpenlinkIQ {
         }
         while (OpenlinkXmppNamespace.TAG_PROFILE.equals(parser.getName())) {
 
-            final int currentDepth = parser.getDepth();
+            final int profileDepth = parser.getDepth();
 
             final Profile.Builder profileBuilder = Profile.Builder.start();
             final Optional<ProfileId> profileId = ProfileId.from(parser.getAttributeValue("", "id"));
@@ -52,24 +52,33 @@ public class GetProfilesResult extends OpenlinkIQ {
             online.ifPresent(profileBuilder::setOnline);
             final Optional<String> device = SmackPacketUtil.getStringAttribute(parser, "device");
             device.ifPresent(profileBuilder::setDevice);
+
             parser.nextTag();
-            final Optional<Site> site = SmackPacketUtil.getSite(parser, parseErrors);
-            site.ifPresent(profileBuilder::setSite);
-            if (parser.getName().equals(OpenlinkXmppNamespace.TAG_ACTIONS) && !parser.isEmptyElementTag()) {
-                do {
-                    parser.nextTag();
-                    if (parser.getName().equals(OpenlinkXmppNamespace.TAG_ACTION)) {
-                        final Optional<RequestAction> requestAction = RequestAction.from(SmackPacketUtil.getStringAttribute(parser, "id").orElse(null));
-                        requestAction.ifPresent(profileBuilder::addAction);
-                    }
-                    ParserUtils.forwardToEndTagOfDepth(parser, parser.getDepth());
-                } while (parser.getName().equals(OpenlinkXmppNamespace.TAG_ACTION));
-                ParserUtils.forwardToEndTagOfDepth(parser, parser.getDepth());
+            do {
+                switch (parser.getName()) {
+                    case "site":
+                        final Optional<Site> site = SmackPacketUtil.getSite(parser, parseErrors);
+                        site.ifPresent(profileBuilder::setSite);
+                        break;
+                    case OpenlinkXmppNamespace.TAG_ACTIONS:
+                        if(!parser.isEmptyElementTag()) {
+                            do {
+                                parser.nextTag();
+                                if (parser.getName().equals(OpenlinkXmppNamespace.TAG_ACTION)) {
+                                    final Optional<RequestAction> requestAction = RequestAction.from(SmackPacketUtil.getStringAttribute(parser, "id").orElse(null));
+                                    requestAction.ifPresent(profileBuilder::addAction);
+                                }
+                                ParserUtils.forwardToEndTagOfDepth(parser, parser.getDepth());
+                            } while (parser.getName().equals(OpenlinkXmppNamespace.TAG_ACTION));
+                        }
+                        break;
+                }
+                ParserUtils.forwardToEndTagOfDepth(parser, profileDepth+1);
                 parser.nextTag();
-            }
+            } while( profileDepth != parser.getDepth());
 
             builder.addProfile(profileBuilder.build(parseErrors));
-            ParserUtils.forwardToEndTagOfDepth(parser, currentDepth);
+            ParserUtils.forwardToEndTagOfDepth(parser, profileDepth);
             parser.nextTag();
         }
         return builder.build(parseErrors);
