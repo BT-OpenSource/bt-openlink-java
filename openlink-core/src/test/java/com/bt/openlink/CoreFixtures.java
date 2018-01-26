@@ -20,7 +20,6 @@ import com.bt.openlink.type.Changed;
 import com.bt.openlink.type.ConferenceId;
 import com.bt.openlink.type.DeviceKey;
 import com.bt.openlink.type.DeviceStatus;
-import com.bt.openlink.type.Feature;
 import com.bt.openlink.type.FeatureId;
 import com.bt.openlink.type.FeatureType;
 import com.bt.openlink.type.Interest;
@@ -92,11 +91,6 @@ public class CoreFixtures {
             .setOnline(true)
             .setDefault(true)
             .setSite(SITE)
-            .build();
-    public static final Feature FEATURE = Feature.Builder.start()
-            .setType(FeatureType.PRIVACY)
-            .setId(FEATURE_ID)
-            .setLabel("Privacy")
             .build();
     public static final CallFeature CALL_FEATURE = CallFeatureBoolean.Builder.start()
             .setType(FeatureType.CALL_BACK)

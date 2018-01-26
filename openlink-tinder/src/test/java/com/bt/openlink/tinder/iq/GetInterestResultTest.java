@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.contains;
 import static org.junit.Assert.assertThat;
 import static org.xmlunit.matchers.CompareMatcher.isIdenticalTo;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -21,7 +22,7 @@ public class GetInterestResultTest {
     @Rule public final ExpectedException expectedException = ExpectedException.none();
 
     @Test
-    public void canCreateAStanza() throws Exception {
+    public void canCreateAStanza() {
 
         final GetInterestResult result = GetInterestResult.Builder.start()
                 .setId(CoreFixtures.STANZA_ID)
@@ -38,7 +39,7 @@ public class GetInterestResultTest {
     }
 
     @Test
-    public void cannotCreateAStanzaWithoutAToField() throws Exception {
+    public void cannotCreateAStanzaWithoutAToField() {
 
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("The stanza 'to' has not been set");
@@ -47,7 +48,7 @@ public class GetInterestResultTest {
     }
 
     @Test
-    public void willGenerateAnXmppStanza() throws Exception {
+    public void willGenerateAnXmppStanza() {
 
         final GetInterestResult result = GetInterestResult.Builder.start()
                 .setId(CoreFixtures.STANZA_ID)
@@ -60,22 +61,20 @@ public class GetInterestResultTest {
     }
 
     @Test
-    public void willParseAnXmppStanza() throws Exception {
+    public void willParseAnXmppStanza() {
 
         final GetInterestResult result = (GetInterestResult) OpenlinkIQParser.parse(Fixtures.iqFrom(GetInterestFixtures.GET_INTEREST_RESULT));
+
         assertThat(result.getID(), is(CoreFixtures.STANZA_ID));
         assertThat(result.getTo(), is(Fixtures.TO_JID));
         assertThat(result.getFrom(), is(Fixtures.FROM_JID));
         assertThat(result.getType(), is(IQ.Type.result));
         final Interest interest = result.getInterest().get();
-        assertThat(interest.getId().get(), is(CoreFixtures.INTEREST_ID));
-        assertThat(interest.getType().get(), is(CoreFixtures.INTEREST_TYPE));
-        assertThat(interest.getLabel().get(), is("test interest label"));
-        assertThat(interest.isDefaultInterest().get(), is(true));
+        assertThat(EqualsBuilder.reflectionEquals(CoreFixtures.INTEREST, interest, false, null, true), is(true));
     }
 
     @Test
-    public void willReturnParsingErrors() throws Exception {
+    public void willReturnParsingErrors() {
 
         final GetInterestResult result = GetInterestResult.from(Fixtures.iqFrom(GetInterestFixtures.GET_INTEREST_RESULT_WITH_BAD_VALUES));
 
@@ -88,7 +87,7 @@ public class GetInterestResultTest {
     }
 
     @Test
-    public void willBuildAResultFromARequest() throws Exception {
+    public void willBuildAResultFromARequest() {
 
         final GetInterestRequest request = GetInterestRequest.Builder.start()
                 .setTo(Fixtures.TO_JID)

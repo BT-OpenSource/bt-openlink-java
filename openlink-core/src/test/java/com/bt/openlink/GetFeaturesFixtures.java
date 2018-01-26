@@ -1,5 +1,10 @@
 package com.bt.openlink;
 
+import com.bt.openlink.type.Feature;
+import com.bt.openlink.type.FeatureId;
+import com.bt.openlink.type.FeatureType;
+
+@SuppressWarnings("ConstantConditions")
 public class GetFeaturesFixtures {
 
     public static final String GET_FEATURES_REQUEST =
@@ -21,6 +26,28 @@ public class GetFeaturesFixtures {
                     "    </iodata>\n" +
                     "  </command>\n" +
                     "</iq>\n";
+
+    public static final Feature FEATURE_HANDSET_1 = Feature.Builder.start()
+            .setType(FeatureType.HANDSET)
+            .setId(FeatureId.from("hs_1").get())
+            .setLabel("Handset 1")
+            .build();
+    public static final Feature FEATURE_HANDSET_2 = Feature.Builder.start()
+            .setType(FeatureType.HANDSET)
+            .setId(FeatureId.from("hs_2").get())
+            .setLabel("Handset 2")
+            .build();
+    public static final Feature FEATURE_PRIVACY = Feature.Builder.start()
+            .setType(FeatureType.PRIVACY)
+            .setId(FeatureId.from("priv_1").get())
+            .setLabel("Privacy")
+            .build();
+    public static final Feature FEATURE_CALL_FORWARD = Feature.Builder.start()
+            .setType(FeatureType.CALL_FORWARD)
+            .setId(FeatureId.from("fwd_1").get())
+            .setLabel("Call Forward")
+            .build();
+
 
     public static final String GET_FEATURES_RESULT =
             "<iq type='result' id='" + CoreFixtures.STANZA_ID + "' to='" + CoreFixtures.TO_JID_STRING + "' from='" + CoreFixtures.FROM_JID_STRING + "'>\n" +

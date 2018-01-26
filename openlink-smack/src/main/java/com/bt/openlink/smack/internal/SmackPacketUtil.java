@@ -88,9 +88,17 @@ public final class SmackPacketUtil {
     }
 
     @Nonnull
-    public static Optional<Boolean> getBooleanAttribute(@Nonnull final XmlPullParser parser, @Nonnull final String attributeName) {
+    public static Optional<Boolean> getBooleanAttribute(
+            @Nonnull final XmlPullParser parser,
+            @Nonnull final String attributeName,
+            @Nonnull final String description,
+            @Nonnull final List<String> parseErrors) {
         final String attributeValue = parser.getAttributeValue("", attributeName);
-        return getBoolean(attributeValue);
+        if (attributeValue == null) {
+            return Optional.empty();
+        } else {
+            return getBoolean(attributeValue, attributeName, description, parseErrors);
+        }
     }
 
     @Nonnull
@@ -111,12 +119,12 @@ public final class SmackPacketUtil {
         }
     }
 
-    public static Optional<Site> getSite(final XmlPullParser parser, final List<String> errors) throws IOException, XmlPullParserException {
+    public static Optional<Site> getSite(final XmlPullParser parser, final List<String> errors, final String description) throws IOException, XmlPullParserException {
         if (parser.getName().equals("site")) {
             final Site.Builder siteBuilder = Site.Builder.start();
             final Optional<Long> siteId = SmackPacketUtil.getLongAttribute(parser, "id");
             siteId.ifPresent(siteBuilder::setId);
-            final Optional<Boolean> isDefaultSite = SmackPacketUtil.getBooleanAttribute(parser, OpenlinkXmppNamespace.TAG_DEFAULT);
+            final Optional<Boolean> isDefaultSite = SmackPacketUtil.getBooleanAttribute(parser, OpenlinkXmppNamespace.TAG_DEFAULT, description, errors);
             isDefaultSite.ifPresent(siteBuilder::setDefault);
             SmackPacketUtil.getStringAttribute(parser, "type")
                     .flatMap(Site.Type::from)
@@ -136,9 +144,9 @@ public final class SmackPacketUtil {
             call.getId().ifPresent(id -> xml.element("id", id.value()));
             call.getConferenceId().ifPresent(conferenceId -> xml.element("conference", conferenceId.value()));
             call.getSite().ifPresent(site -> addSiteXML(xml, site));
-            call.getProfileId().ifPresent(profileId->xml.element("profile", profileId.value()));
-            call.getUserId().ifPresent(userId->xml.element("user", userId.value()));
-            call.getInterestId().ifPresent(interestId->xml.element("interest", interestId.value()));
+            call.getProfileId().ifPresent(profileId -> xml.element("profile", profileId.value()));
+            call.getUserId().ifPresent(userId -> xml.element("user", userId.value()));
+            call.getInterestId().ifPresent(interestId -> xml.element("interest", interestId.value()));
             call.getChanged().ifPresent(changed -> xml.element("changed", changed.getId()));
             call.getState().ifPresent(changed -> xml.element("state", changed.getLabel()));
             call.getDirection().ifPresent(changed -> xml.element(ATTRIBUTE_DIRECTION, changed.getLabel()));
@@ -318,7 +326,7 @@ public final class SmackPacketUtil {
                     addConferenceIdToBuilder(parser, callBuilder);
                     break;
                 case "site":
-                    addSiteToBuilder(parser, errors, callBuilder);
+                    addSiteToBuilder(parser, errors, callBuilder, description);
                     break;
                 case "profile":
                     addProfileIdToBuilder(parser, callBuilder);
@@ -348,10 +356,10 @@ public final class SmackPacketUtil {
                     addOriginatorRefToBuilder(parser, callBuilder);
                     break;
                 case ATTRIBUTE_START_TIME:
-                    getChildElementISO8601(ATTRIBUTE_START_TIME, parser, description, errors).ifPresent(callBuilder::setStartTime);
+                    getElementTestISO8601(ATTRIBUTE_START_TIME, parser, description, errors).ifPresent(callBuilder::setStartTime);
                     break;
                 case ATTRIBUTE_DURATION:
-                    getChildElementLong(ATTRIBUTE_DURATION, parser, description, errors).map(Duration::ofMillis).ifPresent(callBuilder::setDuration);
+                    getElementTextLong(ATTRIBUTE_DURATION, parser, description, errors).map(Duration::ofMillis).ifPresent(callBuilder::setDuration);
                     break;
                 case ELEMENT_ACTIONS:
                     getActions(callBuilder, parser, errors);
@@ -464,8 +472,8 @@ public final class SmackPacketUtil {
         profileIdOptional.ifPresent(callBuilder::setProfileId);
     }
 
-    private static void addSiteToBuilder(@Nonnull final XmlPullParser parser, @Nonnull final List<String> errors, final Call.Builder callBuilder) throws IOException, XmlPullParserException {
-        Optional<Site> site = getSite(parser, errors);
+    private static void addSiteToBuilder(@Nonnull final XmlPullParser parser, @Nonnull final List<String> errors, final Call.Builder callBuilder, final String description) throws IOException, XmlPullParserException {
+        Optional<Site> site = getSite(parser, errors, description);
         site.ifPresent(callBuilder::setSite);
     }
 
@@ -609,7 +617,12 @@ public final class SmackPacketUtil {
     }
 
     @Nonnull
-    private static CallFeature.AbstractCallFeatureBuilder getCallFeatureBuilder(@Nonnull final XmlPullParser parser, @Nonnull final String description, @Nonnull final List<String> parseErrors, @Nonnull final String text) throws XmlPullParserException, IOException {
+    private static CallFeature.AbstractCallFeatureBuilder getCallFeatureBuilder(
+            @Nonnull final XmlPullParser parser,
+            @Nonnull final String description,
+            @Nonnull final List<String> parseErrors,
+            @Nonnull final String text)
+            throws XmlPullParserException, IOException {
         final CallFeature.AbstractCallFeatureBuilder callFeatureBuilder;
         if (parser.getEventType() == XmlPullParser.START_TAG) {
             switch (parser.getName()) {
@@ -623,61 +636,81 @@ public final class SmackPacketUtil {
 
             default:
                 // Assume a simple true/false feature
-                callFeatureBuilder = getBooleanFeatureBuilder(text);
+                callFeatureBuilder = getBooleanFeatureBuilder(text, description, parseErrors, parser.getName());
                 break;
             }
         } else {
             // Assume a simple true/false feature
-            callFeatureBuilder = getBooleanFeatureBuilder(text);
+            callFeatureBuilder = getBooleanFeatureBuilder(text, description, parseErrors, parser.getName());
             parser.nextTag();
         }
         return callFeatureBuilder;
     }
 
     @Nonnull
-    private static CallFeature.AbstractCallFeatureBuilder getBooleanFeatureBuilder(@Nullable final String text) {
-        final CallFeature.AbstractCallFeatureBuilder callFeatureBuilder;
+    private static CallFeature.AbstractCallFeatureBuilder getBooleanFeatureBuilder(
+            @Nullable final String text,
+            @Nonnull final String description,
+            @Nonnull final List<String> parseErrors,
+            @Nonnull final String elementName) {
         final CallFeatureBoolean.Builder booleanBuilder = CallFeatureBoolean.Builder.start();
-        getBoolean(text).ifPresent(booleanBuilder::setEnabled);
-        callFeatureBuilder = booleanBuilder;
-        return callFeatureBuilder;
+        getBoolean(text, elementName, description, parseErrors).ifPresent(booleanBuilder::setEnabled);
+        return booleanBuilder;
     }
 
     @Nonnull
-    private static CallFeature.AbstractCallFeatureBuilder getSpeakerChannelFeatureBuilder(@Nonnull final XmlPullParser parser, @Nonnull final String description, @Nonnull final List<String> parseErrors)
+    private static CallFeature.AbstractCallFeatureBuilder getSpeakerChannelFeatureBuilder(
+            @Nonnull final XmlPullParser parser,
+            @Nonnull final String description,
+            @Nonnull final List<String> parseErrors)
             throws XmlPullParserException, IOException {
-        final CallFeature.AbstractCallFeatureBuilder callFeatureBuilder;
         final CallFeatureSpeakerChannel.Builder speakerChannelBuilder = CallFeatureSpeakerChannel.Builder.start();
-        getChildElementLong(ELEMENT_CHANNEL, parser, description, parseErrors).ifPresent(speakerChannelBuilder::setChannel);
-        getChildElementBoolean(ELEMENT_MICROPHONE, parser, description, parseErrors).ifPresent(speakerChannelBuilder::setMicrophoneActive);
-        getChildElementBoolean(ELEMENT_MUTE, parser, description, parseErrors).ifPresent(speakerChannelBuilder::setMuteRequested);
-        callFeatureBuilder = speakerChannelBuilder;
-        return callFeatureBuilder;
+        final int featureDepth = parser.getDepth();
+        parser.nextTag();
+        while (parser.getDepth() > featureDepth) {
+            switch (parser.getName()) {
+            case ELEMENT_CHANNEL:
+                getElementTextLong(ELEMENT_CHANNEL, parser, description, parseErrors).ifPresent(speakerChannelBuilder::setChannel);
+                break;
+            case ELEMENT_MICROPHONE:
+                getElementTextBoolean(ELEMENT_MICROPHONE, parser, description, parseErrors).ifPresent(speakerChannelBuilder::setMicrophoneActive);
+                break;
+            case ELEMENT_MUTE:
+                getElementTextBoolean(ELEMENT_MUTE, parser, description, parseErrors).ifPresent(speakerChannelBuilder::setMuteRequested);
+                break;
+            default:
+            }
+            ParserUtils.forwardToEndTagOfDepth(parser, featureDepth + 1);
+            parser.nextTag();
+        }
+        return speakerChannelBuilder;
     }
 
     @Nonnull
     private static CallFeature.AbstractCallFeatureBuilder getDeviceKeyFeatureBuilder(@Nonnull final XmlPullParser parser) throws XmlPullParserException, IOException {
-        final CallFeature.AbstractCallFeatureBuilder callFeatureBuilder;
+        final int featureDepth = parser.getDepth() - 1;
         final CallFeatureDeviceKey.Builder deviceKeyBuilder = CallFeatureDeviceKey.Builder.start();
         if (parser.nextTag() == XmlPullParser.START_TAG && "key".equals(parser.getName())) {
             DeviceKey.from(parser.nextText()).ifPresent(deviceKeyBuilder::setDeviceKey);
         }
-        callFeatureBuilder = deviceKeyBuilder;
-        return callFeatureBuilder;
+        ParserUtils.forwardToEndTagOfDepth(parser, featureDepth);
+        parser.nextTag();
+        return deviceKeyBuilder;
     }
 
-    private static Optional<Boolean> getBoolean(String featureText) {
-        if ("true".equals(featureText)) {
+    private static Optional<Boolean> getBoolean(String booleanText, final String childElementName, final String description, final List<String> parseErrors) {
+        if ("true".equals(booleanText)) {
             return Optional.of(Boolean.TRUE);
-        } else if ("false".equals(featureText)) {
+        } else if ("false".equals(booleanText)) {
             return Optional.of(Boolean.FALSE);
         } else {
+            parseErrors.add(String.format("Invalid %s; invalid %s '%s'; please supply an integer", description, childElementName, booleanText));
             return Optional.empty();
         }
     }
 
     @Nonnull
-    private static Optional<Instant> getChildElementISO8601(
+    private static Optional<Instant> getElementTestISO8601(
             @Nonnull final String childElementName,
             @Nonnull final XmlPullParser parser,
             @Nonnull final String description,
@@ -695,38 +728,28 @@ public final class SmackPacketUtil {
     }
 
     @Nonnull
-    public static Optional<Long> getChildElementLong(
+    public static Optional<Long> getElementTextLong(
             @Nonnull final String childElementName,
             @Nonnull final XmlPullParser parser,
             @Nonnull final String stanzaDescription,
             @Nonnull final List<String> parseErrors)
             throws XmlPullParserException, IOException {
-        if (parser.getName().equals(childElementName)) {
-            final String childElementText = parser.nextText();
-            try {
-                return Optional.of(Long.parseLong(childElementText));
-            } catch (final NumberFormatException ignored) {
-                parseErrors.add(String.format("Invalid %s; invalid %s '%s'; please supply an integer", stanzaDescription, childElementName, childElementText));
-            }
+        final String childElementText = parser.nextText();
+        try {
+            return Optional.of(Long.parseLong(childElementText));
+        } catch (final NumberFormatException ignored) {
+            parseErrors.add(String.format("Invalid %s; invalid %s '%s'; please supply an integer", stanzaDescription, childElementName, childElementText));
         }
         return Optional.empty();
     }
 
     @Nonnull
-    public static Optional<Boolean> getChildElementBoolean(
+    public static Optional<Boolean> getElementTextBoolean(
             @Nonnull final String childElementName,
             @Nonnull final XmlPullParser parser,
             @Nonnull final String description,
             @Nonnull final List<String> parseErrors) throws XmlPullParserException, IOException {
-        parser.nextTag();
-        if (parser.getName().equals(childElementName)) {
-            final String value = parser.nextText();
-            try {
-                return getBoolean(value);
-            } catch (final NumberFormatException ignored) {
-                parseErrors.add(String.format("Invalid %s: %s is neither true or false", description, value));
-            }
-        }
-        return Optional.empty();
+        final String value = parser.nextText();
+        return getBoolean(value, childElementName, description, parseErrors);
     }
 }

@@ -69,8 +69,7 @@ public class MakeCallResultTest {
         assertThat(result.getFrom(), is(Fixtures.FROM_JID));
         assertThat(result.isCallStatusBusy().get(),is(false));
         final List<Call> calls = result.getCalls();
-        final Call theOnlyCall = calls.get(0);
-        assertThat(EqualsBuilder.reflectionEquals(CoreFixtures.CALL_INCOMING_ORIGINATED, theOnlyCall, false, null, true), is(true));
+        assertThat(EqualsBuilder.reflectionEquals(CoreFixtures.CALL_INCOMING_ORIGINATED, calls.get(0), false, null, true), is(true));
         assertThat(calls.size(), is(1));
         assertThat(result.getParseErrors().size(), is(0));
     }

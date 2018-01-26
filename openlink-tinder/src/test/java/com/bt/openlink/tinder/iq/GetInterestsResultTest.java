@@ -7,6 +7,7 @@ import static org.xmlunit.matchers.CompareMatcher.isIdenticalTo;
 
 import java.util.List;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -25,7 +26,7 @@ public class GetInterestsResultTest {
     @Rule public final ExpectedException expectedException = ExpectedException.none();
 
     @Test
-    public void canCreateAStanza() throws Exception {
+    public void canCreateAStanza() {
 
         final GetInterestsResult result = GetInterestsResult.Builder.start()
                 .setId(CoreFixtures.STANZA_ID)
@@ -42,7 +43,7 @@ public class GetInterestsResultTest {
     }
 
     @Test
-    public void willGenerateAnXmppStanza() throws Exception {
+    public void willGenerateAnXmppStanza() {
 
         final Interest interest2 = Interest.Builder.start()
                 .setId(InterestId.from("sip:6001@uta.bt.com-DirectDial-1trader1@btsm11").get())
@@ -62,7 +63,7 @@ public class GetInterestsResultTest {
     }
 
     @Test
-    public void willNotBuildAPacketWithDuplicateInterestIds() throws Exception {
+    public void willNotBuildAPacketWithDuplicateInterestIds() {
 
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("Each interest id must be unique - test-interest-id appears more than once");
@@ -76,7 +77,7 @@ public class GetInterestsResultTest {
     }
 
     @Test
-    public void willParseAnXmppStanza() throws Exception {
+    public void willParseAnXmppStanza() {
 
         final GetInterestsResult result = (GetInterestsResult) OpenlinkIQParser.parse(Fixtures.iqFrom(GetInterestsFixtures.GET_INTERESTS_RESULT));
         assertThat(result.getID(), is(CoreFixtures.STANZA_ID));
@@ -85,25 +86,16 @@ public class GetInterestsResultTest {
         assertThat(result.getType(), is(IQ.Type.result));
         final List<Interest> interests = result.getInterests();
 
-        int i = 0;
-        Interest interest = interests.get(i++);
-        assertThat(interest.getId().get(),is(CoreFixtures.INTEREST_ID));
-        assertThat(interest.getLabel().get(),is("test interest label"));
-        assertThat(interest.getType(),is(InterestType.from("test-interest-type")));
+        assertThat(EqualsBuilder.reflectionEquals(CoreFixtures.INTEREST, interests.get(0), false, null, true), is(true));
+        assertThat(EqualsBuilder.reflectionEquals(GetInterestsFixtures.INTEREST_2, interests.get(1), false, null, true), is(true));
 
-        interest = interests.get(i++);
-        assertThat(interest.getId(), is(InterestId.from("sip:6001@uta.bt.com-DirectDial-1trader1@btsm11")));
-        assertThat(interest.getType(), is(InterestType.from("DirectoryNumber")));
-        assertThat(interest.getLabel().get(), is("6001/1"));
-        assertThat(interest.isDefaultInterest().get(), is(false));
-
-        assertThat(interests.size(), is(i));
+        assertThat(interests.size(), is(2));
 
         assertThat(result.getParseErrors().size(), is(0));
     }
 
     @Test
-    public void willReturnParsingErrors() throws Exception {
+    public void willReturnParsingErrors() {
 
         final GetInterestsResult result = GetInterestsResult.from(Fixtures.iqFrom(GetInterestsFixtures.GET_INTERESTS_RESULT_WITH_BAD_VALUES));
 
@@ -116,7 +108,7 @@ public class GetInterestsResultTest {
     }
 
     @Test
-    public void willBuildAResultFromARequest() throws Exception {
+    public void willBuildAResultFromARequest() {
 
         final GetInterestsRequest request = GetInterestsRequest.Builder.start()
                 .setTo(Fixtures.TO_JID)

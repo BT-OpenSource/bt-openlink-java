@@ -7,8 +7,8 @@ import static org.junit.Assert.assertThat;
 import static org.xmlunit.matchers.CompareMatcher.isIdenticalTo;
 
 import java.util.List;
-import java.util.Optional;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.provider.ProviderManager;
 import org.jivesoftware.smack.util.PacketParserUtils;
@@ -23,9 +23,6 @@ import com.bt.openlink.GetProfilesFixtures;
 import com.bt.openlink.OpenlinkXmppNamespace;
 import com.bt.openlink.smack.Fixtures;
 import com.bt.openlink.type.Profile;
-import com.bt.openlink.type.ProfileId;
-import com.bt.openlink.type.RequestAction;
-import com.bt.openlink.type.Site;
 
 @SuppressWarnings({ "ConstantConditions" })
 public class GetProfilesResultTest {
@@ -80,35 +77,11 @@ public class GetProfilesResultTest {
         assertThat(result.getStanzaId(), is(CoreFixtures.STANZA_ID));
         assertThat(result.getType(), is(IQ.Type.result));
         final List<Profile> profiles = result.getProfiles();
-        int i = 0;
 
-        Profile profile = profiles.get(i++);
-        Site site = profile.getSite().get();
-        assertThat(profile.getId().get(), is(CoreFixtures.PROFILE_ID));
-        assertThat(profile.isDefaultProfile().get(), is(true));
-        assertThat(profile.getDevice(), is(Optional.empty()));
-        assertThat(profile.getLabel().get(), is("test profile label"));
-        assertThat(profile.isOnline().get(), is(true));
-        assertThat(profile.getActions(), is(empty()));
-        assertThat(site.getId().get(), is(42L));
-        assertThat(site.getType().get(), is(Site.Type.BTSM));
-        assertThat(site.isDefault().get(), is(true));
-        assertThat(site.getName().get(), is("test site name"));
+        assertThat(EqualsBuilder.reflectionEquals(CoreFixtures.PROFILE, profiles.get(0), false, null, true), is(true));
+        assertThat(EqualsBuilder.reflectionEquals(GetProfilesFixtures.PROFILE_2, profiles.get(1), false, null, true), is(true));
 
-        profile = profiles.get(i++);
-        site = profile.getSite().get();
-        assertThat(profile.getId().get(), is(ProfileId.from("test-profile-id-2").get()));
-        assertThat(profile.isDefaultProfile().get(), is(true));
-        assertThat(profile.getDevice().get(), is("uta"));
-        assertThat(profile.getLabel().get(), is("7001"));
-        assertThat(profile.isOnline().get(), is(true));
-        assertThat(profile.getActions(), contains(RequestAction.ANSWER_CALL, RequestAction.CLEAR_CALL));
-        assertThat(site.getId().get(), is(11L));
-        assertThat(site.getType().get(), is(Site.Type.ITS));
-        assertThat(site.isDefault(), is(Optional.empty()));
-        assertThat(site.getName().get(), is("another-test-site-name"));
-
-        assertThat(profiles.size(), is(i));
+        assertThat(profiles.size(), is(2));
 
         assertThat(result.getParseErrors(), is(empty()));
     }

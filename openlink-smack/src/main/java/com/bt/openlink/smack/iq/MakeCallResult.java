@@ -48,7 +48,7 @@ public class MakeCallResult extends OpenlinkIQ {
         final Builder builder = Builder.start();
         final List<String> parseErrors = new ArrayList<>();
         if (parser.getName().equals(ELEMENT_CALLSTATUS)) {
-            final Optional<Boolean> callBusy = SmackPacketUtil.getBooleanAttribute(parser, "busy");
+            final Optional<Boolean> callBusy = SmackPacketUtil.getBooleanAttribute(parser, "busy", "make-call result", parseErrors);
             callBusy.ifPresent(builder::setCallStatusBusy);
             parser.nextTag();
             final List<Call> calls = SmackPacketUtil.getCalls(parser, "make call result", parseErrors);

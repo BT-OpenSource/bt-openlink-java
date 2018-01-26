@@ -37,7 +37,7 @@ public class GetInterestFixtures {
 
     public static final String GET_INTEREST_RESULT_WITH_BAD_VALUES = 
             "<iq type='set'>\n" +
-            "  <command xmlns='http://jabber.org/protocol/commands' action='execute' node='http://xmpp.org/protocol/openlink:01:00:00#get-interest'>\n" +
+            "  <command xmlns='http://jabber.org/protocol/commands' status='completed' node='http://xmpp.org/protocol/openlink:01:00:00#get-interest'>\n" +
             "    <iodata xmlns='urn:xmpp:tmp:io-data' type='output'>\n" +
             "      <out>\n" +
             "      </out>\n" +

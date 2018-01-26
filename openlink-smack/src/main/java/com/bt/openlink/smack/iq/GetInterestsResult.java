@@ -29,13 +29,13 @@ public class GetInterestsResult extends OpenlinkIQ {
     private GetInterestsResult(@Nonnull Builder builder, @Nullable List<String> parseErrors) {
         super("command", OpenlinkXmppNamespace.XMPP_COMMANDS.uri(), builder, parseErrors);
         this.interests = Collections.unmodifiableList(builder.getInterests());
-        }
+    }
 
     @Nonnull
     public List<Interest> getInterests() {
         return interests;
     }
-    
+
     @Nonnull
     static IQ from(XmlPullParser parser) throws IOException, XmlPullParserException {
 
@@ -56,7 +56,7 @@ public class GetInterestsResult extends OpenlinkIQ {
             interestType.ifPresent(interestBuilder::setType);
             final Optional<String> label = SmackPacketUtil.getStringAttribute(parser, OpenlinkXmppNamespace.TAG_LABEL);
             label.ifPresent(interestBuilder::setLabel);
-            final Optional<Boolean> isDefaultInterest = SmackPacketUtil.getBooleanAttribute(parser, OpenlinkXmppNamespace.TAG_DEFAULT);
+            final Optional<Boolean> isDefaultInterest = SmackPacketUtil.getBooleanAttribute(parser, OpenlinkXmppNamespace.TAG_DEFAULT, "get-interests result", parseErrors);
             isDefaultInterest.ifPresent(interestBuilder::setDefault);
 
             builder.addInterest(interestBuilder.build(parseErrors));
@@ -65,7 +65,7 @@ public class GetInterestsResult extends OpenlinkIQ {
         }
         return builder.build(parseErrors);
     }
-    
+
     @Override
     protected IQChildElementXmlStringBuilder getIQChildElementBuilder(IQChildElementXmlStringBuilder xml) {
         xml.attribute("status", "completed")
@@ -85,7 +85,7 @@ public class GetInterestsResult extends OpenlinkIQ {
             interest.isDefaultInterest().ifPresent(isDefault -> xml.attribute("default", String.valueOf(isDefault)));
             xml.rightAngleBracket();
             xml.closeElement(OpenlinkXmppNamespace.TAG_INTEREST);
-            }
+        }
 
         xml.closeElement(OpenlinkXmppNamespace.TAG_INTERESTS);
         xml.closeElement(OpenlinkXmppNamespace.TAG_OUT);

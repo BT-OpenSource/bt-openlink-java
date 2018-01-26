@@ -42,18 +42,19 @@ public class GetInterestResult extends OpenlinkIQ {
         final Builder builder = Builder.start();
 
         final List<String> parseErrors = new ArrayList<>();
+        if (parser.getName().equals(OpenlinkXmppNamespace.TAG_INTEREST)) {
+            final Interest.Builder interestBuilder = Interest.Builder.start();
+            final Optional<InterestId> interestId = InterestId.from(parser.getAttributeValue("", "id"));
+            interestId.ifPresent(interestBuilder::setId);
+            final Optional<InterestType> interestType = InterestType.from(parser.getAttributeValue("", "type"));
+            interestType.ifPresent(interestBuilder::setType);
+            final Optional<String> label = SmackPacketUtil.getStringAttribute(parser, OpenlinkXmppNamespace.TAG_LABEL);
+            label.ifPresent(interestBuilder::setLabel);
+            final Optional<Boolean> isDefaultInterest = SmackPacketUtil.getBooleanAttribute(parser, OpenlinkXmppNamespace.TAG_DEFAULT, "get-interest result", parseErrors);
+            isDefaultInterest.ifPresent(interestBuilder::setDefault);
 
-        final Interest.Builder interestBuilder = Interest.Builder.start();
-        final Optional<InterestId> interestId = InterestId.from(parser.getAttributeValue("", "id"));
-        interestId.ifPresent(interestBuilder::setId);
-        final Optional<InterestType> interestType = InterestType.from(parser.getAttributeValue("", "type"));
-        interestType.ifPresent(interestBuilder::setType);
-        final Optional<String> label = SmackPacketUtil.getStringAttribute(parser, OpenlinkXmppNamespace.TAG_LABEL);
-        label.ifPresent(interestBuilder::setLabel);
-        final Optional<Boolean> isDefaultInterest = SmackPacketUtil.getBooleanAttribute(parser, OpenlinkXmppNamespace.TAG_DEFAULT);
-        isDefaultInterest.ifPresent(interestBuilder::setDefault);
-
-        builder.setInterest(interestBuilder.build(parseErrors));
+            builder.setInterest(interestBuilder.build(parseErrors));
+        }
 
         return builder.build(parseErrors);
     }

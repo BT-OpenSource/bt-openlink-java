@@ -24,6 +24,7 @@ import com.bt.openlink.type.RequestAction;
 import com.bt.openlink.type.Site;
 
 public class GetProfilesResult extends OpenlinkIQ {
+    private static final String STANZA_DESCRIPTION = "get-profiles result";
     @Nonnull private final List<Profile> profiles;
 
     @Nonnull
@@ -44,11 +45,11 @@ public class GetProfilesResult extends OpenlinkIQ {
             final Profile.Builder profileBuilder = Profile.Builder.start();
             final Optional<ProfileId> profileId = ProfileId.from(parser.getAttributeValue("", "id"));
             profileId.ifPresent(profileBuilder::setId);
-            final Optional<Boolean> isDefaultProfile = SmackPacketUtil.getBooleanAttribute(parser, OpenlinkXmppNamespace.TAG_DEFAULT);
+            final Optional<Boolean> isDefaultProfile = SmackPacketUtil.getBooleanAttribute(parser, OpenlinkXmppNamespace.TAG_DEFAULT, STANZA_DESCRIPTION, parseErrors);
             isDefaultProfile.ifPresent(profileBuilder::setDefault);
             final Optional<String> label = SmackPacketUtil.getStringAttribute(parser, OpenlinkXmppNamespace.TAG_LABEL);
             label.ifPresent(profileBuilder::setLabel);
-            final Optional<Boolean> online = SmackPacketUtil.getBooleanAttribute(parser, "online");
+            final Optional<Boolean> online = SmackPacketUtil.getBooleanAttribute(parser, "online", STANZA_DESCRIPTION, parseErrors);
             online.ifPresent(profileBuilder::setOnline);
             final Optional<String> device = SmackPacketUtil.getStringAttribute(parser, "device");
             device.ifPresent(profileBuilder::setDevice);
@@ -56,19 +57,19 @@ public class GetProfilesResult extends OpenlinkIQ {
             parser.nextTag();
             do {
                 switch (parser.getName()) {
-                    case "site":
-                        addSiteToBuilder(parser, parseErrors, profileBuilder);
-                        break;
-                    case OpenlinkXmppNamespace.TAG_ACTIONS:
-                        addActionsToBuilder(parser, profileBuilder);
-                        break;
-                    default:
-                        parseErrors.add("Unrecognised tag: " + parser.getName());
-                        break;
+                case "site":
+                    addSiteToBuilder(parser, parseErrors, profileBuilder);
+                    break;
+                case OpenlinkXmppNamespace.TAG_ACTIONS:
+                    addActionsToBuilder(parser, profileBuilder);
+                    break;
+                default:
+                    parseErrors.add("Unrecognised tag: " + parser.getName());
+                    break;
                 }
-                ParserUtils.forwardToEndTagOfDepth(parser, profileDepth+1);
+                ParserUtils.forwardToEndTagOfDepth(parser, profileDepth + 1);
                 parser.nextTag();
-            } while( profileDepth != parser.getDepth());
+            } while (profileDepth != parser.getDepth());
 
             builder.addProfile(profileBuilder.build(parseErrors));
             ParserUtils.forwardToEndTagOfDepth(parser, profileDepth);
@@ -78,7 +79,7 @@ public class GetProfilesResult extends OpenlinkIQ {
     }
 
     private static void addActionsToBuilder(final XmlPullParser parser, final Profile.Builder profileBuilder) throws XmlPullParserException, IOException {
-        if(!parser.isEmptyElementTag()) {
+        if (!parser.isEmptyElementTag()) {
             do {
                 parser.nextTag();
                 if (parser.getName().equals(OpenlinkXmppNamespace.TAG_ACTION)) {
@@ -92,7 +93,7 @@ public class GetProfilesResult extends OpenlinkIQ {
     }
 
     private static void addSiteToBuilder(final XmlPullParser parser, final List<String> parseErrors, final Profile.Builder profileBuilder) throws IOException, XmlPullParserException {
-        final Optional<Site> site = SmackPacketUtil.getSite(parser, parseErrors);
+        final Optional<Site> site = SmackPacketUtil.getSite(parser, parseErrors, STANZA_DESCRIPTION);
         site.ifPresent(profileBuilder::setSite);
     }
 

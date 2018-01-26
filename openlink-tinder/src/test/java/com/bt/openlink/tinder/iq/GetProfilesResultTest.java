@@ -7,8 +7,8 @@ import static org.junit.Assert.assertThat;
 import static org.xmlunit.matchers.CompareMatcher.isIdenticalTo;
 
 import java.util.List;
-import java.util.Optional;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -18,9 +18,6 @@ import com.bt.openlink.CoreFixtures;
 import com.bt.openlink.GetProfilesFixtures;
 import com.bt.openlink.tinder.Fixtures;
 import com.bt.openlink.type.Profile;
-import com.bt.openlink.type.ProfileId;
-import com.bt.openlink.type.RequestAction;
-import com.bt.openlink.type.Site;
 
 @SuppressWarnings({ "ConstantConditions" })
 public class GetProfilesResultTest {
@@ -28,7 +25,7 @@ public class GetProfilesResultTest {
     @Rule public final ExpectedException expectedException = ExpectedException.none();
 
     @Test
-    public void canCreateAStanza() throws Exception {
+    public void canCreateAStanza() {
 
         final GetProfilesResult result = GetProfilesResult.Builder.start()
                 .setId(CoreFixtures.STANZA_ID)
@@ -43,7 +40,7 @@ public class GetProfilesResultTest {
     }
 
     @Test
-    public void willGenerateAnXmppStanza() throws Exception {
+    public void willGenerateAnXmppStanza() {
 
         final GetProfilesResult result = GetProfilesResult.Builder.start()
                 .setId(CoreFixtures.STANZA_ID)
@@ -57,7 +54,7 @@ public class GetProfilesResultTest {
     }
 
     @Test
-    public void willParseAnXmppStanza() throws Exception {
+    public void willParseAnXmppStanza() {
 
         final GetProfilesResult result = (GetProfilesResult) OpenlinkIQParser.parse(Fixtures.iqFrom(GetProfilesFixtures.GET_PROFILES_RESULT_WITH_NO_NOTES));
         assertThat(result.getTo(), is(Fixtures.TO_JID));
@@ -65,41 +62,17 @@ public class GetProfilesResultTest {
         assertThat(result.getID(), is(CoreFixtures.STANZA_ID));
         assertThat(result.getType(), is(IQ.Type.result));
         final List<Profile> profiles = result.getProfiles();
-        int i = 0;
 
-        Profile profile = profiles.get(i++);
-        Site site = profile.getSite().get();
-        assertThat(profile.getId().get(), is(CoreFixtures.PROFILE_ID));
-        assertThat(profile.isDefaultProfile().get(), is(true));
-        assertThat(profile.getDevice(), is(Optional.empty()));
-        assertThat(profile.getLabel().get(), is("test profile label"));
-        assertThat(profile.isOnline().get(), is(true));
-        assertThat(profile.getActions(), is(empty()));
-        assertThat(site.getId().get(), is(42L));
-        assertThat(site.getType().get(), is(Site.Type.BTSM));
-        assertThat(site.isDefault().get(), is(true));
-        assertThat(site.getName().get(), is("test site name"));
+        assertThat(EqualsBuilder.reflectionEquals(CoreFixtures.PROFILE, profiles.get(0), false, null, true), is(true));
+        assertThat(EqualsBuilder.reflectionEquals(GetProfilesFixtures.PROFILE_2, profiles.get(1), false, null, true), is(true));
 
-        profile = profiles.get(i++);
-        site = profile.getSite().get();
-        assertThat(profile.getId().get(), is(ProfileId.from("test-profile-id-2").get()));
-        assertThat(profile.isDefaultProfile().get(), is(true));
-        assertThat(profile.getDevice().get(), is("uta"));
-        assertThat(profile.getLabel().get(), is("7001"));
-        assertThat(profile.isOnline().get(), is(true));
-        assertThat(profile.getActions(), contains(RequestAction.ANSWER_CALL, RequestAction.CLEAR_CALL));
-        assertThat(site.getId().get(), is(11L));
-        assertThat(site.getType().get(), is(Site.Type.ITS));
-        assertThat(site.isDefault(), is(Optional.empty()));
-        assertThat(site.getName().get(), is("another-test-site-name"));
-
-        assertThat(profiles.size(), is(i));
+        assertThat(profiles.size(), is(2));
 
         assertThat(result.getParseErrors(), is(empty()));
     }
 
     @Test
-    public void willReturnParsingErrors() throws Exception {
+    public void willReturnParsingErrors() {
 
         final IQ iq = Fixtures.iqFrom(GetProfilesFixtures.GET_PROFILES_RESULT_WITH_BAD_VALUES);
 
@@ -115,7 +88,7 @@ public class GetProfilesResultTest {
     }
 
     @Test
-    public void willReturnANoProfilesParsingError() throws Exception {
+    public void willReturnANoProfilesParsingError() {
 
         final IQ iq = Fixtures.iqFrom(GetProfilesFixtures.GET_PROFILES_RESULT_WITH_NO_PROFILES);
 
@@ -125,7 +98,7 @@ public class GetProfilesResultTest {
     }
 
     @Test
-    public void willBuildAResultFromARequest() throws Exception {
+    public void willBuildAResultFromARequest() {
 
         final GetProfilesRequest request = GetProfilesRequest.Builder.start()
                 .setTo(Fixtures.TO_JID)

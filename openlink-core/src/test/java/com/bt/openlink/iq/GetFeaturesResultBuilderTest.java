@@ -14,6 +14,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import com.bt.openlink.CoreFixtures;
+import com.bt.openlink.GetFeaturesFixtures;
 
 @SuppressWarnings("ConstantConditions")
 public class GetFeaturesResultBuilderTest {
@@ -29,7 +30,7 @@ public class GetFeaturesResultBuilderTest {
     private Builder builder;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
 
         builder = new Builder();
 
@@ -39,22 +40,22 @@ public class GetFeaturesResultBuilderTest {
     }
 
     @Test
-    public void willValidateAPopulatedBuilder() throws Exception {
+    public void willValidateAPopulatedBuilder() {
 
         final List<String> errors = new ArrayList<>();
         builder.setProfileId(CoreFixtures.PROFILE_ID)
-                .addFeature(CoreFixtures.FEATURE);
+                .addFeature(GetFeaturesFixtures.FEATURE_HANDSET_1);
 
         builder.validate();
         builder.validate(errors);
 
         assertThat(errors, is(empty()));
         assertThat(builder.getProfileId().get(), is(CoreFixtures.PROFILE_ID));
-        assertThat(builder.getFeatures(), contains(CoreFixtures.FEATURE));
+        assertThat(builder.getFeatures(), contains(GetFeaturesFixtures.FEATURE_HANDSET_1));
     }
 
     @Test
-    public void willValidateProfileIsSet() throws Exception {
+    public void willValidateProfileIsSet() {
 
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("The get-features result profile has not been set");
@@ -63,31 +64,31 @@ public class GetFeaturesResultBuilderTest {
     }
 
     @Test
-    public void willValidateProfileUniqueness() throws Exception {
+    public void willValidateProfileUniqueness() {
 
         expectedException.expect(IllegalStateException.class);
-        expectedException.expectMessage("Each feature id must be unique - test-feature-id appears more than once");
+        expectedException.expectMessage("Each feature id must be unique - hs_1 appears more than once");
 
         builder.setProfileId(CoreFixtures.PROFILE_ID)
-                .addFeature(CoreFixtures.FEATURE)
-                .addFeature(CoreFixtures.FEATURE);
+                .addFeature(GetFeaturesFixtures.FEATURE_HANDSET_1)
+                .addFeature(GetFeaturesFixtures.FEATURE_HANDSET_1);
 
         builder.validate();
     }
 
     @Test
-    public void willCheckProfileAndUniqueness() throws Exception {
+    public void willCheckProfileAndUniqueness() {
 
         final List<String> errors = new ArrayList<>();
 
-        builder.addFeature(CoreFixtures.FEATURE);
-        builder.addFeature(CoreFixtures.FEATURE);
+        builder.addFeature(GetFeaturesFixtures.FEATURE_HANDSET_1);
+        builder.addFeature(GetFeaturesFixtures.FEATURE_HANDSET_1);
 
         builder.validate(errors);
 
         assertThat(errors, contains(
                 "Invalid get-features result stanza; missing profile",
-                "Invalid get-features result stanza; each feature id must be unique - test-feature-id appears more than once"
+                "Invalid get-features result stanza; each feature id must be unique - hs_1 appears more than once"
         ));
     }
 }
