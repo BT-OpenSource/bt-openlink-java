@@ -9,6 +9,7 @@ import javax.annotation.Nullable;
 
 import com.bt.openlink.type.FeatureId;
 import com.bt.openlink.type.InterestId;
+import com.bt.openlink.type.OriginatorReference;
 import com.bt.openlink.type.PhoneNumber;
 
 public abstract class MakeCallRequestBuilder<B extends MakeCallRequestBuilder, J, T extends Enum<T>> extends IQBuilder<B, J, T> {
@@ -17,6 +18,7 @@ public abstract class MakeCallRequestBuilder<B extends MakeCallRequestBuilder, J
     @Nullable private InterestId interestId;
     @Nullable private PhoneNumber destination;
     @Nonnull private final List<FeatureId> featureIds = new ArrayList<>();
+    @Nonnull private List<OriginatorReference> originatorReferences = new ArrayList<>();
 
     protected MakeCallRequestBuilder(final Class<T> typeClass) {
         super(typeClass);
@@ -56,6 +58,20 @@ public abstract class MakeCallRequestBuilder<B extends MakeCallRequestBuilder, J
         return (B) this;
     }
 
+    @SuppressWarnings("unchecked")
+    @Nonnull
+    public B addOriginatorReference(@Nonnull final String key, @Nonnull final String value) {
+        this.originatorReferences.add(new OriginatorReference(key, value));
+        return (B) this;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Nonnull
+    public B addOriginatorReference(@Nonnull final OriginatorReference originatorReference) {
+        this.originatorReferences.add(originatorReference);
+        return (B) this;
+    }
+
     @Nonnull
     public Optional<J> getJID() {
         return Optional.ofNullable(jid);
@@ -74,6 +90,11 @@ public abstract class MakeCallRequestBuilder<B extends MakeCallRequestBuilder, J
     @Nonnull
     public List<FeatureId> getFeatureIds() {
         return featureIds;
+    }
+
+    @Nonnull
+    public List<OriginatorReference> getOriginatorReferences() {
+        return originatorReferences;
     }
 
     @Override

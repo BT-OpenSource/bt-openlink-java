@@ -492,6 +492,12 @@ public class Call implements Serializable {
         }
 
         @Nonnull
+        public Builder addOriginatorReference(@Nonnull final OriginatorReference originatorReference) {
+            this.originatorReferences.add(originatorReference);
+            return this;
+        }
+
+        @Nonnull
         public Builder setDuration(@Nonnull final Duration duration) {
             this.duration = duration;
             return this;

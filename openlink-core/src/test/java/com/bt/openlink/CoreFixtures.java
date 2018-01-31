@@ -25,6 +25,7 @@ import com.bt.openlink.type.FeatureType;
 import com.bt.openlink.type.Interest;
 import com.bt.openlink.type.InterestId;
 import com.bt.openlink.type.InterestType;
+import com.bt.openlink.type.OriginatorReference;
 import com.bt.openlink.type.Participant;
 import com.bt.openlink.type.ParticipantType;
 import com.bt.openlink.type.PhoneNumber;
@@ -110,6 +111,7 @@ public class CoreFixtures {
             .setId(INTEREST_ID)
             .setLabel("test interest label")
             .build();
+    public static final OriginatorReference ORIGINATOR_REFERENCE = new OriginatorReference("key1", "value1");
     public static final Call CALL_INCOMING_ORIGINATED = Call.Builder.start()
             .setId(CALL_ID)
             .setConferenceId(CONFERENCE_ID)
@@ -127,7 +129,7 @@ public class CoreFixtures {
             .setCalledName(CALLED_NAME)
             .addCalledE164Number(CALLED_E164_NUMBER)
             .setCalledDestination(CALLED_DESTINATION)
-            .addOriginatorReference("key1", "value1")
+            .addOriginatorReference(ORIGINATOR_REFERENCE)
             .addOriginatorReference("key2", "value2")
             .setStartTime(START_TIME)
             .setDuration(DURATION)

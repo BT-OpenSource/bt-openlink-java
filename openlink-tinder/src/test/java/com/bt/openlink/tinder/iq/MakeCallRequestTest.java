@@ -1,6 +1,8 @@
 package com.bt.openlink.tinder.iq;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.xmlunit.matchers.CompareMatcher.isIdenticalTo;
@@ -15,6 +17,7 @@ import org.xmpp.packet.IQ;
 import com.bt.openlink.CoreFixtures;
 import com.bt.openlink.MakeCallFixtures;
 import com.bt.openlink.tinder.Fixtures;
+import com.bt.openlink.type.OriginatorReference;
 
 @SuppressWarnings({ "ConstantConditions", "RedundantThrows" })
 public class MakeCallRequestTest {
@@ -32,6 +35,7 @@ public class MakeCallRequestTest {
                 .setInterestId(CoreFixtures.INTEREST_ID)
                 .setDestination(CoreFixtures.CALLED_DESTINATION)
                 .addFeatureId(CoreFixtures.FEATURE_ID)
+                .addOriginatorReference(CoreFixtures.ORIGINATOR_REFERENCE)
                 .build();
 
         assertThat(request.getID(), is(CoreFixtures.STANZA_ID));
@@ -41,6 +45,7 @@ public class MakeCallRequestTest {
         assertThat(request.getInterestId().get(), is(CoreFixtures.INTEREST_ID));
         assertThat(request.getDestination().get(), is(CoreFixtures.CALLED_DESTINATION));
         assertThat(request.getFeatureIds(), contains(CoreFixtures.FEATURE_ID));
+        assertThat(request.getOriginatorReferences(), contains(CoreFixtures.ORIGINATOR_REFERENCE));
     }
 
     @Test
@@ -64,6 +69,8 @@ public class MakeCallRequestTest {
                 .setJID(Fixtures.USER_FULL_JID)
                 .setInterestId(CoreFixtures.INTEREST_ID)
                 .setDestination(CoreFixtures.CALLED_DESTINATION)
+                .addOriginatorReference(CoreFixtures.ORIGINATOR_REFERENCE)
+                .addOriginatorReference("key2", "value2")
                 .addFeatureId(CoreFixtures.FEATURE_ID)
                 .build();
 
@@ -82,6 +89,7 @@ public class MakeCallRequestTest {
         assertThat(request.getInterestId().get(), is(CoreFixtures.INTEREST_ID));
         assertThat(request.getDestination().get(), is(CoreFixtures.CALLED_DESTINATION));
         assertThat(request.getFeatureIds(), contains(CoreFixtures.FEATURE_ID));
+        assertThat(request.getOriginatorReferences(), contains(CoreFixtures.ORIGINATOR_REFERENCE, new OriginatorReference("key2", "value2")));
         assertThat(request.getParseErrors(), is(empty()));
     }
 

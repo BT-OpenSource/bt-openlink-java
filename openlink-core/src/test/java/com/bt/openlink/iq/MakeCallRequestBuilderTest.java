@@ -15,6 +15,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import com.bt.openlink.CoreFixtures;
+import com.bt.openlink.type.OriginatorReference;
 
 @SuppressWarnings({"ConstantConditions", "RedundantThrows"})
 public class MakeCallRequestBuilderTest {
@@ -45,7 +46,9 @@ public class MakeCallRequestBuilderTest {
         builder.setJID("jid")
                 .setInterestId(CoreFixtures.INTEREST_ID)
                 .addFeatureId(CoreFixtures.FEATURE_ID)
-                .setDestination(CoreFixtures.CALLED_DESTINATION);
+                .setDestination(CoreFixtures.CALLED_DESTINATION)
+                .addOriginatorReference(CoreFixtures.ORIGINATOR_REFERENCE)
+                .addOriginatorReference("key2", "value2");
 
         builder.validate();
         builder.validate(errors);
@@ -55,6 +58,7 @@ public class MakeCallRequestBuilderTest {
         assertThat(builder.getInterestId().get(), is(CoreFixtures.INTEREST_ID));
         assertThat(builder.getFeatureIds(), contains(CoreFixtures.FEATURE_ID));
         assertThat(builder.getDestination().get(), is(CoreFixtures.CALLED_DESTINATION));
+        assertThat(builder.getOriginatorReferences(),contains(CoreFixtures.ORIGINATOR_REFERENCE, new OriginatorReference("key2", "value2")));
     }
 
     @Test

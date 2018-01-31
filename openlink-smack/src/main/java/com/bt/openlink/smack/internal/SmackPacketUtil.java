@@ -152,7 +152,7 @@ public final class SmackPacketUtil {
             call.getDirection().ifPresent(changed -> xml.element(ATTRIBUTE_DIRECTION, changed.getLabel()));
             addCallerDetails(xml, call);
             addCalledDetails(xml, call);
-            addOriginatorReferences(xml, call);
+            addOriginatorReferences(xml, call.getOriginatorReferences());
             call.getStartTime().ifPresent(startTime -> xml.element(ATTRIBUTE_START_TIME, (ISO_8601_FORMATTER.format(startTime.atZone(ZoneOffset.UTC)))));
             call.getDuration().ifPresent(duration -> xml.element(ATTRIBUTE_DURATION, String.valueOf(duration.toMillis())));
             addActions(xml, call);
@@ -213,8 +213,7 @@ public final class SmackPacketUtil {
         xml.closeElement(ELEMENT_CALLER);
     }
 
-    private static void addOriginatorReferences(@Nonnull final IQChildElementXmlStringBuilder xml, @Nonnull final Call call) {
-        final List<OriginatorReference> originatorReferences = call.getOriginatorReferences();
+    public static void addOriginatorReferences(@Nonnull final IQChildElementXmlStringBuilder xml, @Nonnull final List<OriginatorReference> originatorReferences) {
         if (!originatorReferences.isEmpty()) {
             xml.openElement(ELEMENT_ORIGINATOR_REF);
             originatorReferences.forEach(originatorReference -> {
@@ -353,7 +352,7 @@ public final class SmackPacketUtil {
                     addCalledDetailsToBuilder(parser, callBuilder);
                     break;
                 case ELEMENT_ORIGINATOR_REF:
-                    addOriginatorRefToBuilder(parser, callBuilder);
+                    getOriginatorRefs(parser).forEach(callBuilder::addOriginatorReference);
                     break;
                 case ATTRIBUTE_START_TIME:
                     getElementTestISO8601(ATTRIBUTE_START_TIME, parser, description, errors).ifPresent(callBuilder::setStartTime);
@@ -383,7 +382,8 @@ public final class SmackPacketUtil {
         return calls;
     }
 
-    private static void addOriginatorRefToBuilder(final @Nonnull XmlPullParser parser, final Call.Builder callBuilder) throws XmlPullParserException, IOException {
+    public static List<OriginatorReference> getOriginatorRefs(final @Nonnull XmlPullParser parser) throws XmlPullParserException, IOException {
+        final List<OriginatorReference> originatorReferences = new ArrayList<>();
         parser.nextTag();
         while (parser.getName().equals(ELEMENT_PROPERTY)) {
             final int propertyDepth = parser.getDepth();
@@ -395,10 +395,11 @@ public final class SmackPacketUtil {
             } else {
                 value = "";
             }
-            callBuilder.addOriginatorReference(key, value);
+            originatorReferences.add(new OriginatorReference(key, value));
             ParserUtils.forwardToEndTagOfDepth(parser, propertyDepth);
             parser.nextTag(); // end of property tag
         }
+        return originatorReferences;
     }
 
     private static void addCalledDetailsToBuilder(final @Nonnull XmlPullParser parser, final Call.Builder callBuilder) throws XmlPullParserException, IOException {
@@ -679,6 +680,8 @@ public final class SmackPacketUtil {
                 getElementTextBoolean(ELEMENT_MUTE, parser, description, parseErrors).ifPresent(speakerChannelBuilder::setMuteRequested);
                 break;
             default:
+                parseErrors.add("Unrecognised element:" + parser.getName());
+                break;
             }
             ParserUtils.forwardToEndTagOfDepth(parser, featureDepth + 1);
             parser.nextTag();

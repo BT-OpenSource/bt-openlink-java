@@ -332,15 +332,7 @@ public final class TinderPacketUtil {
             if (!calledE164Numbers.isEmpty()) {
                 calledNumberElement.addAttribute("e164", calledE164Numbers);
             }
-            final List<OriginatorReference> originatorReferences = call.getOriginatorReferences();
-            if (!originatorReferences.isEmpty()) {
-                final Element originatorRefElement = callElement.addElement("originator-ref");
-                originatorReferences.forEach(originatorReference -> {
-                    final Element propertyElement = originatorRefElement.addElement("property").addAttribute("id", originatorReference.getKey());
-                    propertyElement.addElement("value").setText(originatorReference.getValue());
-
-                });
-            }
+            addOriginatorReferences(callElement, call.getOriginatorReferences());
             final Element calledNameElement = calledElement.addElement("name");
             call.getCalledName().ifPresent(calledNameElement::setText);
             call.getStartTime().ifPresent(startTime -> callElement.addElement(ATTRIBUTE_START_TIME).setText(ISO_8601_FORMATTER.format(startTime.atZone(ZoneOffset.UTC))));
@@ -349,6 +341,17 @@ public final class TinderPacketUtil {
             addFeatures(call, callElement);
             addParticipants(call, callElement);
         });
+    }
+
+    public static void addOriginatorReferences(final Element callElement, final List<OriginatorReference> originatorReferences) {
+        if (!originatorReferences.isEmpty()) {
+            final Element originatorRefElement = callElement.addElement("originator-ref");
+            originatorReferences.forEach(originatorReference -> {
+                final Element propertyElement = originatorRefElement.addElement("property").addAttribute("id", originatorReference.getKey());
+                propertyElement.addElement("value").setText(originatorReference.getValue());
+
+            });
+        }
     }
 
     public static void addDeviceStatus(@Nonnull final Element itemElement, @Nonnull final DeviceStatus deviceStatus) {
@@ -480,7 +483,7 @@ public final class TinderPacketUtil {
                 getOptionalChildElementString(calledElement, "name").ifPresent(callBuilder::setCalledName);
                 PhoneNumber.from(getNullableStringAttribute(getChildElement(calledElement, ELEMENT_NUMBER), "destination")).ifPresent(callBuilder::setCalledDestination);
                 callBuilder.addCalledE164Numbers(getPhoneNumbers(getChildElement(calledElement, ELEMENT_NUMBER)));
-                getOriginatorReferences(callElement, callBuilder);
+                getOriginatorReferences(callElement).forEach(callBuilder::addOriginatorReference);
                 getChildElementISO8601(callElement, ATTRIBUTE_START_TIME, description, parseErrors).ifPresent(callBuilder::setStartTime);
                 getChildElementLong(callElement, ATTRIBUTE_DURATION, description, parseErrors).map(Duration::ofMillis).ifPresent(callBuilder::setDuration);
                 getActions(callElement, callBuilder, description, parseErrors);
@@ -493,19 +496,20 @@ public final class TinderPacketUtil {
     }
 
     @SuppressWarnings("unchecked")
-    private static void getOriginatorReferences(final Element callElement, final Call.Builder callBuilder) {
+    public static List<OriginatorReference> getOriginatorReferences(final Element parentElement) {
 
-        final Element originatorRefElement = getChildElement(callElement, "originator-ref");
-        if (originatorRefElement == null) {
-            return;
+        final List<OriginatorReference> originatorReferences = new ArrayList<>();
+
+        final Element originatorRefElement = getChildElement(parentElement, "originator-ref");
+        if (originatorRefElement != null) {
+            final List<Element> propertyElements = originatorRefElement.elements("property");
+            propertyElements.forEach(propertyElement -> {
+                final String key = getStringAttribute(propertyElement, "id").orElse("");
+                final String value = getOptionalChildElementString(propertyElement, "value").orElse("");
+                originatorReferences.add(new OriginatorReference(key, value));
+            });
         }
-
-        final List<Element> propertyElements = originatorRefElement.elements("property");
-        propertyElements.forEach(propertyElement -> {
-            final String key = getStringAttribute(propertyElement, "id").orElse("");
-            final String value = getOptionalChildElementString(propertyElement, "value").orElse("");
-            callBuilder.addOriginatorReference(key, value);
-        });
+        return originatorReferences;
     }
 
     public static Optional<DeviceStatus> getDeviceStatus(@Nullable final Element deviceStatusElement, @Nonnull final String stanzaDescription, @Nonnull final List<String> parseErrors) {
