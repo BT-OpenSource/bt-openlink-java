@@ -37,7 +37,8 @@ public class GetProfilesFixtures {
     public static final Profile PROFILE_2 = Profile.Builder.start()
             .setId(PROFILE_ID_2)
             .setDefault(true)
-            .setDevice("uta")
+            .setDeviceType("uta")
+            .setDeviceId("779")
             .setLabel("7001")
             .setOnline(true)
             .setSite(SITE_2)
@@ -51,10 +52,10 @@ public class GetProfilesFixtures {
                     "    <iodata xmlns='urn:xmpp:tmp:io-data' type='output'>\n" +
                     "      <out>\n" +
                     "        <profiles xmlns='http://xmpp.org/protocol/openlink:01:00:00/profiles'>\n" +
-                    "          <profile default='true' id='" + CoreFixtures.PROFILE_ID + "' label='test profile label' online='true'>\n" +
+                    "          <profile default='true' id='" + CoreFixtures.PROFILE.getId().get() + "' label='" +  CoreFixtures.PROFILE.getLabel().get() + "' online='true'>\n" +
                     "            <site default='true' id='42' type='BTSM'>test site name</site>\n" +
                     "          </profile>\n" +
-                    "          <profile default='true' device='uta' id='" + PROFILE_ID_2 + "' label='7001' online='true'>\n" +
+                    "          <profile default='true' id='" + PROFILE_2.getId().get() + "' device='" + PROFILE_2.getDeviceType().get() + "' devicenum='" + PROFILE_2.getDeviceId().get() + "' label='7001' online='true'>\n" +
                     "            <site id='11' type='ITS'>another-test-site-name</site>\n" +
                     "            <actions>\n" +
                     "              <action id='AnswerCall' label='Answer a ringing call'/>\n" +

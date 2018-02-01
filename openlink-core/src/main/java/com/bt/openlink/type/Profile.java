@@ -12,7 +12,8 @@ public final class Profile implements Serializable {
     private static final long serialVersionUID = -2429079888059635951L;
     @Nullable private final ProfileId profileId;
     @Nullable private final Boolean isDefault;
-    @Nullable private final String device;
+    @Nullable private final String deviceType;
+    @Nullable private final String deviceId;
     @Nullable private final String label;
     @Nullable private final Boolean online;
     @Nullable private final Site site;
@@ -21,7 +22,8 @@ public final class Profile implements Serializable {
     private Profile(@Nonnull final Builder builder) {
         this.profileId = builder.profileId;
         this.isDefault = builder.isDefault;
-        this.device = builder.device;
+        this.deviceType = builder.deviceType;
+        this.deviceId = builder.deviceId;
         this.label = builder.label;
         this.online = builder.online;
         this.site = builder.site;
@@ -38,9 +40,26 @@ public final class Profile implements Serializable {
         return Optional.ofNullable(isDefault);
     }
 
+    /**
+     * Returns the type of the device for this profile. This is stored in the "devicenum" attribute of the XML.
+     * For example;
+     * {@code ITS.Netrix}
+     * @return the type of device associated with the profile
+     */
     @Nonnull
-    public Optional<String> getDevice() {
-        return Optional.ofNullable(device);
+    public Optional<String> getDeviceType() {
+        return Optional.ofNullable(deviceType);
+    }
+
+    /**
+     * Returns the id of the device for this profile. This is stored in the "devicenum" attribute of the XML.
+     * For example;
+     * {@code 779}
+     * @return the id of the device associated with the profile
+     */
+    @Nonnull
+    public Optional<String> getDeviceId() {
+        return Optional.ofNullable(deviceId);
     }
 
     @Nonnull
@@ -68,7 +87,7 @@ public final class Profile implements Serializable {
         return "Profile[" +
                 "profileId=" + profileId +
                 ", isDefault=" + isDefault +
-                ", device='" + device + '\'' +
+                ", deviceType='" + deviceType + '\'' +
                 ", label='" + label + '\'' +
                 ", online=" + online +
                 ", site=" + site +
@@ -80,7 +99,8 @@ public final class Profile implements Serializable {
         @Nullable private ProfileId profileId = null;
         @Nullable private Site site = null;
         @Nullable private Boolean isDefault;
-        @Nullable private String device;
+        @Nullable private String deviceType;
+        @Nullable private String deviceId;
         @Nullable private String label;
         @Nullable private Boolean online;
         @Nonnull private final List<RequestAction> actions = new ArrayList<>();
@@ -143,8 +163,26 @@ public final class Profile implements Serializable {
             return this;
         }
 
-        public Builder setDevice(@Nonnull final String device) {
-            this.device = device;
+        /**
+         * Sets the type of device for this profile. This is stored in the "device" attribute of the XML. For example;
+         * {@code ITS.Netrix}
+         * @param deviceType the type of device for the profile
+         * @return the builder
+         */
+        public Builder setDeviceType(@Nonnull final String deviceType) {
+            this.deviceType = deviceType;
+            return this;
+        }
+
+        /**
+         * Sets the id of the device for this profile. This is stored in the "devicenum" attribute of the XML.
+         * For example;
+         * {@code 779}
+         * @param deviceId the id of the device for the profile
+         * @return the builder
+         */
+        public Builder setDeviceId(@Nonnull final String deviceId) {
+            this.deviceId = deviceId;
             return this;
         }
 

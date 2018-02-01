@@ -34,7 +34,8 @@ public class GetProfilesResult extends OpenlinkIQ {
             final Element profileElement = profilesElement.addElement(OpenlinkXmppNamespace.TAG_PROFILE);
             profile.getId().ifPresent(profileId -> profileElement.addAttribute("id", profileId.value()));
             profile.isDefaultProfile().ifPresent(isDefault -> profileElement.addAttribute(ATTRIBUTE_DEFAULT, String.valueOf(isDefault)));
-            profile.getDevice().ifPresent(device -> profileElement.addAttribute("device", device));
+            profile.getDeviceType().ifPresent(deviceTypr -> profileElement.addAttribute("device", deviceTypr));
+            profile.getDeviceId().ifPresent(deviceId -> profileElement.addAttribute("devicenum", deviceId));
             profile.getLabel().ifPresent(label -> profileElement.addAttribute(ATTRIBUTE_LABEL, label));
             profile.isOnline().ifPresent(online -> profileElement.addAttribute("online", String.valueOf(online)));
             profile.getSite().ifPresent(site -> TinderPacketUtil.addSite(profileElement, site));
@@ -63,7 +64,8 @@ public class GetProfilesResult extends OpenlinkIQ {
                 final Profile.Builder profileBuilder = Profile.Builder.start();
                 ProfileId.from(TinderPacketUtil.getNullableStringAttribute(profileElement, "id")).ifPresent(profileBuilder::setId);
                 TinderPacketUtil.getBooleanAttribute(profileElement, ATTRIBUTE_DEFAULT, DESCRIPTION, parseErrors).ifPresent(profileBuilder::setDefault);
-                TinderPacketUtil.getStringAttribute(profileElement, "device", false, DESCRIPTION, parseErrors).ifPresent(profileBuilder::setDevice);
+                TinderPacketUtil.getStringAttribute(profileElement, "device", false, DESCRIPTION, parseErrors).ifPresent(profileBuilder::setDeviceType);
+                TinderPacketUtil.getStringAttribute(profileElement, "devicenum", false, DESCRIPTION, parseErrors).ifPresent(profileBuilder::setDeviceId);
                 TinderPacketUtil.getStringAttribute(profileElement, ATTRIBUTE_LABEL).ifPresent(profileBuilder::setLabel);
                 TinderPacketUtil.getBooleanAttribute(profileElement, "online", DESCRIPTION, parseErrors).ifPresent(profileBuilder::setOnline);
                 TinderPacketUtil.getSite(profileElement, DESCRIPTION, parseErrors).ifPresent(profileBuilder::setSite);

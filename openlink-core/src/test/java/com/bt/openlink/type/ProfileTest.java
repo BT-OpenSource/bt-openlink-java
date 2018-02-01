@@ -24,14 +24,15 @@ public class ProfileTest {
     @Rule public final ExpectedException expectedException = ExpectedException.none();
 
     @Test
-    public void willCreateAProfile() throws Exception {
+    public void willCreateAProfile() {
 
         final ProfileId profileId = ProfileId.from("test-profile-id").orElseThrow(IllegalArgumentException::new);
         final Profile profile = Profile.Builder.start()
                 .setSite(SITE)
                 .setId(profileId)
                 .setDefault(true)
-                .setDevice("test-device")
+                .setDeviceType("test-device-type")
+                .setDeviceId("test-device-id")
                 .setLabel("test-label")
                 .addAction(RequestAction.ANSWER_CALL)
                 .setOnline(true)
@@ -40,7 +41,8 @@ public class ProfileTest {
         assertThat(profile.getSite().get(), is(SITE));
         assertThat(profile.getId().get(), is(profileId));
         assertThat(profile.isDefaultProfile().get(), is(true));
-        assertThat(profile.getDevice().get(), is("test-device"));
+        assertThat(profile.getDeviceType().get(), is("test-device-type"));
+        assertThat(profile.getDeviceId().get(), is("test-device-id"));
         assertThat(profile.getLabel().get(), is("test-label"));
         assertThat(profile.isOnline().get(), is(true));
         assertThat(profile.getActions().size(), is(1));
@@ -48,7 +50,7 @@ public class ProfileTest {
     }
 
     @Test
-    public void willNotCreateAProfileWithoutASite() throws Exception {
+    public void willNotCreateAProfileWithoutASite() {
 
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("The site has not been set");
@@ -59,7 +61,7 @@ public class ProfileTest {
     }
 
     @Test
-    public void willNotCreateAProfileWithoutAProfileId() throws Exception {
+    public void willNotCreateAProfileWithoutAProfileId() {
 
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("The profile id has not been set");
@@ -70,7 +72,7 @@ public class ProfileTest {
     }
 
     @Test
-    public void willNotCreateAProfileWithoutADefaultIndicator() throws Exception {
+    public void willNotCreateAProfileWithoutADefaultIndicator() {
 
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("The default indicator has not been set");
@@ -82,7 +84,7 @@ public class ProfileTest {
     }
 
     @Test
-    public void willNotCreateAProfileWithoutALabel() throws Exception {
+    public void willNotCreateAProfileWithoutALabel() {
 
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("The label has not been set");
@@ -95,7 +97,7 @@ public class ProfileTest {
     }
 
     @Test
-    public void willNotCreateAProfileWithoutAnOnlineIndicator() throws Exception {
+    public void willNotCreateAProfileWithoutAnOnlineIndicator() {
 
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("The online indicator has not been set");
@@ -109,7 +111,7 @@ public class ProfileTest {
     }
 
     @Test
-    public void willCreateAProfileWithoutMandatoryFields() throws Exception {
+    public void willCreateAProfileWithoutMandatoryFields() {
 
         final List<String> errors = new ArrayList<>();
 
@@ -119,7 +121,8 @@ public class ProfileTest {
         assertThat(profile.getSite(), is(Optional.empty()));
         assertThat(profile.getId(), is(Optional.empty()));
         assertThat(profile.isDefaultProfile(), is(Optional.empty()));
-        assertThat(profile.getDevice(), is(Optional.empty()));
+        assertThat(profile.getDeviceType(), is(Optional.empty()));
+        assertThat(profile.getDeviceId(), is(Optional.empty()));
         assertThat(profile.getLabel(), is(Optional.empty()));
         assertThat(profile.isOnline(), is(Optional.empty()));
         assertThat(errors, contains(

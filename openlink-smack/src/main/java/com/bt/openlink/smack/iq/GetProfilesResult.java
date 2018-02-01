@@ -51,8 +51,10 @@ public class GetProfilesResult extends OpenlinkIQ {
             label.ifPresent(profileBuilder::setLabel);
             final Optional<Boolean> online = SmackPacketUtil.getBooleanAttribute(parser, "online", STANZA_DESCRIPTION, parseErrors);
             online.ifPresent(profileBuilder::setOnline);
-            final Optional<String> device = SmackPacketUtil.getStringAttribute(parser, "device");
-            device.ifPresent(profileBuilder::setDevice);
+            final Optional<String> deviceType = SmackPacketUtil.getStringAttribute(parser, "device");
+            deviceType.ifPresent(profileBuilder::setDeviceType);
+            final Optional<String> deviceId = SmackPacketUtil.getStringAttribute(parser, "devicenum");
+            deviceId.ifPresent(profileBuilder::setDeviceId);
 
             parser.nextTag();
             do {
@@ -117,7 +119,8 @@ public class GetProfilesResult extends OpenlinkIQ {
             xml.halfOpenElement(OpenlinkXmppNamespace.TAG_PROFILE);
             profile.getId().ifPresent(profileId -> xml.attribute("id", profileId.value()));
             profile.isDefaultProfile().ifPresent(isDefault -> xml.attribute(OpenlinkXmppNamespace.TAG_DEFAULT, isDefault));
-            profile.getDevice().ifPresent(device -> xml.attribute("device", device));
+            profile.getDeviceType().ifPresent(deviceType -> xml.attribute("device", deviceType));
+            profile.getDeviceId().ifPresent(deviceId -> xml.attribute("devicenum", deviceId));
             profile.getLabel().ifPresent(label -> xml.attribute(OpenlinkXmppNamespace.TAG_LABEL, label));
             profile.isOnline().ifPresent(online -> xml.attribute("online", online));
             xml.rightAngleBracket();
