@@ -29,7 +29,7 @@ public class PubSubMessageFixtures {
                     "    <items node='" + NODE_ID + "'>\n" +
                     "      <item id='" + ITEM_ID + "'>\n" +
                     "        <devicestatus xmlns='http://xmpp.org/protocol/openlink:01:00:00#device-status'>\n" +
-                    "          <profile online='true'>\n" +
+                    "          <profile online='true' devicenum='" + CoreFixtures.DEVICE_ID + "'>\n" +
                     "            " + CoreFixtures.PROFILE_ID + "\n" +
                     "          </profile>\n" +
                     "        </devicestatus>\n" +

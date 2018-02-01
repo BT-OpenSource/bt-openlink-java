@@ -6,6 +6,7 @@ import static org.xmlunit.matchers.CompareMatcher.isIdenticalTo;
 
 import java.util.ArrayList;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -81,7 +82,6 @@ public class DeviceStatusMessageTest {
         assertThat(message.getPubSubNodeId().get(), is(PubSubMessageFixtures.NODE_ID));
         assertThat(message.getItemId().get(), is(PubSubMessageFixtures.ITEM_ID));
         final DeviceStatus deviceStatus = message.getDeviceStatus().get();
-        assertThat(deviceStatus.isOnline().get(), is(true));
-        assertThat(deviceStatus.getProfileId().get(), is(CoreFixtures.PROFILE_ID));
+        assertThat(EqualsBuilder.reflectionEquals(CoreFixtures.DEVICE_STATUS_LOGON, deviceStatus, false, null, true), is(true));
     }
 }

@@ -164,8 +164,7 @@ public class PubSubPublishRequestTest {
         final PubSubPublishRequest request = (PubSubPublishRequest) OpenlinkIQParser.parse(Fixtures.iqFrom(PubSubPublishFixtures.PUBLISH_REQUEST_DEVICE_STATUS));
 
         final DeviceStatus deviceStatus = request.getDeviceStatus().get();
-        assertThat(deviceStatus.isOnline().get(), is(true));
-        assertThat(deviceStatus.getProfileId().get(), is(CoreFixtures.PROFILE_ID));
+        assertThat(EqualsBuilder.reflectionEquals(CoreFixtures.DEVICE_STATUS_LOGON, deviceStatus, false, null, true), is(true));
     }
 
 

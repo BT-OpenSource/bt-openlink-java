@@ -6,6 +6,7 @@ import static org.junit.Assert.assertThat;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -24,10 +25,12 @@ public class DeviceStatusTest {
         final DeviceStatus deviceStatus = DeviceStatus.Builder.start()
                 .setOnline(true)
                 .setProfileId(CoreFixtures.PROFILE_ID)
+                .setDeviceId("test-device-id")
                 .build();
 
         assertThat(deviceStatus.getProfileId().get(), is(CoreFixtures.PROFILE_ID));
         assertThat(deviceStatus.isOnline().get(), is(true));
+        assertThat(deviceStatus.getDeviceId().get(), is("test-device-id"));
     }
 
     @Test
@@ -45,10 +48,13 @@ public class DeviceStatusTest {
 
         final List<String> parseErrors = new ArrayList<>();
 
-        DeviceStatus.Builder.start()
+        final DeviceStatus deviceStatus = DeviceStatus.Builder.start()
                 .build(parseErrors);
 
         assertThat(parseErrors, containsInAnyOrder("Invalid device status; missing profile is mandatory"));
+        assertThat(deviceStatus.getProfileId(), is(Optional.empty()));
+        assertThat(deviceStatus.isOnline(), is(Optional.empty()));
+        assertThat(deviceStatus.getDeviceId(), is(Optional.empty()));
 
     }
 }

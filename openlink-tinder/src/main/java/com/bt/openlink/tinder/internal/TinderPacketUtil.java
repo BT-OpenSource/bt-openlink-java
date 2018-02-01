@@ -359,6 +359,7 @@ public final class TinderPacketUtil {
         final Element profileElement = deviceStatusElement.addElement(ELEMENT_PROFILE);
         deviceStatus.isOnline().ifPresent(online -> profileElement.addAttribute("online", String.valueOf(online)));
         deviceStatus.getProfileId().ifPresent(profileId -> profileElement.setText(profileId.value()));
+        deviceStatus.getDeviceId().ifPresent(deviceId -> profileElement.addAttribute("devicenum", String.valueOf(deviceId)));
     }
 
     private static void addFeatures(@Nonnull final Call call, @Nonnull final Element callElement) {
@@ -521,6 +522,7 @@ public final class TinderPacketUtil {
         final DeviceStatus.Builder builder = DeviceStatus.Builder.start();
 
         getBooleanAttribute(profileElement, "online", stanzaDescription, parseErrors).ifPresent(builder::setOnline);
+        getStringAttribute(profileElement, "devicenum", false, stanzaDescription, parseErrors).ifPresent(builder::setDeviceId);
         ProfileId.from(getNullableChildElementString(deviceStatusElement, ELEMENT_PROFILE)).ifPresent(builder::setProfileId);
 
         return Optional.of(builder.build(parseErrors));

@@ -144,9 +144,11 @@ public class CoreFixtures {
 
     public static final String START_TIME_ISO_8601 = ISO_8601_FORMATTER.format(START_TIME.atZone(ZoneOffset.UTC));
 
+    public static final String DEVICE_ID = "test-device-id";
     public static final DeviceStatus DEVICE_STATUS_LOGON = DeviceStatus.Builder.start()
             .setProfileId(PROFILE_ID)
             .setOnline(true)
+            .setDeviceId(DEVICE_ID)
             .build();
 
     public static final String CALL_STATUS_INCOMING_ORIGINATED =

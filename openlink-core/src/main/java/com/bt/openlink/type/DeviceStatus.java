@@ -11,10 +11,12 @@ public final class DeviceStatus implements Serializable {
     private static final long serialVersionUID = -4817479046901684980L;
     @Nullable private final Boolean online;
     @Nullable private final ProfileId profileId;
+    @Nullable private final String deviceId;
 
     private DeviceStatus(@Nonnull final Builder builder) {
         this.online = builder.online;
         this.profileId = builder.profileId;
+        this.deviceId = builder.deviceId;
     }
 
     @Nonnull
@@ -27,10 +29,16 @@ public final class DeviceStatus implements Serializable {
         return Optional.ofNullable(profileId);
     }
 
+    @Nonnull
+    public Optional<String> getDeviceId() {
+        return Optional.ofNullable(deviceId);
+    }
+
     public static final class Builder {
 
         @Nullable private Boolean online;
         @Nullable private ProfileId profileId;
+        @Nullable private String deviceId;
 
         private Builder() {
         }
@@ -63,6 +71,11 @@ public final class DeviceStatus implements Serializable {
 
         public Builder setProfileId(@Nonnull final ProfileId profileId) {
             this.profileId = profileId;
+            return this;
+        }
+
+        public Builder setDeviceId(@Nonnull final String deviceId) {
+            this.deviceId = deviceId;
             return this;
         }
 
