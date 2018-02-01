@@ -20,6 +20,7 @@ import com.bt.openlink.iq.MakeCallRequestBuilder;
 import com.bt.openlink.smack.internal.SmackPacketUtil;
 import com.bt.openlink.type.FeatureId;
 import com.bt.openlink.type.InterestId;
+import com.bt.openlink.type.MakeCallFeature;
 import com.bt.openlink.type.OriginatorReference;
 import com.bt.openlink.type.PhoneNumber;
 
@@ -27,7 +28,7 @@ public class MakeCallRequest extends OpenlinkIQ {
     @Nullable private final Jid jid;
     @Nullable private final InterestId interestId;
     @Nullable private final PhoneNumber destination;
-    @Nonnull private final List<FeatureId> featureIds;
+    @Nonnull private final List<MakeCallFeature> features;
     @Nonnull private final List<OriginatorReference> originatorReferences;
 
     private MakeCallRequest(@Nonnull Builder builder, @Nullable List<String> parseErrors) {
@@ -35,7 +36,7 @@ public class MakeCallRequest extends OpenlinkIQ {
         this.jid = builder.getJID().orElse(null);
         this.interestId = builder.getInterestId().orElse(null);
         this.destination = builder.getDestination().orElse(null);
-        this.featureIds = Collections.unmodifiableList(builder.getFeatureIds());
+        this.features = Collections.unmodifiableList(builder.getFeatures());
         this.originatorReferences = Collections.unmodifiableList(builder.getOriginatorReferences());
     }
 
@@ -55,8 +56,8 @@ public class MakeCallRequest extends OpenlinkIQ {
     }
 
     @Nonnull
-    public List<FeatureId> getFeatureIds() {
-        return featureIds;
+    public List<MakeCallFeature> getFeatures() {
+        return features;
     }
 
     @Nonnull
@@ -85,20 +86,7 @@ public class MakeCallRequest extends OpenlinkIQ {
                 PhoneNumber.from(parser.nextText()).ifPresent(builder::setDestination);
                 break;
             case OpenlinkXmppNamespace.TAG_FEATURES:
-                parser.nextTag();
-                while (parser.getName().equals(OpenlinkXmppNamespace.TAG_FEATURE)) {
-                    parser.nextTag();
-                    if ("id".equals(parser.getName())) {
-                        final String featureIdString;
-                        featureIdString = parser.nextText();
-                        final Optional<FeatureId> featureId = FeatureId.from(featureIdString);
-                        featureId.ifPresent(builder::addFeatureId);
-                        ParserUtils.forwardToEndTagOfDepth(parser, parser.getDepth());
-                        parser.nextTag();
-                    }
-
-                    ParserUtils.forwardToEndTagOfDepth(parser, parser.getDepth());
-                }
+                getFeatures(parser, parseErrors, builder);
                 break;
             case "originator-ref":
                 SmackPacketUtil.getOriginatorRefs(parser).forEach(builder::addOriginatorReference);
@@ -114,6 +102,35 @@ public class MakeCallRequest extends OpenlinkIQ {
         return builder.build(parseErrors);
     }
 
+    private static void getFeatures(final XmlPullParser parser, final ArrayList<String> parseErrors, final Builder builder) throws XmlPullParserException, IOException {
+        parser.nextTag();
+        final int featureDepth = parser.getDepth();
+        while (parser.getName().equals(OpenlinkXmppNamespace.TAG_FEATURE)) {
+            final MakeCallFeature.Builder featureBuilder = MakeCallFeature.Builder.start();
+            parser.nextTag();
+            while (parser.getDepth() > featureDepth) {
+                switch (parser.getName()) {
+                    case "id":
+                        FeatureId.from(parser.nextText()).ifPresent(featureBuilder::setFeatureId);
+                        break;
+                    case "value1":
+                        SmackPacketUtil.getElementTextString(parser).ifPresent(featureBuilder::setValue1);
+                        break;
+                    case "value2":
+                        SmackPacketUtil.getElementTextString(parser).ifPresent(featureBuilder::setValue2);
+                        break;
+                    default:
+                        parseErrors.add("Unrecognised feature element:" + parser.getName());
+                        break;
+                }
+                ParserUtils.forwardToEndTagOfDepth(parser, featureDepth + 1);
+                parser.nextTag();
+            }
+            builder.addFeature(featureBuilder.build(parseErrors));
+            parser.nextTag();
+        }
+    }
+
     @Override
     protected IQChildElementXmlStringBuilder getIQChildElementBuilder(IQChildElementXmlStringBuilder xml) {
         xml.attribute("action", "execute")
@@ -123,19 +140,21 @@ public class MakeCallRequest extends OpenlinkIQ {
                 .attribute("xmlns", OpenlinkXmppNamespace.XMPP_IO_DATA.uri())
                 .attribute("type", "input")
                 .rightAngleBracket();
-        xml.halfOpenElement(OpenlinkXmppNamespace.TAG_IN).rightAngleBracket();
+        xml.openElement(OpenlinkXmppNamespace.TAG_IN);
         xml.optElement("jid", jid);
         xml.optElement("interest", interestId);
         xml.optElement("destination", destination);
         SmackPacketUtil.addOriginatorReferences(xml, originatorReferences);
 
-        if (!featureIds.isEmpty()) {
-            xml.halfOpenElement(OpenlinkXmppNamespace.TAG_FEATURES).rightAngleBracket();
+        if (!features.isEmpty()) {
+            xml.openElement(OpenlinkXmppNamespace.TAG_FEATURES);
 
-            for (final FeatureId featureId : featureIds)
+            for (final MakeCallFeature makeCallFeature : features)
             {
-                xml.halfOpenElement(OpenlinkXmppNamespace.TAG_FEATURE).rightAngleBracket();
-                xml.optElement("id", featureId);
+                xml.openElement(OpenlinkXmppNamespace.TAG_FEATURE);
+                makeCallFeature.getFeatureId().ifPresent(id->xml.element("id", id.value()));
+                makeCallFeature.getValue1().ifPresent(value1->xml.element("value1", value1));
+                makeCallFeature.getValue2().ifPresent(value2->xml.element("value2", value2));
                 xml.closeElement(OpenlinkXmppNamespace.TAG_FEATURE);
             }
 

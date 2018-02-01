@@ -7,8 +7,8 @@ import java.util.Optional;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.bt.openlink.type.FeatureId;
 import com.bt.openlink.type.InterestId;
+import com.bt.openlink.type.MakeCallFeature;
 import com.bt.openlink.type.OriginatorReference;
 import com.bt.openlink.type.PhoneNumber;
 
@@ -17,7 +17,7 @@ public abstract class MakeCallRequestBuilder<B extends MakeCallRequestBuilder, J
     @Nullable private J jid;
     @Nullable private InterestId interestId;
     @Nullable private PhoneNumber destination;
-    @Nonnull private final List<FeatureId> featureIds = new ArrayList<>();
+    @Nonnull private final List<MakeCallFeature> features = new ArrayList<>();
     @Nonnull private List<OriginatorReference> originatorReferences = new ArrayList<>();
 
     protected MakeCallRequestBuilder(final Class<T> typeClass) {
@@ -53,8 +53,8 @@ public abstract class MakeCallRequestBuilder<B extends MakeCallRequestBuilder, J
 
     @Nonnull
     @SuppressWarnings("unchecked")
-    public B addFeatureId(@Nonnull final FeatureId featureId) {
-        this.featureIds.add(featureId);
+    public B addFeature(@Nonnull final MakeCallFeature feature) {
+        this.features.add(feature);
         return (B) this;
     }
 
@@ -88,8 +88,8 @@ public abstract class MakeCallRequestBuilder<B extends MakeCallRequestBuilder, J
     }
 
     @Nonnull
-    public List<FeatureId> getFeatureIds() {
-        return featureIds;
+    public List<MakeCallFeature> getFeatures() {
+        return features;
     }
 
     @Nonnull

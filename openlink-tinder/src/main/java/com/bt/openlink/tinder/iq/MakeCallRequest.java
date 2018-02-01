@@ -17,6 +17,7 @@ import com.bt.openlink.iq.MakeCallRequestBuilder;
 import com.bt.openlink.tinder.internal.TinderPacketUtil;
 import com.bt.openlink.type.FeatureId;
 import com.bt.openlink.type.InterestId;
+import com.bt.openlink.type.MakeCallFeature;
 import com.bt.openlink.type.OriginatorReference;
 import com.bt.openlink.type.PhoneNumber;
 
@@ -24,7 +25,7 @@ public class MakeCallRequest extends OpenlinkIQ {
     @Nullable private final JID jid;
     @Nullable private final InterestId interestId;
     @Nullable private final PhoneNumber destination;
-    @Nonnull private final List<FeatureId> featureIds;
+    @Nonnull private final List<MakeCallFeature> features;
     @Nonnull private final List<OriginatorReference> originatorReferences;
 
     private MakeCallRequest(@Nonnull Builder builder, @Nullable List<String> parseErrors) {
@@ -32,17 +33,20 @@ public class MakeCallRequest extends OpenlinkIQ {
         this.jid = builder.getJID().orElse(null);
         this.interestId = builder.getInterestId().orElse(null);
         this.destination = builder.getDestination().orElse(null);
-        this.featureIds = Collections.unmodifiableList(builder.getFeatureIds());
+        this.features = Collections.unmodifiableList(builder.getFeatures());
         this.originatorReferences = Collections.unmodifiableList(builder.getOriginatorReferences());
         final Element inElement = TinderPacketUtil.addCommandIOInputElement(this, OpenlinkXmppNamespace.OPENLINK_MAKE_CALL);
         TinderPacketUtil.addElementWithTextIfNotNull(inElement, "jid", jid);
         TinderPacketUtil.addElementWithTextIfNotNull(inElement, "interest", interestId);
         TinderPacketUtil.addElementWithTextIfNotNull(inElement, "destination", destination);
         TinderPacketUtil.addOriginatorReferences(inElement, originatorReferences);
-        if (!featureIds.isEmpty()) {
+        if (!features.isEmpty()) {
             final Element featuresElement = inElement.addElement("features");
-            for (final FeatureId featureId : featureIds) {
-                featuresElement.addElement("feature").addElement("id").setText(featureId.value());
+            for (final MakeCallFeature feature : features) {
+                final Element featureElement = featuresElement.addElement("feature");
+                feature.getFeatureId().ifPresent(id->featureElement.addElement("id").setText(id.value()));
+                feature.getValue1().ifPresent(value1->featureElement.addElement("value1").setText(value1));
+                feature.getValue2().ifPresent(value2->featureElement.addElement("value2").setText(value2));
             }
         }
     }
@@ -63,8 +67,8 @@ public class MakeCallRequest extends OpenlinkIQ {
     }
 
     @Nonnull
-    public List<FeatureId> getFeatureIds() {
-        return featureIds;
+    public List<MakeCallFeature> getFeatures() {
+        return features;
     }
 
     @Nonnull
@@ -93,7 +97,11 @@ public class MakeCallRequest extends OpenlinkIQ {
         if (featuresElement != null) {
             final List<Element> featureElements = featuresElement.elements("feature");
             for (final Element featureElement : featureElements) {
-                FeatureId.from(TinderPacketUtil.getNullableChildElementString(featureElement, "id")).ifPresent(builder::addFeatureId);
+                final MakeCallFeature.Builder makeCallFeatureBuilder = MakeCallFeature.Builder.start();
+                FeatureId.from(TinderPacketUtil.getNullableChildElementString(featureElement, "id")).ifPresent(makeCallFeatureBuilder::setFeatureId);
+                TinderPacketUtil.getOptionalChildElementString(featureElement, "value1").ifPresent(makeCallFeatureBuilder::setValue1);
+                TinderPacketUtil.getOptionalChildElementString(featureElement, "value2").ifPresent(makeCallFeatureBuilder::setValue2);
+                builder.addFeature(makeCallFeatureBuilder.build());
             }
         }
     }

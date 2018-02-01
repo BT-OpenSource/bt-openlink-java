@@ -755,4 +755,14 @@ public final class SmackPacketUtil {
         final String value = parser.nextText();
         return getBoolean(value, childElementName, description, parseErrors);
     }
+
+    @Nonnull
+    public static Optional<String> getElementTextString(@Nonnull final XmlPullParser parser) throws IOException, XmlPullParserException {
+        final String value = parser.nextText();
+        if(value==null || value.isEmpty()) {
+            return Optional.empty();
+        } else {
+            return Optional.of(value);
+        }
+    }
 }

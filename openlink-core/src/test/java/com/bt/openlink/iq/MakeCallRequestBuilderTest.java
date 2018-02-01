@@ -15,6 +15,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import com.bt.openlink.CoreFixtures;
+import com.bt.openlink.MakeCallFixtures;
 import com.bt.openlink.type.OriginatorReference;
 
 @SuppressWarnings({"ConstantConditions", "RedundantThrows"})
@@ -45,7 +46,7 @@ public class MakeCallRequestBuilderTest {
         final List<String> errors = new ArrayList<>();
         builder.setJID("jid")
                 .setInterestId(CoreFixtures.INTEREST_ID)
-                .addFeatureId(CoreFixtures.FEATURE_ID)
+                .addFeature(MakeCallFixtures.MAKE_CALL_FEATURE)
                 .setDestination(CoreFixtures.CALLED_DESTINATION)
                 .addOriginatorReference(CoreFixtures.ORIGINATOR_REFERENCE)
                 .addOriginatorReference("key2", "value2");
@@ -56,7 +57,7 @@ public class MakeCallRequestBuilderTest {
         assertThat(errors, is(empty()));
         assertThat(builder.getJID().get(), is("jid"));
         assertThat(builder.getInterestId().get(), is(CoreFixtures.INTEREST_ID));
-        assertThat(builder.getFeatureIds(), contains(CoreFixtures.FEATURE_ID));
+        assertThat(builder.getFeatures(), contains(MakeCallFixtures.MAKE_CALL_FEATURE));
         assertThat(builder.getDestination().get(), is(CoreFixtures.CALLED_DESTINATION));
         assertThat(builder.getOriginatorReferences(),contains(CoreFixtures.ORIGINATOR_REFERENCE, new OriginatorReference("key2", "value2")));
     }
@@ -80,7 +81,7 @@ public class MakeCallRequestBuilderTest {
         assertThat(errors, contains("Invalid make-call request stanza; missing or invalid 'jid'"));
         assertThat(builder.getJID(), is(Optional.empty()));
         assertThat(builder.getInterestId(), is(Optional.empty()));
-        assertThat(builder.getFeatureIds(), is(empty()));
+        assertThat(builder.getFeatures(), is(empty()));
         assertThat(builder.getDestination(), is(Optional.empty()));
     }
 

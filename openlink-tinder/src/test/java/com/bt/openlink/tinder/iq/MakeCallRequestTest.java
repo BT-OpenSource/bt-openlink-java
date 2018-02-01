@@ -7,8 +7,11 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.xmlunit.matchers.CompareMatcher.isIdenticalTo;
 
+import java.util.List;
 import java.util.Optional;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.hamcrest.CoreMatchers;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -17,6 +20,7 @@ import org.xmpp.packet.IQ;
 import com.bt.openlink.CoreFixtures;
 import com.bt.openlink.MakeCallFixtures;
 import com.bt.openlink.tinder.Fixtures;
+import com.bt.openlink.type.MakeCallFeature;
 import com.bt.openlink.type.OriginatorReference;
 
 @SuppressWarnings({ "ConstantConditions", "RedundantThrows" })
@@ -34,7 +38,7 @@ public class MakeCallRequestTest {
                 .setJID(Fixtures.USER_FULL_JID)
                 .setInterestId(CoreFixtures.INTEREST_ID)
                 .setDestination(CoreFixtures.CALLED_DESTINATION)
-                .addFeatureId(CoreFixtures.FEATURE_ID)
+                .addFeature(MakeCallFixtures.MAKE_CALL_FEATURE)
                 .addOriginatorReference(CoreFixtures.ORIGINATOR_REFERENCE)
                 .build();
 
@@ -44,7 +48,7 @@ public class MakeCallRequestTest {
         assertThat(request.getJID().get(), is(Fixtures.USER_FULL_JID));
         assertThat(request.getInterestId().get(), is(CoreFixtures.INTEREST_ID));
         assertThat(request.getDestination().get(), is(CoreFixtures.CALLED_DESTINATION));
-        assertThat(request.getFeatureIds(), contains(CoreFixtures.FEATURE_ID));
+        assertThat(request.getFeatures(), contains(MakeCallFixtures.MAKE_CALL_FEATURE));
         assertThat(request.getOriginatorReferences(), contains(CoreFixtures.ORIGINATOR_REFERENCE));
     }
 
@@ -71,7 +75,7 @@ public class MakeCallRequestTest {
                 .setDestination(CoreFixtures.CALLED_DESTINATION)
                 .addOriginatorReference(CoreFixtures.ORIGINATOR_REFERENCE)
                 .addOriginatorReference("key2", "value2")
-                .addFeatureId(CoreFixtures.FEATURE_ID)
+                .addFeature(MakeCallFixtures.MAKE_CALL_FEATURE)
                 .build();
 
         assertThat(request.toXML(), isIdenticalTo(MakeCallFixtures.MAKE_CALL_REQUEST).ignoreWhitespace());
@@ -88,7 +92,9 @@ public class MakeCallRequestTest {
         assertThat(request.getJID().get(), is(Fixtures.USER_FULL_JID));
         assertThat(request.getInterestId().get(), is(CoreFixtures.INTEREST_ID));
         assertThat(request.getDestination().get(), is(CoreFixtures.CALLED_DESTINATION));
-        assertThat(request.getFeatureIds(), contains(CoreFixtures.FEATURE_ID));
+        final List<MakeCallFeature> features = request.getFeatures();
+        assertThat(features.size(),is(1));
+        assertThat(EqualsBuilder.reflectionEquals(MakeCallFixtures.MAKE_CALL_FEATURE, features.get(0), false, null, true), CoreMatchers.is(true));
         assertThat(request.getOriginatorReferences(), contains(CoreFixtures.ORIGINATOR_REFERENCE, new OriginatorReference("key2", "value2")));
         assertThat(request.getParseErrors(), is(empty()));
     }

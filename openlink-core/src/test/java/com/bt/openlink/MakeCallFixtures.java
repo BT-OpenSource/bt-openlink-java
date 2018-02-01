@@ -1,6 +1,15 @@
 package com.bt.openlink;
 
+import com.bt.openlink.type.MakeCallFeature;
+
+@SuppressWarnings("ConstantConditions")
 public class MakeCallFixtures {
+
+    public static final MakeCallFeature MAKE_CALL_FEATURE = MakeCallFeature.Builder.start()
+            .setFeatureId(CoreFixtures.FEATURE_ID)
+            .setValue1(1)
+            .setValue2(false)
+            .build();
 
     public static final String MAKE_CALL_REQUEST =
             "<iq type='set' id='" + CoreFixtures.STANZA_ID + "' to='" + CoreFixtures.TO_JID_STRING + "' from='" + CoreFixtures.FROM_JID_STRING + "'>\n" +
@@ -20,7 +29,9 @@ public class MakeCallFixtures {
                     "        </originator-ref>\n" +
                     "        <features>" +
                     "           <feature>" +
-                    "               <id>" + CoreFixtures.FEATURE_ID + "</id>" +
+                    "               <id>" + MAKE_CALL_FEATURE.getFeatureId().get() + "</id>" +
+                    "               <value1>" + MAKE_CALL_FEATURE.getValue1().get() + "</value1>" +
+                    "               <value2>" + MAKE_CALL_FEATURE.getValue2().get() + "</value2>" +
                     "           </feature>" +
                     "        </features>\n" +
                     "      </in>\n" +
