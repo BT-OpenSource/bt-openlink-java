@@ -12,7 +12,7 @@ public class Site implements Serializable {
     private static final long serialVersionUID = -5504996561253140171L;
 
     public enum Type {
-        BTSM, CISCO, IPT, ITS;
+        AVAYA, BTSM, CISCO, IPT, ITS;
 
         public static Optional<Type> from(@Nullable final String value) {
             for (final Type type : Type.values()) {
