@@ -427,7 +427,7 @@ public final class TinderPacketUtil {
         final Element siteElement = parentElement.addElement("site");
         site.getId().ifPresent(id -> siteElement.addAttribute("id", String.valueOf(id)));
         site.isDefault().ifPresent(isDefault -> siteElement.addAttribute("default", String.valueOf(isDefault)));
-        site.getType().ifPresent(type -> siteElement.addAttribute("type", type.name()));
+        site.getType().ifPresent(type -> siteElement.addAttribute("type", type.getLabel()));
         site.getName().ifPresent(siteElement::setText);
     }
 

@@ -241,7 +241,7 @@ public final class SmackPacketUtil {
         xml.halfOpenElement("site");
         site.getId().ifPresent(id -> xml.attribute("id", String.valueOf(id)));
         site.isDefault().ifPresent(isDefault -> xml.attribute(OpenlinkXmppNamespace.TAG_DEFAULT, String.valueOf(isDefault)));
-        site.getType().ifPresent(type -> xml.attribute("type", type.name()));
+        site.getType().ifPresent(type -> xml.attribute("type", type.getLabel()));
         xml.rightAngleBracket();
         site.getName().ifPresent(xml::escape);
         xml.closeElement("site");

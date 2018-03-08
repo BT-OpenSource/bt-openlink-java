@@ -12,15 +12,26 @@ public class Site implements Serializable {
     private static final long serialVersionUID = -5504996561253140171L;
 
     public enum Type {
-        AVAYA, BTSM, CISCO, IPT, ITS;
+        AVAYA("Avaya"), BTSM("BTSM"), CISCO("Cisco"), IPT("IPT"), ITS("ITS");
 
-        public static Optional<Type> from(@Nullable final String value) {
+        @Nonnull private final String label;
+
+        Type(@Nonnull final String label) {
+            this.label = label;
+        }
+
+        public static Optional<Type> from(@Nullable final String label) {
             for (final Type type : Type.values()) {
-                if (type.name().equals(value)) {
+                if (type.label.equalsIgnoreCase(label)) {
                     return Optional.of(type);
                 }
             }
             return Optional.empty();
+        }
+
+        @Nonnull
+        public String getLabel() {
+            return label;
         }
     }
 
