@@ -31,6 +31,7 @@ public class CallTest {
 
         final Call call = Call.Builder.start()
                 .setId(CoreFixtures.CALL_ID)
+                .setTelephonyCallId(CoreFixtures.TELEPHONY_CALL_ID)
                 .setConferenceId(CoreFixtures.CONFERENCE_ID)
                 .setSite(CoreFixtures.SITE)
                 .setProfileId(CoreFixtures.PROFILE_ID)
@@ -56,6 +57,7 @@ public class CallTest {
                 .build();
 
         assertThat(call.getId().get(), is(CoreFixtures.CALL_ID));
+        assertThat(call.getTelephonyCallId().get(), is(CoreFixtures.TELEPHONY_CALL_ID));
         assertThat(call.getConferenceId().get(), is(CoreFixtures.CONFERENCE_ID));
         assertThat(call.getSite().get(), is(CoreFixtures.SITE));
         assertThat(call.getProfileId().get(), is(CoreFixtures.PROFILE_ID));
@@ -239,6 +241,7 @@ public class CallTest {
                 .build(errors);
 
         assertThat(call.getId(), is(Optional.empty()));
+        assertThat(call.getTelephonyCallId(), is(Optional.empty()));
         assertThat(call.getConferenceId(), is(Optional.empty()));
         assertThat(call.getSite(), is(Optional.empty()));
         assertThat(call.getProfileId(), is(Optional.empty()));

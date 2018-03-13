@@ -48,6 +48,7 @@ import com.bt.openlink.type.PhoneNumber;
 import com.bt.openlink.type.ProfileId;
 import com.bt.openlink.type.RequestAction;
 import com.bt.openlink.type.Site;
+import com.bt.openlink.type.TelephonyCallId;
 import com.bt.openlink.type.UserId;
 
 public final class SmackPacketUtil {
@@ -141,7 +142,11 @@ public final class SmackPacketUtil {
     public static IQChildElementXmlStringBuilder addCalls(@Nonnull IQChildElementXmlStringBuilder xml, @Nonnull final Collection<Call> calls) {
         xml.openElement("call");
         for (final Call call : calls) {
-            call.getId().ifPresent(id -> xml.element("id", id.value()));
+            xml.halfOpenElement("id");
+            call.getTelephonyCallId().ifPresent(telephonyCallId -> xml.attribute("telephony", telephonyCallId.value()));
+            xml.rightAngleBracket();
+            call.getId().ifPresent(id -> xml.escape(id.value()));
+            xml.closeElement("id");
             call.getConferenceId().ifPresent(conferenceId -> xml.element("conference", conferenceId.value()));
             call.getSite().ifPresent(site -> addSiteXML(xml, site));
             call.getProfileId().ifPresent(profileId -> xml.element("profile", profileId.value()));
@@ -485,9 +490,10 @@ public final class SmackPacketUtil {
     }
 
     private static void addCallIdToBuilder(@Nonnull final XmlPullParser parser, @Nonnull final Call.Builder callBuilder) throws XmlPullParserException, IOException {
+        final String telephonyCallId = parser.getAttributeValue("", "telephony");
+        TelephonyCallId.from(telephonyCallId).ifPresent(callBuilder::setTelephonyCallId);
         final String callIdString = parser.nextText();
-        final Optional<CallId> callIdOptional = CallId.from(callIdString);
-        callIdOptional.ifPresent(callBuilder::setId);
+        CallId.from(callIdString).ifPresent(callBuilder::setId);
     }
 
     private static List<PhoneNumber> getPhoneNumbers(final XmlPullParser parser) {

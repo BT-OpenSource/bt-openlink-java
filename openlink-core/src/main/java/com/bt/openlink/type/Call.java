@@ -37,6 +37,7 @@ public class Call implements Serializable {
     }
 
     @Nullable private final CallId callId;
+    @Nullable private final TelephonyCallId telephonyCallId;
     @Nullable private final ConferenceId conferenceId;
     @Nullable private final Site site;
     @Nullable private final ProfileId profileId;
@@ -61,6 +62,7 @@ public class Call implements Serializable {
 
     private Call(@Nonnull final Builder builder) {
         this.callId = builder.callId;
+        this.telephonyCallId = builder.telephonyCallId;
         this.conferenceId = builder.conferenceId;
         this.site = builder.site;
         this.profileId = builder.profileId;
@@ -87,6 +89,11 @@ public class Call implements Serializable {
     @Nonnull
     public Optional<CallId> getId() {
         return Optional.ofNullable(callId);
+    }
+
+    @Nonnull
+    public Optional<TelephonyCallId> getTelephonyCallId() {
+        return Optional.ofNullable(telephonyCallId);
     }
 
     @Nonnull
@@ -281,6 +288,7 @@ public class Call implements Serializable {
 
     public static final class Builder {
         @Nullable private CallId callId;
+        @Nullable private TelephonyCallId telephonyCallId;
         @Nullable private ConferenceId conferenceId;
         @Nullable private Site site;
         @Nullable private ProfileId profileId;
@@ -373,6 +381,12 @@ public class Call implements Serializable {
         @Nonnull
         public Builder setId(@Nonnull final CallId callId) {
             this.callId = callId;
+            return this;
+        }
+
+        @Nonnull
+        public Builder setTelephonyCallId(@Nonnull final TelephonyCallId telephonyCallId) {
+            this.telephonyCallId = telephonyCallId;
             return this;
         }
 

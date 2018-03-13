@@ -33,6 +33,7 @@ import com.bt.openlink.type.Profile;
 import com.bt.openlink.type.ProfileId;
 import com.bt.openlink.type.RequestAction;
 import com.bt.openlink.type.Site;
+import com.bt.openlink.type.TelephonyCallId;
 import com.bt.openlink.type.UserId;
 
 @SuppressWarnings("ConstantConditions")
@@ -58,6 +59,7 @@ public class CoreFixtures {
     public static final Instant START_TIME = LocalDateTime.parse("2017-10-09T08:07:00").atZone(ZoneId.of("UTC")).toInstant();
     public static final Duration DURATION = Duration.ofMinutes(1);
     public static final CallId CALL_ID = CallId.from("test-call-id").get();
+    public static final TelephonyCallId TELEPHONY_CALL_ID = TelephonyCallId.from("test-telephony-call-id").get();
     public static final ConferenceId CONFERENCE_ID = ConferenceId.from("test-conference-id").get();
     public static final ProfileId PROFILE_ID = ProfileId.from("test-profile-id").get();
     public static final UserId USER_ID = UserId.from("test-user-id").get();
@@ -114,6 +116,7 @@ public class CoreFixtures {
     public static final OriginatorReference ORIGINATOR_REFERENCE = new OriginatorReference("key1", "value1");
     public static final Call CALL_INCOMING_ORIGINATED = Call.Builder.start()
             .setId(CALL_ID)
+            .setTelephonyCallId(TELEPHONY_CALL_ID)
             .setConferenceId(CONFERENCE_ID)
             .setSite(SITE)
             .setProfileId(PROFILE_ID)
@@ -154,7 +157,7 @@ public class CoreFixtures {
     public static final String CALL_STATUS_INCOMING_ORIGINATED =
             "<callstatus xmlns='http://xmpp.org/protocol/openlink:01:00:00#call-status' busy='false'>\n" +
                     "  <call>\n" +
-                    "    <id>" + CoreFixtures.CALL_ID + "</id>\n" +
+                    "    <id telephony='" + CoreFixtures.TELEPHONY_CALL_ID + "'>" + CoreFixtures.CALL_ID + "</id>\n" +
                     "    <conference>" + CoreFixtures.CONFERENCE_ID + "</conference>\n" +
                     "    <site id='42' type='BTSM' default='true'>test site name</site>\n" +
                     "    <profile>" + CoreFixtures.PROFILE_ID + "</profile>\n" +
