@@ -7,7 +7,7 @@ import javax.annotation.Nullable;
 
 public final class DeviceKey extends AbstractType<String> {
 
-    private static final long serialVersionUID = 1909201076526681103L;
+    private static final long serialVersionUID = 4457941703354039912L;
 
     private DeviceKey(final String value) {
         super(value);
@@ -16,6 +16,11 @@ public final class DeviceKey extends AbstractType<String> {
     @Nonnull
     public static Optional<DeviceKey> from(@Nullable final String value) {
         return value == null || value.isEmpty() ? Optional.empty() : Optional.of(new DeviceKey(value));
+    }
+
+    @Nonnull
+    public static DeviceKey from(@Nonnull final AbstractType<String> type) {
+        return new DeviceKey(type.value());
     }
 
 }

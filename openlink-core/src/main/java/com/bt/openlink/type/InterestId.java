@@ -6,7 +6,7 @@ import javax.annotation.Nonnull;
 
 public final class InterestId extends AbstractType<String> {
 
-    private static final long serialVersionUID = 943539393503149322L;
+    private static final long serialVersionUID = -8800572210349782359L;
 
     private InterestId(final String value) {
         super(value);
@@ -20,6 +20,11 @@ public final class InterestId extends AbstractType<String> {
     @Nonnull
     public PubSubNodeId toPubSubNodeId() {
         return PubSubNodeId.from(value()).orElseThrow(()->new IllegalStateException("Unable to convert InterestId to PubSubNodeId"));
+    }
+
+    @Nonnull
+    public static InterestId from(@Nonnull final AbstractType<String> type) {
+        return new InterestId(type.value());
     }
 
 }

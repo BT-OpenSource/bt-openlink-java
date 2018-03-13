@@ -7,7 +7,7 @@ import javax.annotation.Nullable;
 
 public final class PhoneNumber extends AbstractType<String> {
 
-    private static final long serialVersionUID = -2291321457995129772L;
+    private static final long serialVersionUID = -3276853895053218217L;
 
     private PhoneNumber(final String value) {
         super(value);
@@ -16,6 +16,11 @@ public final class PhoneNumber extends AbstractType<String> {
     @Nonnull
     public static Optional<PhoneNumber> from(@Nullable final String value) {
         return value == null || value.isEmpty() ? Optional.empty() : Optional.of(new PhoneNumber(value));
+    }
+
+    @Nonnull
+    public static PhoneNumber from(@Nonnull final AbstractType<String> type) {
+        return new PhoneNumber(type.value());
     }
 
 }

@@ -7,7 +7,7 @@ import javax.annotation.Nullable;
 
 public final class TelephonyCallId extends AbstractType<String> {
 
-    private static final long serialVersionUID = 8408746346754574008L;
+    private static final long serialVersionUID = 5315524927016409290L;
 
     private TelephonyCallId(final String value) {
         super(value);
@@ -16,6 +16,11 @@ public final class TelephonyCallId extends AbstractType<String> {
     @Nonnull
     public static Optional<TelephonyCallId> from(@Nullable final String value) {
         return value == null || value.isEmpty() ? Optional.empty() : Optional.of(new TelephonyCallId(value));
+    }
+
+    @Nonnull
+    public static TelephonyCallId from(@Nonnull final AbstractType<String> type) {
+        return new TelephonyCallId(type.value());
     }
 
 }
