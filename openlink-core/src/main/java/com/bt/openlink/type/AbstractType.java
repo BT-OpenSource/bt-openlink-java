@@ -5,8 +5,8 @@ import java.util.Objects;
 
 import javax.annotation.Nonnull;
 
-public abstract class AbstractType<T extends Serializable> implements Serializable {
-    private static final long serialVersionUID = -9151712856005085627L;
+public abstract class AbstractType<T extends Serializable & Comparable<T>> implements Serializable, Comparable<AbstractType<T>> {
+    private static final long serialVersionUID = -1523068455863475062L;
     @Nonnull private final T value;
 
     protected AbstractType(@Nonnull final T value) {
@@ -43,4 +43,8 @@ public abstract class AbstractType<T extends Serializable> implements Serializab
         return Objects.hashCode(value);
     }
 
+    @Override
+    public int compareTo(@Nonnull final AbstractType<T> that) {
+        return this.value.compareTo(that.value);
+    }
 }
