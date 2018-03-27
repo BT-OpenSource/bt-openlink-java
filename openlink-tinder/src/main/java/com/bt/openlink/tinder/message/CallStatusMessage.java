@@ -1,7 +1,6 @@
 package com.bt.openlink.tinder.message;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,33 +13,26 @@ import org.xmpp.packet.Message;
 
 import com.bt.openlink.message.CallStatusMessageBuilder;
 import com.bt.openlink.tinder.internal.TinderPacketUtil;
-import com.bt.openlink.type.Call;
+import com.bt.openlink.type.CallStatus;
 
 public class CallStatusMessage extends OpenlinkPubSubMessage {
 
     private static final String STANZA_DESCRIPTION = "call status";
 
-    @Nullable private final Boolean callStatusBusy;
-    @Nonnull private final List<Call> calls;
+    @Nullable private final CallStatus callStatus;
 
     private CallStatusMessage(@Nonnull final Builder builder, @Nullable final List<String> parseErrors) {
         super(builder, parseErrors);
-        this.callStatusBusy = builder.isCallStatusBusy().orElse(null);
-        this.calls = Collections.unmodifiableList(builder.getCalls());
+        this.callStatus = builder.getCallStatus().orElse(null);
         final Element messageElement = getElement();
         final Element itemElement = TinderPacketUtil.addPubSubMetaData(messageElement, builder);
-        TinderPacketUtil.addCallStatusCalls(itemElement, callStatusBusy, calls);
+        getCallStatus().ifPresent(status->TinderPacketUtil.addCallStatus(itemElement, status));
         TinderPacketUtil.addDelay(messageElement, builder);
     }
 
     @Nonnull
-    public Optional<Boolean> isCallStatusBusy() {
-        return Optional.ofNullable(callStatusBusy);
-    }
-
-    @Nonnull
-    public List<Call> getCalls() {
-        return calls;
+    public Optional<CallStatus> getCallStatus() {
+        return Optional.ofNullable(callStatus);
     }
 
     @Nonnull
@@ -48,9 +40,7 @@ public class CallStatusMessage extends OpenlinkPubSubMessage {
         final List<String> parseErrors = new ArrayList<>();
         final Builder builder = Builder.start();
         final Element itemElement = TinderPacketUtil.setPubSubMetaData(message, builder, STANZA_DESCRIPTION, parseErrors);
-        final Element callStatusElement = TinderPacketUtil.getChildElement(itemElement, "callstatus");
-        TinderPacketUtil.getBooleanAttribute(callStatusElement, "busy", "busy attribute", parseErrors).ifPresent(builder::setCallStatusBusy);
-        builder.addCalls(TinderPacketUtil.getCalls(callStatusElement, STANZA_DESCRIPTION, parseErrors));
+        TinderPacketUtil.getCallStatus(itemElement, "callstatus message", parseErrors).ifPresent(builder::setCallStatus);
         return builder.build(parseErrors);
     }
 
@@ -72,7 +62,7 @@ public class CallStatusMessage extends OpenlinkPubSubMessage {
 
         @Nonnull
         protected CallStatusMessage build(final List<String> parseErrors) {
-            super.validate(parseErrors, true);
+            super.validate(parseErrors);
             return new CallStatusMessage(this, parseErrors);
         }
     }

@@ -16,6 +16,7 @@ import com.bt.openlink.type.CallFeatureDeviceKey;
 import com.bt.openlink.type.CallFeatureSpeakerChannel;
 import com.bt.openlink.type.CallId;
 import com.bt.openlink.type.CallState;
+import com.bt.openlink.type.CallStatus;
 import com.bt.openlink.type.Changed;
 import com.bt.openlink.type.ConferenceId;
 import com.bt.openlink.type.DeviceKey;
@@ -107,12 +108,6 @@ public class CoreFixtures {
             .setMicrophoneActive(true)
             .setMuteRequested(true)
             .build();
-    public static final Interest INTEREST = Interest.Builder.start()
-            .setType(INTEREST_TYPE)
-            .setDefault(true)
-            .setId(INTEREST_ID)
-            .setLabel("test interest label")
-            .build();
     public static final OriginatorReference ORIGINATOR_REFERENCE = new OriginatorReference("key1", "value1");
     public static final Call CALL_INCOMING_ORIGINATED = Call.Builder.start()
             .setId(CALL_ID)
@@ -144,6 +139,17 @@ public class CoreFixtures {
             .addFeature(SPEAKER_FEATURE)
             .addParticipant(PARTICIPANT)
             .build();
+    public static final CallStatus CALL_STATUS = CallStatus.Builder.start()
+            .addCall(CALL_INCOMING_ORIGINATED)
+            .setCallStatusBusy(true)
+            .build();
+    public static final Interest INTEREST = Interest.Builder.start()
+            .setType(INTEREST_TYPE)
+            .setDefault(true)
+            .setId(INTEREST_ID)
+            .setLabel("test interest label")
+            .setCallStatus(CALL_STATUS)
+            .build();
 
     public static final String START_TIME_ISO_8601 = ISO_8601_FORMATTER.format(START_TIME.atZone(ZoneOffset.UTC));
 
@@ -155,7 +161,7 @@ public class CoreFixtures {
             .build();
 
     public static final String CALL_STATUS_INCOMING_ORIGINATED =
-            "<callstatus xmlns='http://xmpp.org/protocol/openlink:01:00:00#call-status' busy='false'>\n" +
+            "<callstatus xmlns='http://xmpp.org/protocol/openlink:01:00:00#call-status' busy='true'>\n" +
                     "  <call>\n" +
                     "    <id telephony='" + CoreFixtures.TELEPHONY_CALL_ID + "'>" + CoreFixtures.CALL_ID + "</id>\n" +
                     "    <conference>" + CoreFixtures.CONFERENCE_ID + "</conference>\n" +

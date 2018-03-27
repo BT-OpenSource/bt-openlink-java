@@ -5,9 +5,6 @@ import static org.hamcrest.Matchers.contains;
 import static org.junit.Assert.assertThat;
 import static org.xmlunit.matchers.CompareMatcher.isIdenticalTo;
 
-import java.util.Collections;
-import java.util.List;
-
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.junit.Rule;
 import org.junit.Test;
@@ -16,7 +13,6 @@ import org.junit.rules.ExpectedException;
 import com.bt.openlink.CoreFixtures;
 import com.bt.openlink.MakeCallFixtures;
 import com.bt.openlink.tinder.Fixtures;
-import com.bt.openlink.type.Call;
 
 @SuppressWarnings({"ConstantConditions", "RedundantThrows"})
 public class MakeCallResultTest {
@@ -29,10 +25,10 @@ public class MakeCallResultTest {
         final MakeCallResult result = MakeCallResult.Builder.start()
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
-                .addCall(CoreFixtures.CALL_INCOMING_ORIGINATED)
+                .setCallStatus(CoreFixtures.CALL_STATUS)
                 .build();
 
-        assertThat(result.getCalls(), contains(CoreFixtures.CALL_INCOMING_ORIGINATED));
+        assertThat(result.getCallStatus().get(), is(CoreFixtures.CALL_STATUS));
     }
 
     @Test
@@ -42,7 +38,7 @@ public class MakeCallResultTest {
                 .setId(CoreFixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
-                .addCalls(Collections.singletonList(CoreFixtures.CALL_INCOMING_ORIGINATED))
+                .setCallStatus(CoreFixtures.CALL_STATUS)
                 .build();
 
         assertThat(result.toXML(), isIdenticalTo(MakeCallFixtures.MAKE_CALL_RESULT).ignoreWhitespace());
@@ -67,10 +63,7 @@ public class MakeCallResultTest {
         assertThat(result.getID(), is(CoreFixtures.STANZA_ID));
         assertThat(result.getTo(), is(Fixtures.TO_JID));
         assertThat(result.getFrom(), is(Fixtures.FROM_JID));
-        assertThat(result.isCallStatusBusy().get(),is(false));
-        final List<Call> calls = result.getCalls();
-        assertThat(EqualsBuilder.reflectionEquals(CoreFixtures.CALL_INCOMING_ORIGINATED, calls.get(0), false, null, true), is(true));
-        assertThat(calls.size(), is(1));
+        assertThat(EqualsBuilder.reflectionEquals(CoreFixtures.CALL_STATUS, result.getCallStatus().get(), false, null, true), is(true));
         assertThat(result.getParseErrors().size(), is(0));
     }
 
@@ -84,6 +77,6 @@ public class MakeCallResultTest {
                 "Invalid stanza; missing 'from' attribute is mandatory",
                 "Invalid stanza; missing 'id' attribute is mandatory",
                 "Invalid stanza; missing or incorrect 'type' attribute",
-                "Invalid make-call result stanza; missing or invalid calls"));
+                "Invalid make-call result stanza; missing or invalid callstatus"));
     }
 }

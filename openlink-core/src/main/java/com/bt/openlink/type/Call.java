@@ -4,38 +4,15 @@ import java.io.Serializable;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class Call implements Serializable {
-
-    private static final long serialVersionUID = -1434746928588613056L;
-
-    public static Optional<Boolean> oneOrMoreCallsIsBusy(final Collection<Call> calls) {
-        final AtomicBoolean callBusySet = new AtomicBoolean(false);
-        final AtomicBoolean aCallIsBusy = new AtomicBoolean(false);
-        calls.forEach(call -> call.getState().ifPresent(callState -> call.getDirection().ifPresent(callDirection -> {
-            final boolean participating = callState.isParticipating(callDirection);
-            if (!callBusySet.get() || participating) {
-                callBusySet.compareAndSet(false, true);
-                aCallIsBusy.compareAndSet(false, participating);
-            }
-        })));
-
-        if (callBusySet.get()) {
-            return Optional.of(aCallIsBusy.get());
-        } else {
-            return Optional.empty();
-        }
-
-    }
-
+    private static final long serialVersionUID = -2696465843616780273L;
     @Nullable private final CallId callId;
     @Nullable private final TelephonyCallId telephonyCallId;
     @Nullable private final ConferenceId conferenceId;

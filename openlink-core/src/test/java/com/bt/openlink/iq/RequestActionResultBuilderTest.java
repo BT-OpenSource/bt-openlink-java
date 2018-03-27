@@ -7,6 +7,7 @@ import static org.hamcrest.Matchers.empty;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -15,6 +16,7 @@ import org.junit.rules.ExpectedException;
 
 import com.bt.openlink.CoreFixtures;
 
+@SuppressWarnings("ConstantConditions")
 public class RequestActionResultBuilderTest {
 
     private static class Builder extends RequestActionResultBuilder<Builder, String, CoreFixtures.typeEnum> {
@@ -42,29 +44,16 @@ public class RequestActionResultBuilderTest {
     public void willValidateAPopulatedBuilder() {
 
         final List<String> errors = new ArrayList<>();
-        builder.addCall(CoreFixtures.CALL_INCOMING_ORIGINATED)
+        builder.setCallStatus(CoreFixtures.CALL_STATUS)
                 .validate();
         builder.validate(errors);
 
         assertThat(errors, is(empty()));
-        assertThat(builder.getCalls(), contains(CoreFixtures.CALL_INCOMING_ORIGINATED));
+        assertThat(builder.getCallStatus().get(), is(CoreFixtures.CALL_STATUS));
     }
 
     @Test
-    public void willAddMultipleCalls() {
-
-        final List<String> errors = new ArrayList<>();
-        builder.addCall(CoreFixtures.CALL_INCOMING_ORIGINATED)
-                .addCall(CoreFixtures.CALL_INCOMING_ORIGINATED)
-                .validate();
-        builder.validate(errors);
-
-        assertThat(errors, is(empty()));
-        assertThat(builder.getCalls(), contains(CoreFixtures.CALL_INCOMING_ORIGINATED, CoreFixtures.CALL_INCOMING_ORIGINATED));
-    }
-
-    @Test
-    public void willValidateTheCallIsSet() {
+    public void willValidateTheCallStatusIsSet() {
 
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("The request-action result has no calls");
@@ -80,7 +69,7 @@ public class RequestActionResultBuilderTest {
         builder.validate(errors);
 
         assertThat(errors, contains("Invalid request-action result stanza; missing or invalid calls"));
-        assertThat(builder.getCalls(), is(empty()));
+        assertThat(builder.getCallStatus(), is(Optional.empty()));
     }
 
 

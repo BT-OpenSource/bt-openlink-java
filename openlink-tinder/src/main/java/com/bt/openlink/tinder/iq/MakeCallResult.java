@@ -1,7 +1,6 @@
 package com.bt.openlink.tinder.iq;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,28 +14,21 @@ import org.xmpp.packet.JID;
 import com.bt.openlink.OpenlinkXmppNamespace;
 import com.bt.openlink.iq.MakeCallResultBuilder;
 import com.bt.openlink.tinder.internal.TinderPacketUtil;
-import com.bt.openlink.type.Call;
+import com.bt.openlink.type.CallStatus;
 
 public class MakeCallResult extends OpenlinkIQ {
-    @Nullable private final Boolean callStatusBusy;
-    @Nonnull private final List<Call> calls;
+    @Nullable private final CallStatus callStatus;
 
     private MakeCallResult(@Nonnull Builder builder, @Nullable List<String> parseErrors) {
         super(builder, parseErrors);
-        this.calls = Collections.unmodifiableList(builder.getCalls());
-        this.callStatusBusy = builder.isCallStatusBusy().orElse(null);
+        this.callStatus = builder.getCallStatus().orElse(null);
         final Element outElement = TinderPacketUtil.addCommandIOOutputElement(this, OpenlinkXmppNamespace.OPENLINK_MAKE_CALL);
-        TinderPacketUtil.addCallStatusCalls(outElement, callStatusBusy, calls);
+        getCallStatus().ifPresent(status->TinderPacketUtil.addCallStatus(outElement, status));
     }
 
     @Nonnull
-    public List<Call> getCalls() {
-        return calls;
-    }
-
-    @Nonnull
-    public Optional<Boolean> isCallStatusBusy() {
-        return Optional.ofNullable(callStatusBusy);
+    public Optional<CallStatus> getCallStatus() {
+        return Optional.ofNullable(callStatus);
     }
 
     @Nonnull
@@ -44,10 +36,7 @@ public class MakeCallResult extends OpenlinkIQ {
         final List<String> parseErrors = new ArrayList<>();
         final Element outElement = TinderPacketUtil.getIOOutElement(iq);
         final Builder builder = Builder.start(iq);
-        final Element callStatusElement = TinderPacketUtil.getChildElement(outElement, "callstatus");
-        TinderPacketUtil.getBooleanAttribute(callStatusElement, "busy", "busy attribute", parseErrors).ifPresent(builder::setCallStatusBusy);
-        final List<Call> calls = TinderPacketUtil.getCalls(callStatusElement, "make call result", parseErrors);
-        builder.addCalls(calls);
+        TinderPacketUtil.getCallStatus(outElement, "make-call result", parseErrors).ifPresent(builder::setCallStatus);
         final MakeCallResult result = builder.build(parseErrors);
         result.setID(iq.getID());
         return result;

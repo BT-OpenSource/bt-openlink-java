@@ -58,6 +58,8 @@ public class GetInterestsResult extends OpenlinkIQ {
             label.ifPresent(interestBuilder::setLabel);
             final Optional<Boolean> isDefaultInterest = SmackPacketUtil.getBooleanAttribute(parser, OpenlinkXmppNamespace.TAG_DEFAULT, "get-interests result", parseErrors);
             isDefaultInterest.ifPresent(interestBuilder::setDefault);
+            parser.nextTag();
+            SmackPacketUtil.getCallStatus(parser, "get-interest result", parseErrors).ifPresent(interestBuilder::setCallStatus);
 
             builder.addInterest(interestBuilder.build(parseErrors));
             ParserUtils.forwardToEndTagOfDepth(parser, currentDepth);
@@ -84,6 +86,7 @@ public class GetInterestsResult extends OpenlinkIQ {
             interest.getLabel().ifPresent(label -> xml.attribute(OpenlinkXmppNamespace.TAG_LABEL, label));
             interest.isDefaultInterest().ifPresent(isDefault -> xml.attribute("default", String.valueOf(isDefault)));
             xml.rightAngleBracket();
+            interest.getCallStatus().ifPresent(callStatus -> SmackPacketUtil.addCallStatus(xml, callStatus));
             xml.closeElement(OpenlinkXmppNamespace.TAG_INTEREST);
         }
 

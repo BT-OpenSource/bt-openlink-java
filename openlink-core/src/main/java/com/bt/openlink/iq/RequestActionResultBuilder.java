@@ -1,19 +1,16 @@
 package com.bt.openlink.iq;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.bt.openlink.type.Call;
+import com.bt.openlink.type.CallStatus;
 
 public abstract class RequestActionResultBuilder<B extends RequestActionResultBuilder, J, T extends Enum<T>> extends IQBuilder<B, J, T> {
 
-    @Nullable private Boolean callStatusBusy = null;
-    @Nonnull private List<Call> calls = new ArrayList<>();
+    @Nullable private CallStatus callStatus = null;
 
     protected RequestActionResultBuilder(final Class<T> typeClass) {
         super(typeClass);
@@ -27,42 +24,22 @@ public abstract class RequestActionResultBuilder<B extends RequestActionResultBu
 
     @Nonnull
     @SuppressWarnings("unchecked")
-    public B addCall(@Nonnull final Call call) {
-        this.calls.add(call);
+    public B setCallStatus(@Nonnull final CallStatus callStatus) {
+        this.callStatus = callStatus;
         return (B) this;
     }
 
     @Nonnull
-    @SuppressWarnings("unchecked")
-    public B addCalls(@Nonnull final Collection<Call> calls) {
-        this.calls.addAll(calls);
-        return (B) this;
-    }
-
-    @Nonnull
-    public List<Call> getCalls() {
-        return calls;
-    }
-
-    @SuppressWarnings("unchecked")
-    @Nonnull
-    public B setCallStatusBusy(final boolean callStatusBusy) {
-        this.callStatusBusy = callStatusBusy;
-        return (B) this;
-    }
-
-    @Nonnull
-    public Optional<Boolean> isCallStatusBusy() {
-        return Optional.ofNullable(callStatusBusy);
+    public Optional<CallStatus> getCallStatus() {
+        return Optional.ofNullable(callStatus);
     }
 
     @Override
     protected void validate() {
         super.validate();
-        if (calls.isEmpty()) {
+        if (callStatus == null) {
             throw new IllegalStateException("The request-action result has no calls");
         }
-        Call.oneOrMoreCallsIsBusy(calls).ifPresent(this::setCallStatusBusy);
     }
 
     @Override
@@ -74,7 +51,7 @@ public abstract class RequestActionResultBuilder<B extends RequestActionResultBu
         if (checkIQFields) {
             super.validate(errors);
         }
-        if (calls.isEmpty()) {
+        if (callStatus == null) {
             errors.add("Invalid request-action result stanza; missing or invalid calls");
         }
     }

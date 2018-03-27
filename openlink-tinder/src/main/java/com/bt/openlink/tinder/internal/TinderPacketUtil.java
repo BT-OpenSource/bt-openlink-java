@@ -35,6 +35,7 @@ import com.bt.openlink.type.CallFeatureDeviceKey;
 import com.bt.openlink.type.CallFeatureSpeakerChannel;
 import com.bt.openlink.type.CallId;
 import com.bt.openlink.type.CallState;
+import com.bt.openlink.type.CallStatus;
 import com.bt.openlink.type.Changed;
 import com.bt.openlink.type.ConferenceId;
 import com.bt.openlink.type.DeviceKey;
@@ -300,12 +301,10 @@ public final class TinderPacketUtil {
         return jidString == null || jidString.isEmpty() ? Optional.empty() : Optional.of(new JID(jidString));
     }
 
-    public static void addCallStatusCalls(@Nonnull final Element itemElement, @Nullable final Boolean callStatusBusy, @Nonnull final Collection<Call> calls) {
-        final Element callStatusElement = itemElement.addElement("callstatus", OpenlinkXmppNamespace.OPENLINK_CALL_STATUS.uri());
-        if (callStatusBusy != null) {
-            callStatusElement.addAttribute("busy", String.valueOf(callStatusBusy));
-        }
-        calls.forEach(call -> {
+    public static void addCallStatus(@Nonnull final Element parentElement, @Nonnull final CallStatus callStatus) {
+        final Element callStatusElement = parentElement.addElement("callstatus", OpenlinkXmppNamespace.OPENLINK_CALL_STATUS.uri());
+        callStatus.isCallStatusBusy().ifPresent(callStatusBusy -> callStatusElement.addAttribute("busy", String.valueOf(callStatusBusy)));
+        callStatus.getCalls().forEach(call -> {
             final Element callElement = callStatusElement.addElement("call");
             final Element idElement = callElement.addElement("id");
             call.getId().ifPresent(callId -> idElement.setText(callId.value()));
@@ -463,41 +462,45 @@ public final class TinderPacketUtil {
     }
 
     @SuppressWarnings("unchecked")
-    public static List<Call> getCalls(@Nullable final Element callStatusElement, @Nonnull final String description, @Nonnull final List<String> parseErrors) {
-        final List<Call> calls = new ArrayList<>();
-        if (callStatusElement != null) {
-            final List<Element> callElements = callStatusElement.elements("call");
-            for (final Element callElement : callElements) {
-                final Element callerElement = getChildElement(callElement, "caller");
-                final Element calledElement = getChildElement(callElement, "called");
-                final Call.Builder callBuilder = Call.Builder.start();
-                CallId.from(getNullableChildElementString(callElement, "id")).ifPresent(callBuilder::setId);
-                TelephonyCallId.from(getNullableStringAttribute(getChildElement(callElement, "id"), "telephony")).ifPresent(callBuilder::setTelephonyCallId);
-                ConferenceId.from(getNullableChildElementString(callElement, "conference")).ifPresent(callBuilder::setConferenceId);
-                getSite(callElement, description, parseErrors).ifPresent(callBuilder::setSite);
-                ProfileId.from(getNullableChildElementString(callElement, ELEMENT_PROFILE)).ifPresent(callBuilder::setProfileId);
-                UserId.from(getNullableChildElementString(callElement, "user")).ifPresent(callBuilder::setUserId);
-                InterestId.from(getNullableChildElementString(callElement, "interest")).ifPresent(callBuilder::setInterestId);
-                Changed.from(getNullableChildElementString(callElement, "changed")).ifPresent(callBuilder::setChanged);
-                CallState.from(getNullableChildElementString(callElement, "state")).ifPresent(callBuilder::setState);
-                CallDirection.from(getNullableChildElementString(callElement, ATTRIBUTE_DIRECTION)).ifPresent(callBuilder::setDirection);
-                PhoneNumber.from(getNullableChildElementString(callerElement, ELEMENT_NUMBER)).ifPresent(callBuilder::setCallerNumber);
-                getOptionalChildElementString(callerElement, "name").ifPresent(callBuilder::setCallerName);
-                callBuilder.addCallerE164Numbers(getPhoneNumbers(getChildElement(callerElement, ELEMENT_NUMBER)));
-                PhoneNumber.from(getNullableChildElementString(calledElement, ELEMENT_NUMBER)).ifPresent(callBuilder::setCalledNumber);
-                getOptionalChildElementString(calledElement, "name").ifPresent(callBuilder::setCalledName);
-                PhoneNumber.from(getNullableStringAttribute(getChildElement(calledElement, ELEMENT_NUMBER), "destination")).ifPresent(callBuilder::setCalledDestination);
-                callBuilder.addCalledE164Numbers(getPhoneNumbers(getChildElement(calledElement, ELEMENT_NUMBER)));
-                getOriginatorReferences(callElement).forEach(callBuilder::addOriginatorReference);
-                getChildElementISO8601(callElement, ATTRIBUTE_START_TIME, description, parseErrors).ifPresent(callBuilder::setStartTime);
-                getChildElementLong(callElement, ATTRIBUTE_DURATION, description, parseErrors).map(Duration::ofMillis).ifPresent(callBuilder::setDuration);
-                getActions(callElement, callBuilder, description, parseErrors);
-                getFeatures(callElement, callBuilder, description, parseErrors);
-                getParticipants(callElement, callBuilder, description, parseErrors);
-                calls.add(callBuilder.build(parseErrors));
-            }
+    public static Optional<CallStatus> getCallStatus(@Nullable final Element parentElement, @Nonnull final String description, @Nonnull final List<String> parseErrors) {
+        final Element callStatusElement = getChildElement(parentElement, "callstatus");
+        if (callStatusElement == null) {
+            return Optional.empty();
         }
-        return calls;
+
+        final CallStatus.Builder builder = CallStatus.Builder.start();
+        TinderPacketUtil.getBooleanAttribute(callStatusElement, "busy", "callstatus busy attribute", parseErrors).ifPresent(builder::setCallStatusBusy);
+        final List<Element> callElements = callStatusElement.elements("call");
+        for (final Element callElement : callElements) {
+            final Element callerElement = getChildElement(callElement, "caller");
+            final Element calledElement = getChildElement(callElement, "called");
+            final Call.Builder callBuilder = Call.Builder.start();
+            CallId.from(getNullableChildElementString(callElement, "id")).ifPresent(callBuilder::setId);
+            TelephonyCallId.from(getNullableStringAttribute(getChildElement(callElement, "id"), "telephony")).ifPresent(callBuilder::setTelephonyCallId);
+            ConferenceId.from(getNullableChildElementString(callElement, "conference")).ifPresent(callBuilder::setConferenceId);
+            getSite(callElement, description, parseErrors).ifPresent(callBuilder::setSite);
+            ProfileId.from(getNullableChildElementString(callElement, ELEMENT_PROFILE)).ifPresent(callBuilder::setProfileId);
+            UserId.from(getNullableChildElementString(callElement, "user")).ifPresent(callBuilder::setUserId);
+            InterestId.from(getNullableChildElementString(callElement, "interest")).ifPresent(callBuilder::setInterestId);
+            Changed.from(getNullableChildElementString(callElement, "changed")).ifPresent(callBuilder::setChanged);
+            CallState.from(getNullableChildElementString(callElement, "state")).ifPresent(callBuilder::setState);
+            CallDirection.from(getNullableChildElementString(callElement, ATTRIBUTE_DIRECTION)).ifPresent(callBuilder::setDirection);
+            PhoneNumber.from(getNullableChildElementString(callerElement, ELEMENT_NUMBER)).ifPresent(callBuilder::setCallerNumber);
+            getOptionalChildElementString(callerElement, "name").ifPresent(callBuilder::setCallerName);
+            callBuilder.addCallerE164Numbers(getPhoneNumbers(getChildElement(callerElement, ELEMENT_NUMBER)));
+            PhoneNumber.from(getNullableChildElementString(calledElement, ELEMENT_NUMBER)).ifPresent(callBuilder::setCalledNumber);
+            getOptionalChildElementString(calledElement, "name").ifPresent(callBuilder::setCalledName);
+            PhoneNumber.from(getNullableStringAttribute(getChildElement(calledElement, ELEMENT_NUMBER), "destination")).ifPresent(callBuilder::setCalledDestination);
+            callBuilder.addCalledE164Numbers(getPhoneNumbers(getChildElement(calledElement, ELEMENT_NUMBER)));
+            getOriginatorReferences(callElement).forEach(callBuilder::addOriginatorReference);
+            getChildElementISO8601(callElement, ATTRIBUTE_START_TIME, description, parseErrors).ifPresent(callBuilder::setStartTime);
+            getChildElementLong(callElement, ATTRIBUTE_DURATION, description, parseErrors).map(Duration::ofMillis).ifPresent(callBuilder::setDuration);
+            getActions(callElement, callBuilder, description, parseErrors);
+            getFeatures(callElement, callBuilder, description, parseErrors);
+            getParticipants(callElement, callBuilder, description, parseErrors);
+            builder.addCall(callBuilder.build(parseErrors));
+        }
+        return Optional.of(builder.build());
     }
 
     @SuppressWarnings("unchecked")

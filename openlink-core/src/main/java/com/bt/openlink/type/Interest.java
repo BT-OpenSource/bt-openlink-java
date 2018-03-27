@@ -8,17 +8,19 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public final class Interest implements Serializable {
-    private static final long serialVersionUID = -542840983239765814L;
+    private static final long serialVersionUID = -5017206771588788508L;
     @Nullable private final InterestId interestId;
     @Nullable private final InterestType interestType;
     @Nullable private final String label;
     @Nullable private final Boolean isDefault;
+    @Nullable private final CallStatus callStatus;
 
     private Interest(@Nonnull final Builder builder) {
         this.interestId = builder.interestId;
         this.interestType = builder.interestType;
         this.label = builder.label;
         this.isDefault = builder.isDefault;
+        this.callStatus = builder.callStatus;
     }
 
     @Nonnull
@@ -41,6 +43,11 @@ public final class Interest implements Serializable {
         return Optional.ofNullable(isDefault);
     }
 
+    @Nonnull
+    public Optional<CallStatus> getCallStatus() {
+        return Optional.ofNullable(callStatus);
+    }
+
     @Override
     public String toString() {
         return "Interest[" +
@@ -57,6 +64,7 @@ public final class Interest implements Serializable {
         @Nullable private InterestType interestType = null;
         @Nullable private String label = null;
         @Nullable private Boolean isDefault = null;
+        @Nullable private CallStatus callStatus = null;
 
         private Builder() {
         }
@@ -117,6 +125,11 @@ public final class Interest implements Serializable {
 
         public Builder setDefault(final boolean isDefault) {
             this.isDefault = isDefault;
+            return this;
+        }
+
+        public Builder setCallStatus(@Nonnull final CallStatus callStatus) {
+            this.callStatus = callStatus;
             return this;
         }
     }

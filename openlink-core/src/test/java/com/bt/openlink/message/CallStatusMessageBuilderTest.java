@@ -15,7 +15,6 @@ import org.junit.rules.ExpectedException;
 
 import com.bt.openlink.CoreFixtures;
 import com.bt.openlink.PubSubMessageFixtures;
-import com.bt.openlink.type.Call;
 import com.bt.openlink.type.PubSubNodeId;
 
 @SuppressWarnings("ConstantConditions")
@@ -46,16 +45,13 @@ public class CallStatusMessageBuilderTest {
         final Instant delayedFrom = Instant.now();
 
         builder.setDelay(delayedFrom)
-                .addCall(CoreFixtures.CALL_INCOMING_ORIGINATED)
+                .setCallStatus(CoreFixtures.CALL_STATUS)
                 .validate();
 
         assertThat(builder.getDelay().get(), is(delayedFrom));
         assertThat(builder.getPubSubNodeId().get(), is(PubSubMessageFixtures.NODE_ID));
         assertThat(builder.getItemId().get(), is(PubSubMessageFixtures.ITEM_ID));
-        assertThat(builder.isCallStatusBusy().get(), is(false));
-        final List<Call> calls = builder.getCalls();
-        assertThat(calls.size(), is(1));
-        assertThat(calls.get(0).getId().get(), is(CoreFixtures.CALL_ID));
+        assertThat(builder.getCallStatus().get(), is(CoreFixtures.CALL_STATUS));
     }
 
     @Test
@@ -68,48 +64,23 @@ public class CallStatusMessageBuilderTest {
     }
 
     @Test
-    public void willNotValidateABuilderWithDuplicateCalls() {
-
-        expectedException.expect(IllegalStateException.class);
-        expectedException.expectMessage("Each call id must be unique - test-call-id appears more than once");
-
-        builder.setPubSubNodeId(CoreFixtures.INTEREST_ID)
-                .setItemId(PubSubMessageFixtures.ITEM_ID)
-                .addCall(CoreFixtures.CALL_INCOMING_ORIGINATED)
-                .addCall(CoreFixtures.CALL_INCOMING_ORIGINATED)
-                .validate();
-    }
-
-    @Test
     public void willNotValidateABuilderWithCallsOnDifferentInterests() {
 
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("The call with id test-call-id is on interest test-interest-id which differs from the pub-sub node id another-node");
 
         builder.setPubSubNodeId(PubSubNodeId.from("another-node").get())
-                .addCall(CoreFixtures.CALL_INCOMING_ORIGINATED)
+                .setCallStatus(CoreFixtures.CALL_STATUS)
                 .validate();
     }
 
     @Test
-    public void willCheckCallUniqueness() {
-
-        final List<String> errors = new ArrayList<>();
-
-        builder.addCall(CoreFixtures.CALL_INCOMING_ORIGINATED)
-                .addCall(CoreFixtures.CALL_INCOMING_ORIGINATED)
-                .validate(errors);
-
-        assertThat(errors, contains("Invalid callstatus message stanza; each call id must be unique - test-call-id appears more than once"));
-    }
-
-    @Test
-    public void willCheckCallsAreOnTheRightNodeUniqueness() {
+    public void willCheckCallsAreOnTheRightNode() {
 
         final List<String> errors = new ArrayList<>();
 
         builder.setPubSubNodeId(PubSubNodeId.from("another-node").get())
-                .addCall(CoreFixtures.CALL_INCOMING_ORIGINATED)
+                .setCallStatus(CoreFixtures.CALL_STATUS)
                 .validate(errors);
 
         assertThat(errors, contains("Invalid callstatus message stanza; the call with id test-call-id is on interest test-interest-id which differs from the pub-sub node id another-node"));

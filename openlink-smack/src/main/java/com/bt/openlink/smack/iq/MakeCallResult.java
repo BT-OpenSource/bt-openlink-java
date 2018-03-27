@@ -2,7 +2,6 @@ package com.bt.openlink.smack.iq;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,27 +16,20 @@ import org.xmlpull.v1.XmlPullParserException;
 import com.bt.openlink.OpenlinkXmppNamespace;
 import com.bt.openlink.iq.MakeCallResultBuilder;
 import com.bt.openlink.smack.internal.SmackPacketUtil;
-import com.bt.openlink.type.Call;
+import com.bt.openlink.type.CallStatus;
 
 public class MakeCallResult extends OpenlinkIQ {
     private static final String ELEMENT_CALLSTATUS = "callstatus";
-    @Nullable private final Boolean callStatusBusy;
-    @Nonnull private final List<Call> calls;
+    @Nullable private final CallStatus callStatus;
 
     private MakeCallResult(@Nonnull Builder builder, @Nullable List<String> parseErrors) {
         super("command", OpenlinkXmppNamespace.XMPP_COMMANDS.uri(), builder, parseErrors);
-        this.calls = Collections.unmodifiableList(builder.getCalls());
-        this.callStatusBusy = builder.isCallStatusBusy().orElse(null);
+        this.callStatus = builder.getCallStatus().orElse(null);
     }
 
     @Nonnull
-    public List<Call> getCalls() {
-        return calls;
-    }
-
-    @Nonnull
-    public Optional<Boolean> isCallStatusBusy() {
-        return Optional.ofNullable(callStatusBusy);
+    public Optional<CallStatus> getCallStatus() {
+        return Optional.ofNullable(callStatus);
     }
 
     @Nonnull
@@ -47,13 +39,7 @@ public class MakeCallResult extends OpenlinkIQ {
 
         final Builder builder = Builder.start();
         final List<String> parseErrors = new ArrayList<>();
-        if (parser.getName().equals(ELEMENT_CALLSTATUS)) {
-            final Optional<Boolean> callBusy = SmackPacketUtil.getBooleanAttribute(parser, "busy", "make-call result", parseErrors);
-            callBusy.ifPresent(builder::setCallStatusBusy);
-            parser.nextTag();
-            final List<Call> calls = SmackPacketUtil.getCalls(parser, "make call result", parseErrors);
-            builder.addCalls(calls);
-        }
+        SmackPacketUtil.getCallStatus(parser, "make-call result", parseErrors).ifPresent(builder::setCallStatus);
         return builder.build(parseErrors);
     }
 
@@ -65,14 +51,11 @@ public class MakeCallResult extends OpenlinkIQ {
         xml.halfOpenElement(OpenlinkXmppNamespace.TAG_IODATA)
                 .attribute("xmlns", OpenlinkXmppNamespace.XMPP_IO_DATA.uri()).attribute("type", "output")
                 .rightAngleBracket();
-        xml.halfOpenElement(OpenlinkXmppNamespace.TAG_OUT)
-                .rightAngleBracket();
-        xml.halfOpenElement(ELEMENT_CALLSTATUS)
-                .attribute("xmlns", "http://xmpp.org/protocol/openlink:01:00:00#call-status")
-                .attribute("busy", String.valueOf(callStatusBusy))
-                .rightAngleBracket();
-
-        return SmackPacketUtil.addCalls(xml, calls);
+        xml.openElement(OpenlinkXmppNamespace.TAG_OUT);
+        getCallStatus().ifPresent(status->SmackPacketUtil.addCallStatus(xml, status));
+        xml.closeElement(OpenlinkXmppNamespace.TAG_OUT);
+        xml.closeElement(OpenlinkXmppNamespace.TAG_IODATA);
+        return xml;
     }
 
     public static final class Builder extends MakeCallResultBuilder<Builder, Jid, IQ.Type> {

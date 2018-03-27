@@ -7,6 +7,7 @@ import static org.hamcrest.Matchers.empty;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -29,7 +30,7 @@ public class MakeCallResultBuilderTest {
     private Builder builder;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
 
         builder = new Builder();
 
@@ -39,32 +40,19 @@ public class MakeCallResultBuilderTest {
     }
 
     @Test
-    public void willValidateAPopulatedBuilder() throws Exception {
+    public void willValidateAPopulatedBuilder() {
 
         final List<String> errors = new ArrayList<>();
-        builder.addCall(CoreFixtures.CALL_INCOMING_ORIGINATED)
+        builder.setCallStatus(CoreFixtures.CALL_STATUS)
                 .validate();
         builder.validate(errors);
 
         assertThat(errors, is(empty()));
-        assertThat(builder.getCalls(), contains(CoreFixtures.CALL_INCOMING_ORIGINATED));
+        assertThat(builder.getCallStatus().get(), is(CoreFixtures.CALL_STATUS));
     }
 
     @Test
-    public void willAddMultipleCalls() throws Exception {
-
-        final List<String> errors = new ArrayList<>();
-        builder.addCall(CoreFixtures.CALL_INCOMING_ORIGINATED)
-                .addCall(CoreFixtures.CALL_INCOMING_ORIGINATED)
-                .validate();
-        builder.validate(errors);
-
-        assertThat(errors, is(empty()));
-        assertThat(builder.getCalls(), contains(CoreFixtures.CALL_INCOMING_ORIGINATED, CoreFixtures.CALL_INCOMING_ORIGINATED));
-    }
-
-    @Test
-    public void willValidateTheCallIsSet() throws Exception {
+    public void willValidateTheCallStatusIsSet() {
 
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("The make-call result has no calls");
@@ -73,14 +61,14 @@ public class MakeCallResultBuilderTest {
     }
 
     @Test
-    public void willCheckThatTheCallIsSet() throws Exception {
+    public void willCheckThatTheCallStatusIsSet() {
 
         final List<String> errors = new ArrayList<>();
 
         builder.validate(errors);
 
-        assertThat(errors, contains("Invalid make-call result stanza; missing or invalid calls"));
-        assertThat(builder.getCalls(), is(empty()));
+        assertThat(errors, contains("Invalid make-call result stanza; missing or invalid callstatus"));
+        assertThat(builder.getCallStatus(), is(Optional.empty()));
     }
 
 }

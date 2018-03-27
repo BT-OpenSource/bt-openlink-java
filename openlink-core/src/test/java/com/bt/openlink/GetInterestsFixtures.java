@@ -43,7 +43,9 @@ public class GetInterestsFixtures {
                     "    <iodata xmlns='urn:xmpp:tmp:io-data' type='output'>\n" +
                     "      <out>\n" +
                     "        <interests xmlns='http://xmpp.org/protocol/openlink:01:00:00/interests'>\n" +
-                    "          <interest id='" + INTEREST_ID + "' type='test-interest-type' label='test interest label' default='true'/>\n" +
+                    "          <interest id='" + INTEREST_ID + "' type='test-interest-type' label='test interest label' default='true'>\n" +
+                    CoreFixtures.CALL_STATUS_INCOMING_ORIGINATED +
+                    "           </interest>\n" +
                     "          <interest id='sip:6001@uta.bt.com-DirectDial-1trader1@btsm11' type='DirectoryNumber' label='6001/1' default='false'/>\n" +
                     "        </interests>\n" +
                     "      </out>\n" +

@@ -20,23 +20,25 @@ public class InterestTest {
     @Rule public final ExpectedException expectedException = ExpectedException.none();
 
     @Test
-    public void willBuildAnInterest() throws Exception {
+    public void willBuildAnInterest() {
 
         final Interest interest = Interest.Builder.start()
                 .setId(CoreFixtures.INTEREST_ID)
                 .setType(CoreFixtures.INTEREST_TYPE)
                 .setLabel("test-interest-label")
                 .setDefault(true)
+                .setCallStatus(CoreFixtures.CALL_STATUS)
                 .build();
 
         assertThat(interest.getId().get(), is(CoreFixtures.INTEREST_ID));
         assertThat(interest.getType().get(), is(CoreFixtures.INTEREST_TYPE));
         assertThat(interest.getLabel().get(), is("test-interest-label"));
         assertThat(interest.isDefaultInterest().get(), is(true));
+        assertThat(interest.getCallStatus().get(), is(CoreFixtures.CALL_STATUS));
     }
 
     @Test
-    public void willNotBuildAnInterestWithoutAnId() throws Exception {
+    public void willNotBuildAnInterestWithoutAnId() {
 
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("The interest id has not been set");
@@ -49,7 +51,7 @@ public class InterestTest {
     }
 
     @Test
-    public void willNotBuildAnInterestWithoutAType() throws Exception {
+    public void willNotBuildAnInterestWithoutAType() {
 
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("The interest type has not been set");
@@ -62,7 +64,7 @@ public class InterestTest {
     }
 
     @Test
-    public void willNotBuildAnInterestWithoutALabel() throws Exception {
+    public void willNotBuildAnInterestWithoutALabel() {
 
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("The interest label has not been set");
@@ -75,7 +77,7 @@ public class InterestTest {
     }
 
     @Test
-    public void willNotBuildAnInterestWithoutADefaultIndicator() throws Exception {
+    public void willNotBuildAnInterestWithoutADefaultIndicator() {
 
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("The interest default indicator has not been set");
@@ -88,7 +90,7 @@ public class InterestTest {
     }
 
     @Test
-    public void willBuildAnInterestWithoutMandatoryValues() throws Exception {
+    public void willBuildAnInterestWithoutMandatoryValues() {
 
         final List<String> errors = new ArrayList<>();
 
@@ -105,6 +107,7 @@ public class InterestTest {
         assertThat(interest.getType(), is(Optional.empty()));
         assertThat(interest.getLabel(), is(Optional.empty()));
         assertThat(interest.isDefaultInterest(), is(Optional.empty()));
+        assertThat(interest.getCallStatus(), is(Optional.empty()));
     }
 
 }

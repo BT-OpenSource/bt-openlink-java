@@ -38,23 +38,9 @@ public class PubSubMessageFixtures {
                     "  </event>\n" +
                     "</message>";
 
-    public static final String CALL_STATUS_MESSAGE_WITH_LEGACY_TIMESTAMP_ONLY = CALL_STATUS_MESSAGE.replace(" start='" + CoreFixtures.START_TIME_ISO_8601 + "'", "");
-
     public static final String CALL_STATUS_MESSAGE_WITH_MISMATCHED_TIMESTAMPS = CALL_STATUS_MESSAGE.replace(" start='" + CoreFixtures.START_TIME_ISO_8601 + "'", " start='" + CoreFixtures.ISO_8601_FORMATTER.format(CoreFixtures.START_TIME.plusSeconds(60).atZone(ZoneOffset.UTC)) + "'");
 
-    public static final String CALL_STATUS_MESSAGE_WITH_NO_FIELDS =
-            "<message>\n" +
-                    "  <event xmlns='http://jabber.org/protocol/pubsub#event'>\n" +
-                    "    <items>\n" +
-                    "      <item>\n" +
-                    "        <callstatus xmlns='http://xmpp.org/protocol/openlink:01:00:00#call-status'>\n" +
-                    "        </callstatus>\n" +
-                    "      </item>\n" +
-                    "    </items>\n" +
-                    "  </event>\n" +
-                    "</message>";
-
-    public static final String DEVICE_STATUS_MESSAGE_WITH_NO_FIELDS =
+    public static final String PUBSUB_MESSAGE_WITH_NO_FIELDS =
             "<message>\n" +
                     "  <event xmlns='http://jabber.org/protocol/pubsub#event'>\n" +
                     "    <items>\n" +

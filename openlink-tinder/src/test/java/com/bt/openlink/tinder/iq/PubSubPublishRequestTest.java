@@ -4,8 +4,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.xmlunit.matchers.CompareMatcher.isIdenticalTo;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.Optional;
 import java.util.TimeZone;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -21,7 +20,6 @@ import com.bt.openlink.CoreFixtures;
 import com.bt.openlink.PubSubMessageFixtures;
 import com.bt.openlink.PubSubPublishFixtures;
 import com.bt.openlink.tinder.Fixtures;
-import com.bt.openlink.type.Call;
 import com.bt.openlink.type.DeviceStatus;
 import com.bt.openlink.type.PubSubNodeId;
 
@@ -50,15 +48,14 @@ public class PubSubPublishRequestTest {
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
                 .setPubSubNodeId(PubSubMessageFixtures.NODE_ID)
-                .addCall(CoreFixtures.CALL_INCOMING_ORIGINATED)
+                .setCallStatus(CoreFixtures.CALL_STATUS)
                 .build();
 
         assertThat(request.getID(), is(CoreFixtures.STANZA_ID));
         assertThat(request.getTo(), is(Fixtures.TO_JID));
         assertThat(request.getFrom(), is(Fixtures.FROM_JID));
         assertThat(request.getPubSubNodeId().get(), is(PubSubMessageFixtures.NODE_ID));
-        assertThat(request.getCalls().size(), is(1));
-        assertThat(request.getCalls().iterator().next(), is(CoreFixtures.CALL_INCOMING_ORIGINATED));
+        assertThat(request.getCallStatus().get(), is(CoreFixtures.CALL_STATUS));
     }
 
     @Test
@@ -69,7 +66,7 @@ public class PubSubPublishRequestTest {
         PubSubPublishRequest.Builder.start()
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
-                .addCall(CoreFixtures.CALL_INCOMING_ORIGINATED)
+                .setCallStatus(CoreFixtures.CALL_STATUS)
                 .build();
     }
 
@@ -83,7 +80,7 @@ public class PubSubPublishRequestTest {
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
                 .setPubSubNodeId(PubSubNodeId.from("another-node").get())
-                .addCalls(Collections.singletonList(CoreFixtures.CALL_INCOMING_ORIGINATED))
+                .setCallStatus(CoreFixtures.CALL_STATUS)
                 .build();
     }
 
@@ -94,7 +91,7 @@ public class PubSubPublishRequestTest {
                 .setId(CoreFixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
-                .addCall(CoreFixtures.CALL_INCOMING_ORIGINATED)
+                .setCallStatus(CoreFixtures.CALL_STATUS)
                 .setInterestId(CoreFixtures.INTEREST_ID)
                 .build();
         assertThat(request.toXML(), isIdenticalTo(PubSubPublishFixtures.PUBLISH_REQUEST_CALL_STATUS).ignoreWhitespace());
@@ -109,11 +106,7 @@ public class PubSubPublishRequestTest {
         assertThat(request.getFrom(), CoreMatchers.is(Fixtures.FROM_JID));
         assertThat(request.getType(), is(IQ.Type.set));
         assertThat(request.getPubSubNodeId().get(), is(PubSubMessageFixtures.NODE_ID));
-        assertThat(request.isCallStatusBusy().get(),is(false));
-        final List<Call> calls = request.getCalls();
-        final Call theOnlyCall = calls.get(0);
-        assertThat(EqualsBuilder.reflectionEquals(CoreFixtures.CALL_INCOMING_ORIGINATED, theOnlyCall, false, null, true), is(true));
-        assertThat(calls.size(), is(1));
+        assertThat(EqualsBuilder.reflectionEquals(CoreFixtures.CALL_STATUS, request.getCallStatus().get(), false, null, true), is(true));
         assertThat(request.getParseErrors().size(), is(0));
     }
 
@@ -141,7 +134,7 @@ public class PubSubPublishRequestTest {
         assertThat(request.getTo(), is(Fixtures.TO_JID));
         assertThat(request.getFrom(), is(Fixtures.FROM_JID));
         assertThat(request.getPubSubNodeId().get(), is(PubSubMessageFixtures.NODE_ID));
-        assertThat(request.getCalls().size(), is(0));
+        assertThat(request.getCallStatus(), is(Optional.empty()));
         assertThat(request.getDeviceStatus().get(), is(CoreFixtures.DEVICE_STATUS_LOGON));
     }
 

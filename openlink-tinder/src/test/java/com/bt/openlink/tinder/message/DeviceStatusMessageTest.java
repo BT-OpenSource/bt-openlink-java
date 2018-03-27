@@ -66,7 +66,7 @@ public class DeviceStatusMessageTest {
         final DeviceStatusMessage message = DeviceStatusMessage.Builder.start()
                 .build(new ArrayList<>());
 
-        assertThat(message.toXML(), isIdenticalTo(PubSubMessageFixtures.DEVICE_STATUS_MESSAGE_WITH_NO_FIELDS).ignoreWhitespace());
+        assertThat(message.toXML(), isIdenticalTo(PubSubMessageFixtures.PUBSUB_MESSAGE_WITH_NO_FIELDS).ignoreWhitespace());
     }
 
     @Test

@@ -35,6 +35,7 @@ import com.bt.openlink.type.CallFeatureDeviceKey;
 import com.bt.openlink.type.CallFeatureSpeakerChannel;
 import com.bt.openlink.type.CallId;
 import com.bt.openlink.type.CallState;
+import com.bt.openlink.type.CallStatus;
 import com.bt.openlink.type.Changed;
 import com.bt.openlink.type.ConferenceId;
 import com.bt.openlink.type.DeviceKey;
@@ -139,9 +140,13 @@ public final class SmackPacketUtil {
         }
     }
 
-    public static IQChildElementXmlStringBuilder addCalls(@Nonnull IQChildElementXmlStringBuilder xml, @Nonnull final Collection<Call> calls) {
-        xml.openElement("call");
-        for (final Call call : calls) {
+    public static void addCallStatus(@Nonnull IQChildElementXmlStringBuilder xml, @Nonnull final CallStatus callStatus) {
+        xml.halfOpenElement("callstatus")
+                .attribute("xmlns", "http://xmpp.org/protocol/openlink:01:00:00#call-status");
+        callStatus.isCallStatusBusy().ifPresent(callStatusBusy->xml.attribute("busy", String.valueOf(callStatusBusy)));
+        xml.rightAngleBracket();
+        for (final Call call : callStatus.getCalls()) {
+            xml.openElement("call");
             xml.halfOpenElement("id");
             call.getTelephonyCallId().ifPresent(telephonyCallId -> xml.attribute("telephony", telephonyCallId.value()));
             xml.rightAngleBracket();
@@ -163,12 +168,9 @@ public final class SmackPacketUtil {
             addActions(xml, call);
             addFeatures(xml, call);
             addParticipants(xml, call);
+            xml.closeElement("call");
         }
-        xml.closeElement("call");
         xml.closeElement("callstatus");
-        xml.closeElement(OpenlinkXmppNamespace.TAG_OUT);
-        xml.closeElement(OpenlinkXmppNamespace.TAG_IODATA);
-        return xml;
     }
 
     private static void addParticipants(@Nonnull final IQChildElementXmlStringBuilder xml, @Nonnull final Call call) {
@@ -311,80 +313,84 @@ public final class SmackPacketUtil {
     }
 
     @SuppressWarnings("unchecked")
-    public static List<Call> getCalls(
+    public static Optional<CallStatus> getCallStatus(
             @Nonnull final XmlPullParser parser,
             @Nonnull final String description,
             @Nonnull final List<String> errors)
             throws IOException, XmlPullParserException {
-        final List<Call> calls = new ArrayList<>();
-        final Call.Builder callBuilder = Call.Builder.start();
+        if(!parser.getName().equals("callstatus")) {
+            return Optional.empty();
+        }
+        final CallStatus.Builder builder = CallStatus.Builder.start();
+        getBooleanAttribute(parser, "busy", description, errors).ifPresent(builder::setCallStatusBusy);
+        parser.nextTag();
         if (parser.getName().equals("call")) {
+            final Call.Builder callBuilder = Call.Builder.start();
             final int callDepth = parser.getDepth();
             parser.nextTag();
             do {
                 switch (parser.getName()) {
-                case "id":
-                    addCallIdToBuilder(parser, callBuilder);
-                    break;
-                case "conference":
-                    addConferenceIdToBuilder(parser, callBuilder);
-                    break;
-                case "site":
-                    addSiteToBuilder(parser, errors, callBuilder, description);
-                    break;
-                case "profile":
-                    addProfileIdToBuilder(parser, callBuilder);
-                    break;
-                case "user":
-                    addUserToBuilder(parser, callBuilder);
-                    break;
-                case "interest":
-                    addInterestToBuilder(parser, callBuilder);
-                    break;
-                case "changed":
-                    addChangedToBuilder(parser, callBuilder);
-                    break;
-                case "state":
-                    addCallStateToBuilder(parser, callBuilder);
-                    break;
-                case ATTRIBUTE_DIRECTION:
-                    addDirectionToBuilder(parser, callBuilder);
-                    break;
-                case ELEMENT_CALLER:
-                    addCallerDetailsToBuilder(parser, callBuilder);
-                    break;
-                case ELEMENT_CALLED:
-                    addCalledDetailsToBuilder(parser, callBuilder);
-                    break;
-                case ELEMENT_ORIGINATOR_REF:
-                    getOriginatorRefs(parser).forEach(callBuilder::addOriginatorReference);
-                    break;
-                case ATTRIBUTE_START_TIME:
-                    getElementTestISO8601(ATTRIBUTE_START_TIME, parser, description, errors).ifPresent(callBuilder::setStartTime);
-                    break;
-                case ATTRIBUTE_DURATION:
-                    getElementTextLong(ATTRIBUTE_DURATION, parser, description, errors).map(Duration::ofMillis).ifPresent(callBuilder::setDuration);
-                    break;
-                case ELEMENT_ACTIONS:
-                    getActions(callBuilder, parser, errors);
-                    break;
-                case ELEMENT_FEATURES:
-                    getFeatures(callBuilder, parser, description, errors);
-                    break;
-                case ELEMENT_PARTICIPANTS:
-                    getParticipants(callBuilder, parser, description, errors);
-                    break;
-                default:
-                    errors.add("Unrecognised tag: " + parser.getName());
-                    break;
+                    case "id":
+                        addCallIdToBuilder(parser, callBuilder);
+                        break;
+                    case "conference":
+                        addConferenceIdToBuilder(parser, callBuilder);
+                        break;
+                    case "site":
+                        addSiteToBuilder(parser, errors, callBuilder, description);
+                        break;
+                    case "profile":
+                        addProfileIdToBuilder(parser, callBuilder);
+                        break;
+                    case "user":
+                        addUserToBuilder(parser, callBuilder);
+                        break;
+                    case "interest":
+                        addInterestToBuilder(parser, callBuilder);
+                        break;
+                    case "changed":
+                        addChangedToBuilder(parser, callBuilder);
+                        break;
+                    case "state":
+                        addCallStateToBuilder(parser, callBuilder);
+                        break;
+                    case ATTRIBUTE_DIRECTION:
+                        addDirectionToBuilder(parser, callBuilder);
+                        break;
+                    case ELEMENT_CALLER:
+                        addCallerDetailsToBuilder(parser, callBuilder);
+                        break;
+                    case ELEMENT_CALLED:
+                        addCalledDetailsToBuilder(parser, callBuilder);
+                        break;
+                    case ELEMENT_ORIGINATOR_REF:
+                        getOriginatorRefs(parser).forEach(callBuilder::addOriginatorReference);
+                        break;
+                    case ATTRIBUTE_START_TIME:
+                        getElementTestISO8601(ATTRIBUTE_START_TIME, parser, description, errors).ifPresent(callBuilder::setStartTime);
+                        break;
+                    case ATTRIBUTE_DURATION:
+                        getElementTextLong(ATTRIBUTE_DURATION, parser, description, errors).map(Duration::ofMillis).ifPresent(callBuilder::setDuration);
+                        break;
+                    case ELEMENT_ACTIONS:
+                        getActions(callBuilder, parser, errors);
+                        break;
+                    case ELEMENT_FEATURES:
+                        getFeatures(callBuilder, parser, description, errors);
+                        break;
+                    case ELEMENT_PARTICIPANTS:
+                        getParticipants(callBuilder, parser, description, errors);
+                        break;
+                    default:
+                        errors.add("Unrecognised tag: " + parser.getName());
+                        break;
                 }
                 ParserUtils.forwardToEndTagOfDepth(parser, callDepth + 1);
                 parser.nextTag();
             } while (callDepth != parser.getDepth());
-            calls.add(callBuilder.build(errors));
+            builder.addCall(callBuilder.build(errors));
         }
-
-        return calls;
+        return Optional.of(builder.build());
     }
 
     public static List<OriginatorReference> getOriginatorRefs(final @Nonnull XmlPullParser parser) throws XmlPullParserException, IOException {

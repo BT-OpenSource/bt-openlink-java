@@ -7,7 +7,6 @@ import static org.junit.Assert.assertThat;
 import static org.xmlunit.matchers.CompareMatcher.isIdenticalTo;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -19,7 +18,6 @@ import org.xmpp.packet.Message;
 import com.bt.openlink.CoreFixtures;
 import com.bt.openlink.PubSubMessageFixtures;
 import com.bt.openlink.tinder.Fixtures;
-import com.bt.openlink.type.Call;
 import com.bt.openlink.type.ItemId;
 
 @SuppressWarnings({ "ConstantConditions" })
@@ -36,18 +34,14 @@ public class CallStatusMessageTest {
                 .setFrom(Fixtures.FROM_JID)
                 .setPubSubNodeId(CoreFixtures.CALL_INCOMING_ORIGINATED.getInterestId().get())
                 .setItemId(PubSubMessageFixtures.ITEM_ID)
-                .addCall(CoreFixtures.CALL_INCOMING_ORIGINATED)
+                .setCallStatus(CoreFixtures.CALL_STATUS)
                 .build();
 
         assertThat(message.getID(), is(CoreFixtures.STANZA_ID));
         assertThat(message.getTo(), is(Fixtures.TO_JID));
         assertThat(message.getFrom(), is(Fixtures.FROM_JID));
         assertThat(message.getPubSubNodeId().get(), is(PubSubMessageFixtures.NODE_ID));
-        assertThat(message.isCallStatusBusy().get(), is(false));
-        final List<Call> calls = message.getCalls();
-        final Call theOnlyCall = calls.get(0);
-        assertThat(theOnlyCall, is(sameInstance(CoreFixtures.CALL_INCOMING_ORIGINATED)));
-        assertThat(calls.size(), is(1));
+        assertThat(message.getCallStatus().get(), is(CoreFixtures.CALL_STATUS));
     }
 
     @Test
@@ -59,8 +53,7 @@ public class CallStatusMessageTest {
                 .setFrom(Fixtures.FROM_JID)
                 .setPubSubNodeId(CoreFixtures.CALL_INCOMING_ORIGINATED.getInterestId().get())
                 .setItemId(ItemId.from("test-item-id").get())
-                .setCallStatusBusy(true)
-                .addCall(CoreFixtures.CALL_INCOMING_ORIGINATED)
+                .setCallStatus(CoreFixtures.CALL_STATUS)
                 .build();
 
         assertThat(message.toXML(), isIdenticalTo(PubSubMessageFixtures.CALL_STATUS_MESSAGE).ignoreWhitespace());
@@ -72,7 +65,7 @@ public class CallStatusMessageTest {
         final CallStatusMessage message = CallStatusMessage.Builder.start()
                 .build(new ArrayList<>());
 
-        assertThat(message.toXML(), isIdenticalTo(PubSubMessageFixtures.CALL_STATUS_MESSAGE_WITH_NO_FIELDS).ignoreWhitespace());
+        assertThat(message.toXML(), isIdenticalTo(PubSubMessageFixtures.PUBSUB_MESSAGE_WITH_NO_FIELDS).ignoreWhitespace());
     }
 
     @Test
@@ -87,11 +80,7 @@ public class CallStatusMessageTest {
         assertThat(message.getFrom(), is(Fixtures.FROM_JID));
         assertThat(message.getPubSubNodeId().get(), is(PubSubMessageFixtures.NODE_ID));
         assertThat(message.getItemId().get(), is(PubSubMessageFixtures.ITEM_ID));
-        assertThat(message.isCallStatusBusy().get(), is(false));
-        final List<Call> calls = message.getCalls();
-        final Call theOnlyCall = calls.get(0);
-        assertThat(EqualsBuilder.reflectionEquals(CoreFixtures.CALL_INCOMING_ORIGINATED, theOnlyCall, false, null, true), is(true));
-        assertThat(calls.size(), is(1));
+        assertThat(EqualsBuilder.reflectionEquals(CoreFixtures.CALL_STATUS, message.getCallStatus().get(), false, null, true), is(true));
         assertThat(message.getParseErrors().size(), is(0));
     }
 
@@ -112,7 +101,7 @@ public class CallStatusMessageTest {
                 .setFrom(Fixtures.FROM_JID)
                 .setPubSubNodeId(CoreFixtures.CALL_INCOMING_ORIGINATED.getInterestId().get())
                 .setItemId(ItemId.from("test-item-id").get())
-                .addCall(CoreFixtures.CALL_INCOMING_ORIGINATED)
+                .setCallStatus(CoreFixtures.CALL_STATUS)
                 .setDelay(PubSubMessageFixtures.DELAYED_FROM)
                 .build();
 
@@ -136,15 +125,6 @@ public class CallStatusMessageTest {
         assertThat(
                 message.getParseErrors(),
                 contains("Invalid call status; invalid timestamp 'not-a-timestamp'; format should be compliant with XEP-0082"));
-    }
-
-    @Test
-    public void willParseAMessageWithALegacyTimestamp() {
-        final Message stanza = Fixtures.messageFrom(PubSubMessageFixtures.CALL_STATUS_MESSAGE_WITH_LEGACY_TIMESTAMP_ONLY);
-
-        final CallStatusMessage message = (CallStatusMessage) OpenlinkMessageParser.parse(stanza);
-
-        assertThat(message.getCalls().get(0).getParticipants().get(0).getStartTime().get(), is(CoreFixtures.START_TIME));
     }
 
     @Test

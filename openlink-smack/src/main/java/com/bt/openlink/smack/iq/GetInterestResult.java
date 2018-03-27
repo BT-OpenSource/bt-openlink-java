@@ -52,7 +52,9 @@ public class GetInterestResult extends OpenlinkIQ {
             label.ifPresent(interestBuilder::setLabel);
             final Optional<Boolean> isDefaultInterest = SmackPacketUtil.getBooleanAttribute(parser, OpenlinkXmppNamespace.TAG_DEFAULT, "get-interest result", parseErrors);
             isDefaultInterest.ifPresent(interestBuilder::setDefault);
-
+//            ParserUtils.forwardToEndTagOfDepth(parser, parser.getDepth());
+            parser.nextTag();
+            SmackPacketUtil.getCallStatus(parser, "get-interest result", parseErrors).ifPresent(interestBuilder::setCallStatus);
             builder.setInterest(interestBuilder.build(parseErrors));
         }
 
@@ -69,16 +71,16 @@ public class GetInterestResult extends OpenlinkIQ {
         xml.halfOpenElement(OpenlinkXmppNamespace.TAG_OUT).rightAngleBracket();
         xml.halfOpenElement(OpenlinkXmppNamespace.TAG_INTERESTS)
                 .attribute("xmlns", "http://xmpp.org/protocol/openlink:01:00:00/interests").rightAngleBracket();
-        xml.halfOpenElement(OpenlinkXmppNamespace.TAG_INTEREST);
         if (interest != null) {
+            xml.halfOpenElement(OpenlinkXmppNamespace.TAG_INTEREST);
             interest.getId().ifPresent(interestId -> xml.attribute("id", interestId.value()));
             interest.getType().ifPresent(interestType -> xml.attribute("type", interestType.value()));
             interest.getLabel().ifPresent(label -> xml.attribute(OpenlinkXmppNamespace.TAG_LABEL, label));
             interest.isDefaultInterest().ifPresent(isDefault -> xml.attribute("default", String.valueOf(isDefault)));
+            xml.rightAngleBracket();
+            interest.getCallStatus().ifPresent(callStatus -> SmackPacketUtil.addCallStatus(xml, callStatus));
+            xml.closeElement(OpenlinkXmppNamespace.TAG_INTEREST);
         }
-        xml.rightAngleBracket();
-        xml.closeElement(OpenlinkXmppNamespace.TAG_INTEREST);
-
         xml.closeElement(OpenlinkXmppNamespace.TAG_INTERESTS);
         xml.closeElement(OpenlinkXmppNamespace.TAG_OUT);
         xml.closeElement(OpenlinkXmppNamespace.TAG_IODATA);

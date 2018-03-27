@@ -1,12 +1,8 @@
 package com.bt.openlink.tinder.iq;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.Matchers.contains;
 import static org.junit.Assert.assertThat;
 import static org.xmlunit.matchers.CompareMatcher.isIdenticalTo;
-
-import java.util.Collections;
-import java.util.List;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.junit.Rule;
@@ -17,7 +13,6 @@ import com.bt.openlink.CoreFixtures;
 import com.bt.openlink.MakeCallFixtures;
 import com.bt.openlink.RequestActionFixtures;
 import com.bt.openlink.tinder.Fixtures;
-import com.bt.openlink.type.Call;
 
 @SuppressWarnings("ConstantConditions")
 public class RequestActionResultTest {
@@ -31,10 +26,10 @@ public class RequestActionResultTest {
         final RequestActionResult result = RequestActionResult.Builder.start()
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
-                .addCall(CoreFixtures.CALL_INCOMING_ORIGINATED)
+                .setCallStatus(CoreFixtures.CALL_STATUS)
                 .build();
 
-        assertThat(result.getCalls(), contains(CoreFixtures.CALL_INCOMING_ORIGINATED));
+        assertThat(result.getCallStatus().get(), is(CoreFixtures.CALL_STATUS));
     }
 
     @Test
@@ -44,7 +39,7 @@ public class RequestActionResultTest {
                 .setId(CoreFixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
-                .addCalls(Collections.singletonList(CoreFixtures.CALL_INCOMING_ORIGINATED))
+                .setCallStatus(CoreFixtures.CALL_STATUS)
                 .build();
 
         assertThat(result.toXML(), isIdenticalTo(MakeCallFixtures.MAKE_CALL_RESULT).ignoreWhitespace());
@@ -69,11 +64,7 @@ public class RequestActionResultTest {
         assertThat(result.getID(), is(CoreFixtures.STANZA_ID));
         assertThat(result.getTo(), is(Fixtures.TO_JID));
         assertThat(result.getFrom(), is(Fixtures.FROM_JID));
-        assertThat(result.isCallStatusBusy().get(),is(false));
-        final List<Call> calls = result.getCalls();
-        final Call theOnlyCall = calls.get(0);
-        assertThat(EqualsBuilder.reflectionEquals(CoreFixtures.CALL_INCOMING_ORIGINATED, theOnlyCall, false, null, true), is(true));
-        assertThat(calls.size(), is(1));
+        assertThat(EqualsBuilder.reflectionEquals(CoreFixtures.CALL_STATUS, result.getCallStatus().get(), false, null, true), is(true));
         assertThat(result.getParseErrors().size(), is(0));
     }
 
