@@ -249,6 +249,11 @@ public class Call implements Serializable {
                 .flatMap(CallFeatureBoolean::isEnabled);
     }
 
+    @Nonnull
+    public CallStatus toCallStatus() {
+        return CallStatus.Builder.start().addCall(this).build();
+    }
+
     /**
      * Indicates if the call is public or private.
      *

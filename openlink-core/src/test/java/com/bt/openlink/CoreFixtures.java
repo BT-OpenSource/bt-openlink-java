@@ -139,10 +139,7 @@ public class CoreFixtures {
             .addFeature(SPEAKER_FEATURE)
             .addParticipant(PARTICIPANT)
             .build();
-    public static final CallStatus CALL_STATUS = CallStatus.Builder.start()
-            .addCall(CALL_INCOMING_ORIGINATED)
-            .setCallStatusBusy(true)
-            .build();
+    public static final CallStatus CALL_STATUS = CALL_INCOMING_ORIGINATED.toCallStatus();
     public static final Interest INTEREST = Interest.Builder.start()
             .setType(INTEREST_TYPE)
             .setDefault(true)
@@ -161,7 +158,7 @@ public class CoreFixtures {
             .build();
 
     public static final String CALL_STATUS_INCOMING_ORIGINATED =
-            "<callstatus xmlns='http://xmpp.org/protocol/openlink:01:00:00#call-status' busy='true'>\n" +
+            "<callstatus xmlns='http://xmpp.org/protocol/openlink:01:00:00#call-status' busy='false'>\n" +
                     "  <call>\n" +
                     "    <id telephony='" + CoreFixtures.TELEPHONY_CALL_ID + "'>" + CoreFixtures.CALL_ID + "</id>\n" +
                     "    <conference>" + CoreFixtures.CONFERENCE_ID + "</conference>\n" +
