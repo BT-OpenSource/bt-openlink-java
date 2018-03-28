@@ -17,6 +17,7 @@ public class MakeCallFixtures {
                     "    <iodata xmlns='urn:xmpp:tmp:io-data' type='input'>\n" +
                     "      <in>\n" +
                     "        <jid>" + CoreFixtures.USER_FULL_JID_STRING + "</jid>\n" +
+                    "        <profile>" + CoreFixtures.PROFILE_ID + "</profile>\n" +
                     "        <interest>" + CoreFixtures.INTEREST_ID + "</interest>\n" +
                     "        <destination>" + CoreFixtures.CALLED_DESTINATION + "</destination>\n" +
                     "        <originator-ref>\n" +

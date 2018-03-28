@@ -20,9 +20,11 @@ import com.bt.openlink.type.InterestId;
 import com.bt.openlink.type.MakeCallFeature;
 import com.bt.openlink.type.OriginatorReference;
 import com.bt.openlink.type.PhoneNumber;
+import com.bt.openlink.type.ProfileId;
 
 public class MakeCallRequest extends OpenlinkIQ {
     @Nullable private final JID jid;
+    @Nullable private final ProfileId profileId;
     @Nullable private final InterestId interestId;
     @Nullable private final PhoneNumber destination;
     @Nonnull private final List<MakeCallFeature> features;
@@ -31,12 +33,14 @@ public class MakeCallRequest extends OpenlinkIQ {
     private MakeCallRequest(@Nonnull Builder builder, @Nullable List<String> parseErrors) {
         super(builder, parseErrors);
         this.jid = builder.getJID().orElse(null);
+        this.profileId = builder.getProfileId().orElse(null);
         this.interestId = builder.getInterestId().orElse(null);
         this.destination = builder.getDestination().orElse(null);
         this.features = Collections.unmodifiableList(builder.getFeatures());
         this.originatorReferences = Collections.unmodifiableList(builder.getOriginatorReferences());
         final Element inElement = TinderPacketUtil.addCommandIOInputElement(this, OpenlinkXmppNamespace.OPENLINK_MAKE_CALL);
         TinderPacketUtil.addElementWithTextIfNotNull(inElement, "jid", jid);
+        TinderPacketUtil.addElementWithTextIfNotNull(inElement, "profile", profileId);
         TinderPacketUtil.addElementWithTextIfNotNull(inElement, "interest", interestId);
         TinderPacketUtil.addElementWithTextIfNotNull(inElement, "destination", destination);
         TinderPacketUtil.addOriginatorReferences(inElement, originatorReferences);
@@ -54,6 +58,11 @@ public class MakeCallRequest extends OpenlinkIQ {
     @Nonnull
     public Optional<JID> getJID() {
         return Optional.ofNullable(jid);
+    }
+
+    @Nonnull
+    public Optional<ProfileId> getProfileId() {
+        return Optional.ofNullable(profileId);
     }
 
     @Nonnull
@@ -82,6 +91,7 @@ public class MakeCallRequest extends OpenlinkIQ {
         final Element inElement = TinderPacketUtil.getIOInElement(iq);
         final Builder builder = Builder.start(iq);
         TinderPacketUtil.getJID(TinderPacketUtil.getNullableChildElementString(inElement, "jid")).ifPresent(builder::setJID);
+        ProfileId.from(TinderPacketUtil.getNullableChildElementString(inElement, "profile")).ifPresent(builder::setProfileId);
         InterestId.from(TinderPacketUtil.getNullableChildElementString(inElement, "interest")).ifPresent(builder::setInterestId);
         PhoneNumber.from(TinderPacketUtil.getNullableChildElementString(inElement, "destination")).ifPresent(builder::setDestination);
         TinderPacketUtil.getOriginatorReferences(inElement).forEach(builder::addOriginatorReference);

@@ -11,10 +11,12 @@ import com.bt.openlink.type.InterestId;
 import com.bt.openlink.type.MakeCallFeature;
 import com.bt.openlink.type.OriginatorReference;
 import com.bt.openlink.type.PhoneNumber;
+import com.bt.openlink.type.ProfileId;
 
 public abstract class MakeCallRequestBuilder<B extends MakeCallRequestBuilder, J, T extends Enum<T>> extends IQBuilder<B, J, T> {
 
     @Nullable private J jid;
+    @Nullable private ProfileId profileId;
     @Nullable private InterestId interestId;
     @Nullable private PhoneNumber destination;
     @Nonnull private final List<MakeCallFeature> features = new ArrayList<>();
@@ -34,6 +36,13 @@ public abstract class MakeCallRequestBuilder<B extends MakeCallRequestBuilder, J
     @SuppressWarnings("unchecked")
     public B setJID(@Nonnull final J jid) {
         this.jid = jid;
+        return (B) this;
+    }
+
+    @Nonnull
+    @SuppressWarnings("unchecked")
+    public B setProfileId(@Nonnull final ProfileId profileId) {
+        this.profileId = profileId;
         return (B) this;
     }
 
@@ -75,6 +84,11 @@ public abstract class MakeCallRequestBuilder<B extends MakeCallRequestBuilder, J
     @Nonnull
     public Optional<J> getJID() {
         return Optional.ofNullable(jid);
+    }
+
+    @Nonnull
+    public Optional<ProfileId> getProfileId() {
+        return Optional.ofNullable(profileId);
     }
 
     @Nonnull

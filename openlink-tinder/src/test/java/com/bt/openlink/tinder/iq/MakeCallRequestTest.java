@@ -36,6 +36,7 @@ public class MakeCallRequestTest {
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
                 .setJID(Fixtures.USER_FULL_JID)
+                .setProfileId(CoreFixtures.PROFILE_ID)
                 .setInterestId(CoreFixtures.INTEREST_ID)
                 .setDestination(CoreFixtures.CALLED_DESTINATION)
                 .addFeature(MakeCallFixtures.MAKE_CALL_FEATURE)
@@ -46,6 +47,7 @@ public class MakeCallRequestTest {
         assertThat(request.getTo(), is(Fixtures.TO_JID));
         assertThat(request.getFrom(), is(Fixtures.FROM_JID));
         assertThat(request.getJID().get(), is(Fixtures.USER_FULL_JID));
+        assertThat(request.getProfileId().get(), is(CoreFixtures.PROFILE_ID));
         assertThat(request.getInterestId().get(), is(CoreFixtures.INTEREST_ID));
         assertThat(request.getDestination().get(), is(CoreFixtures.CALLED_DESTINATION));
         assertThat(request.getFeatures(), contains(MakeCallFixtures.MAKE_CALL_FEATURE));
@@ -71,6 +73,7 @@ public class MakeCallRequestTest {
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
                 .setJID(Fixtures.USER_FULL_JID)
+                .setProfileId(CoreFixtures.PROFILE_ID)
                 .setInterestId(CoreFixtures.INTEREST_ID)
                 .setDestination(CoreFixtures.CALLED_DESTINATION)
                 .addOriginatorReference(CoreFixtures.ORIGINATOR_REFERENCE)
@@ -90,6 +93,7 @@ public class MakeCallRequestTest {
         assertThat(request.getFrom(), is(Fixtures.FROM_JID));
         assertThat(request.getType(), is(IQ.Type.set));
         assertThat(request.getJID().get(), is(Fixtures.USER_FULL_JID));
+        assertThat(request.getProfileId().get(), is(CoreFixtures.PROFILE_ID));
         assertThat(request.getInterestId().get(), is(CoreFixtures.INTEREST_ID));
         assertThat(request.getDestination().get(), is(CoreFixtures.CALLED_DESTINATION));
         final List<MakeCallFeature> features = request.getFeatures();
@@ -111,6 +115,7 @@ public class MakeCallRequestTest {
         assertThat(request.getFrom(), is(nullValue()));
         assertThat(request.getType(), is(IQ.Type.get));
         assertThat(request.getJID(), is(Optional.empty()));
+        assertThat(request.getProfileId(), is(Optional.empty()));
         assertThat(request.getInterestId(), is(Optional.empty()));
         assertThat(request.getDestination(), is(Optional.empty()));
         assertThat(request.getParseErrors(), contains(

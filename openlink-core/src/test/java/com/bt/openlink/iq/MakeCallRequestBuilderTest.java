@@ -45,6 +45,7 @@ public class MakeCallRequestBuilderTest {
 
         final List<String> errors = new ArrayList<>();
         builder.setJID("jid")
+                .setProfileId(CoreFixtures.PROFILE_ID)
                 .setInterestId(CoreFixtures.INTEREST_ID)
                 .addFeature(MakeCallFixtures.MAKE_CALL_FEATURE)
                 .setDestination(CoreFixtures.CALLED_DESTINATION)
@@ -56,6 +57,7 @@ public class MakeCallRequestBuilderTest {
 
         assertThat(errors, is(empty()));
         assertThat(builder.getJID().get(), is("jid"));
+        assertThat(builder.getProfileId().get(), is(CoreFixtures.PROFILE_ID));
         assertThat(builder.getInterestId().get(), is(CoreFixtures.INTEREST_ID));
         assertThat(builder.getFeatures(), contains(MakeCallFixtures.MAKE_CALL_FEATURE));
         assertThat(builder.getDestination().get(), is(CoreFixtures.CALLED_DESTINATION));
@@ -80,6 +82,7 @@ public class MakeCallRequestBuilderTest {
 
         assertThat(errors, contains("Invalid make-call request stanza; missing or invalid 'jid'"));
         assertThat(builder.getJID(), is(Optional.empty()));
+        assertThat(builder.getProfileId(), is(Optional.empty()));
         assertThat(builder.getInterestId(), is(Optional.empty()));
         assertThat(builder.getFeatures(), is(empty()));
         assertThat(builder.getDestination(), is(Optional.empty()));
