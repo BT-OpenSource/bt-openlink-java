@@ -8,7 +8,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public final class Interest implements Serializable {
-    private static final long serialVersionUID = -5017206771588788508L;
+    private static final long serialVersionUID = 7189237932741479652L;
     @Nullable private final InterestId interestId;
     @Nullable private final InterestType interestType;
     @Nullable private final String label;
