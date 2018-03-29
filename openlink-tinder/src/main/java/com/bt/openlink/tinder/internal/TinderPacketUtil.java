@@ -246,6 +246,17 @@ public final class TinderPacketUtil {
         }
     }
 
+    @Nonnull
+    public static Optional<Integer> getIntegerAttribute(final Element parentElement, final String attributeName, final String description, final List<String> parseErrors) {
+        final Optional<String> stringValue = getStringAttribute(parentElement, attributeName);
+        try {
+            return stringValue.map(Integer::valueOf);
+        } catch (final NumberFormatException e) {
+            parseErrors.add(String.format("Invalid %s; Unable to parse number attribute %s: '%s'", description, attributeName, stringValue));
+            return Optional.empty();
+        }
+    }
+
     private static Optional<Instant> getISO8601Attribute(final Element parentElement, final String attributeName, final String description, final List<String> parseErrors) {
         final Optional<String> stringValue = getStringAttribute(parentElement, attributeName, false, description, parseErrors);
         try {

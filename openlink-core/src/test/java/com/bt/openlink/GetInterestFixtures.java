@@ -28,7 +28,7 @@ public class GetInterestFixtures {
                     "    <iodata xmlns='urn:xmpp:tmp:io-data' type='output'>\n" +
                     "      <out>\n" +
                     "        <interests xmlns='http://xmpp.org/protocol/openlink:01:00:00/interests'>\n" +
-                    "          <interest id='" + CoreFixtures.INTEREST_ID + "' type='test-interest-type' label='test interest label' default='true'>\n" +
+                    "          <interest id='" + CoreFixtures.INTEREST_ID + "' type='test-interest-type' label='test interest label' default='true' maxCalls='3'>\n" +
                     CoreFixtures.CALL_STATUS_INCOMING_ORIGINATED +
                     "          </interest>\n" +
                     "        </interests>\n" +

@@ -14,6 +14,7 @@ public final class Interest implements Serializable {
     @Nullable private final String label;
     @Nullable private final Boolean isDefault;
     @Nullable private final CallStatus callStatus;
+    @Nullable private final Integer maxCalls;
 
     private Interest(@Nonnull final Builder builder) {
         this.interestId = builder.interestId;
@@ -21,6 +22,7 @@ public final class Interest implements Serializable {
         this.label = builder.label;
         this.isDefault = builder.isDefault;
         this.callStatus = builder.callStatus;
+        this.maxCalls = builder.maxCalls;
     }
 
     @Nonnull
@@ -48,6 +50,11 @@ public final class Interest implements Serializable {
         return Optional.ofNullable(callStatus);
     }
 
+    @Nonnull
+    public Optional<Integer> getMaxCalls() {
+        return Optional.ofNullable(maxCalls);
+    }
+
     @Override
     public String toString() {
         return "Interest[" +
@@ -65,6 +72,7 @@ public final class Interest implements Serializable {
         @Nullable private String label = null;
         @Nullable private Boolean isDefault = null;
         @Nullable private CallStatus callStatus = null;
+        @Nullable private Integer maxCalls = null;
 
         private Builder() {
         }
@@ -130,6 +138,11 @@ public final class Interest implements Serializable {
 
         public Builder setCallStatus(@Nonnull final CallStatus callStatus) {
             this.callStatus = callStatus;
+            return this;
+        }
+
+        public Builder setMaxCalls(final int maxCalls) {
+            this.maxCalls = maxCalls;
             return this;
         }
     }

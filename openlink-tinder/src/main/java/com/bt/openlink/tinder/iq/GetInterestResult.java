@@ -34,6 +34,7 @@ public class GetInterestResult extends OpenlinkIQ {
             interest.getType().ifPresent(interestType -> interestElement.addAttribute("type", interestType.value()));
             interest.getLabel().ifPresent(label -> interestElement.addAttribute("label", label));
             interest.isDefaultInterest().ifPresent(isDefault -> interestElement.addAttribute("default", String.valueOf(isDefault)));
+            interest.getMaxCalls().ifPresent(maxCalls->interestElement.addAttribute("maxCalls", String.valueOf(maxCalls)));
             interest.getCallStatus().ifPresent(callStatus->TinderPacketUtil.addCallStatus(interestElement, callStatus));
         }
     }
@@ -56,6 +57,7 @@ public class GetInterestResult extends OpenlinkIQ {
             InterestType.from(TinderPacketUtil.getNullableStringAttribute(interestElement, "type")).ifPresent(interestBuilder::setType);
             TinderPacketUtil.getStringAttribute(interestElement, "label").ifPresent(interestBuilder::setLabel);
             TinderPacketUtil.getBooleanAttribute(interestElement, "default", DESCRIPTION, parseErrors).ifPresent(interestBuilder::setDefault);
+            TinderPacketUtil.getIntegerAttribute(interestElement, "maxCalls", DESCRIPTION, parseErrors).ifPresent(interestBuilder::setMaxCalls);
             TinderPacketUtil.getCallStatus(interestElement, DESCRIPTION, parseErrors).ifPresent(interestBuilder::setCallStatus);
             builder.setInterest(interestBuilder.build(parseErrors));
         }

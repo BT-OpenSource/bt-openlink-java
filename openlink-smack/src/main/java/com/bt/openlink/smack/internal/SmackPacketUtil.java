@@ -121,6 +121,19 @@ public final class SmackPacketUtil {
         }
     }
 
+    @Nonnull
+    public static Optional<Integer> getIntegerAttribute(@Nonnull final XmlPullParser parser, @Nonnull final String attributeName) {
+        final String attributeValue = parser.getAttributeValue("", attributeName);
+        if (attributeValue == null || attributeValue.isEmpty()) {
+            return Optional.empty();
+        }
+        try {
+            return Optional.of(Integer.valueOf(attributeValue));
+        } catch (final NumberFormatException ignored) {
+            return Optional.empty();
+        }
+    }
+
     public static Optional<Site> getSite(final XmlPullParser parser, final List<String> errors, final String description) throws IOException, XmlPullParserException {
         if (parser.getName().equals("site")) {
             final Site.Builder siteBuilder = Site.Builder.start();

@@ -146,6 +146,7 @@ public class CoreFixtures {
             .setId(INTEREST_ID)
             .setLabel("test interest label")
             .setCallStatus(CALL_STATUS)
+            .setMaxCalls(3)
             .build();
 
     public static final String START_TIME_ISO_8601 = ISO_8601_FORMATTER.format(START_TIME.atZone(ZoneOffset.UTC));
