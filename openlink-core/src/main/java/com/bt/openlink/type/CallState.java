@@ -14,7 +14,7 @@ public enum CallState {
     CALL_ORIGINATED("CallOriginated", false, true),
     CALL_DELIVERED("CallDelivered", false, true),
     CALL_ESTABLISHED("CallEstablished", true, true),
-    CALL_FAILED("CallFailed", false, false),
+    CALL_FAILED("CallFailed", true, true),
     CALL_CONFERENCED("CallConferenced", true, true),
     CALL_BUSY("CallBusy", false, false),
     CALL_HELD("CallHeld", false, false),
