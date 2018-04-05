@@ -239,8 +239,8 @@ public class Call implements Serializable {
     @Nonnull
     public Optional<Boolean> isPrivate() {
         return getFeatures().stream()
-                .filter(feature->feature instanceof CallFeatureBoolean)
-                .map(feature->(CallFeatureBoolean)feature)
+                .filter(feature -> feature instanceof CallFeatureBoolean)
+                .map(feature -> (CallFeatureBoolean) feature)
                 .filter(feature -> {
                     final Optional<FeatureType> type = feature.getType();
                     return type.isPresent() && type.get() == FeatureType.PRIVACY && feature.isEnabled().isPresent();
@@ -264,6 +264,10 @@ public class Call implements Serializable {
         return isPrivate().map(isPrivate -> !isPrivate);
     }
 
+    /**
+     * Indicates if the call is currently being participated in by the user.
+     * @return {@code true} or {@code false}
+     */
     public boolean isParticipating() {
         return state != null && direction != null && state.isParticipating(direction);
     }
@@ -479,7 +483,6 @@ public class Call implements Serializable {
             this.calledE164Numbers.addAll(calledE164Numbers);
             return this;
         }
-
 
         @Nonnull
         public Builder addOriginatorReference(@Nonnull final String key, @Nonnull final String value) {
