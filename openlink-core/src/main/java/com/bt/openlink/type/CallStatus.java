@@ -69,16 +69,13 @@ public class CallStatus implements Serializable {
             });
 
             if (callStatusBusy == null) {
-                final AtomicReference<Boolean> anyCallIsBusy = new AtomicReference<>();
-                calls.forEach(call ->
-                        call.getState().ifPresent(callState ->
-                                call.getDirection().ifPresent(callDirection -> {
-                                    final boolean participating = callState.isParticipating(callDirection);
-                                    if (anyCallIsBusy.get() == null || participating) {
-                                        anyCallIsBusy.set(participating);
-                                    }
-                                })));
-                this.callStatusBusy = anyCallIsBusy.get();
+                final AtomicReference<Boolean> anyCallIsParticipating = new AtomicReference<>();
+                calls.forEach(call -> call.isParticipating().ifPresent(participating -> {
+                    if (anyCallIsParticipating.get() == null || participating) {
+                        anyCallIsParticipating.set(participating);
+                    }
+                }));
+                this.callStatusBusy = anyCallIsParticipating.get();
             }
 
             return new CallStatus(this);

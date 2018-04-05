@@ -266,10 +266,16 @@ public class Call implements Serializable {
 
     /**
      * Indicates if the call is currently being participated in by the user.
-     * @return {@code true} or {@code false}
+     * 
+     * @return {@code empty} if there is insufficient information to determine the participition, otherwise {@code true}
+     *         or {@code false}.
      */
-    public boolean isParticipating() {
-        return state != null && direction != null && state.isParticipating(direction);
+    public Optional<Boolean> isParticipating() {
+        if (state == null || direction == null) {
+            return Optional.empty();
+        } else {
+            return Optional.of(state.isParticipating(direction));
+        }
     }
 
     public static final class Builder {

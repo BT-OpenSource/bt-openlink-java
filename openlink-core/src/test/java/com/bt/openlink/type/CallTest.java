@@ -76,14 +76,14 @@ public class CallTest {
         assertThat(call.getOriginatorReferences(), contains(CoreFixtures.ORIGINATOR_REFERENCE, new OriginatorReference("key2", "value2")));
         assertThat(call.getStartTime().get(), is(startTime));
         assertThat(call.getDuration().get(), is(duration));
-        assertThat(call.isParticipating(), is(false));
+        assertThat(call.isParticipating().get(), is(false));
         assertThat(call.getActions(), contains(RequestAction.ANSWER_CALL));
         assertThat(call.getFeatures(), contains(CoreFixtures.CALL_FEATURE));
         assertThat(call.getParticipants(), contains(CoreFixtures.PARTICIPANT));
-        assertThat(call.getActiveHandset(),is(Optional.empty()));
-        assertThat(call.getActiveSpeakerChannel(),is(Optional.empty()));
-        assertThat(call.isPrivate(),is(Optional.empty()));
-        assertThat(call.isPublic(),is(Optional.empty()));
+        assertThat(call.getActiveHandset(), is(Optional.empty()));
+        assertThat(call.getActiveSpeakerChannel(), is(Optional.empty()));
+        assertThat(call.isPrivate(), is(Optional.empty()));
+        assertThat(call.isPublic(), is(Optional.empty()));
     }
 
     @Test
@@ -260,7 +260,7 @@ public class CallTest {
         assertThat(call.getOriginatorReferences(), is(empty()));
         assertThat(call.getStartTime(), is(Optional.empty()));
         assertThat(call.getDuration(), is(Optional.empty()));
-        assertThat(call.isParticipating(), is(false));
+        assertThat(call.isParticipating(), is(Optional.empty()));
         assertThat(call.getActions(), is(empty()));
         assertThat(call.getFeatures(), is(empty()));
         assertThat(call.getParticipants(), is(empty()));
