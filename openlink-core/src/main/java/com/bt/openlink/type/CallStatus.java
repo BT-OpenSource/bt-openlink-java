@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 import javax.annotation.Nonnull;
@@ -69,13 +68,11 @@ public class CallStatus implements Serializable {
             });
 
             if (callStatusBusy == null) {
-                final AtomicReference<Boolean> anyCallIsParticipating = new AtomicReference<>();
                 calls.forEach(call -> call.isParticipating().ifPresent(participating -> {
-                    if (anyCallIsParticipating.get() == null || participating) {
-                        anyCallIsParticipating.set(participating);
+                    if (callStatusBusy == null || participating) {
+                        callStatusBusy = participating;
                     }
                 }));
-                this.callStatusBusy = anyCallIsParticipating.get();
             }
 
             return new CallStatus(this);
