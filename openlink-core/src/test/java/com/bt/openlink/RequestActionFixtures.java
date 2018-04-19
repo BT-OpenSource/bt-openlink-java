@@ -24,7 +24,7 @@ public class RequestActionFixtures {
 
     public static final String REQUEST_ACTION_RESULT =
             "<iq from='" + CoreFixtures.FROM_JID_STRING + "' to='" + CoreFixtures.TO_JID_STRING + "' id='" + CoreFixtures.STANZA_ID + "' type='result'>\n" +
-                    "  <command xmlns='http://jabber.org/protocol/commands' action='execute' node='http://xmpp.org/protocol/openlink:01:00:00#request-action'>\n" +
+                    "  <command xmlns='http://jabber.org/protocol/commands' node='http://xmpp.org/protocol/openlink:01:00:00#request-action' status='completed'>\n" +
                     "    <iodata xmlns='urn:xmpp:tmp:io-data' type='output'>\n" +
                     "      <out>\n" +
                     CoreFixtures.CALL_STATUS_INCOMING_ORIGINATED +
