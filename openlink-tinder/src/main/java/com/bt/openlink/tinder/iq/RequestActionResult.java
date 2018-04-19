@@ -22,7 +22,7 @@ public class RequestActionResult extends OpenlinkIQ {
     private RequestActionResult(@Nonnull Builder builder, @Nullable List<String> parseErrors) {
         super(builder, parseErrors);
         this.callStatus = builder.getCallStatus().orElse(null);
-        final Element outElement = TinderPacketUtil.addCommandIOOutputElement(this, OpenlinkXmppNamespace.OPENLINK_MAKE_CALL);
+        final Element outElement = TinderPacketUtil.addCommandIOOutputElement(this, OpenlinkXmppNamespace.OPENLINK_REQUEST_ACTION);
         getCallStatus().ifPresent(status->TinderPacketUtil.addCallStatus(outElement, status));
     }
 

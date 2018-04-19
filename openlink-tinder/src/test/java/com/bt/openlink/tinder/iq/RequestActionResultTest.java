@@ -42,7 +42,7 @@ public class RequestActionResultTest {
                 .setCallStatus(CoreFixtures.CALL_STATUS)
                 .build();
 
-        assertThat(result.toXML(), isIdenticalTo(MakeCallFixtures.MAKE_CALL_RESULT).ignoreWhitespace());
+        assertThat(result.toXML(), isIdenticalTo(RequestActionFixtures.REQUEST_ACTION_RESULT).ignoreWhitespace());
     }
 
     @Test
