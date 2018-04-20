@@ -56,6 +56,8 @@ public final class SmackPacketUtil {
 
     private static final DateTimeFormatter JAVA_UTIL_DATE_FORMATTER = DateTimeFormatter.ofPattern("EEE MMM dd HH:mm:ss zzz yyyy");
     private static final DateTimeFormatter ISO_8601_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+    private static final String ATTRIBUTE_NUMBER = "number";
+    private static final String ATTRIBUTE_DESTINATION = "destination";
     private static final String ATTRIBUTE_DIRECTION = "direction";
     private static final String ATTRIBUTE_START_TIME = "start";
     private static final String ATTRIBUTE_TIMESTAMP = "timestamp";
@@ -193,8 +195,8 @@ public final class SmackPacketUtil {
             participants.forEach(participant -> {
                 xml.halfOpenElement(ELEMENT_PARTICIPANT);
                 participant.getJID().ifPresent(jid -> xml.attribute("jid", jid));
-                participant.getNumber().ifPresent(number -> xml.attribute("number", number.value()));
-                participant.getDestinationNumber().ifPresent(destination -> xml.attribute("destination", destination.value()));
+                participant.getNumber().ifPresent(number -> xml.attribute(ATTRIBUTE_NUMBER, number.value()));
+                participant.getDestinationNumber().ifPresent(destination -> xml.attribute(ATTRIBUTE_DESTINATION, destination.value()));
                 xml.optAttribute("e164Number", joinList(participant.getE164Numbers()));
                 participant.getType().ifPresent(type -> xml.attribute("type", type.getId()));
                 participant.getDirection().ifPresent(direction -> xml.attribute(ATTRIBUTE_DIRECTION, direction.getLabel()));
@@ -214,7 +216,7 @@ public final class SmackPacketUtil {
     private static void addCalledDetails(@Nonnull final IQChildElementXmlStringBuilder xml, @Nonnull final Call call) {
         xml.openElement(ELEMENT_CALLED);
         xml.halfOpenElement(ELEMENT_NUMBER);
-        call.getCalledDestination().ifPresent(destination -> xml.attribute("destination", destination.value()));
+        call.getCalledDestination().ifPresent(destination -> xml.attribute(ATTRIBUTE_DESTINATION, destination.value()));
         xml.optAttribute("e164", joinList(call.getCalledE164Numbers()));
         xml.rightAngleBracket();
         call.getCalledNumber().ifPresent(calledNumber -> xml.escape(calledNumber.value()));
@@ -440,7 +442,7 @@ public final class SmackPacketUtil {
         parser.nextTag();
         if (parser.getName().equals(ELEMENT_NUMBER)) {
             callBuilder.addCalledE164Numbers(getPhoneNumbers(parser, "e164"));
-            SmackPacketUtil.getStringAttribute(parser, "destination")
+            SmackPacketUtil.getStringAttribute(parser, ATTRIBUTE_DESTINATION)
                     .flatMap(PhoneNumber::from)
                     .ifPresent(callBuilder::setCalledDestination);
             final String calledNumberString = parser.nextText();
@@ -546,7 +548,7 @@ public final class SmackPacketUtil {
                 final Participant.Builder participantBuilder = Participant.Builder.start();
                 SmackPacketUtil.getStringAttribute(parser, "jid").ifPresent(participantBuilder::setJID);
                 SmackPacketUtil.getStringAttribute(parser, "number").flatMap(PhoneNumber::from).ifPresent(participantBuilder::setNumber);
-                SmackPacketUtil.getStringAttribute(parser, "destination").flatMap(PhoneNumber::from).ifPresent(participantBuilder::setDestinationNumber);
+                SmackPacketUtil.getStringAttribute(parser, ATTRIBUTE_DESTINATION).flatMap(PhoneNumber::from).ifPresent(participantBuilder::setDestinationNumber);
                 participantBuilder.addE164Numbers(getPhoneNumbers(parser, "e164Number"));
                 SmackPacketUtil.getStringAttribute(parser, "type")
                         .flatMap(ParticipantType::from)
