@@ -83,7 +83,7 @@ public abstract class PubSubPublishRequestBuilder<B extends PubSubPublishRequest
         if (pubSubNodeId == null) {
             throw new IllegalStateException("The stanza 'pubSubNodeId'/'interestId' has not been set");
         }
-        getCallStatus().ifPresent(callStatus -> validateCallsAreOnTheCorrectInterest(callStatus, call -> {
+        getCallStatus().ifPresent(cs -> validateCallsAreOnTheCorrectInterest(cs, call -> {
             throw new IllegalStateException("The call with id " + call.getId().orElse(null) + " is on interest " + call.getInterestId().orElse(null) + " which differs from the pub-sub node id " + pubSubNodeId);
         }));
         if (callStatus == null && deviceStatus == null) {
@@ -118,7 +118,7 @@ public abstract class PubSubPublishRequestBuilder<B extends PubSubPublishRequest
             errors.add("Invalid pub-sub publish request stanza; missing node id/interest id");
         }
         getCallStatus().ifPresent(
-                callStatus -> validateCallsAreOnTheCorrectInterest(callStatus,
+                cs -> validateCallsAreOnTheCorrectInterest(cs,
                         call -> errors.add("Invalid pub-sub publish request stanza; the call with id " + call.getId().orElse(null) + " is on interest " + call.getInterestId().orElse(null)
                                 + " which differs from the pub-sub node id " + pubSubNodeId)));
     }

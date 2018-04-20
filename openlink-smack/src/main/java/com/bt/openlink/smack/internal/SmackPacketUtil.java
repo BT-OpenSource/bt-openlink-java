@@ -63,6 +63,7 @@ public final class SmackPacketUtil {
     private static final String ATTRIBUTE_TIMESTAMP = "timestamp";
     private static final String ATTRIBUTE_DURATION = "duration";
     private static final String ATTRIBUTE_LABEL = "label";
+    private static final String ATTRIBUTE_XMLNS = "xmlns";
     private static final String ELEMENT_DEVICEKEYS = "devicekeys";
     private static final String ELEMENT_NUMBER = "number";
     private static final String ELEMENT_CALLER = "caller";
@@ -78,6 +79,7 @@ public final class SmackPacketUtil {
     private static final String ELEMENT_MICROPHONE = "microphone";
     private static final String ELEMENT_MUTE = "mute";
     private static final String ELEMENT_NAME = "name";
+    private static final String ELEMENT_CALLSTATUS = "callstatus";
 
     private SmackPacketUtil() {
     }
@@ -156,8 +158,8 @@ public final class SmackPacketUtil {
     }
 
     public static void addCallStatus(@Nonnull IQChildElementXmlStringBuilder xml, @Nonnull final CallStatus callStatus) {
-        xml.halfOpenElement("callstatus")
-                .attribute("xmlns", "http://xmpp.org/protocol/openlink:01:00:00#call-status");
+        xml.halfOpenElement(ELEMENT_CALLSTATUS)
+                .attribute(ATTRIBUTE_XMLNS, "http://xmpp.org/protocol/openlink:01:00:00#call-status");
         callStatus.isCallStatusBusy().ifPresent(callStatusBusy->xml.attribute("busy", String.valueOf(callStatusBusy)));
         xml.rightAngleBracket();
         for (final Call call : callStatus.getCalls()) {
@@ -185,7 +187,7 @@ public final class SmackPacketUtil {
             addParticipants(xml, call);
             xml.closeElement("call");
         }
-        xml.closeElement("callstatus");
+        xml.closeElement(ELEMENT_CALLSTATUS);
     }
 
     private static void addParticipants(@Nonnull final IQChildElementXmlStringBuilder xml, @Nonnull final Call call) {
@@ -297,7 +299,7 @@ public final class SmackPacketUtil {
                     xml.rightAngleBracket();
                     final CallFeatureDeviceKey callFeatureDeviceKey = (CallFeatureDeviceKey) feature;
                     xml.halfOpenElement(ELEMENT_DEVICEKEYS);
-                    xml.attribute("xmlns", OpenlinkXmppNamespace.OPENLINK_DEVICE_KEY.uri());
+                    xml.attribute(ATTRIBUTE_XMLNS, OpenlinkXmppNamespace.OPENLINK_DEVICE_KEY.uri());
                     xml.rightAngleBracket();
                     callFeatureDeviceKey.getDeviceKey().ifPresent(deviceKey -> {
                         xml.openElement("key");
@@ -309,7 +311,7 @@ public final class SmackPacketUtil {
                     xml.rightAngleBracket();
                     final CallFeatureSpeakerChannel callFeatureSpeakerChannel = (CallFeatureSpeakerChannel) feature;
                     xml.halfOpenElement(ELEMENT_SPEAKERCHANNEL);
-                    xml.attribute("xmlns", OpenlinkXmppNamespace.OPENLINK_SPEAKER_CHANNEL.uri());
+                    xml.attribute(ATTRIBUTE_XMLNS, OpenlinkXmppNamespace.OPENLINK_SPEAKER_CHANNEL.uri());
                     xml.rightAngleBracket();
                     callFeatureSpeakerChannel.getChannel().ifPresent(channel -> {
                         xml.openElement(ELEMENT_CHANNEL);
@@ -343,7 +345,7 @@ public final class SmackPacketUtil {
             @Nonnull final String description,
             @Nonnull final List<String> errors)
             throws IOException, XmlPullParserException {
-        if(!parser.getName().equals("callstatus")) {
+        if(!parser.getName().equals(ELEMENT_CALLSTATUS)) {
             return Optional.empty();
         }
         final CallStatus.Builder builder = CallStatus.Builder.start();
@@ -547,7 +549,7 @@ public final class SmackPacketUtil {
             while (parser.getName().equals(ELEMENT_PARTICIPANT)) {
                 final Participant.Builder participantBuilder = Participant.Builder.start();
                 SmackPacketUtil.getStringAttribute(parser, "jid").ifPresent(participantBuilder::setJID);
-                SmackPacketUtil.getStringAttribute(parser, "number").flatMap(PhoneNumber::from).ifPresent(participantBuilder::setNumber);
+                SmackPacketUtil.getStringAttribute(parser, ATTRIBUTE_NUMBER).flatMap(PhoneNumber::from).ifPresent(participantBuilder::setNumber);
                 SmackPacketUtil.getStringAttribute(parser, ATTRIBUTE_DESTINATION).flatMap(PhoneNumber::from).ifPresent(participantBuilder::setDestinationNumber);
                 participantBuilder.addE164Numbers(getPhoneNumbers(parser, "e164Number"));
                 SmackPacketUtil.getStringAttribute(parser, "type")
