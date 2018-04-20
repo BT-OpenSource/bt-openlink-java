@@ -5,13 +5,12 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
 import static org.xmlunit.matchers.CompareMatcher.isIdenticalTo;
 
 import java.util.List;
 import java.util.Optional;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.hamcrest.CoreMatchers;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -98,7 +97,7 @@ public class MakeCallRequestTest {
         assertThat(request.getDestination().get(), is(CoreFixtures.CALLED_DESTINATION));
         final List<MakeCallFeature> features = request.getFeatures();
         assertThat(features.size(),is(1));
-        assertThat(EqualsBuilder.reflectionEquals(MakeCallFixtures.MAKE_CALL_FEATURE, features.get(0), false, null, true), CoreMatchers.is(true));
+        assertReflectionEquals(MakeCallFixtures.MAKE_CALL_FEATURE, features.get(0));
         assertThat(request.getOriginatorReferences(), contains(CoreFixtures.ORIGINATOR_REFERENCE, new OriginatorReference("key2", "value2")));
         assertThat(request.getParseErrors(), is(empty()));
     }

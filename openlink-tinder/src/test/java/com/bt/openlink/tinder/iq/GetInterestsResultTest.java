@@ -3,11 +3,11 @@ package com.bt.openlink.tinder.iq;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.contains;
 import static org.junit.Assert.assertThat;
+import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
 import static org.xmlunit.matchers.CompareMatcher.isIdenticalTo;
 
 import java.util.List;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -86,10 +86,12 @@ public class GetInterestsResultTest {
         assertThat(result.getType(), is(IQ.Type.result));
         final List<Interest> interests = result.getInterests();
 
-        assertThat(EqualsBuilder.reflectionEquals(CoreFixtures.INTEREST, interests.get(0), false, null, true), is(true));
-        assertThat(EqualsBuilder.reflectionEquals(GetInterestsFixtures.INTEREST_2, interests.get(1), false, null, true), is(true));
+        assertReflectionEquals(CoreFixtures.INTEREST, interests.get(0));
+        assertReflectionEquals(GetInterestsFixtures.INTEREST_2, interests.get(1));
 
         assertThat(interests.size(), is(2));
+
+        System.out.println(result.getParseErrors());
 
         assertThat(result.getParseErrors().size(), is(0));
     }

@@ -3,6 +3,7 @@ package com.bt.openlink.type;
 import java.io.Serializable;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -12,6 +13,9 @@ import javax.annotation.Nullable;
 public final class Participant implements Serializable {
     private static final long serialVersionUID = 8143091859904009327L;
     @Nullable private final String jid;
+    @Nullable private final PhoneNumber number;
+    @Nonnull private final List<PhoneNumber> e164Numbers;
+    @Nullable private final PhoneNumber destinationNumber;
     @Nullable private final ParticipantType participantType;
     @Nullable private final CallDirection direction;
     @SuppressWarnings("squid:S3437") @Nullable private final Instant startTime;
@@ -19,6 +23,9 @@ public final class Participant implements Serializable {
 
     private Participant(@Nonnull final Builder builder) {
         this.jid = builder.jid;
+        this.number = builder.number;
+        this.e164Numbers = new ArrayList<>(builder.e164Numbers);
+        this.destinationNumber = builder.destinationNumber;
         this.participantType = builder.participantType;
         this.direction = builder.direction;
         this.startTime = builder.startTime;
@@ -28,6 +35,21 @@ public final class Participant implements Serializable {
     @Nonnull
     public Optional<String> getJID() {
         return Optional.ofNullable(jid);
+    }
+
+    @Nonnull
+    public Optional<PhoneNumber> getNumber() {
+        return Optional.ofNullable(number);
+    }
+
+    @Nonnull
+    public List<PhoneNumber> getE164Numbers() {
+        return e164Numbers;
+    }
+
+    @Nonnull
+    public Optional<PhoneNumber> getDestinationNumber() {
+        return Optional.ofNullable(destinationNumber);
     }
 
     @Nonnull
@@ -53,6 +75,9 @@ public final class Participant implements Serializable {
     public static final class Builder {
 
         @Nullable private String jid;
+        @Nullable private PhoneNumber number;
+        @Nonnull private final List<PhoneNumber> e164Numbers = new ArrayList<>();
+        @Nullable private PhoneNumber destinationNumber;
         @Nullable private ParticipantType participantType;
         @Nullable private CallDirection direction;
         @Nullable private Instant startTime;
@@ -68,8 +93,8 @@ public final class Participant implements Serializable {
 
         @Nonnull
         public Participant build() {
-            if (jid == null) {
-                throw new IllegalStateException("The participation jid has not been set");
+            if (jid == null && number == null) {
+                throw new IllegalStateException("Either the participation jid or number must be set");
             }
             if (participantType == null) {
                 throw new IllegalStateException("The participation type has not been set");
@@ -88,8 +113,8 @@ public final class Participant implements Serializable {
 
         @Nonnull
         public Participant build(final List<String> errors) {
-            if (jid == null) {
-                errors.add("Invalid participant; missing participation jid is mandatory");
+            if (jid == null && number == null) {
+                errors.add("Invalid participant; either the participation jid or number must be set");
             }
             if (participantType == null) {
                 errors.add("Invalid participant; missing participation type is mandatory");
@@ -108,6 +133,26 @@ public final class Participant implements Serializable {
 
         public Builder setJID(@Nonnull final String jid) {
             this.jid = jid;
+            return this;
+        }
+
+        public Builder setNumber(@Nonnull final PhoneNumber number) {
+            this.number = number;
+            return this;
+        }
+
+        public Builder addE164Number(@Nonnull final PhoneNumber e164Number) {
+            this.e164Numbers.add(e164Number);
+            return this;
+        }
+
+        public Builder addE164Numbers(@Nonnull final List<PhoneNumber> e164Numbers) {
+            this.e164Numbers.addAll(e164Numbers);
+            return this;
+        }
+
+        public Builder setDestinationNumber(@Nonnull final PhoneNumber destinationNumber) {
+            this.destinationNumber = destinationNumber;
             return this;
         }
 

@@ -186,7 +186,7 @@ public final class TinderPacketUtil {
     }
 
     @Nonnull
-    public static Optional<Boolean> getChildElementBoolean(
+    private static Optional<Boolean> getChildElementBoolean(
             @Nullable final Element parentElement,
             @Nonnull final String childElementName,
             @Nonnull final String stanzaDescription,
@@ -331,20 +331,14 @@ public final class TinderPacketUtil {
             final Element callerElement = callElement.addElement("caller");
             final Element callerNumberElement = callerElement.addElement(ELEMENT_NUMBER);
             call.getCallerNumber().ifPresent(callerNumber -> callerNumberElement.setText(callerNumber.value()));
-            final String callerE164Numbers = String.join(",", call.getCallerE164Numbers().stream().map(PhoneNumber::value).collect(Collectors.toList()));
-            if (!callerE164Numbers.isEmpty()) {
-                callerNumberElement.addAttribute("e164", callerE164Numbers);
-            }
+            addList(callerNumberElement, call.getCallerE164Numbers(), "e164");
             final Element callerNameElement = callerElement.addElement("name");
             call.getCallerName().ifPresent(callerNameElement::setText);
             final Element calledElement = callElement.addElement("called");
             final Element calledNumberElement = calledElement.addElement(ELEMENT_NUMBER);
             call.getCalledNumber().ifPresent(calledNumber -> calledNumberElement.setText(calledNumber.value()));
             call.getCalledDestination().ifPresent(calledDestination -> calledNumberElement.addAttribute("destination", calledDestination.value()));
-            final String calledE164Numbers = String.join(",", call.getCalledE164Numbers().stream().map(PhoneNumber::value).collect(Collectors.toList()));
-            if (!calledE164Numbers.isEmpty()) {
-                calledNumberElement.addAttribute("e164", calledE164Numbers);
-            }
+            addList(calledNumberElement, call.getCalledE164Numbers(), "e164");
             addOriginatorReferences(callElement, call.getOriginatorReferences());
             final Element calledNameElement = calledElement.addElement("name");
             call.getCalledName().ifPresent(calledNameElement::setText);
@@ -354,6 +348,13 @@ public final class TinderPacketUtil {
             addFeatures(call, callElement);
             addParticipants(call, callElement);
         });
+    }
+
+    private static void addList(Element element, List<?> list, String attributeName) {
+        final String string = String.join(",", list.stream().map(Object::toString).collect(Collectors.toList()));
+        if (!string.isEmpty()) {
+            element.addAttribute(attributeName, string);
+        }
     }
 
     public static void addOriginatorReferences(final Element callElement, final List<OriginatorReference> originatorReferences) {
@@ -423,6 +424,9 @@ public final class TinderPacketUtil {
             participants.forEach(participant -> {
                 final Element participantElement = participantsElement.addElement("participant");
                 participant.getJID().ifPresent(jid -> participantElement.addAttribute("jid", jid));
+                participant.getNumber().ifPresent(number->participantElement.addAttribute("number", number.value()));
+                addList(participantElement, participant.getE164Numbers(), "e164Number");
+                participant.getDestinationNumber().ifPresent(destination->participantElement.addAttribute("destination", destination.value()));
                 participant.getType().ifPresent(type -> participantElement.addAttribute("type", type.getId()));
                 participant.getDirection().ifPresent(direction -> participantElement.addAttribute(ATTRIBUTE_DIRECTION, direction.getLabel()));
                 participant.getStartTime().ifPresent(startTime -> {
@@ -460,8 +464,8 @@ public final class TinderPacketUtil {
         return Optional.of(siteBuilder.build(parseErrors));
     }
 
-    private static List<PhoneNumber> getPhoneNumbers(@Nullable final Element parentElement) {
-        final Optional<String> e164String = getStringAttribute(parentElement, "e164");
+    private static List<PhoneNumber> getPhoneNumbers(@Nullable final Element parentElement, String attributeName) {
+        final Optional<String> e164String = getStringAttribute(parentElement, attributeName);
         final List<PhoneNumber> phoneNumbers = new ArrayList<>();
         e164String.ifPresent(string -> Arrays.stream(string.split(","))
                 .map(String::trim)
@@ -498,11 +502,11 @@ public final class TinderPacketUtil {
             CallDirection.from(getNullableChildElementString(callElement, ATTRIBUTE_DIRECTION)).ifPresent(callBuilder::setDirection);
             PhoneNumber.from(getNullableChildElementString(callerElement, ELEMENT_NUMBER)).ifPresent(callBuilder::setCallerNumber);
             getOptionalChildElementString(callerElement, "name").ifPresent(callBuilder::setCallerName);
-            callBuilder.addCallerE164Numbers(getPhoneNumbers(getChildElement(callerElement, ELEMENT_NUMBER)));
+            callBuilder.addCallerE164Numbers(getPhoneNumbers(getChildElement(callerElement, ELEMENT_NUMBER), "e164"));
             PhoneNumber.from(getNullableChildElementString(calledElement, ELEMENT_NUMBER)).ifPresent(callBuilder::setCalledNumber);
             getOptionalChildElementString(calledElement, "name").ifPresent(callBuilder::setCalledName);
             PhoneNumber.from(getNullableStringAttribute(getChildElement(calledElement, ELEMENT_NUMBER), "destination")).ifPresent(callBuilder::setCalledDestination);
-            callBuilder.addCalledE164Numbers(getPhoneNumbers(getChildElement(calledElement, ELEMENT_NUMBER)));
+            callBuilder.addCalledE164Numbers(getPhoneNumbers(getChildElement(calledElement, ELEMENT_NUMBER), "e164"));
             getOriginatorReferences(callElement).forEach(callBuilder::addOriginatorReference);
             getChildElementISO8601(callElement, ATTRIBUTE_START_TIME, description, parseErrors).ifPresent(callBuilder::setStartTime);
             getChildElementLong(callElement, ATTRIBUTE_DURATION, description, parseErrors).map(Duration::ofMillis).ifPresent(callBuilder::setDuration);
@@ -615,7 +619,10 @@ public final class TinderPacketUtil {
             final List<Element> participantElements = participantsElement.elements("participant");
             for (final Element participantElement : participantElements) {
                 final Participant.Builder participantBuilder = Participant.Builder.start();
-                getStringAttribute(participantElement, "jid", true, description, parseErrors).ifPresent(participantBuilder::setJID);
+                getStringAttribute(participantElement, "jid", false, description, parseErrors).ifPresent(participantBuilder::setJID);
+                getStringAttribute(participantElement, "number", false, description, parseErrors).flatMap(PhoneNumber::from).ifPresent(participantBuilder::setNumber);
+                participantBuilder.addE164Numbers(getPhoneNumbers(participantElement, "e164Number"));
+                getStringAttribute(participantElement, "destination", false, description, parseErrors).flatMap(PhoneNumber::from).ifPresent(participantBuilder::setDestinationNumber);
                 ParticipantType.from(getNullableStringAttribute(participantElement, "type")).ifPresent(participantBuilder::setType);
                 CallDirection.from(getNullableStringAttribute(participantElement, ATTRIBUTE_DIRECTION)).ifPresent(participantBuilder::setDirection);
                 final Optional<Instant> participantTimestamp = getJavaUtilDateAttribute(participantElement, ATTRIBUTE_TIMESTAMP, description, parseErrors);

@@ -3,9 +3,9 @@ package com.bt.openlink.smack.iq;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.Assert.assertThat;
+import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
 import static org.xmlunit.matchers.CompareMatcher.isIdenticalTo;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.provider.ProviderManager;
 import org.jivesoftware.smack.util.PacketParserUtils;
@@ -83,7 +83,7 @@ public class GetInterestResultTest {
         assertThat(result.getFrom(), is(Fixtures.FROM_JID));
         assertThat(result.getType(), is(IQ.Type.result));
         final Interest interest = result.getInterest().get();
-        assertThat(EqualsBuilder.reflectionEquals(CoreFixtures.INTEREST, interest, false, null, true), is(true));
+        assertReflectionEquals(CoreFixtures.INTEREST, interest);
     }
 
     @Test

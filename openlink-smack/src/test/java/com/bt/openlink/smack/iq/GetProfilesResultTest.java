@@ -4,11 +4,11 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.empty;
 import static org.junit.Assert.assertThat;
+import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
 import static org.xmlunit.matchers.CompareMatcher.isIdenticalTo;
 
 import java.util.List;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.provider.ProviderManager;
 import org.jivesoftware.smack.util.PacketParserUtils;
@@ -78,8 +78,8 @@ public class GetProfilesResultTest {
         assertThat(result.getType(), is(IQ.Type.result));
         final List<Profile> profiles = result.getProfiles();
 
-        assertThat(EqualsBuilder.reflectionEquals(CoreFixtures.PROFILE, profiles.get(0), false, null, true), is(true));
-        assertThat(EqualsBuilder.reflectionEquals(GetProfilesFixtures.PROFILE_2, profiles.get(1), false, null, true), is(true));
+        assertReflectionEquals(CoreFixtures.PROFILE, profiles.get(0));
+        assertReflectionEquals(GetProfilesFixtures.PROFILE_2, profiles.get(1));
 
         assertThat(profiles.size(), is(2));
 

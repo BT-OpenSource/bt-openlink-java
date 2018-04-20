@@ -3,11 +3,11 @@ package com.bt.openlink.tinder.iq;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.contains;
 import static org.junit.Assert.assertThat;
+import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
 import static org.xmlunit.matchers.CompareMatcher.isIdenticalTo;
 
 import java.util.List;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -105,10 +105,10 @@ public class GetFeaturesResultTest {
         assertThat(result.getProfileId().get(), is(CoreFixtures.PROFILE_ID));
         final List<Feature> features = result.getFeatures();
 
-        assertThat(EqualsBuilder.reflectionEquals(GetFeaturesFixtures.FEATURE_HANDSET_1, features.get(0), false, null, true), is(true));
-        assertThat(EqualsBuilder.reflectionEquals(GetFeaturesFixtures.FEATURE_HANDSET_2, features.get(1), false, null, true), is(true));
-        assertThat(EqualsBuilder.reflectionEquals(GetFeaturesFixtures.FEATURE_PRIVACY, features.get(2), false, null, true), is(true));
-        assertThat(EqualsBuilder.reflectionEquals(GetFeaturesFixtures.FEATURE_CALL_FORWARD, features.get(3), false, null, true), is(true));
+        assertReflectionEquals(GetFeaturesFixtures.FEATURE_HANDSET_1, features.get(0));
+        assertReflectionEquals(GetFeaturesFixtures.FEATURE_HANDSET_2, features.get(1));
+        assertReflectionEquals(GetFeaturesFixtures.FEATURE_PRIVACY, features.get(2));
+        assertReflectionEquals(GetFeaturesFixtures.FEATURE_CALL_FORWARD, features.get(3));
 
         assertThat(features.size(), is(4));
         assertThat(result.getParseErrors().size(), is(0));

@@ -109,7 +109,7 @@ public final class SmackPacketUtil {
     }
 
     @Nonnull
-    public static Optional<Long> getLongAttribute(@Nonnull final XmlPullParser parser, @Nonnull final String attributeName) {
+    private static Optional<Long> getLongAttribute(@Nonnull final XmlPullParser parser, @Nonnull final String attributeName) {
         final String attributeValue = parser.getAttributeValue("", attributeName);
         if (attributeValue == null || attributeValue.isEmpty()) {
             return Optional.empty();
@@ -193,6 +193,9 @@ public final class SmackPacketUtil {
             participants.forEach(participant -> {
                 xml.halfOpenElement(ELEMENT_PARTICIPANT);
                 participant.getJID().ifPresent(jid -> xml.attribute("jid", jid));
+                participant.getNumber().ifPresent(number -> xml.attribute("number", number.value()));
+                participant.getDestinationNumber().ifPresent(destination -> xml.attribute("destination", destination.value()));
+                xml.optAttribute("e164Number", joinList(participant.getE164Numbers()));
                 participant.getType().ifPresent(type -> xml.attribute("type", type.getId()));
                 participant.getDirection().ifPresent(direction -> xml.attribute(ATTRIBUTE_DIRECTION, direction.getLabel()));
                 participant.getStartTime().ifPresent(startTime -> {
@@ -212,8 +215,7 @@ public final class SmackPacketUtil {
         xml.openElement(ELEMENT_CALLED);
         xml.halfOpenElement(ELEMENT_NUMBER);
         call.getCalledDestination().ifPresent(destination -> xml.attribute("destination", destination.value()));
-        final String calledE164Numbers = String.join(",", call.getCalledE164Numbers().stream().map(PhoneNumber::value).collect(Collectors.toList()));
-        xml.attribute("e164", calledE164Numbers);
+        xml.optAttribute("e164", joinList(call.getCalledE164Numbers()));
         xml.rightAngleBracket();
         call.getCalledNumber().ifPresent(calledNumber -> xml.escape(calledNumber.value()));
         xml.closeElement(ELEMENT_NUMBER);
@@ -221,11 +223,19 @@ public final class SmackPacketUtil {
         xml.closeElement(ELEMENT_CALLED);
     }
 
+    @Nullable
+    private static String joinList(@Nonnull List<?> numbers) {
+        if( numbers.isEmpty()) {
+            return null;
+        } else {
+            return String.join(",", numbers.stream().map(Object::toString).collect(Collectors.toList()));
+        }
+    }
+
     private static void addCallerDetails(@Nonnull final IQChildElementXmlStringBuilder xml, @Nonnull final Call call) {
         xml.openElement(ELEMENT_CALLER);
         xml.halfOpenElement(ELEMENT_NUMBER);
-        final String callerE164Numbers = String.join(",", call.getCallerE164Numbers().stream().map(PhoneNumber::value).collect(Collectors.toList()));
-        xml.attribute("e164", callerE164Numbers);
+        xml.optAttribute("e164", joinList(call.getCallerE164Numbers()));
         xml.rightAngleBracket();
         call.getCallerNumber().ifPresent(callerNumber -> xml.escape(callerNumber.value()));
         xml.closeElement(ELEMENT_NUMBER);
@@ -429,7 +439,7 @@ public final class SmackPacketUtil {
     private static void addCalledDetailsToBuilder(final @Nonnull XmlPullParser parser, final Call.Builder callBuilder) throws XmlPullParserException, IOException {
         parser.nextTag();
         if (parser.getName().equals(ELEMENT_NUMBER)) {
-            callBuilder.addCalledE164Numbers(getPhoneNumbers(parser));
+            callBuilder.addCalledE164Numbers(getPhoneNumbers(parser, "e164"));
             SmackPacketUtil.getStringAttribute(parser, "destination")
                     .flatMap(PhoneNumber::from)
                     .ifPresent(callBuilder::setCalledDestination);
@@ -448,7 +458,7 @@ public final class SmackPacketUtil {
     private static void addCallerDetailsToBuilder(@Nonnull final XmlPullParser parser, @Nonnull final Call.Builder callBuilder) throws XmlPullParserException, IOException {
         parser.nextTag();
         if (parser.getName().equals(ELEMENT_NUMBER)) {
-            callBuilder.addCallerE164Numbers(getPhoneNumbers(parser));
+            callBuilder.addCallerE164Numbers(getPhoneNumbers(parser, "e164"));
             final String callerNumberString = parser.nextText();
             final Optional<PhoneNumber> callerNumberOptional = PhoneNumber.from(callerNumberString);
             callerNumberOptional.ifPresent(callBuilder::setCallerNumber);
@@ -515,8 +525,8 @@ public final class SmackPacketUtil {
         CallId.from(callIdString).ifPresent(callBuilder::setId);
     }
 
-    private static List<PhoneNumber> getPhoneNumbers(final XmlPullParser parser) {
-        final Optional<String> e164String = SmackPacketUtil.getStringAttribute(parser, "e164");
+    private static List<PhoneNumber> getPhoneNumbers(final XmlPullParser parser, String attributeName) {
+        final Optional<String> e164String = SmackPacketUtil.getStringAttribute(parser, attributeName);
         final List<PhoneNumber> phoneNumbers = new ArrayList<>();
         e164String.ifPresent(string -> Arrays.stream(string.split(",")).map(String::trim).map(PhoneNumber::from)
                 .filter(Optional::isPresent).map(Optional::get).forEach(phoneNumbers::add));
@@ -535,6 +545,9 @@ public final class SmackPacketUtil {
             while (parser.getName().equals(ELEMENT_PARTICIPANT)) {
                 final Participant.Builder participantBuilder = Participant.Builder.start();
                 SmackPacketUtil.getStringAttribute(parser, "jid").ifPresent(participantBuilder::setJID);
+                SmackPacketUtil.getStringAttribute(parser, "number").flatMap(PhoneNumber::from).ifPresent(participantBuilder::setNumber);
+                SmackPacketUtil.getStringAttribute(parser, "destination").flatMap(PhoneNumber::from).ifPresent(participantBuilder::setDestinationNumber);
+                participantBuilder.addE164Numbers(getPhoneNumbers(parser, "e164Number"));
                 SmackPacketUtil.getStringAttribute(parser, "type")
                         .flatMap(ParticipantType::from)
                         .ifPresent(participantBuilder::setType);
@@ -756,7 +769,7 @@ public final class SmackPacketUtil {
     }
 
     @Nonnull
-    public static Optional<Long> getElementTextLong(
+    private static Optional<Long> getElementTextLong(
             @Nonnull final String childElementName,
             @Nonnull final XmlPullParser parser,
             @Nonnull final String stanzaDescription,
@@ -772,7 +785,7 @@ public final class SmackPacketUtil {
     }
 
     @Nonnull
-    public static Optional<Boolean> getElementTextBoolean(
+    private static Optional<Boolean> getElementTextBoolean(
             @Nonnull final String childElementName,
             @Nonnull final XmlPullParser parser,
             @Nonnull final String description,

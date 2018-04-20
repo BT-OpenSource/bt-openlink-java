@@ -2,12 +2,12 @@ package com.bt.openlink.tinder.iq;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
 import static org.xmlunit.matchers.CompareMatcher.isIdenticalTo;
 
 import java.util.Optional;
 import java.util.TimeZone;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.hamcrest.CoreMatchers;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -106,7 +106,7 @@ public class PubSubPublishRequestTest {
         assertThat(request.getFrom(), CoreMatchers.is(Fixtures.FROM_JID));
         assertThat(request.getType(), is(IQ.Type.set));
         assertThat(request.getPubSubNodeId().get(), is(PubSubMessageFixtures.NODE_ID));
-        assertThat(EqualsBuilder.reflectionEquals(CoreFixtures.CALL_STATUS, request.getCallStatus().get(), false, null, true), is(true));
+        assertReflectionEquals(CoreFixtures.CALL_STATUS, request.getCallStatus().get());
         assertThat(request.getParseErrors().size(), is(0));
     }
 
@@ -157,7 +157,7 @@ public class PubSubPublishRequestTest {
         final PubSubPublishRequest request = (PubSubPublishRequest) OpenlinkIQParser.parse(Fixtures.iqFrom(PubSubPublishFixtures.PUBLISH_REQUEST_DEVICE_STATUS));
 
         final DeviceStatus deviceStatus = request.getDeviceStatus().get();
-        assertThat(EqualsBuilder.reflectionEquals(CoreFixtures.DEVICE_STATUS_LOGON, deviceStatus, false, null, true), is(true));
+        assertReflectionEquals(CoreFixtures.DEVICE_STATUS_LOGON, deviceStatus);
     }
 
 

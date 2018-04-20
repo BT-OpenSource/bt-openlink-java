@@ -133,6 +133,6 @@ public class CallStatusMessageTest {
 
         final CallStatusMessage message = (CallStatusMessage) OpenlinkMessageParser.parse(stanza);
 
-        assertThat(message.getParseErrors(), contains("Invalid participant; the legacy timestamp field does not match the start time field"));
+        assertThat(message.getParseErrors(), contains("Invalid participant; the legacy timestamp field does not match the start time field", "Invalid participant; the legacy timestamp field does not match the start time field"));
     }
 }

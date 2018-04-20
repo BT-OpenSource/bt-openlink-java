@@ -2,15 +2,14 @@ package com.bt.openlink.tinder.iq;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
 import static org.xmlunit.matchers.CompareMatcher.isIdenticalTo;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import com.bt.openlink.CoreFixtures;
-import com.bt.openlink.MakeCallFixtures;
 import com.bt.openlink.RequestActionFixtures;
 import com.bt.openlink.tinder.Fixtures;
 
@@ -64,7 +63,7 @@ public class RequestActionResultTest {
         assertThat(result.getID(), is(CoreFixtures.STANZA_ID));
         assertThat(result.getTo(), is(Fixtures.TO_JID));
         assertThat(result.getFrom(), is(Fixtures.FROM_JID));
-        assertThat(EqualsBuilder.reflectionEquals(CoreFixtures.CALL_STATUS, result.getCallStatus().get(), false, null, true), is(true));
+        assertReflectionEquals(CoreFixtures.CALL_STATUS, result.getCallStatus().get());
         assertThat(result.getParseErrors().size(), is(0));
     }
 

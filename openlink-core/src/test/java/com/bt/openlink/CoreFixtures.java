@@ -76,10 +76,19 @@ public class CoreFixtures {
     public static final String CALLED_NAME = "test-called-name";
     public static final PhoneNumber CALLED_DESTINATION = PhoneNumber.from("test-called-destination").get();
     public static final PhoneNumber CALLED_E164_NUMBER = PhoneNumber.from("test-called-e164-number").get();
-    public static final Participant PARTICIPANT = Participant.Builder.start()
+    public static final Participant LOCAL_PARTICIPANT = Participant.Builder.start()
             .setJID(USER_BARE_JID_STRING)
             .setType(ParticipantType.ACTIVE)
             .setDirection(CallDirection.INCOMING)
+            .setStartTime(START_TIME)
+            .setDuration(DURATION)
+            .build();
+    public static final Participant REMOTE_PARTICIPANT = Participant.Builder.start()
+            .setNumber(CALLED_NUMBER)
+            .setDestinationNumber(CALLED_DESTINATION)
+            .addE164Number(CALLED_E164_NUMBER)
+            .setType(ParticipantType.ACTIVE)
+            .setDirection(CallDirection.OUTGOING)
             .setStartTime(START_TIME)
             .setDuration(DURATION)
             .build();
@@ -137,7 +146,8 @@ public class CoreFixtures {
             .addFeature(CallFeatureBoolean.Builder.start().setId(FeatureId.from("priv_1").get()).setType(FeatureType.PRIVACY).setLabel("Privacy").setEnabled(false).build())
             .addFeature(CallFeatureDeviceKey.Builder.start().setId(FeatureId.from("NetrixHiTouch_sales1").get()).setType(FeatureType.DEVICE_KEYS).setLabel("NetrixHiTouch").setDeviceKey(DeviceKey.from("key_1:1:1").get()).build())
             .addFeature(SPEAKER_FEATURE)
-            .addParticipant(PARTICIPANT)
+            .addParticipant(LOCAL_PARTICIPANT)
+            .addParticipant(REMOTE_PARTICIPANT)
             .build();
     public static final CallStatus CALL_STATUS = CALL_INCOMING_ORIGINATED.toCallStatus();
     public static final Interest INTEREST = Interest.Builder.start()
@@ -210,6 +220,10 @@ public class CoreFixtures {
                     "    </features>\n" +
                     "    <participants>\n" +
                     "      <participant direction='Incoming' jid='test-user@test-domain' start='" + START_TIME_ISO_8601 + "' timestamp='" + JAVA_UTIL_DATE_FORMATTER.format(START_TIME.atZone(TimeZone.getTimeZone("UTC").toZoneId())) + "' duration='60000' type='Active'/>\n" +
+                    "      <participant direction='Outgoing' number='" + CALLED_NUMBER +"'"
+                    + " destination='" + CALLED_DESTINATION + "'"
+                    + " e164Number='" + CALLED_E164_NUMBER + "'"
+                    + " start='" + START_TIME_ISO_8601 + "' timestamp='" + JAVA_UTIL_DATE_FORMATTER.format(START_TIME.atZone(TimeZone.getTimeZone("UTC").toZoneId())) + "' duration='60000' type='Active'/>\n" +
                     "    </participants>\n" +
                     "  </call>\n" +
                     "</callstatus>\n";

@@ -53,7 +53,7 @@ public class CallTest {
                 .setDuration(duration)
                 .addAction(RequestAction.ANSWER_CALL)
                 .addFeature(CoreFixtures.CALL_FEATURE)
-                .addParticipant(CoreFixtures.PARTICIPANT)
+                .addParticipant(CoreFixtures.LOCAL_PARTICIPANT)
                 .build();
 
         assertThat(call.getId().get(), is(CoreFixtures.CALL_ID));
@@ -79,7 +79,7 @@ public class CallTest {
         assertThat(call.isParticipating().get(), is(false));
         assertThat(call.getActions(), contains(RequestAction.ANSWER_CALL));
         assertThat(call.getFeatures(), contains(CoreFixtures.CALL_FEATURE));
-        assertThat(call.getParticipants(), contains(CoreFixtures.PARTICIPANT));
+        assertThat(call.getParticipants(), contains(CoreFixtures.LOCAL_PARTICIPANT));
         assertThat(call.getActiveHandset(), is(Optional.empty()));
         assertThat(call.getActiveSpeakerChannel(), is(Optional.empty()));
         assertThat(call.isPrivate(), is(Optional.empty()));
