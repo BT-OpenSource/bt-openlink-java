@@ -11,7 +11,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public final class Participant implements Serializable {
-    private static final long serialVersionUID = 8143091859904009327L;
+    private static final long serialVersionUID = 4608389094208243328L;
     @Nullable private final String jid;
     @Nullable private final PhoneNumber number;
     @Nonnull private final List<PhoneNumber> e164Numbers;
