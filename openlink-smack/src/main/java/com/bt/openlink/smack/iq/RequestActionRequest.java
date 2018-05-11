@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+
 public class RequestActionRequest extends OpenlinkIQ {
 
     @Nullable private final InterestId interestId;
