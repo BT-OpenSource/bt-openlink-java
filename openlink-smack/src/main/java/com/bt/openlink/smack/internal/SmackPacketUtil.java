@@ -351,7 +351,8 @@ public final class SmackPacketUtil {
         final CallStatus.Builder builder = CallStatus.Builder.start();
         getBooleanAttribute(parser, "busy", description, errors).ifPresent(builder::setCallStatusBusy);
         parser.nextTag();
-        if (parser.getName().equals("call")) {
+
+        while(parser.getName().equals("call")) {
             final Call.Builder callBuilder = Call.Builder.start();
             final int callDepth = parser.getDepth();
             parser.nextTag();
@@ -416,7 +417,10 @@ public final class SmackPacketUtil {
                 parser.nextTag();
             } while (callDepth != parser.getDepth());
             builder.addCall(callBuilder.build(errors));
+
+            parser.nextTag();
         }
+
         return Optional.of(builder.build());
     }
 
