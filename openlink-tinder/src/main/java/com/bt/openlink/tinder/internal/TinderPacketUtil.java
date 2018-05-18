@@ -517,7 +517,7 @@ public final class TinderPacketUtil {
             getParticipants(callElement, callBuilder, description, parseErrors);
             builder.addCall(callBuilder.build(parseErrors));
         }
-        return Optional.of(builder.build());
+        return Optional.of(builder.build(parseErrors));
     }
 
     @SuppressWarnings("unchecked")
