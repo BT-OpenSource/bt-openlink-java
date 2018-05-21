@@ -53,6 +53,9 @@ public class RequestActionRequest extends OpenlinkIQ {
                 case OpenlinkXmppNamespace.TAG_INTEREST:
                     InterestId.from(parser.nextText()).ifPresent(builder::setInterestId);
                     break;
+                case "action":
+                    SmackPacketUtil.getElementTextString(parser).ifPresent(action -> builder.setAction(RequestAction.from(action).orElse(null)));
+                    break;
                 case "call":
                     SmackPacketUtil.getElementTextString(parser).ifPresent(callId -> builder.setCallId(CallId.from(callId).orElse(null)));
                     break;
