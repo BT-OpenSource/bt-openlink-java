@@ -1,5 +1,7 @@
 package com.bt.openlink.tinder.iq;
 
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.xmlunit.matchers.CompareMatcher.isIdenticalTo;
@@ -11,6 +13,8 @@ import com.bt.openlink.CoreFixtures;
 import com.bt.openlink.RequestActionFixtures;
 import com.bt.openlink.tinder.Fixtures;
 import com.bt.openlink.type.RequestAction;
+
+import java.util.Optional;
 
 @SuppressWarnings("ConstantConditions")
 public class RequestActionRequestTest {
@@ -73,4 +77,25 @@ public class RequestActionRequestTest {
         assertThat(request.getValue2().get(), is(RequestActionFixtures.REQUEST_ACTION_VALUE_2));
     }
 
+    @Test
+    public void willReturnParsingErrors() throws Exception {
+
+        final IQ iq = Fixtures.iqFrom(RequestActionFixtures.REQUEST_ACTION_REQUEST_WITH_BAD_VALUES);
+
+        final RequestActionRequest request = RequestActionRequest.from(iq);
+
+        assertThat(request.getID(), is(nullValue()));
+        assertThat(request.getTo(), is(nullValue()));
+        assertThat(request.getFrom(), is(nullValue()));
+        assertThat(request.getType(), is(IQ.Type.set));
+        assertThat(request.getAction(), is(Optional.empty()));
+        assertThat(request.getInterestId(), is(Optional.empty()));
+        assertThat(request.getParseErrors(), contains(
+                "Invalid stanza; missing 'to' attribute is mandatory",
+                "Invalid stanza; missing 'from' attribute is mandatory",
+                "Invalid stanza; missing 'id' attribute is mandatory",
+                "Invalid request-action stanza; missing 'interestId'",
+                "Invalid request-action stanza; missing or invalid 'requestAction'",
+                "Invalid request-action stanza; missing 'callId'"));
+    }
 }

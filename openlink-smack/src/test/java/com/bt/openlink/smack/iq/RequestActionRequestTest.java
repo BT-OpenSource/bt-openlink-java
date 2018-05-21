@@ -81,6 +81,7 @@ public class RequestActionRequestTest {
         assertThat(request.getTo(), is(Fixtures.TO_JID));
         assertThat(request.getFrom(), is(Fixtures.FROM_JID));
         assertThat(request.getType(), is(IQ.Type.set));
+        assertThat(request.getAction().get(), is(RequestAction.START_VOICE_DROP));
         assertThat(request.getCallId().get(), is(CoreFixtures.CALL_ID));
         assertThat(request.getInterestId().get(), is(CoreFixtures.INTEREST_ID));
         assertThat(request.getValue1().get(), is(RequestActionFixtures.REQUEST_ACTION_VALUE_1));
