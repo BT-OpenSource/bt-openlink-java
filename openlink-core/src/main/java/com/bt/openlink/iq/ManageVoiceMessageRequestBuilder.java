@@ -83,9 +83,10 @@ public class ManageVoiceMessageRequestBuilder<B extends ManageVoiceMessageReques
             if(label == null && action.requiresLabel()) {
                 errors.add(String.format("Invalid manage-voice-message stanza; The '%s' action requires a label", action));
             }
-        }
-        if (features.size() > 1 && !action.allowsMultipleFeatures()) {
-            errors.add((String.format("Invalid manage-voice-message stanza; Only one feature can be supplied with the '%s' action", action)));
+
+            if (features.size() > 1 && !action.allowsMultipleFeatures()) {
+                errors.add((String.format("Invalid manage-voice-message stanza; Only one feature can be supplied with the '%s' action", action)));
+            }
         }
     }
 
