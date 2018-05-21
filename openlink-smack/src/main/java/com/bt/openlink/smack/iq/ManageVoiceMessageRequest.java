@@ -37,7 +37,7 @@ public class ManageVoiceMessageRequest extends OpenlinkIQ {
 
     @Override
     protected IQChildElementXmlStringBuilder getIQChildElementBuilder(IQChildElementXmlStringBuilder xml) {
-        xml.attribute("action", "execute")
+        xml.attribute(OpenlinkXmppNamespace.TAG_ACTION, "execute")
                 .attribute("node", OpenlinkXmppNamespace.OPENLINK_MANAGE_VOICE_MESSAGE.uri())
                 .rightAngleBracket();
         xml.halfOpenElement(OpenlinkXmppNamespace.TAG_IODATA)
@@ -47,7 +47,7 @@ public class ManageVoiceMessageRequest extends OpenlinkIQ {
         xml.openElement(OpenlinkXmppNamespace.TAG_IN);
 
         xml.optElement("profile", profileId);
-        xml.optElement("action", Optional.ofNullable(action).map(ManageVoiceMessageAction::getId).orElse(null));
+        xml.optElement(OpenlinkXmppNamespace.TAG_ACTION, Optional.ofNullable(action).map(ManageVoiceMessageAction::getId).orElse(null));
         xml.optElement("label", label);
         if (!features.isEmpty()) {
             xml.openElement(OpenlinkXmppNamespace.TAG_FEATURES);
@@ -81,7 +81,7 @@ public class ManageVoiceMessageRequest extends OpenlinkIQ {
                 case OpenlinkXmppNamespace.TAG_PROFILE:
                     ProfileId.from(parser.nextText()).ifPresent(builder::setProfile);
                     break;
-                case "action":
+                case OpenlinkXmppNamespace.TAG_ACTION:
                     ManageVoiceMessageAction.from(parser.nextText()).ifPresent(builder::setAction);
                     break;
                 case "label":
@@ -111,13 +111,10 @@ public class ManageVoiceMessageRequest extends OpenlinkIQ {
         while (parser.getName().equals(OpenlinkXmppNamespace.TAG_FEATURE)) {
             parser.nextTag();
             while (parser.getDepth() > featureDepth) {
-                switch (parser.getName()) {
-                    case "id":
-                        FeatureId.from(parser.nextText()).ifPresent(builder::addFeature);
-                        break;
-                    default:
-                        parseErrors.add("Unrecognised feature element:" + parser.getName());
-                        break;
+                if (parser.getName().equals("id")) {
+                    FeatureId.from(parser.nextText()).ifPresent(builder::addFeature);
+                } else {
+                    parseErrors.add("Unrecognised feature element:" + parser.getName());
                 }
                 ParserUtils.forwardToEndTagOfDepth(parser, featureDepth + 1);
                 parser.nextTag();
@@ -151,17 +148,17 @@ public class ManageVoiceMessageRequest extends OpenlinkIQ {
 
     }
 
-    @Nullable
+    @Nonnull
     public Optional<ProfileId> getProfileId() {
         return Optional.ofNullable(profileId);
     }
 
-    @Nullable
+    @Nonnull
     public Optional<ManageVoiceMessageAction> getAction() {
         return Optional.ofNullable(action);
     }
 
-    @Nullable
+    @Nonnull
     public Optional<String> getLabel() {
         return Optional.ofNullable(label);
     }

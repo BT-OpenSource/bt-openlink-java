@@ -35,7 +35,7 @@ public class RequestActionRequest extends OpenlinkIQ {
         this.value2 = builder.getValue2().orElse(null);
         final Element inElement = TinderPacketUtil.addCommandIOInputElement(this, OpenlinkXmppNamespace.OPENLINK_REQUEST_ACTION);
         TinderPacketUtil.addElementWithTextIfNotNull(inElement, "interest", interestId);
-        getAction().ifPresent(requestAction->TinderPacketUtil.addElementWithTextIfNotNull(inElement, "action", requestAction.getId()));
+        getAction().ifPresent(requestAction->TinderPacketUtil.addElementWithTextIfNotNull(inElement, OpenlinkXmppNamespace.TAG_ACTION, requestAction.getId()));
         TinderPacketUtil.addElementWithTextIfNotNull(inElement, "call", callId);
         TinderPacketUtil.addElementWithTextIfNotNull(inElement, "value1", value1);
         TinderPacketUtil.addElementWithTextIfNotNull(inElement, "value2", value2);
@@ -47,7 +47,7 @@ public class RequestActionRequest extends OpenlinkIQ {
         final Element inElement = TinderPacketUtil.getIOInElement(iq);
         final Builder builder = Builder.start(iq);
         InterestId.from(TinderPacketUtil.getNullableChildElementString(inElement, "interest")).ifPresent(builder::setInterestId);
-        RequestAction.from(TinderPacketUtil.getNullableChildElementString(inElement, "action")).ifPresent(builder::setAction);
+        RequestAction.from(TinderPacketUtil.getNullableChildElementString(inElement, OpenlinkXmppNamespace.TAG_ACTION)).ifPresent(builder::setAction);
         CallId.from(TinderPacketUtil.getNullableChildElementString(inElement, "call")).ifPresent(builder::setCallId);
         RequestActionValue.from(TinderPacketUtil.getNullableChildElementString(inElement, "value1")).ifPresent(builder::setValue1);
         RequestActionValue.from(TinderPacketUtil.getNullableChildElementString(inElement, "value2")).ifPresent(builder::setValue2);
