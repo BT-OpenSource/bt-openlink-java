@@ -1,6 +1,7 @@
 package com.bt.openlink.smack.internal;
 
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneOffset;
@@ -18,8 +19,14 @@ import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.bt.openlink.type.DeviceStatus;
+import com.bt.openlink.type.ManageVoiceMessageAction;
+import com.bt.openlink.type.VoiceMessage;
+import com.bt.openlink.type.VoiceMessageFeature;
+import com.bt.openlink.type.VoiceMessageStatus;
 import org.jivesoftware.smack.packet.IQ.IQChildElementXmlStringBuilder;
 import org.jivesoftware.smack.util.ParserUtils;
+import org.jivesoftware.smack.util.XmlStringBuilder;
 import org.jxmpp.jid.Jid;
 import org.jxmpp.jid.impl.JidCreate;
 import org.jxmpp.stringprep.XmppStringprepException;
@@ -52,6 +59,7 @@ import com.bt.openlink.type.Site;
 import com.bt.openlink.type.TelephonyCallId;
 import com.bt.openlink.type.UserId;
 
+
 public final class SmackPacketUtil {
 
     private static final DateTimeFormatter JAVA_UTIL_DATE_FORMATTER = DateTimeFormatter.ofPattern("EEE MMM dd HH:mm:ss zzz yyyy");
@@ -68,18 +76,27 @@ public final class SmackPacketUtil {
     private static final String ELEMENT_NUMBER = "number";
     private static final String ELEMENT_CALLER = "caller";
     private static final String ELEMENT_CALLED = "called";
+    private static final String ELEMENT_PROFILE = "profile";
     private static final String ELEMENT_ORIGINATOR_REF = "originator-ref";
     private static final String ELEMENT_PROPERTY = "property";
     private static final String ELEMENT_ACTIONS = "actions";
     private static final String ELEMENT_PARTICIPANTS = "participants";
     private static final String ELEMENT_PARTICIPANT = "participant";
     private static final String ELEMENT_FEATURES = "features";
+    private static final String ELEMENT_FEATURE = "feature";
     private static final String ELEMENT_SPEAKERCHANNEL = "speakerchannel";
     private static final String ELEMENT_CHANNEL = "channel";
     private static final String ELEMENT_MICROPHONE = "microphone";
     private static final String ELEMENT_MUTE = "mute";
     private static final String ELEMENT_NAME = "name";
     private static final String ELEMENT_CALLSTATUS = "callstatus";
+    private static final String ELEMENT_DEVICESTATUS = "devicestatus";
+    private static final String ELEMENT_VOICE_MESSAGE = "voicemessage";
+    private static final String ELEMENT_STATUS = "status";
+    private static final String ELEMENT_ACTION = "action";
+    private static final String ELEMENT_MESSAGE_LENGTH = "msglen";
+    private static final String ELEMENT_CREATION_DATE = "creationdate";
+    public static final long NANOS_PER_SECOND = 1000_000_000L;
 
     private SmackPacketUtil() {
     }
@@ -157,10 +174,78 @@ public final class SmackPacketUtil {
         }
     }
 
+    public static void addDeviceStatus(@Nonnull IQChildElementXmlStringBuilder xml, @Nonnull final DeviceStatus deviceStatus) {
+        final XmlStringBuilder deviceStatusElement = xml.halfOpenElement(ELEMENT_DEVICESTATUS)
+                .attribute(ATTRIBUTE_XMLNS, OpenlinkXmppNamespace.OPENLINK_DEVICE_STATUS.uri());
+        xml.rightAngleBracket();
+
+        final XmlStringBuilder profileElement = deviceStatusElement.halfOpenElement(ELEMENT_PROFILE);
+        deviceStatus.isOnline().ifPresent(online -> profileElement.attribute("online", String.valueOf(online)));
+        deviceStatus.getDeviceId().ifPresent(deviceId -> profileElement.attribute("devicenum", String.valueOf(deviceId)));
+        deviceStatusElement.rightAngleBracket();
+        deviceStatus.getProfileId().ifPresent(profileId -> profileElement.escape(profileId.value()));
+
+        deviceStatusElement.closeElement(ELEMENT_PROFILE);
+
+        final List<VoiceMessageFeature> voiceMessageFeatures = deviceStatus.getFeatures();
+        if (!voiceMessageFeatures.isEmpty()) {
+            xml.openElement(ELEMENT_FEATURES);
+
+            for (VoiceMessageFeature voiceMessageFeature : voiceMessageFeatures) {
+                final XmlStringBuilder featureElement = xml.halfOpenElement(ELEMENT_FEATURE);
+                voiceMessageFeature.getId().ifPresent(featureId -> featureElement.attribute("id", featureId.value()));
+                featureElement.rightAngleBracket();
+
+                voiceMessageFeature.getVoiceMessage()
+                        .ifPresent(voiceMessage -> {
+                            addVoiceMessage(featureElement, voiceMessage);
+                        });
+
+                xml.closeElement(ELEMENT_FEATURE);
+            }
+
+            xml.closeElement(ELEMENT_FEATURES);
+        }
+
+        xml.closeElement(ELEMENT_DEVICESTATUS);
+    }
+
+    private static void addVoiceMessage(@Nonnull XmlStringBuilder featureElement, @Nonnull VoiceMessage voiceMessage) {
+        final XmlStringBuilder voiceMessageElement = featureElement.halfOpenElement(ELEMENT_VOICE_MESSAGE)
+                .attribute(ATTRIBUTE_XMLNS, OpenlinkXmppNamespace.OPENLINK_VOICE_MESSAGE.uri());
+        voiceMessageElement.rightAngleBracket();
+
+        voiceMessageElement.openElement(ATTRIBUTE_LABEL);
+        voiceMessage.getLabel().ifPresent(voiceMessageElement::escape);
+        voiceMessageElement.closeElement(ATTRIBUTE_LABEL);
+
+        voiceMessageElement.openElement(ELEMENT_STATUS);
+        voiceMessage.getStatus().ifPresent(voiceMessageStatus -> voiceMessageElement.escape(voiceMessageStatus.getLabel()));
+        voiceMessageElement.closeElement(ELEMENT_STATUS);
+
+        voiceMessageElement.openElement(ELEMENT_ACTION);
+        voiceMessage.getAction().ifPresent(action -> voiceMessageElement.escape(action.getId()));
+        voiceMessageElement.closeElement(ELEMENT_ACTION);
+
+        voiceMessageElement.openElement(ELEMENT_MESSAGE_LENGTH);
+        voiceMessage.getMsgLength().ifPresent(msgLength -> voiceMessageElement.escape(formatVoiceMessageLength(msgLength)));
+        voiceMessageElement.closeElement(ELEMENT_MESSAGE_LENGTH);
+
+        voiceMessageElement.openElement(ELEMENT_CREATION_DATE);
+        voiceMessage.getCreationDate().ifPresent(creationDate -> voiceMessageElement.escape(Timestamp.from(creationDate).toString()));
+        voiceMessageElement.closeElement(ELEMENT_CREATION_DATE);
+
+        voiceMessageElement.closeElement(ELEMENT_VOICE_MESSAGE);
+    }
+
+    private static String formatVoiceMessageLength(@Nonnull final Duration duration) {
+       return Float.toString(duration.toMillis() / 1000f);
+    }
+
     public static void addCallStatus(@Nonnull IQChildElementXmlStringBuilder xml, @Nonnull final CallStatus callStatus) {
         xml.halfOpenElement(ELEMENT_CALLSTATUS)
                 .attribute(ATTRIBUTE_XMLNS, "http://xmpp.org/protocol/openlink:01:00:00#call-status");
-        callStatus.isCallStatusBusy().ifPresent(callStatusBusy->xml.attribute("busy", String.valueOf(callStatusBusy)));
+        callStatus.isCallStatusBusy().ifPresent(callStatusBusy -> xml.attribute("busy", String.valueOf(callStatusBusy)));
         xml.rightAngleBracket();
         for (final Call call : callStatus.getCalls()) {
             xml.openElement("call");
@@ -229,7 +314,7 @@ public final class SmackPacketUtil {
 
     @Nullable
     private static String joinList(@Nonnull List<?> numbers) {
-        if( numbers.isEmpty()) {
+        if (numbers.isEmpty()) {
             return null;
         } else {
             return String.join(",", numbers.stream().map(Object::toString).collect(Collectors.toList()));
@@ -340,78 +425,201 @@ public final class SmackPacketUtil {
     }
 
     @SuppressWarnings("unchecked")
+    public static Optional<DeviceStatus> getDeviceStatus(
+            @Nonnull final XmlPullParser parser,
+            @Nonnull final List<String> errors) throws IOException, XmlPullParserException {
+
+        final DeviceStatus.Builder deviceStatusBuilder = DeviceStatus.Builder.start();
+
+        if (!parser.getName().equals(ELEMENT_DEVICESTATUS)) {
+            return Optional.empty();
+        }
+
+        getBooleanAttribute(parser, "online", "online", errors).ifPresent(deviceStatusBuilder::setOnline);
+        getStringAttribute(parser, "devicenum").ifPresent(deviceStatusBuilder::setDeviceId);
+
+        final int inDepth = parser.getDepth();
+        parser.nextTag();
+        while (parser.getDepth() > inDepth) {
+            switch (parser.getName()) {
+            case ELEMENT_PROFILE:
+
+                getElementTextString(parser).map(ProfileId::from)
+                        .orElse(Optional.empty())
+                        .ifPresent(deviceStatusBuilder::setProfileId);
+                break;
+
+            case ELEMENT_FEATURES:
+                addDeviceStatusFeaturesToBuilder(parser, deviceStatusBuilder);
+                break;
+            }
+            ParserUtils.forwardToEndTagOfDepth(parser, inDepth + 1);
+            parser.nextTag();
+        }
+        ;
+
+        return Optional.of(deviceStatusBuilder.build());
+    }
+
+    private static void addDeviceStatusFeaturesToBuilder(
+            @Nonnull final XmlPullParser parser,
+            @Nonnull final DeviceStatus.Builder deviceStatusBuilder) throws IOException, XmlPullParserException {
+
+        parser.nextTag();
+        while (parser.getName().equals(ELEMENT_FEATURE)) {
+            final VoiceMessageFeature.Builder voiceMessageFeatureBuilder = VoiceMessageFeature.Builder.start();
+
+            getStringAttribute(parser, "id")
+                    .flatMap(FeatureId::from)
+                    .ifPresent(voiceMessageFeatureBuilder::setId);
+
+            final int callDepth = parser.getDepth();
+            parser.nextTag();
+            do {
+                switch (parser.getName()) {
+                case ELEMENT_VOICE_MESSAGE:
+                    addVoiceMessagesToBuilder(parser, voiceMessageFeatureBuilder);
+                    break;
+                }
+
+                deviceStatusBuilder.addFeature(voiceMessageFeatureBuilder.build());
+            } while (callDepth != parser.getDepth());
+            parser.nextTag();
+        }
+    }
+
+    private static void addVoiceMessagesToBuilder(
+            @Nonnull final XmlPullParser parser,
+            @Nonnull final VoiceMessageFeature.Builder builder) throws IOException, XmlPullParserException {
+        while (parser.getName().equals(ELEMENT_VOICE_MESSAGE)) {
+            final int callDepth = parser.getDepth();
+            parser.nextTag();
+
+            final VoiceMessage.Builder voiceMessageBuilder = VoiceMessage.Builder.start();
+
+            do {
+                switch (parser.getName()) {
+                case ATTRIBUTE_LABEL:
+                    getElementTextString(parser)
+                            .ifPresent(voiceMessageBuilder::setLabel);
+                    break;
+                case ELEMENT_STATUS:
+                    getElementTextString(parser)
+                            .flatMap(VoiceMessageStatus::from)
+                            .ifPresent(voiceMessageBuilder::setStatus);
+                    break;
+                case ELEMENT_ACTION:
+                    getElementTextString(parser)
+                            .flatMap(ManageVoiceMessageAction::from)
+                            .ifPresent(voiceMessageBuilder::setAction);
+                    break;
+                case ELEMENT_MESSAGE_LENGTH:
+                    getElementTextString(parser)
+                            .flatMap(msgLength -> {
+                                try {
+                                    return Optional.of(Duration.ofMillis((long) (Float.parseFloat(msgLength) * 1000)));
+                                } catch (Exception e) {
+                                    return Optional.empty();
+                                }
+                            })
+                            .ifPresent(voiceMessageBuilder::setMsgLength);
+
+                    break;
+                case ELEMENT_CREATION_DATE:
+                    getElementTextString(parser)
+                            .flatMap(msgLength -> {
+                                try {
+                                    return Optional.of(Timestamp.valueOf(msgLength).toInstant());
+                                } catch (Exception e) {
+                                    return Optional.empty();
+                                }
+                            })
+                            .ifPresent(voiceMessageBuilder::setCreationDate);
+                    break;
+                }
+                ParserUtils.forwardToEndTagOfDepth(parser, callDepth + 1);
+                parser.nextTag();
+            } while (callDepth != parser.getDepth());
+
+            builder.setVoiceMessage(voiceMessageBuilder.build());
+
+            parser.nextTag();
+        }
+    }
+
+    @SuppressWarnings("unchecked")
     public static Optional<CallStatus> getCallStatus(
             @Nonnull final XmlPullParser parser,
             @Nonnull final String description,
             @Nonnull final List<String> errors)
             throws IOException, XmlPullParserException {
-        if(!parser.getName().equals(ELEMENT_CALLSTATUS)) {
+        if (!parser.getName().equals(ELEMENT_CALLSTATUS)) {
             return Optional.empty();
         }
         final CallStatus.Builder builder = CallStatus.Builder.start();
         getBooleanAttribute(parser, "busy", description, errors).ifPresent(builder::setCallStatusBusy);
         parser.nextTag();
 
-        while(parser.getName().equals("call")) {
+        while (parser.getName().equals("call")) {
             final Call.Builder callBuilder = Call.Builder.start();
             final int callDepth = parser.getDepth();
             parser.nextTag();
             do {
                 switch (parser.getName()) {
-                    case "id":
-                        addCallIdToBuilder(parser, callBuilder);
-                        break;
-                    case "conference":
-                        addConferenceIdToBuilder(parser, callBuilder);
-                        break;
-                    case "site":
-                        addSiteToBuilder(parser, errors, callBuilder, description);
-                        break;
-                    case "profile":
-                        addProfileIdToBuilder(parser, callBuilder);
-                        break;
-                    case "user":
-                        addUserToBuilder(parser, callBuilder);
-                        break;
-                    case "interest":
-                        addInterestToBuilder(parser, callBuilder);
-                        break;
-                    case "changed":
-                        addChangedToBuilder(parser, callBuilder);
-                        break;
-                    case "state":
-                        addCallStateToBuilder(parser, callBuilder);
-                        break;
-                    case ATTRIBUTE_DIRECTION:
-                        addDirectionToBuilder(parser, callBuilder);
-                        break;
-                    case ELEMENT_CALLER:
-                        addCallerDetailsToBuilder(parser, callBuilder);
-                        break;
-                    case ELEMENT_CALLED:
-                        addCalledDetailsToBuilder(parser, callBuilder);
-                        break;
-                    case ELEMENT_ORIGINATOR_REF:
-                        getOriginatorRefs(parser).forEach(callBuilder::addOriginatorReference);
-                        break;
-                    case ATTRIBUTE_START_TIME:
-                        getElementTestISO8601(ATTRIBUTE_START_TIME, parser, description, errors).ifPresent(callBuilder::setStartTime);
-                        break;
-                    case ATTRIBUTE_DURATION:
-                        getElementTextLong(ATTRIBUTE_DURATION, parser, description, errors).map(Duration::ofMillis).ifPresent(callBuilder::setDuration);
-                        break;
-                    case ELEMENT_ACTIONS:
-                        getActions(callBuilder, parser, errors);
-                        break;
-                    case ELEMENT_FEATURES:
-                        getFeatures(callBuilder, parser, description, errors);
-                        break;
-                    case ELEMENT_PARTICIPANTS:
-                        getParticipants(callBuilder, parser, description, errors);
-                        break;
-                    default:
-                        errors.add("Unrecognised tag: " + parser.getName());
-                        break;
+                case "id":
+                    addCallIdToBuilder(parser, callBuilder);
+                    break;
+                case "conference":
+                    addConferenceIdToBuilder(parser, callBuilder);
+                    break;
+                case "site":
+                    addSiteToBuilder(parser, errors, callBuilder, description);
+                    break;
+                case "profile":
+                    addProfileIdToBuilder(parser, callBuilder);
+                    break;
+                case "user":
+                    addUserToBuilder(parser, callBuilder);
+                    break;
+                case "interest":
+                    addInterestToBuilder(parser, callBuilder);
+                    break;
+                case "changed":
+                    addChangedToBuilder(parser, callBuilder);
+                    break;
+                case "state":
+                    addCallStateToBuilder(parser, callBuilder);
+                    break;
+                case ATTRIBUTE_DIRECTION:
+                    addDirectionToBuilder(parser, callBuilder);
+                    break;
+                case ELEMENT_CALLER:
+                    addCallerDetailsToBuilder(parser, callBuilder);
+                    break;
+                case ELEMENT_CALLED:
+                    addCalledDetailsToBuilder(parser, callBuilder);
+                    break;
+                case ELEMENT_ORIGINATOR_REF:
+                    getOriginatorRefs(parser).forEach(callBuilder::addOriginatorReference);
+                    break;
+                case ATTRIBUTE_START_TIME:
+                    getElementTestISO8601(ATTRIBUTE_START_TIME, parser, description, errors).ifPresent(callBuilder::setStartTime);
+                    break;
+                case ATTRIBUTE_DURATION:
+                    getElementTextLong(ATTRIBUTE_DURATION, parser, description, errors).map(Duration::ofMillis).ifPresent(callBuilder::setDuration);
+                    break;
+                case ELEMENT_ACTIONS:
+                    getActions(callBuilder, parser, errors);
+                    break;
+                case ELEMENT_FEATURES:
+                    getFeatures(callBuilder, parser, description, errors);
+                    break;
+                case ELEMENT_PARTICIPANTS:
+                    getParticipants(callBuilder, parser, description, errors);
+                    break;
+                default:
+                    errors.add("Unrecognised tag: " + parser.getName());
+                    break;
                 }
                 ParserUtils.forwardToEndTagOfDepth(parser, callDepth + 1);
                 parser.nextTag();
@@ -805,7 +1013,7 @@ public final class SmackPacketUtil {
     @Nonnull
     public static Optional<String> getElementTextString(@Nonnull final XmlPullParser parser) throws IOException, XmlPullParserException {
         final String value = parser.nextText();
-        if(value==null || value.isEmpty()) {
+        if (value == null || value.isEmpty()) {
             return Optional.empty();
         } else {
             return Optional.of(value);
