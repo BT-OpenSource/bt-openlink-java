@@ -1,6 +1,8 @@
 package com.bt.openlink.type;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -12,11 +14,13 @@ public final class DeviceStatus implements Serializable {
     @Nullable private final Boolean online;
     @Nullable private final ProfileId profileId;
     @Nullable private final String deviceId;
+    @Nonnull private List<VoiceMessageFeature> features;
 
     private DeviceStatus(@Nonnull final Builder builder) {
         this.online = builder.online;
         this.profileId = builder.profileId;
         this.deviceId = builder.deviceId;
+        this.features = Collections.unmodifiableList(builder.getFeatures());
     }
 
     @Nonnull
@@ -34,11 +38,17 @@ public final class DeviceStatus implements Serializable {
         return Optional.ofNullable(deviceId);
     }
 
+    @Nonnull
+    public List<VoiceMessageFeature> getFeatures() {
+        return features;
+    }
+
     public static final class Builder {
 
         @Nullable private Boolean online;
         @Nullable private ProfileId profileId;
         @Nullable private String deviceId;
+        @Nonnull private List<VoiceMessageFeature> features = new ArrayList<>();
 
         private Builder() {
         }
@@ -62,6 +72,17 @@ public final class DeviceStatus implements Serializable {
                 errors.add("Invalid device status; missing profile is mandatory");
             }
             return new DeviceStatus(this);
+        }
+
+        @Nonnull
+        public Builder addFeature(@Nonnull final VoiceMessageFeature feature) {
+            features.add(feature);
+            return this;
+        }
+
+        @Nonnull
+        public List<VoiceMessageFeature> getFeatures() {
+            return features;
         }
 
         public Builder setOnline(final boolean online) {

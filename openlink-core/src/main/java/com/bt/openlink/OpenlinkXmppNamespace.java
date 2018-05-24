@@ -21,6 +21,7 @@ public enum OpenlinkXmppNamespace {
     OPENLINK_REQUEST_ACTION("http://xmpp.org/protocol/openlink:01:00:00#request-action", "Request action"),
     OPENLINK_MAKE_INTERCOM_CALL("http://xmpp.org/protocol/openlink:01:00:00#make-intercom-call", "Make intercom call"),
     OPENLINK_MANAGE_VOICE_MESSAGE("http://xmpp.org/protocol/openlink:01:00:00#manage-voice-message", "Manage voice message"),
+    OPENLINK_VOICE_MESSAGE("http://xmpp.org/protocol/openlink:01:00:00/features#voice-message", "Voice message"),
     OPENLINK_MANAGE_VOICE_BLAST("http://xmpp.org/protocol/openlink:01:00:00#manage-voice-blast", "Manage voice blast"),
     OPENLINK_MANAGE_VOICE_BRIDGE("http://xmpp.org/protocol/openlink:01:00:00#manage-voice-bridge", "Manage voice bridge"),
     OPENLINK_MANAGE_INTERESTS("http://xmpp.org/protocol/openlink:01:00:00#manage-interests", "Manage interests"),
