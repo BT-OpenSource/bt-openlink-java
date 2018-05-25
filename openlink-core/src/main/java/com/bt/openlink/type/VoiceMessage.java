@@ -127,7 +127,7 @@ public class VoiceMessage implements Serializable {
                     if (creationDate == null) {
                         throw new IllegalStateException("The VoiceMessage creationDate has not been set");
                     }
-                } else if (action == ManageVoiceMessageAction.PLAYBACK) {
+                } else if (action == ManageVoiceMessageAction.PLAYBACK || action == ManageVoiceMessageAction.RECORD) {
                     if (extension == null) {
                         throw new IllegalStateException("The VoiceMessage extension has not been set");
                     }
@@ -152,7 +152,7 @@ public class VoiceMessage implements Serializable {
                     if (creationDate == null) {
                         errors.add("Invalid VoiceMessage; missing creationDate is mandatory");
                     }
-                } else if (action == ManageVoiceMessageAction.PLAYBACK) {
+                } else if (action == ManageVoiceMessageAction.PLAYBACK || action == ManageVoiceMessageAction.RECORD) {
                     if (extension == null) {
                         errors.add("Invalid VoiceMessage; missing creationDate is mandatory");
                     }

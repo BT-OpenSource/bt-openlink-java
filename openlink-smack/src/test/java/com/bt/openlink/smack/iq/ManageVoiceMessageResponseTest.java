@@ -84,6 +84,19 @@ public class ManageVoiceMessageResponseTest {
     }
 
     @Test
+    public void willGenerateAnXmppManageVoiceMessageRecordStanza() throws Exception {
+
+        final ManageVoiceMessageResponse result = ManageVoiceMessageResponse.Builder.start()
+                .setId(CoreFixtures.STANZA_ID)
+                .setTo(Fixtures.TO_JID)
+                .setFrom(Fixtures.FROM_JID)
+                .setDeviceStatus(ManageVoiceMessageFixtures.DEVICE_STATUS_RECORD)
+                .build();
+
+        assertThat(result.toXML().toString(), isIdenticalTo(ManageVoiceMessageFixtures.MANAGE_VOICE_MESSAGE_RECORD_RESULT).ignoreWhitespace());
+    }
+
+    @Test
     public void willEnsureTheStanzaHasADeviceStatus() throws Exception {
 
         expectedException.expect(IllegalStateException.class);
