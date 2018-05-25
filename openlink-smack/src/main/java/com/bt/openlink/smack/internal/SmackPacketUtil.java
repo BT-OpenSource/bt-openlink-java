@@ -59,7 +59,6 @@ import com.bt.openlink.type.Site;
 import com.bt.openlink.type.TelephonyCallId;
 import com.bt.openlink.type.UserId;
 
-
 public final class SmackPacketUtil {
 
     private static final DateTimeFormatter JAVA_UTIL_DATE_FORMATTER = DateTimeFormatter.ofPattern("EEE MMM dd HH:mm:ss zzz yyyy");
@@ -96,7 +95,9 @@ public final class SmackPacketUtil {
     private static final String ELEMENT_ACTION = "action";
     private static final String ELEMENT_MESSAGE_LENGTH = "msglen";
     private static final String ELEMENT_CREATION_DATE = "creationdate";
-    public static final long NANOS_PER_SECOND = 1000_000_000L;
+    private static final String ATTRIBUTE_ONLINE = "online";
+    private static final String ATTRIBUTE_ID = "id";
+    private static final String ELEMENT_EXTENSION = "exten";
 
     private SmackPacketUtil() {
     }
@@ -158,7 +159,7 @@ public final class SmackPacketUtil {
     public static Optional<Site> getSite(final XmlPullParser parser, final List<String> errors, final String description) throws IOException, XmlPullParserException {
         if (parser.getName().equals("site")) {
             final Site.Builder siteBuilder = Site.Builder.start();
-            final Optional<Long> siteId = SmackPacketUtil.getLongAttribute(parser, "id");
+            final Optional<Long> siteId = SmackPacketUtil.getLongAttribute(parser, ATTRIBUTE_ID);
             siteId.ifPresent(siteBuilder::setId);
             final Optional<Boolean> isDefaultSite = SmackPacketUtil.getBooleanAttribute(parser, OpenlinkXmppNamespace.TAG_DEFAULT, description, errors);
             isDefaultSite.ifPresent(siteBuilder::setDefault);
@@ -180,7 +181,7 @@ public final class SmackPacketUtil {
         xml.rightAngleBracket();
 
         final XmlStringBuilder profileElement = deviceStatusElement.halfOpenElement(ELEMENT_PROFILE);
-        deviceStatus.isOnline().ifPresent(online -> profileElement.attribute("online", String.valueOf(online)));
+        deviceStatus.isOnline().ifPresent(online -> profileElement.attribute(ATTRIBUTE_ONLINE, String.valueOf(online)));
         deviceStatus.getDeviceId().ifPresent(deviceId -> profileElement.attribute("devicenum", String.valueOf(deviceId)));
         deviceStatusElement.rightAngleBracket();
         deviceStatus.getProfileId().ifPresent(profileId -> profileElement.escape(profileId.value()));
@@ -193,13 +194,11 @@ public final class SmackPacketUtil {
 
             for (VoiceMessageFeature voiceMessageFeature : voiceMessageFeatures) {
                 final XmlStringBuilder featureElement = xml.halfOpenElement(ELEMENT_FEATURE);
-                voiceMessageFeature.getId().ifPresent(featureId -> featureElement.attribute("id", featureId.value()));
+                voiceMessageFeature.getId().ifPresent(featureId -> featureElement.attribute(ATTRIBUTE_ID, featureId.value()));
                 featureElement.rightAngleBracket();
 
                 voiceMessageFeature.getVoiceMessage()
-                        .ifPresent(voiceMessage -> {
-                            addVoiceMessage(featureElement, voiceMessage);
-                        });
+                        .ifPresent(voiceMessage -> addVoiceMessage(featureElement, voiceMessage));
 
                 xml.closeElement(ELEMENT_FEATURE);
             }
@@ -210,36 +209,24 @@ public final class SmackPacketUtil {
         xml.closeElement(ELEMENT_DEVICESTATUS);
     }
 
-    private static void addVoiceMessage(@Nonnull XmlStringBuilder featureElement, @Nonnull VoiceMessage voiceMessage) {
+    private static void addVoiceMessage(@Nonnull final XmlStringBuilder featureElement, @Nonnull final VoiceMessage voiceMessage) {
         final XmlStringBuilder voiceMessageElement = featureElement.halfOpenElement(ELEMENT_VOICE_MESSAGE)
                 .attribute(ATTRIBUTE_XMLNS, OpenlinkXmppNamespace.OPENLINK_VOICE_MESSAGE.uri());
         voiceMessageElement.rightAngleBracket();
 
-        voiceMessageElement.openElement(ATTRIBUTE_LABEL);
-        voiceMessage.getLabel().ifPresent(voiceMessageElement::escape);
-        voiceMessageElement.closeElement(ATTRIBUTE_LABEL);
+        voiceMessage.getLabel().ifPresent(label -> voiceMessageElement.element(ATTRIBUTE_LABEL, label));
+        voiceMessage.getStatus().ifPresent(voiceMessageStatus -> voiceMessageElement.element(ELEMENT_STATUS, voiceMessageStatus.getLabel()));
+        voiceMessage.getAction().ifPresent(action -> voiceMessageElement.element(ELEMENT_ACTION, action.getId()));
+        voiceMessage.getExtension().ifPresent(extension -> voiceMessageElement.element(ELEMENT_EXTENSION, extension.value()));
+        voiceMessage.getMsgLength().ifPresent(msgLength -> voiceMessageElement.element(ELEMENT_MESSAGE_LENGTH, formatVoiceMessageLength(msgLength)));
 
-        voiceMessageElement.openElement(ELEMENT_STATUS);
-        voiceMessage.getStatus().ifPresent(voiceMessageStatus -> voiceMessageElement.escape(voiceMessageStatus.getLabel()));
-        voiceMessageElement.closeElement(ELEMENT_STATUS);
-
-        voiceMessageElement.openElement(ELEMENT_ACTION);
-        voiceMessage.getAction().ifPresent(action -> voiceMessageElement.escape(action.getId()));
-        voiceMessageElement.closeElement(ELEMENT_ACTION);
-
-        voiceMessageElement.openElement(ELEMENT_MESSAGE_LENGTH);
-        voiceMessage.getMsgLength().ifPresent(msgLength -> voiceMessageElement.escape(formatVoiceMessageLength(msgLength)));
-        voiceMessageElement.closeElement(ELEMENT_MESSAGE_LENGTH);
-
-        voiceMessageElement.openElement(ELEMENT_CREATION_DATE);
-        voiceMessage.getCreationDate().ifPresent(creationDate -> voiceMessageElement.escape(Timestamp.from(creationDate).toString()));
-        voiceMessageElement.closeElement(ELEMENT_CREATION_DATE);
+        voiceMessage.getCreationDate().ifPresent(creationDate -> voiceMessageElement.element(ELEMENT_CREATION_DATE, Timestamp.from(creationDate).toString()));
 
         voiceMessageElement.closeElement(ELEMENT_VOICE_MESSAGE);
     }
 
     private static String formatVoiceMessageLength(@Nonnull final Duration duration) {
-       return Float.toString(duration.toMillis() / 1000f);
+        return Float.toString(duration.toMillis() / 1000f);
     }
 
     public static void addCallStatus(@Nonnull IQChildElementXmlStringBuilder xml, @Nonnull final CallStatus callStatus) {
@@ -249,14 +236,14 @@ public final class SmackPacketUtil {
         xml.rightAngleBracket();
         for (final Call call : callStatus.getCalls()) {
             xml.openElement("call");
-            xml.halfOpenElement("id");
+            xml.halfOpenElement(ATTRIBUTE_ID);
             call.getTelephonyCallId().ifPresent(telephonyCallId -> xml.attribute("telephony", telephonyCallId.value()));
             xml.rightAngleBracket();
             call.getId().ifPresent(id -> xml.escape(id.value()));
-            xml.closeElement("id");
+            xml.closeElement(ATTRIBUTE_ID);
             call.getConferenceId().ifPresent(conferenceId -> xml.element("conference", conferenceId.value()));
             call.getSite().ifPresent(site -> addSiteXML(xml, site));
-            call.getProfileId().ifPresent(profileId -> xml.element("profile", profileId.value()));
+            call.getProfileId().ifPresent(profileId -> xml.element(ELEMENT_PROFILE, profileId.value()));
             call.getUserId().ifPresent(userId -> xml.element("user", userId.value()));
             call.getInterestId().ifPresent(interestId -> xml.element("interest", interestId.value()));
             call.getChanged().ifPresent(changed -> xml.element("changed", changed.getId()));
@@ -336,7 +323,7 @@ public final class SmackPacketUtil {
         if (!originatorReferences.isEmpty()) {
             xml.openElement(ELEMENT_ORIGINATOR_REF);
             originatorReferences.forEach(originatorReference -> {
-                xml.halfOpenElement(ELEMENT_PROPERTY).attribute("id", originatorReference.getKey()).rightAngleBracket();
+                xml.halfOpenElement(ELEMENT_PROPERTY).attribute(ATTRIBUTE_ID, originatorReference.getKey()).rightAngleBracket();
                 xml.element("value", originatorReference.getValue());
                 xml.closeElement(ELEMENT_PROPERTY);
             });
@@ -358,7 +345,7 @@ public final class SmackPacketUtil {
 
     public static void addSiteXML(@Nonnull final IQChildElementXmlStringBuilder xml, @Nonnull final Site site) {
         xml.halfOpenElement("site");
-        site.getId().ifPresent(id -> xml.attribute("id", String.valueOf(id)));
+        site.getId().ifPresent(id -> xml.attribute(ATTRIBUTE_ID, String.valueOf(id)));
         site.isDefault().ifPresent(isDefault -> xml.attribute(OpenlinkXmppNamespace.TAG_DEFAULT, String.valueOf(isDefault)));
         site.getType().ifPresent(type -> xml.attribute("type", type.getLabel()));
         xml.rightAngleBracket();
@@ -372,7 +359,7 @@ public final class SmackPacketUtil {
             xml.openElement(ELEMENT_FEATURES);
             features.forEach(feature -> {
                 xml.halfOpenElement("feature");
-                feature.getId().ifPresent(id -> xml.attribute("id", id.value()));
+                feature.getId().ifPresent(id -> xml.attribute(ATTRIBUTE_ID, id.value()));
                 feature.getType().ifPresent(type -> xml.attribute("type", type.getId()));
                 if (feature instanceof CallFeatureBoolean) {
                     feature.getLabel().ifPresent(label -> xml.attribute(ATTRIBUTE_LABEL, label));
@@ -435,7 +422,7 @@ public final class SmackPacketUtil {
             return Optional.empty();
         }
 
-        getBooleanAttribute(parser, "online", "online", errors).ifPresent(deviceStatusBuilder::setOnline);
+        getBooleanAttribute(parser, ATTRIBUTE_ONLINE, ATTRIBUTE_ONLINE, errors).ifPresent(deviceStatusBuilder::setOnline);
         getStringAttribute(parser, "devicenum").ifPresent(deviceStatusBuilder::setDeviceId);
 
         final int inDepth = parser.getDepth();
@@ -450,26 +437,32 @@ public final class SmackPacketUtil {
                 break;
 
             case ELEMENT_FEATURES:
-                addDeviceStatusFeaturesToBuilder(parser, deviceStatusBuilder);
+                addDeviceStatusFeaturesToBuilder(parser, deviceStatusBuilder, errors);
+                break;
+            case ATTRIBUTE_ID:
+                //ignore
+                break;
+            default:
+                errors.add("Unrecognised tag: " + parser.getName());
                 break;
             }
+
             ParserUtils.forwardToEndTagOfDepth(parser, inDepth + 1);
             parser.nextTag();
         }
-        ;
-
         return Optional.of(deviceStatusBuilder.build());
     }
 
     private static void addDeviceStatusFeaturesToBuilder(
             @Nonnull final XmlPullParser parser,
-            @Nonnull final DeviceStatus.Builder deviceStatusBuilder) throws IOException, XmlPullParserException {
+            @Nonnull final DeviceStatus.Builder deviceStatusBuilder,
+            @Nonnull final List<String> errors) throws IOException, XmlPullParserException {
 
         parser.nextTag();
         while (parser.getName().equals(ELEMENT_FEATURE)) {
             final VoiceMessageFeature.Builder voiceMessageFeatureBuilder = VoiceMessageFeature.Builder.start();
 
-            getStringAttribute(parser, "id")
+            getStringAttribute(parser, ATTRIBUTE_ID)
                     .flatMap(FeatureId::from)
                     .ifPresent(voiceMessageFeatureBuilder::setId);
 
@@ -478,7 +471,10 @@ public final class SmackPacketUtil {
             do {
                 switch (parser.getName()) {
                 case ELEMENT_VOICE_MESSAGE:
-                    addVoiceMessagesToBuilder(parser, voiceMessageFeatureBuilder);
+                    addVoiceMessagesToBuilder(parser, voiceMessageFeatureBuilder, errors);
+                    break;
+                default:
+                    errors.add("Unrecognised tag: " + parser.getName());
                     break;
                 }
 
@@ -490,7 +486,8 @@ public final class SmackPacketUtil {
 
     private static void addVoiceMessagesToBuilder(
             @Nonnull final XmlPullParser parser,
-            @Nonnull final VoiceMessageFeature.Builder builder) throws IOException, XmlPullParserException {
+            @Nonnull final VoiceMessageFeature.Builder builder,
+            @Nonnull final List<String> errors) throws IOException, XmlPullParserException {
         while (parser.getName().equals(ELEMENT_VOICE_MESSAGE)) {
             final int callDepth = parser.getDepth();
             parser.nextTag();
@@ -536,6 +533,15 @@ public final class SmackPacketUtil {
                             })
                             .ifPresent(voiceMessageBuilder::setCreationDate);
                     break;
+                case ELEMENT_EXTENSION:
+                    getElementTextString(parser)
+                            .flatMap(PhoneNumber::from)
+                            .ifPresent(voiceMessageBuilder::setExtension);
+
+                    break;
+                default:
+                    errors.add("Unrecognised tag: " + parser.getName());
+                    break;
                 }
                 ParserUtils.forwardToEndTagOfDepth(parser, callDepth + 1);
                 parser.nextTag();
@@ -566,7 +572,7 @@ public final class SmackPacketUtil {
             parser.nextTag();
             do {
                 switch (parser.getName()) {
-                case "id":
+                case ATTRIBUTE_ID:
                     addCallIdToBuilder(parser, callBuilder);
                     break;
                 case "conference":
@@ -575,7 +581,7 @@ public final class SmackPacketUtil {
                 case "site":
                     addSiteToBuilder(parser, errors, callBuilder, description);
                     break;
-                case "profile":
+                case ELEMENT_PROFILE:
                     addProfileIdToBuilder(parser, callBuilder);
                     break;
                 case "user":
@@ -637,7 +643,7 @@ public final class SmackPacketUtil {
         parser.nextTag();
         while (parser.getName().equals(ELEMENT_PROPERTY)) {
             final int propertyDepth = parser.getDepth();
-            final String key = SmackPacketUtil.getStringAttribute(parser, "id").orElse("");
+            final String key = SmackPacketUtil.getStringAttribute(parser, ATTRIBUTE_ID).orElse("");
             parser.nextTag();
             final String value;
             if (parser.getName().equals("value")) {
@@ -847,7 +853,7 @@ public final class SmackPacketUtil {
             final int featuresDepth = parser.getDepth();
             parser.nextTag();
             while (OpenlinkXmppNamespace.TAG_FEATURE.equals(parser.getName())) {
-                final Optional<FeatureId> featureId = FeatureId.from(parser.getAttributeValue("", "id"));
+                final Optional<FeatureId> featureId = FeatureId.from(parser.getAttributeValue("", ATTRIBUTE_ID));
                 final Optional<String> featureTypeString = SmackPacketUtil.getStringAttribute(parser, "type");
                 final Optional<String> label = SmackPacketUtil.getStringAttribute(parser, OpenlinkXmppNamespace.TAG_LABEL);
                 String text = "";
