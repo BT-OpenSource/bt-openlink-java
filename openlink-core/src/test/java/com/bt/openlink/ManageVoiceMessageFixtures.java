@@ -98,6 +98,38 @@ public class ManageVoiceMessageFixtures {
             "    </command>\n" +
             "</iq>";
 
+    public static final String MANAGE_VOICE_MESSAGE_EDIT_RESULT = "<iq type=\"result\" id='" + CoreFixtures.STANZA_ID + "' to='" + CoreFixtures.TO_JID_STRING + "' from='" + CoreFixtures.FROM_JID_STRING + "'>\n" +
+            "  <command xmlns=\"http://jabber.org/protocol/commands\" node=\"http://xmpp.org/protocol/openlink:01:00:00#manage-voice-message\" status=\"completed\">\n" +
+            "    <iodata xmlns=\"urn:xmpp:tmp:io-data\" type=\"output\">\n" +
+            "      <out>\n" +
+            "        <devicestatus xmlns=\"http://xmpp.org/protocol/openlink:01:00:00#device-status\">\n" +
+            "          <profile>" + CoreFixtures.PROFILE_ID + "</profile>\n" +
+            "          <features>\n" +
+            "            <feature id=\"MK1047\">\n" +
+            "              <voicemessage xmlns=\"http://xmpp.org/protocol/openlink:01:00:00/features#voice-message\">\n" +
+            "                <status>ok</status>\n" +
+            "                <action>Edit</action>\n" +
+            "              </voicemessage>\n" +
+            "            </feature>\n" +
+            "          </features>\n" +
+            "        </devicestatus>\n" +
+            "      </out>\n" +
+            "    </iodata>\n" +
+            "  </command>\n" +
+            "</iq>";
+
+    public static final DeviceStatus DEVICE_STATUS_EDIT = DeviceStatus.Builder.start()
+            .setProfileId(CoreFixtures.PROFILE_ID)
+            .addFeature(VoiceMessageFeature.Builder.start()
+                    .setId(FeatureId.from("MK1047").get())
+                    .setVoiceMessage(VoiceMessage.Builder.start()
+                            .setStatus(VoiceMessageStatus.OK)
+                            .setAction(ManageVoiceMessageAction.EDIT)
+                            .build())
+                    .build()
+            )
+            .build();
+
     public static final DeviceStatus DEVICE_STATUS_PLAYBACK = DeviceStatus.Builder.start()
             .setProfileId(CoreFixtures.PROFILE_ID)
             .addFeature(VoiceMessageFeature.Builder.start()
