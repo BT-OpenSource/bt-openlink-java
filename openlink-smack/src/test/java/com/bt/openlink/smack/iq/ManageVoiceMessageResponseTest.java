@@ -71,6 +71,19 @@ public class ManageVoiceMessageResponseTest {
     }
 
     @Test
+    public void willGenerateAnXmppManageVoiceMessageEditStanza() throws Exception {
+
+        final ManageVoiceMessageResponse result = ManageVoiceMessageResponse.Builder.start()
+                .setId(CoreFixtures.STANZA_ID)
+                .setTo(Fixtures.TO_JID)
+                .setFrom(Fixtures.FROM_JID)
+                .setDeviceStatus(ManageVoiceMessageFixtures.DEVICE_STATUS_EDIT)
+                .build();
+
+        assertThat(result.toXML().toString(), isIdenticalTo(ManageVoiceMessageFixtures.MANAGE_VOICE_MESSAGE_EDIT_RESULT).ignoreWhitespace());
+    }
+
+    @Test
     public void willEnsureTheStanzaHasADeviceStatus() throws Exception {
 
         expectedException.expect(IllegalStateException.class);
@@ -102,6 +115,18 @@ public class ManageVoiceMessageResponseTest {
         assertThat(result.getTo(), is(Fixtures.TO_JID));
         assertThat(result.getFrom(), is(Fixtures.FROM_JID));
         assertReflectionEquals(ManageVoiceMessageFixtures.DEVICE_STATUS_PLAYBACK, result.getDeviceStatus().get());
+        assertThat(result.getParseErrors().size(), is(0));
+    }
+
+    @Test
+    public void willParseAManageVoiceMessageEditStanza() throws Exception {
+
+        final ManageVoiceMessageResponse result = PacketParserUtils.parseStanza(ManageVoiceMessageFixtures.MANAGE_VOICE_MESSAGE_EDIT_RESULT);
+
+        assertThat(result.getStanzaId(), is(CoreFixtures.STANZA_ID));
+        assertThat(result.getTo(), is(Fixtures.TO_JID));
+        assertThat(result.getFrom(), is(Fixtures.FROM_JID));
+        assertReflectionEquals(ManageVoiceMessageFixtures.DEVICE_STATUS_EDIT, result.getDeviceStatus().get());
         assertThat(result.getParseErrors().size(), is(0));
     }
 }
