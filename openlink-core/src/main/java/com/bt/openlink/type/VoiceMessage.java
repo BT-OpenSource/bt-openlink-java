@@ -17,6 +17,7 @@ public class VoiceMessage implements Serializable {
     @Nullable private final ManageVoiceMessageAction action;
     @Nullable private final Duration msgLength;
     @Nullable private final Instant creationDate;
+    @Nullable private final PhoneNumber extension;
 
     VoiceMessage(@Nonnull final Builder builder) {
         this.label = builder.label;
@@ -24,6 +25,7 @@ public class VoiceMessage implements Serializable {
         this.action = builder.action;
         this.msgLength = builder.msgLength;
         this.creationDate = builder.creationDate;
+        this.extension = builder.extension;
     }
 
     @Nonnull
@@ -39,6 +41,11 @@ public class VoiceMessage implements Serializable {
     @Nonnull
     public Optional<ManageVoiceMessageAction> getAction() {
         return Optional.ofNullable(action);
+    }
+
+    @Nonnull
+    public Optional<PhoneNumber> getExtension() {
+        return Optional.ofNullable(extension);
     }
 
     @Nonnull
@@ -65,6 +72,13 @@ public class VoiceMessage implements Serializable {
         @Nullable private ManageVoiceMessageAction action = null;
         @Nullable private Duration msgLength = null;
         @Nullable private Instant creationDate = null;
+        @Nullable private PhoneNumber extension = null;
+
+        @SuppressWarnings("unchecked")
+        public B setExtension(@Nullable final PhoneNumber extension) {
+            this.extension = extension;
+            return (B) this;
+        }
 
         @SuppressWarnings("unchecked")
         public B setCreationDate(@Nonnull final Instant creationDate) {
@@ -97,38 +111,52 @@ public class VoiceMessage implements Serializable {
         }
 
         protected void validate() {
-            if (label == null) {
-                throw new IllegalStateException("The VoiceMessage label has not been set");
-            }
             if (status == null) {
                 throw new IllegalStateException("The VoiceMessage status has not been set");
             }
             if (action == null) {
                 throw new IllegalStateException("The VoiceMessage action has not been set");
-            }
-            if (msgLength == null) {
-                throw new IllegalStateException("The VoiceMessage msgLength has not been set");
-            }
-            if (creationDate == null) {
-                throw new IllegalStateException("The VoiceMessage creationDate has not been set");
+            } else {
+                if (action == ManageVoiceMessageAction.QUERY) {
+                    if (label == null) {
+                        throw new IllegalStateException("The VoiceMessage label has not been set");
+                    }
+                    if (msgLength == null) {
+                        throw new IllegalStateException("The VoiceMessage msgLength has not been set");
+                    }
+                    if (creationDate == null) {
+                        throw new IllegalStateException("The VoiceMessage creationDate has not been set");
+                    }
+                } else if (action == ManageVoiceMessageAction.PLAYBACK) {
+                    if (extension == null) {
+                        throw new IllegalStateException("The VoiceMessage extension has not been set");
+                    }
+                }
             }
         }
 
         public void validate(final List<String> errors) {
-            if (label == null) {
-                errors.add("Invalid VoiceMessage; missing label is mandatory");
-            }
             if (status == null) {
                 errors.add("Invalid VoiceMessage; missing status is mandatory");
             }
             if (action == null) {
                 errors.add("Invalid VoiceMessage; missing action is mandatory");
-            }
-            if (msgLength == null) {
-                errors.add("Invalid VoiceMessage; missing msgLength is mandatory");
-            }
-            if (creationDate == null) {
-                errors.add("Invalid VoiceMessage; missing creationDate is mandatory");
+            } else {
+                if (label == null) {
+                    errors.add("Invalid VoiceMessage; missing label is mandatory");
+                }
+                if (action == ManageVoiceMessageAction.QUERY) {
+                    if (msgLength == null) {
+                        errors.add("Invalid VoiceMessage; missing msgLength is mandatory");
+                    }
+                    if (creationDate == null) {
+                        errors.add("Invalid VoiceMessage; missing creationDate is mandatory");
+                    }
+                } else if (action == ManageVoiceMessageAction.PLAYBACK) {
+                    if (extension == null) {
+                        errors.add("Invalid VoiceMessage; missing creationDate is mandatory");
+                    }
+                }
             }
         }
 
