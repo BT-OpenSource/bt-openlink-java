@@ -15,7 +15,6 @@ import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
 import com.bt.openlink.OpenlinkXmppNamespace;
-import com.bt.openlink.iq.GetFeaturesRequestBuilder;
 import com.bt.openlink.type.ProfileId;
 
 
