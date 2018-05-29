@@ -23,4 +23,9 @@ public class SetFeaturesFixtures {
                     "    </iodata>\n" +
                     "  </command>\n" +
                     "</iq>\n";
+
+    public static final String SET_FEATURES_RESULT =  "<iq type='result' id='" + CoreFixtures.STANZA_ID + "' to='" + CoreFixtures.TO_JID_STRING + "' from='" + CoreFixtures.FROM_JID_STRING + "'>\n" +
+            "<command xmlns=\"http://jabber.org/protocol/commands\" \n" +
+            "         node=\"http://xmpp.org/protocol/openlink:01:00:00#set-features\" status=\"completed\"/>\n" +
+            "</iq>";
 }
