@@ -1,13 +1,9 @@
 package com.bt.openlink.smack.iq;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.empty;
 import static org.junit.Assert.assertThat;
-import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
 import static org.xmlunit.matchers.CompareMatcher.isIdenticalTo;
-
-import java.util.List;
 
 import com.bt.openlink.SetFeaturesFixtures;
 import org.jivesoftware.smack.packet.IQ;
@@ -20,10 +16,8 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import com.bt.openlink.CoreFixtures;
-import com.bt.openlink.GetProfilesFixtures;
 import com.bt.openlink.OpenlinkXmppNamespace;
 import com.bt.openlink.smack.Fixtures;
-import com.bt.openlink.type.Profile;
 
 @SuppressWarnings({ "ConstantConditions" })
 public class SetFeaturesResultTest {

@@ -1,9 +1,7 @@
 package com.bt.openlink.smack.iq;
 
 import com.bt.openlink.OpenlinkXmppNamespace;
-import com.bt.openlink.iq.GetProfilesResultBuilder;
 import com.bt.openlink.iq.IQBuilder;
-import com.bt.openlink.smack.internal.SmackPacketUtil;
 import org.jivesoftware.smack.packet.IQ;
 import org.jxmpp.jid.Jid;
 import org.xmlpull.v1.XmlPullParser;
