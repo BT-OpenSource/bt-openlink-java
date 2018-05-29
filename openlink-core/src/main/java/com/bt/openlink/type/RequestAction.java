@@ -25,7 +25,7 @@ public enum RequestAction {
     PUBLIC_CALL("PublicCall", "Make a call public", 0),
     ADD_THIRD_PARTY("AddThirdParty", "Add a third party to a call, making it a conference if necessary", 1),
     REMOVE_THIRD_PARTY("RemoveThirdParty", "Remove a third party from a call", 1),
-    CONNECT_SPEAKER("ConnectSpeaker", "Put a call on a speaker channel", 1),
+    CONNECT_SPEAKER("ConnectSpeaker", "Put a call on a speaker channel", 0),
     DISCONNECT_SPEAKER("DisconnectSpeaker", "Remove a call from a speaker channel", 1);
 
     @Nonnull private final String id;
