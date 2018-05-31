@@ -19,8 +19,8 @@ public enum CallState {
     CALL_BUSY("CallBusy", false, false),
     CALL_HELD("CallHeld", false, false),
     CALL_HELD_ELSEWHERE("CallHeldElsewhere", false, false),
-    CALL_TRANSFERRING("CallTransferring", true, true),
-    CALL_TRANSFERRED("CallTransferred", true, true),
+    CALL_TRANSFERRING("CallTransferring", false, false),
+    CALL_TRANSFERRED("CallTransferred", false, false),
     /**
      * TransferCompleted is undocumented, currently only used by ITSCall, and should not be used. Eventually the only
      * use of it will be removed.
