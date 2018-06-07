@@ -8,6 +8,7 @@ import javax.annotation.Nullable;
 public enum ParticipantType {
 
     ACTIVE("Active"),
+    ALERTING("Alerting"),
     INACTIVE("Inactive");
 
     @Nonnull private final String id;
