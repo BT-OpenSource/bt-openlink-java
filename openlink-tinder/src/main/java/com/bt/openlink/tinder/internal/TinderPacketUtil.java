@@ -413,8 +413,8 @@ public final class TinderPacketUtil {
 
     private static void addActions(@Nonnull final Call call, @Nonnull final Element callElement) {
         final Collection<RequestAction> actions = call.getActions();
+        final Element actionsElement = callElement.addElement("actions");
         if (!actions.isEmpty()) {
-            final Element actionsElement = callElement.addElement("actions");
             actions.forEach(action -> actionsElement.addElement(action.getId()));
         }
     }
