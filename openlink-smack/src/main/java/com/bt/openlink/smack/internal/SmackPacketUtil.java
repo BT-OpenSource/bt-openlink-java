@@ -333,14 +333,14 @@ public final class SmackPacketUtil {
 
     private static void addActions(@Nonnull final IQChildElementXmlStringBuilder xml, @Nonnull final Call call) {
         final Collection<RequestAction> actions = call.getActions();
+        xml.openElement(ELEMENT_ACTIONS);
         if (!actions.isEmpty()) {
-            xml.openElement(ELEMENT_ACTIONS);
             actions.forEach(action -> {
                 xml.halfOpenElement(action.getId()).rightAngleBracket();
                 xml.closeElement(action.getId());
             });
-            xml.closeElement(ELEMENT_ACTIONS);
         }
+        xml.closeElement(ELEMENT_ACTIONS);
     }
 
     public static void addSiteXML(@Nonnull final IQChildElementXmlStringBuilder xml, @Nonnull final Site site) {
