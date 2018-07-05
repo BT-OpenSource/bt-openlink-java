@@ -20,6 +20,12 @@ import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.bt.openlink.type.CallFeatureVoiceRecorder;
+import com.bt.openlink.type.RecorderChannel;
+import com.bt.openlink.type.RecorderNumber;
+import com.bt.openlink.type.RecorderPort;
+import com.bt.openlink.type.RecorderType;
+import com.bt.openlink.type.VoiceRecorderInfo;
 import org.dom4j.Element;
 import org.xmpp.packet.IQ;
 import org.xmpp.packet.JID;
@@ -403,6 +409,17 @@ public final class TinderPacketUtil {
                     callFeatureSpeakerChannel.isMicrophoneActive().ifPresent(microphoneActive -> speakerChannelElement.addElement("microphone").setText(String.valueOf(microphoneActive)));
                     callFeatureSpeakerChannel.isMuteRequested().ifPresent(muteRequested -> speakerChannelElement.addElement("mute").setText(String.valueOf(muteRequested)));
                     featureLabel = Optional.empty();
+                } else if (feature instanceof CallFeatureVoiceRecorder) {
+                    final CallFeatureVoiceRecorder callFeatureVoiceRecorder = (CallFeatureVoiceRecorder) feature;
+                    final Element voiceRecorderElement = featureElement.addElement("voicerecorder", OpenlinkXmppNamespace.OPENLINK_VOICE_RECORDER.uri());
+                    callFeatureVoiceRecorder.getVoiceRecorderInfo()
+                            .ifPresent(voiceRecorderInfo -> {
+                                voiceRecorderInfo.getRecorderNumber().ifPresent(recorderChannel -> voiceRecorderElement.addElement("recnumber").setText(recorderChannel.value()));
+                                voiceRecorderInfo.getRecorderPort().ifPresent(recorderPort -> voiceRecorderElement.addElement("recport").setText(recorderPort.value()));
+                                voiceRecorderInfo.getRecorderChannel().ifPresent(recorderChannel -> voiceRecorderElement.addElement("recchan").setText(recorderChannel.value()));
+                                voiceRecorderInfo.getRecorderType().ifPresent(recorderType -> voiceRecorderElement.addElement("rectype").setText(recorderType.value()));
+                            });
+                    featureLabel = Optional.empty();
                 } else {
                     featureLabel = feature.getLabel();
                 }
@@ -426,9 +443,9 @@ public final class TinderPacketUtil {
             participants.forEach(participant -> {
                 final Element participantElement = participantsElement.addElement("participant");
                 participant.getJID().ifPresent(jid -> participantElement.addAttribute("jid", jid));
-                participant.getNumber().ifPresent(number->participantElement.addAttribute(ATTRIBUTE_NUMBER, number.value()));
+                participant.getNumber().ifPresent(number -> participantElement.addAttribute(ATTRIBUTE_NUMBER, number.value()));
                 addList(participantElement, participant.getE164Numbers(), "e164Number");
-                participant.getDestinationNumber().ifPresent(destination->participantElement.addAttribute(ATTRIBUTE_DESTINATION, destination.value()));
+                participant.getDestinationNumber().ifPresent(destination -> participantElement.addAttribute(ATTRIBUTE_DESTINATION, destination.value()));
                 participant.getType().ifPresent(type -> participantElement.addAttribute("type", type.getId()));
                 participant.getDirection().ifPresent(direction -> participantElement.addAttribute(ATTRIBUTE_DIRECTION, direction.getLabel()));
                 participant.getStartTime().ifPresent(startTime -> {
@@ -579,6 +596,22 @@ public final class TinderPacketUtil {
                         getChildElementBoolean(childElement, "microphone", description, parseErrors).ifPresent(speakerChannelBuilder::setMicrophoneActive);
                         getChildElementBoolean(childElement, "mute", description, parseErrors).ifPresent(speakerChannelBuilder::setMuteRequested);
                         callFeatureBuilder = speakerChannelBuilder;
+                        break;
+                    case "voicerecorder":
+                        final CallFeatureVoiceRecorder.Builder voiceRecorderBuilder = CallFeatureVoiceRecorder.Builder.start();
+                        final VoiceRecorderInfo.Builder voiceRecorderInfoBuilder = VoiceRecorderInfo.Builder.start();
+
+                        RecorderNumber.from(getNullableChildElementString(childElement, "recnumber"))
+                                .ifPresent(voiceRecorderInfoBuilder::setRecorderNumber);
+                        RecorderPort.from(getNullableChildElementString(childElement, "recport"))
+                                .ifPresent(voiceRecorderInfoBuilder::setRecorderPort);
+                        RecorderChannel.from(getNullableChildElementString(childElement, "recchan"))
+                                .ifPresent(voiceRecorderInfoBuilder::setRecorderChannel);
+                        RecorderType.from(getNullableChildElementString(childElement, "rectype"))
+                                .ifPresent(voiceRecorderInfoBuilder::setRecorderType);
+                        voiceRecorderBuilder.setVoiceRecorderInfo(voiceRecorderInfoBuilder.build(parseErrors));
+
+                        callFeatureBuilder = voiceRecorderBuilder;
                         break;
                     default:
                         // Assume it's a simple true/false call feature

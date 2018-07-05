@@ -14,6 +14,7 @@ import com.bt.openlink.type.CallFeature;
 import com.bt.openlink.type.CallFeatureBoolean;
 import com.bt.openlink.type.CallFeatureDeviceKey;
 import com.bt.openlink.type.CallFeatureSpeakerChannel;
+import com.bt.openlink.type.CallFeatureVoiceRecorder;
 import com.bt.openlink.type.CallId;
 import com.bt.openlink.type.CallState;
 import com.bt.openlink.type.CallStatus;
@@ -32,10 +33,15 @@ import com.bt.openlink.type.ParticipantType;
 import com.bt.openlink.type.PhoneNumber;
 import com.bt.openlink.type.Profile;
 import com.bt.openlink.type.ProfileId;
+import com.bt.openlink.type.RecorderChannel;
+import com.bt.openlink.type.RecorderNumber;
+import com.bt.openlink.type.RecorderPort;
+import com.bt.openlink.type.RecorderType;
 import com.bt.openlink.type.RequestAction;
 import com.bt.openlink.type.Site;
 import com.bt.openlink.type.TelephonyCallId;
 import com.bt.openlink.type.UserId;
+import com.bt.openlink.type.VoiceRecorderInfo;
 
 @SuppressWarnings("ConstantConditions")
 public class CoreFixtures {
@@ -118,7 +124,8 @@ public class CoreFixtures {
             .setMuteRequested(true)
             .build();
     public static final OriginatorReference ORIGINATOR_REFERENCE = new OriginatorReference("key1", "value1");
-    public static final Call CALL_INCOMING_ORIGINATED = Call.Builder.start()
+    public static final Call CALL_INCOMING_ORIGINATED = Call.Builder
+            .start()
             .setId(CALL_ID)
             .setTelephonyCallId(TELEPHONY_CALL_ID)
             .setConferenceId(CONFERENCE_ID)
@@ -144,8 +151,23 @@ public class CoreFixtures {
             .addFeature(CallFeatureBoolean.Builder.start().setId(FeatureId.from("hs_1").get()).setType(FeatureType.HANDSET).setLabel("Handset 1").setEnabled(false).build())
             .addFeature(CallFeatureBoolean.Builder.start().setId(FeatureId.from("hs_2").get()).setType(FeatureType.HANDSET).setLabel("Handset 2").setEnabled(false).build())
             .addFeature(CallFeatureBoolean.Builder.start().setId(FeatureId.from("priv_1").get()).setType(FeatureType.PRIVACY).setLabel("Privacy").setEnabled(false).build())
-            .addFeature(CallFeatureDeviceKey.Builder.start().setId(FeatureId.from("NetrixHiTouch_sales1").get()).setType(FeatureType.DEVICE_KEYS).setLabel("NetrixHiTouch").setDeviceKey(DeviceKey.from("key_1:1:1").get()).build())
+            .addFeature(
+                    CallFeatureDeviceKey.Builder.start().setId(FeatureId.from("NetrixHiTouch_sales1").get()).setType(FeatureType.DEVICE_KEYS).setLabel("NetrixHiTouch").setDeviceKey(DeviceKey.from("key_1:1:1").get())
+                            .build())
             .addFeature(SPEAKER_FEATURE)
+            .addFeature(CallFeatureVoiceRecorder.Builder.start()
+                    .setId(FeatureId.from("voicerecorder_1").get())
+                    .setLabel("Voice Recorder")
+                    .setType(FeatureType.VOICE_RECORDER)
+                    .setVoiceRecorderInfo(
+                            VoiceRecorderInfo.Builder.start()
+                                    .setRecorderNumber(RecorderNumber.from("011").get())
+                                    .setRecorderPort(RecorderPort.from("5").get())
+                                    .setRecorderChannel(RecorderChannel.from("2").get())
+                                    .setRecorderType(RecorderType.from("V").get())
+                                    .build()
+                    )
+                    .build())
             .addParticipant(LOCAL_PARTICIPANT)
             .addParticipant(REMOTE_PARTICIPANT)
             .build();
@@ -217,10 +239,19 @@ public class CoreFixtures {
                     "          <mute>true</mute>\n" +
                     "        </speakerchannel>\n" +
                     "      </feature>\n" +
+                    "      <feature id='voicerecorder_1' type='VoiceRecorder'>\n" +
+                    "           <voicerecorder xmlns='http://xmpp.org/protocol/openlink:01:00:00/features#voice-recorder'>\n" +
+                    "               <recnumber>011</recnumber>\n" +
+                    "               <recport>5</recport>\n" +
+                    "               <recchan>2</recchan>\n" +
+                    "               <rectype>V</rectype>\n" +
+                    "           </voicerecorder>\n" +
+                    "       </feature>\n" +
                     "    </features>\n" +
                     "    <participants>\n" +
-                    "      <participant direction='Incoming' jid='test-user@test-domain' start='" + START_TIME_ISO_8601 + "' timestamp='" + JAVA_UTIL_DATE_FORMATTER.format(START_TIME.atZone(TimeZone.getTimeZone("UTC").toZoneId())) + "' duration='60000' type='Active'/>\n" +
-                    "      <participant direction='Outgoing' number='" + CALLED_NUMBER +"'"
+                    "      <participant direction='Incoming' jid='test-user@test-domain' start='" + START_TIME_ISO_8601 + "' timestamp='"
+                    + JAVA_UTIL_DATE_FORMATTER.format(START_TIME.atZone(TimeZone.getTimeZone("UTC").toZoneId())) + "' duration='60000' type='Active'/>\n" +
+                    "      <participant direction='Outgoing' number='" + CALLED_NUMBER + "'"
                     + " destination='" + CALLED_DESTINATION + "'"
                     + " e164Number='" + CALLED_E164_NUMBER + "'"
                     + " start='" + START_TIME_ISO_8601 + "' timestamp='" + JAVA_UTIL_DATE_FORMATTER.format(START_TIME.atZone(TimeZone.getTimeZone("UTC").toZoneId())) + "' duration='60000' type='Active'/>\n" +
