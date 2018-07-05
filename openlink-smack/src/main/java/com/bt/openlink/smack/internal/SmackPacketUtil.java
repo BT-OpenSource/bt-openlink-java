@@ -19,11 +19,17 @@ import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.bt.openlink.type.CallFeatureVoiceRecorder;
 import com.bt.openlink.type.DeviceStatus;
 import com.bt.openlink.type.ManageVoiceMessageAction;
+import com.bt.openlink.type.RecorderChannel;
+import com.bt.openlink.type.RecorderNumber;
+import com.bt.openlink.type.RecorderPort;
+import com.bt.openlink.type.RecorderType;
 import com.bt.openlink.type.VoiceMessage;
 import com.bt.openlink.type.VoiceMessageFeature;
 import com.bt.openlink.type.VoiceMessageStatus;
+import com.bt.openlink.type.VoiceRecorderInfo;
 import org.jivesoftware.smack.packet.IQ.IQChildElementXmlStringBuilder;
 import org.jivesoftware.smack.util.ParserUtils;
 import org.jivesoftware.smack.util.XmlStringBuilder;
@@ -84,6 +90,7 @@ public final class SmackPacketUtil {
     private static final String ELEMENT_FEATURES = "features";
     private static final String ELEMENT_FEATURE = "feature";
     private static final String ELEMENT_SPEAKERCHANNEL = "speakerchannel";
+    private static final String ELEMENT_VOICERECORDER = "voicerecorder";
     private static final String ELEMENT_CHANNEL = "channel";
     private static final String ELEMENT_MICROPHONE = "microphone";
     private static final String ELEMENT_MUTE = "mute";
@@ -98,6 +105,10 @@ public final class SmackPacketUtil {
     private static final String ATTRIBUTE_ONLINE = "online";
     private static final String ATTRIBUTE_ID = "id";
     private static final String ELEMENT_EXTENSION = "exten";
+    private static final String ELEMENT_RECORDER_NUMBER = "recnumber";
+    private static final String ELEMENT_RECORDER_PORT = "recport";
+    private static final String ELEMENT_RECORDER_CHANNEL = "recchan";
+    private static final String ELEMENT_RECORDER_TYPE = "rectype";
 
     private SmackPacketUtil() {
     }
@@ -373,11 +384,7 @@ public final class SmackPacketUtil {
                     xml.halfOpenElement(ELEMENT_DEVICEKEYS);
                     xml.attribute(ATTRIBUTE_XMLNS, OpenlinkXmppNamespace.OPENLINK_DEVICE_KEY.uri());
                     xml.rightAngleBracket();
-                    callFeatureDeviceKey.getDeviceKey().ifPresent(deviceKey -> {
-                        xml.openElement("key");
-                        xml.escape(deviceKey.value());
-                        xml.closeElement("key");
-                    });
+                    callFeatureDeviceKey.getDeviceKey().ifPresent(deviceKey -> xml.element("key", deviceKey.value()));
                     xml.closeElement(ELEMENT_DEVICEKEYS);
                 } else if (feature instanceof CallFeatureSpeakerChannel) {
                     xml.rightAngleBracket();
@@ -385,22 +392,26 @@ public final class SmackPacketUtil {
                     xml.halfOpenElement(ELEMENT_SPEAKERCHANNEL);
                     xml.attribute(ATTRIBUTE_XMLNS, OpenlinkXmppNamespace.OPENLINK_SPEAKER_CHANNEL.uri());
                     xml.rightAngleBracket();
-                    callFeatureSpeakerChannel.getChannel().ifPresent(channel -> {
-                        xml.openElement(ELEMENT_CHANNEL);
-                        xml.escape(String.valueOf(channel));
-                        xml.closeElement(ELEMENT_CHANNEL);
-                    });
-                    callFeatureSpeakerChannel.isMicrophoneActive().ifPresent(microphone -> {
-                        xml.openElement(ELEMENT_MICROPHONE);
-                        xml.escape(String.valueOf(microphone));
-                        xml.closeElement(ELEMENT_MICROPHONE);
-                    });
-                    callFeatureSpeakerChannel.isMuteRequested().ifPresent(muteRequested -> {
-                        xml.openElement(ELEMENT_MUTE);
-                        xml.escape(String.valueOf(muteRequested));
-                        xml.closeElement(ELEMENT_MUTE);
-                    });
+                    callFeatureSpeakerChannel.getChannel().ifPresent(channel -> xml.element(ELEMENT_CHANNEL, String.valueOf(channel)));
+                    callFeatureSpeakerChannel.isMicrophoneActive().ifPresent(microphone -> xml.element(ELEMENT_MICROPHONE, String.valueOf(microphone)));
+                    callFeatureSpeakerChannel.isMuteRequested().ifPresent(muteRequested -> xml.element(ELEMENT_MUTE, String.valueOf(muteRequested)));
                     xml.closeElement(ELEMENT_SPEAKERCHANNEL);
+                } else if (feature instanceof CallFeatureVoiceRecorder) {
+                    xml.rightAngleBracket();
+                    final CallFeatureVoiceRecorder callFeatureVoiceRecorder = (CallFeatureVoiceRecorder) feature;
+                    xml.halfOpenElement(ELEMENT_VOICERECORDER);
+                    xml.attribute(ATTRIBUTE_XMLNS, OpenlinkXmppNamespace.OPENLINK_VOICE_RECORDER.uri());
+                    xml.rightAngleBracket();
+
+                    callFeatureVoiceRecorder.getVoiceRecorderInfo()
+                            .ifPresent(voiceRecorderInfo -> {
+                                voiceRecorderInfo.getRecorderNumber().ifPresent(recorderNumber -> xml.element(ELEMENT_RECORDER_NUMBER, recorderNumber.value()));
+                                voiceRecorderInfo.getRecorderPort().ifPresent(recorderPort -> xml.element(ELEMENT_RECORDER_PORT, recorderPort.value()));
+                                voiceRecorderInfo.getRecorderChannel().ifPresent(recorderChannel -> xml.element(ELEMENT_RECORDER_CHANNEL, recorderChannel.value()));
+                                voiceRecorderInfo.getRecorderType().ifPresent(recorderType -> xml.element(ELEMENT_RECORDER_TYPE, recorderType.value()));
+                            });
+
+                    xml.closeElement(ELEMENT_VOICERECORDER);
                 } else {
                     feature.getLabel().ifPresent(label -> xml.attribute(ATTRIBUTE_LABEL, label));
                     xml.rightAngleBracket();
@@ -890,11 +901,12 @@ public final class SmackPacketUtil {
             case ELEMENT_DEVICEKEYS:
                 callFeatureBuilder = getDeviceKeyFeatureBuilder(parser);
                 break;
-
             case ELEMENT_SPEAKERCHANNEL:
                 callFeatureBuilder = getSpeakerChannelFeatureBuilder(parser, description, parseErrors);
                 break;
-
+            case ELEMENT_VOICERECORDER:
+                callFeatureBuilder = getVoiceRecorderFeatureBuilder(parser, parseErrors);
+                break;
             default:
                 // Assume a simple true/false feature
                 callFeatureBuilder = getBooleanFeatureBuilder(text, description, parseErrors, parser.getName());
@@ -905,6 +917,41 @@ public final class SmackPacketUtil {
             callFeatureBuilder = getBooleanFeatureBuilder(text, description, parseErrors, parser.getName());
             parser.nextTag();
         }
+        return callFeatureBuilder;
+    }
+
+    private static CallFeature.AbstractCallFeatureBuilder getVoiceRecorderFeatureBuilder(
+            @Nonnull final XmlPullParser parser,
+            @Nonnull final List<String> parseErrors) throws XmlPullParserException, IOException {
+        CallFeature.AbstractCallFeatureBuilder callFeatureBuilder;
+        final CallFeatureVoiceRecorder.Builder voiceRecorderBuilder = CallFeatureVoiceRecorder.Builder.start();
+        final VoiceRecorderInfo.Builder voiceRecorderInfoBuilder = VoiceRecorderInfo.Builder.start();
+
+        final int featureDepth = parser.getDepth();
+        parser.nextTag();
+        while (parser.getDepth() > featureDepth) {
+            switch (parser.getName()) {
+            case ELEMENT_RECORDER_NUMBER:
+                getElementTextString(parser).flatMap(RecorderNumber::from).ifPresent(voiceRecorderInfoBuilder::setRecorderNumber);
+                break;
+            case ELEMENT_RECORDER_CHANNEL:
+                getElementTextString(parser).flatMap(RecorderChannel::from).ifPresent(voiceRecorderInfoBuilder::setRecorderChannel);
+                break;
+            case ELEMENT_RECORDER_PORT:
+                getElementTextString(parser).flatMap(RecorderPort::from).ifPresent(voiceRecorderInfoBuilder::setRecorderPort);
+                break;
+            case ELEMENT_RECORDER_TYPE:
+                getElementTextString(parser).flatMap(RecorderType::from).ifPresent(voiceRecorderInfoBuilder::setRecorderType);
+                break;
+            default:
+                parseErrors.add("Unrecognised element:" + parser.getName());
+                break;
+            }
+            ParserUtils.forwardToEndTagOfDepth(parser, featureDepth + 1);
+            parser.nextTag();
+        }
+        voiceRecorderBuilder.setVoiceRecorderInfo(voiceRecorderInfoBuilder.build());
+        callFeatureBuilder = voiceRecorderBuilder;
         return callFeatureBuilder;
     }
 
@@ -926,9 +973,10 @@ public final class SmackPacketUtil {
             @Nonnull final List<String> parseErrors)
             throws XmlPullParserException, IOException {
         final CallFeatureSpeakerChannel.Builder speakerChannelBuilder = CallFeatureSpeakerChannel.Builder.start();
-        final int featureDepth = parser.getDepth();
+        final int featureDepth = parser.getDepth() -1;
+        final int speakerChannelDepth = parser.getDepth();
         parser.nextTag();
-        while (parser.getDepth() > featureDepth) {
+        while (parser.getDepth() > speakerChannelDepth) {
             switch (parser.getName()) {
             case ELEMENT_CHANNEL:
                 getElementTextLong(ELEMENT_CHANNEL, parser, description, parseErrors).ifPresent(speakerChannelBuilder::setChannel);
@@ -943,9 +991,11 @@ public final class SmackPacketUtil {
                 parseErrors.add("Unrecognised element:" + parser.getName());
                 break;
             }
-            ParserUtils.forwardToEndTagOfDepth(parser, featureDepth + 1);
+            ParserUtils.forwardToEndTagOfDepth(parser, speakerChannelDepth + 1);
             parser.nextTag();
         }
+        ParserUtils.forwardToEndTagOfDepth(parser, featureDepth);
+        parser.nextTag();
         return speakerChannelBuilder;
     }
 
