@@ -14,6 +14,7 @@ import com.bt.openlink.type.CallFeature;
 import com.bt.openlink.type.CallFeatureBoolean;
 import com.bt.openlink.type.CallFeatureDeviceKey;
 import com.bt.openlink.type.CallFeatureSpeakerChannel;
+import com.bt.openlink.type.CallFeatureTextValue;
 import com.bt.openlink.type.CallFeatureVoiceRecorder;
 import com.bt.openlink.type.CallId;
 import com.bt.openlink.type.CallState;
@@ -155,6 +156,12 @@ public class CoreFixtures {
                     CallFeatureDeviceKey.Builder.start().setId(FeatureId.from("NetrixHiTouch_sales1").get()).setType(FeatureType.DEVICE_KEYS).setLabel("NetrixHiTouch").setDeviceKey(DeviceKey.from("key_1:1:1").get())
                             .build())
             .addFeature(SPEAKER_FEATURE)
+            .addFeature(CallFeatureTextValue.Builder.start()
+                    .setId(FeatureId.from("MK1021").get())
+                    .setValue("VoiceMessage")
+                    .setType(FeatureType.VOICE_MESSAGE)
+                    .setLabel("Voice Message")
+            .build())
             .addFeature(CallFeatureVoiceRecorder.Builder.start()
                     .setId(FeatureId.from("voicerecorder_1").get())
                     .setLabel("Voice Recorder")
@@ -239,6 +246,7 @@ public class CoreFixtures {
                     "          <mute>true</mute>\n" +
                     "        </speakerchannel>\n" +
                     "      </feature>\n" +
+                    "      <feature id=\"MK1021\" type='VoiceMessage' label='Voice Message'>VoiceMessage</feature>\n" +
                     "      <feature id='voicerecorder_1' type='VoiceRecorder'>\n" +
                     "           <voicerecorder xmlns='http://xmpp.org/protocol/openlink:01:00:00/features#voice-recorder'>\n" +
                     "               <recnumber>011</recnumber>\n" +
