@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.bt.openlink.type.CallFeatureTextValue;
 import com.bt.openlink.type.CallFeatureVoiceRecorder;
 import com.bt.openlink.type.RecorderChannel;
 import com.bt.openlink.type.RecorderNumber;
@@ -397,6 +398,10 @@ public final class TinderPacketUtil {
                     final CallFeatureBoolean callFeatureBoolean = (CallFeatureBoolean) feature;
                     callFeatureBoolean.isEnabled().ifPresent(enabled -> featureElement.setText(String.valueOf(enabled)));
                     featureLabel = feature.getLabel();
+                } else if (feature instanceof CallFeatureTextValue) {
+                    final CallFeatureTextValue callFeatureText = (CallFeatureTextValue) feature;
+                    callFeatureText.getValue().ifPresent(enabled -> featureElement.setText(String.valueOf(enabled)));
+                    featureLabel = feature.getLabel();
                 } else if (feature instanceof CallFeatureDeviceKey) {
                     final CallFeatureDeviceKey callFeatureDeviceKey = (CallFeatureDeviceKey) feature;
                     final Element deviceKeysElement = featureElement.addElement("devicekeys", OpenlinkXmppNamespace.OPENLINK_DEVICE_KEY.uri());
@@ -578,6 +583,7 @@ public final class TinderPacketUtil {
                 final Optional<FeatureId> featureId = FeatureId.from(featureElement.attributeValue("id"));
                 Optional<String> label = Optional.ofNullable(featureElement.attributeValue("label"));
                 final Optional<FeatureType> featureType = FeatureType.from(featureElement.attributeValue("type"));
+
                 final Iterator<Element> elementIterator = featureElement.elementIterator();
                 final boolean hasChildElement = elementIterator.hasNext();
                 final CallFeature.AbstractCallFeatureBuilder callFeatureBuilder;
@@ -614,6 +620,7 @@ public final class TinderPacketUtil {
                         callFeatureBuilder = voiceRecorderBuilder;
                         break;
                     default:
+
                         // Assume it's a simple true/false call feature
                         final CallFeatureBoolean.Builder booleanBuilder = CallFeatureBoolean.Builder.start();
                         getBoolean(featureElement.getText(), description, parseErrors).ifPresent(booleanBuilder::setEnabled);
@@ -621,10 +628,16 @@ public final class TinderPacketUtil {
                         break;
                     }
                 } else {
-                    // It's a simple true/false call feature
-                    final CallFeatureBoolean.Builder booleanBuilder = CallFeatureBoolean.Builder.start();
-                    getBoolean(featureElement.getText(), description, parseErrors).ifPresent(booleanBuilder::setEnabled);
-                    callFeatureBuilder = booleanBuilder;
+                    if (FeatureType.VOICE_MESSAGE.equals(featureType.orElse(null))) {
+                        final CallFeatureTextValue.Builder textValueBuilder = CallFeatureTextValue.Builder.start();
+                        textValueBuilder.setValue(featureElement.getText());
+                        callFeatureBuilder = textValueBuilder;
+                    } else {
+                        // It's a simple true/false call feature
+                        final CallFeatureBoolean.Builder booleanBuilder = CallFeatureBoolean.Builder.start();
+                        getBoolean(featureElement.getText(), description, parseErrors).ifPresent(booleanBuilder::setEnabled);
+                        callFeatureBuilder = booleanBuilder;
+                    }
                 }
                 featureId.ifPresent(callFeatureBuilder::setId);
                 label.ifPresent(callFeatureBuilder::setLabel);

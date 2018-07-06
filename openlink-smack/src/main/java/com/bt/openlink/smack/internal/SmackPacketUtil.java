@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.bt.openlink.type.CallFeatureTextValue;
 import com.bt.openlink.type.CallFeatureVoiceRecorder;
 import com.bt.openlink.type.DeviceStatus;
 import com.bt.openlink.type.ManageVoiceMessageAction;
@@ -377,6 +378,11 @@ public final class SmackPacketUtil {
                     xml.rightAngleBracket();
                     final CallFeatureBoolean callFeatureBoolean = (CallFeatureBoolean) feature;
                     callFeatureBoolean.isEnabled().ifPresent(enabled -> xml.escape(String.valueOf(enabled)));
+                } else if (feature instanceof CallFeatureTextValue) {
+                    feature.getLabel().ifPresent(label -> xml.attribute(ATTRIBUTE_LABEL, label));
+                    xml.rightAngleBracket();
+                    final CallFeatureTextValue callFeatureText = (CallFeatureTextValue) feature;
+                    callFeatureText.getValue().ifPresent(enabled -> xml.escape(String.valueOf(enabled)));
                 } else if (feature instanceof CallFeatureDeviceKey) {
                     feature.getLabel().ifPresent(label -> xml.attribute(ATTRIBUTE_LABEL, label));
                     xml.rightAngleBracket();
@@ -865,23 +871,25 @@ public final class SmackPacketUtil {
             parser.nextTag();
             while (OpenlinkXmppNamespace.TAG_FEATURE.equals(parser.getName())) {
                 final Optional<FeatureId> featureId = FeatureId.from(parser.getAttributeValue("", ATTRIBUTE_ID));
-                final Optional<String> featureTypeString = SmackPacketUtil.getStringAttribute(parser, "type");
+                final Optional<FeatureType> optFeatureType = SmackPacketUtil.getStringAttribute(parser, "type")
+                        .flatMap(featureType -> {
+                            final Optional<FeatureType> type = FeatureType.from(featureType);
+                            if (!type.isPresent()) {
+                                parseErrors.add("Invalid %s; invalid feature type - '%s'");
+                            }
+                            return type;
+                        });
+
                 final Optional<String> label = SmackPacketUtil.getStringAttribute(parser, OpenlinkXmppNamespace.TAG_LABEL);
                 String text = "";
                 while (parser.next() == XmlPullParser.TEXT) {
                     text = parser.getText();
                 }
-                final CallFeature.AbstractCallFeatureBuilder callFeatureBuilder = getCallFeatureBuilder(parser, description, parseErrors, text);
+                final CallFeature.AbstractCallFeatureBuilder callFeatureBuilder = getCallFeatureBuilder(parser, optFeatureType.orElse(null), description, parseErrors, text);
                 featureId.ifPresent(callFeatureBuilder::setId);
                 label.ifPresent(callFeatureBuilder::setLabel);
-                featureTypeString.ifPresent(featureType -> {
-                    final Optional<FeatureType> type = FeatureType.from(featureType);
-                    if (type.isPresent()) {
-                        callFeatureBuilder.setType(type.get());
-                    } else {
-                        parseErrors.add("Invalid %s; invalid feature type - '%s'");
-                    }
-                });
+                optFeatureType.ifPresent(callFeatureBuilder::setType);
+
                 callBuilder.addFeature(callFeatureBuilder.build(parseErrors));
             }
             ParserUtils.forwardToEndTagOfDepth(parser, featuresDepth);
@@ -891,6 +899,7 @@ public final class SmackPacketUtil {
     @Nonnull
     private static CallFeature.AbstractCallFeatureBuilder getCallFeatureBuilder(
             @Nonnull final XmlPullParser parser,
+            @Nullable FeatureType featureType,
             @Nonnull final String description,
             @Nonnull final List<String> parseErrors,
             @Nonnull final String text)
@@ -912,6 +921,9 @@ public final class SmackPacketUtil {
                 callFeatureBuilder = getBooleanFeatureBuilder(text, description, parseErrors, parser.getName());
                 break;
             }
+        } else if(FeatureType.VOICE_MESSAGE.equals(featureType)) {
+            callFeatureBuilder = getTextFeatureBuilder(text);
+            parser.nextTag();
         } else {
             // Assume a simple true/false feature
             callFeatureBuilder = getBooleanFeatureBuilder(text, description, parseErrors, parser.getName());
@@ -953,6 +965,14 @@ public final class SmackPacketUtil {
         voiceRecorderBuilder.setVoiceRecorderInfo(voiceRecorderInfoBuilder.build());
         callFeatureBuilder = voiceRecorderBuilder;
         return callFeatureBuilder;
+    }
+
+    @Nonnull
+    private static CallFeature.AbstractCallFeatureBuilder getTextFeatureBuilder(
+            @Nullable final String text) {
+        final CallFeatureTextValue.Builder textValueBuiler = CallFeatureTextValue.Builder.start();
+        textValueBuiler.setValue(text);
+        return textValueBuiler;
     }
 
     @Nonnull
