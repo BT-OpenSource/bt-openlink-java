@@ -405,7 +405,7 @@ public final class TinderPacketUtil {
                 } else if (feature instanceof CallFeatureDeviceKey) {
                     final CallFeatureDeviceKey callFeatureDeviceKey = (CallFeatureDeviceKey) feature;
                     final Element deviceKeysElement = featureElement.addElement("devicekeys", OpenlinkXmppNamespace.OPENLINK_DEVICE_KEY.uri());
-                    callFeatureDeviceKey.getDeviceKey().ifPresent(deviceKey -> deviceKeysElement.addElement("key").setText(deviceKey.value()));
+                    callFeatureDeviceKey.getDeviceKeys().forEach(deviceKey -> deviceKeysElement.addElement("key").setText(deviceKey.value()));
                     featureLabel = feature.getLabel();
                 } else if (feature instanceof CallFeatureSpeakerChannel) {
                     final CallFeatureSpeakerChannel callFeatureSpeakerChannel = (CallFeatureSpeakerChannel) feature;
@@ -593,7 +593,11 @@ public final class TinderPacketUtil {
                     switch (childElementName) {
                     case "devicekeys":
                         final CallFeatureDeviceKey.Builder deviceKeyBuilder = CallFeatureDeviceKey.Builder.start();
-                        DeviceKey.from(getNullableChildElementString(childElement, "key")).ifPresent(deviceKeyBuilder::setDeviceKey);
+                        final List<Element> keysElements = childElement.elements("key");
+                        for (Element keyElement : keysElements) {
+                            DeviceKey.from(Optional.ofNullable(keyElement.getText()).map(String::trim).orElse(null))
+                                    .ifPresent(deviceKeyBuilder::addDeviceKey);
+                        }
                         callFeatureBuilder = deviceKeyBuilder;
                         break;
                     case "speakerchannel":

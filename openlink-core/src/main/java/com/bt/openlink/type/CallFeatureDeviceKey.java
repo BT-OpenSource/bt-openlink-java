@@ -1,5 +1,7 @@
 package com.bt.openlink.type;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -8,21 +10,21 @@ import javax.annotation.Nullable;
 
 public class CallFeatureDeviceKey extends CallFeature {
     private static final long serialVersionUID = -1837276539059039203L;
-    @Nullable private final DeviceKey deviceKey;
+    @Nonnull private final List<DeviceKey> deviceKeys;
 
     protected CallFeatureDeviceKey(@Nonnull final Builder builder) {
         super(builder);
-        this.deviceKey = builder.getDeviceKey();
+        this.deviceKeys = Collections.unmodifiableList(builder.deviceKeys);
     }
 
     @Nonnull
-    public Optional<DeviceKey> getDeviceKey() {
-        return Optional.ofNullable(deviceKey);
+    public List<DeviceKey> getDeviceKeys() {
+        return deviceKeys;
     }
 
     public static final class Builder extends AbstractCallFeatureBuilder<Builder> {
 
-        @Nullable private DeviceKey deviceKey = null;
+        @Nonnull private final List<DeviceKey> deviceKeys = new ArrayList<>();
 
         private Builder() {
         }
@@ -44,31 +46,26 @@ public class CallFeatureDeviceKey extends CallFeature {
             return new CallFeatureDeviceKey(this);
         }
 
-        @Nullable
-        public DeviceKey getDeviceKey() {
-            return deviceKey;
-        }
-
         @Override
         protected void validate() {
             super.validate();
-            if (deviceKey == null) {
-                throw new IllegalStateException("The device key must be set");
+            if (deviceKeys.isEmpty()) {
+                throw new IllegalStateException("At least one device key must be set");
             }
         }
 
         @Override
         public void validate(final List<String> errors) {
             super.validate(errors);
-            if (deviceKey == null) {
+            if (deviceKeys.isEmpty()) {
                 errors.add("Invalid feature; the device key must be set");
             }
         }
 
         @SuppressWarnings("unchecked")
         @Nonnull
-        public Builder setDeviceKey(@Nonnull final DeviceKey deviceKey) {
-            this.deviceKey = deviceKey;
+        public Builder addDeviceKey(@Nonnull final DeviceKey deviceKey) {
+            this.deviceKeys.add(deviceKey);
             return this;
         }
     }

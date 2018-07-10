@@ -153,7 +153,7 @@ public class CoreFixtures {
             .addFeature(CallFeatureBoolean.Builder.start().setId(FeatureId.from("hs_2").get()).setType(FeatureType.HANDSET).setLabel("Handset 2").setEnabled(false).build())
             .addFeature(CallFeatureBoolean.Builder.start().setId(FeatureId.from("priv_1").get()).setType(FeatureType.PRIVACY).setLabel("Privacy").setEnabled(false).build())
             .addFeature(
-                    CallFeatureDeviceKey.Builder.start().setId(FeatureId.from("NetrixHiTouch_sales1").get()).setType(FeatureType.DEVICE_KEYS).setLabel("NetrixHiTouch").setDeviceKey(DeviceKey.from("key_1:1:1").get())
+                    CallFeatureDeviceKey.Builder.start().setId(FeatureId.from("NetrixHiTouch_sales1").get()).setType(FeatureType.DEVICE_KEYS).setLabel("NetrixHiTouch").addDeviceKey(DeviceKey.from("key_1:1:1").get())
                             .build())
             .addFeature(SPEAKER_FEATURE)
             .addFeature(CallFeatureTextValue.Builder.start()
