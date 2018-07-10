@@ -390,7 +390,7 @@ public final class SmackPacketUtil {
                     xml.halfOpenElement(ELEMENT_DEVICEKEYS);
                     xml.attribute(ATTRIBUTE_XMLNS, OpenlinkXmppNamespace.OPENLINK_DEVICE_KEY.uri());
                     xml.rightAngleBracket();
-                    callFeatureDeviceKey.getDeviceKey().ifPresent(deviceKey -> xml.element("key", deviceKey.value()));
+                    callFeatureDeviceKey.getDeviceKeys().forEach(deviceKey -> xml.element("key", deviceKey.value()));
                     xml.closeElement(ELEMENT_DEVICEKEYS);
                 } else if (feature instanceof CallFeatureSpeakerChannel) {
                     xml.rightAngleBracket();
@@ -1023,8 +1023,11 @@ public final class SmackPacketUtil {
     private static CallFeature.AbstractCallFeatureBuilder getDeviceKeyFeatureBuilder(@Nonnull final XmlPullParser parser) throws XmlPullParserException, IOException {
         final int featureDepth = parser.getDepth() - 1;
         final CallFeatureDeviceKey.Builder deviceKeyBuilder = CallFeatureDeviceKey.Builder.start();
-        if (parser.nextTag() == XmlPullParser.START_TAG && "key".equals(parser.getName())) {
-            DeviceKey.from(parser.nextText()).ifPresent(deviceKeyBuilder::setDeviceKey);
+        if (parser.nextTag() == XmlPullParser.START_TAG) {
+            while ("key".equalsIgnoreCase(parser.getName())) {
+                DeviceKey.from(parser.nextText()).ifPresent(deviceKeyBuilder::addDeviceKey);
+                parser.nextTag();
+            }
         }
         ParserUtils.forwardToEndTagOfDepth(parser, featureDepth);
         parser.nextTag();
