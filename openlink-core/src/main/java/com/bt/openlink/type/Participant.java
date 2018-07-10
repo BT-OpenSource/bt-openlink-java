@@ -17,6 +17,7 @@ public final class Participant implements Serializable {
     @Nonnull private final List<PhoneNumber> e164Numbers;
     @Nullable private final PhoneNumber destinationNumber;
     @Nullable private final ParticipantType participantType;
+    @Nullable private final ParticipantCategory participantCategory;
     @Nullable private final CallDirection direction;
     @SuppressWarnings("squid:S3437") @Nullable private final Instant startTime;
     @SuppressWarnings("squid:S3437") @Nullable private final Duration duration;
@@ -27,6 +28,7 @@ public final class Participant implements Serializable {
         this.e164Numbers = new ArrayList<>(builder.e164Numbers);
         this.destinationNumber = builder.destinationNumber;
         this.participantType = builder.participantType;
+        this.participantCategory = builder.participantCategory;
         this.direction = builder.direction;
         this.startTime = builder.startTime;
         this.duration = builder.duration;
@@ -35,6 +37,11 @@ public final class Participant implements Serializable {
     @Nonnull
     public Optional<String> getJID() {
         return Optional.ofNullable(jid);
+    }
+
+    @Nonnull
+    public Optional<ParticipantCategory> getParticipantCategory() {
+        return Optional.ofNullable(participantCategory);
     }
 
     @Nonnull
@@ -79,6 +86,7 @@ public final class Participant implements Serializable {
         @Nonnull private final List<PhoneNumber> e164Numbers = new ArrayList<>();
         @Nullable private PhoneNumber destinationNumber;
         @Nullable private ParticipantType participantType;
+        @Nullable private ParticipantCategory participantCategory;
         @Nullable private CallDirection direction;
         @Nullable private Instant startTime;
         @Nullable private Duration duration;
@@ -158,6 +166,11 @@ public final class Participant implements Serializable {
 
         public Builder setType(@Nonnull final ParticipantType participantType) {
             this.participantType = participantType;
+            return this;
+        }
+
+        public Builder setParticipantCategory(@Nonnull final ParticipantCategory participantCategory) {
+            this.participantCategory = participantCategory;
             return this;
         }
 
