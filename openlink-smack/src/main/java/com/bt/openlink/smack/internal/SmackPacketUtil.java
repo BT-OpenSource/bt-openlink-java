@@ -23,6 +23,7 @@ import com.bt.openlink.type.CallFeatureTextValue;
 import com.bt.openlink.type.CallFeatureVoiceRecorder;
 import com.bt.openlink.type.DeviceStatus;
 import com.bt.openlink.type.ManageVoiceMessageAction;
+import com.bt.openlink.type.ParticipantCategory;
 import com.bt.openlink.type.RecorderChannel;
 import com.bt.openlink.type.RecorderNumber;
 import com.bt.openlink.type.RecorderPort;
@@ -285,6 +286,7 @@ public final class SmackPacketUtil {
                 participant.getDestinationNumber().ifPresent(destination -> xml.attribute(ATTRIBUTE_DESTINATION, destination.value()));
                 xml.optAttribute("e164Number", joinList(participant.getE164Numbers()));
                 participant.getType().ifPresent(type -> xml.attribute("type", type.getId()));
+                participant.getParticipantCategory().ifPresent(category -> xml.attribute("category", category.getId()));
                 participant.getDirection().ifPresent(direction -> xml.attribute(ATTRIBUTE_DIRECTION, direction.getLabel()));
                 participant.getStartTime().ifPresent(startTime -> {
                     final ZonedDateTime startTimeInUTC = startTime.atZone(TimeZone.getTimeZone("UTC").toZoneId());
@@ -790,6 +792,9 @@ public final class SmackPacketUtil {
                 SmackPacketUtil.getStringAttribute(parser, "type")
                         .flatMap(ParticipantType::from)
                         .ifPresent(participantBuilder::setType);
+                SmackPacketUtil.getStringAttribute(parser, "category")
+                        .flatMap(ParticipantCategory::from)
+                        .ifPresent(participantBuilder::setParticipantCategory);
                 SmackPacketUtil.getStringAttribute(parser, ATTRIBUTE_DIRECTION)
                         .flatMap(CallDirection::from)
                         .ifPresent(participantBuilder::setDirection);

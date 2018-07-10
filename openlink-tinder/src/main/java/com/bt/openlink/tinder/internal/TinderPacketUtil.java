@@ -22,6 +22,7 @@ import javax.annotation.Nullable;
 
 import com.bt.openlink.type.CallFeatureTextValue;
 import com.bt.openlink.type.CallFeatureVoiceRecorder;
+import com.bt.openlink.type.ParticipantCategory;
 import com.bt.openlink.type.RecorderChannel;
 import com.bt.openlink.type.RecorderNumber;
 import com.bt.openlink.type.RecorderPort;
@@ -452,6 +453,7 @@ public final class TinderPacketUtil {
                 addList(participantElement, participant.getE164Numbers(), "e164Number");
                 participant.getDestinationNumber().ifPresent(destination -> participantElement.addAttribute(ATTRIBUTE_DESTINATION, destination.value()));
                 participant.getType().ifPresent(type -> participantElement.addAttribute("type", type.getId()));
+                participant.getParticipantCategory().ifPresent(category -> participantElement.addAttribute("category", category.getId()));
                 participant.getDirection().ifPresent(direction -> participantElement.addAttribute(ATTRIBUTE_DIRECTION, direction.getLabel()));
                 participant.getStartTime().ifPresent(startTime -> {
                     final ZonedDateTime startTimeInUTC = startTime.atZone(TimeZone.getTimeZone("UTC").toZoneId());
@@ -676,6 +678,7 @@ public final class TinderPacketUtil {
                 participantBuilder.addE164Numbers(getPhoneNumbers(participantElement, "e164Number"));
                 getStringAttribute(participantElement, ATTRIBUTE_DESTINATION, false, description, parseErrors).flatMap(PhoneNumber::from).ifPresent(participantBuilder::setDestinationNumber);
                 ParticipantType.from(getNullableStringAttribute(participantElement, "type")).ifPresent(participantBuilder::setType);
+                ParticipantCategory.from(getNullableStringAttribute(participantElement, "category")).ifPresent(participantBuilder::setParticipantCategory);
                 CallDirection.from(getNullableStringAttribute(participantElement, ATTRIBUTE_DIRECTION)).ifPresent(participantBuilder::setDirection);
                 final Optional<Instant> participantTimestamp = getJavaUtilDateAttribute(participantElement, ATTRIBUTE_TIMESTAMP, description, parseErrors);
                 participantTimestamp.ifPresent(participantBuilder::setStartTime);
