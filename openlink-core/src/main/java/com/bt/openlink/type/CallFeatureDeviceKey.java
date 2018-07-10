@@ -3,10 +3,8 @@ package com.bt.openlink.type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 public class CallFeatureDeviceKey extends CallFeature {
     private static final long serialVersionUID = -1837276539059039203L;
@@ -58,7 +56,7 @@ public class CallFeatureDeviceKey extends CallFeature {
         public void validate(final List<String> errors) {
             super.validate(errors);
             if (deviceKeys.isEmpty()) {
-                errors.add("Invalid feature; the device key must be set");
+                errors.add("Invalid feature; at least one device key must be set");
             }
         }
 
