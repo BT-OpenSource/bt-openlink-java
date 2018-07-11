@@ -254,6 +254,13 @@ public class Call implements Serializable {
         return CallStatus.Builder.start().addCall(this).build();
     }
 
+    @Nonnull
+    public CallStatus toCallStatus(final boolean callStatusBusy) {
+        return CallStatus.Builder.start()
+                .setCallStatusBusy(callStatusBusy)
+                .addCall(this).build();
+    }
+
     /**
      * Indicates if the call is public or private.
      *

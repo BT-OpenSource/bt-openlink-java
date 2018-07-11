@@ -67,14 +67,6 @@ public class CallStatus implements Serializable {
                 throw new IllegalStateException("Each call id must be unique - " + callId + " appears more than once");
             });
 
-            if (callStatusBusy == null) {
-                calls.forEach(call -> call.isParticipating().ifPresent(participating -> {
-                    if (callStatusBusy == null || participating) {
-                        callStatusBusy = participating;
-                    }
-                }));
-            }
-
             return new CallStatus(this);
         }
 

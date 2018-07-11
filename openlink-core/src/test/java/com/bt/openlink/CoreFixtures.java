@@ -178,7 +178,7 @@ public class CoreFixtures {
             .addParticipant(LOCAL_PARTICIPANT)
             .addParticipant(REMOTE_PARTICIPANT)
             .build();
-    public static final CallStatus CALL_STATUS = CALL_INCOMING_ORIGINATED.toCallStatus();
+    public static final CallStatus CALL_STATUS = CALL_INCOMING_ORIGINATED.toCallStatus(false);
     public static final Interest INTEREST = Interest.Builder.start()
             .setType(INTEREST_TYPE)
             .setDefault(true)
