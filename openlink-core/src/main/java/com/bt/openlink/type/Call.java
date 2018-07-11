@@ -187,8 +187,8 @@ public class Call implements Serializable {
     @Nonnull
     public Optional<FeatureId> getActiveHandset() {
         return getFeatures().stream()
-                .filter(feature -> feature instanceof CallFeatureBoolean)
-                .map(feature -> (CallFeatureBoolean) feature)
+                .filter(CallFeatureBoolean.class::isInstance)
+                .map(CallFeatureBoolean.class::cast)
                 .filter(feature -> {
                     final Optional<FeatureType> type = feature.getType();
                     return type.isPresent() && type.get() == FeatureType.HANDSET && feature.isEnabled().orElse(false);
@@ -206,8 +206,8 @@ public class Call implements Serializable {
     @Nonnull
     public Optional<FeatureId> getActiveHeadset() {
         return getFeatures().stream()
-                .filter(feature -> feature instanceof CallFeatureBoolean)
-                .map(feature -> (CallFeatureBoolean) feature)
+                .filter(CallFeatureBoolean.class::isInstance)
+                .map(CallFeatureBoolean.class::cast)
                 .filter(feature -> {
                     final Optional<FeatureType> type = feature.getType();
                     return type.isPresent() && type.get() == FeatureType.HEADSET && feature.isEnabled().orElse(false);
@@ -225,8 +225,8 @@ public class Call implements Serializable {
     @Nonnull
     public Optional<Long> getActiveSpeakerChannel() {
         return getFeatures().stream()
-                .filter(feature -> feature instanceof CallFeatureSpeakerChannel)
-                .map(feature -> (CallFeatureSpeakerChannel) feature)
+                .filter(CallFeatureSpeakerChannel.class::isInstance)
+                .map(CallFeatureSpeakerChannel.class::cast)
                 .findAny()
                 .flatMap(CallFeatureSpeakerChannel::getChannel);
     }
@@ -239,8 +239,8 @@ public class Call implements Serializable {
     @Nonnull
     public Optional<Boolean> isPrivate() {
         return getFeatures().stream()
-                .filter(feature -> feature instanceof CallFeatureBoolean)
-                .map(feature -> (CallFeatureBoolean) feature)
+                .filter(CallFeatureBoolean.class::isInstance)
+                .map(CallFeatureBoolean.class::cast)
                 .filter(feature -> {
                     final Optional<FeatureType> type = feature.getType();
                     return type.isPresent() && type.get() == FeatureType.PRIVACY && feature.isEnabled().isPresent();
