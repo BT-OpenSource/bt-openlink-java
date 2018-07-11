@@ -326,9 +326,6 @@ public class Call implements Serializable {
             if (site == null) {
                 throw new IllegalStateException("The call site has not been set");
             }
-            if (profileId == null) {
-                throw new IllegalStateException("The profile id has not been set");
-            }
             if (interestId == null) {
                 throw new IllegalStateException("The interest id has not been set");
             }
@@ -355,9 +352,6 @@ public class Call implements Serializable {
             }
             if (site == null) {
                 errors.add("Invalid call status; missing call site is mandatory");
-            }
-            if (profileId == null) {
-                errors.add("Invalid call status; missing profile id is mandatory");
             }
             if (interestId == null) {
                 errors.add("Invalid call status; missing interest id is mandatory");
