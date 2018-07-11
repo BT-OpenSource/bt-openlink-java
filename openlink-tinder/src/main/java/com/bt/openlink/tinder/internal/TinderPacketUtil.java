@@ -325,6 +325,7 @@ public final class TinderPacketUtil {
     public static void addCallStatus(@Nonnull final Element parentElement, @Nonnull final CallStatus callStatus) {
         final Element callStatusElement = parentElement.addElement("callstatus", OpenlinkXmppNamespace.OPENLINK_CALL_STATUS.uri());
         callStatus.isCallStatusBusy().ifPresent(callStatusBusy -> callStatusElement.addAttribute("busy", String.valueOf(callStatusBusy)));
+        callStatus.getCallForward().ifPresent(callForward -> callStatusElement.addAttribute("fwd", callForward.value()));
         callStatus.getCalls().forEach(call -> {
             final Element callElement = callStatusElement.addElement("call");
             final Element idElement = callElement.addElement("id");
@@ -511,6 +512,7 @@ public final class TinderPacketUtil {
 
         final CallStatus.Builder builder = CallStatus.Builder.start();
         TinderPacketUtil.getBooleanAttribute(callStatusElement, "busy", "callstatus busy attribute", parseErrors).ifPresent(builder::setCallStatusBusy);
+        TinderPacketUtil.getStringAttribute(callStatusElement, "fwd").flatMap(PhoneNumber::from).ifPresent(builder::setCallForward);
         final List<Element> callElements = callStatusElement.elements("call");
         for (final Element callElement : callElements) {
             final Element callerElement = getChildElement(callElement, "caller");
