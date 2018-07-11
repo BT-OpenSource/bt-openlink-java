@@ -13,16 +13,23 @@ import javax.annotation.Nullable;
 public class CallStatus implements Serializable {
     private static final long serialVersionUID = 1042623536248308079L;
     @Nullable private final Boolean callStatusBusy;
+    @Nullable private PhoneNumber callForward;
     @Nonnull private final List<Call> calls;
 
     public CallStatus(@Nonnull final Builder builder) {
         this.callStatusBusy = builder.callStatusBusy;
+        this.callForward = builder.callForward;
         this.calls = Collections.unmodifiableList(builder.calls);
     }
 
     @Nonnull
     public Optional<Boolean> isCallStatusBusy() {
         return Optional.ofNullable(callStatusBusy);
+    }
+
+    @Nonnull
+    public Optional<PhoneNumber> getCallForward() {
+        return Optional.ofNullable(callForward);
     }
 
     @Nonnull
@@ -33,10 +40,17 @@ public class CallStatus implements Serializable {
     public static class Builder {
 
         @Nullable private Boolean callStatusBusy;
+        @Nullable private PhoneNumber callForward;
         @Nonnull private final List<Call> calls = new ArrayList<>();
 
         public static Builder start() {
             return new Builder();
+        }
+
+        @Nonnull
+        public Builder setCallForward(final PhoneNumber callForward) {
+            this.callForward = callForward;
+            return this;
         }
 
         @Nonnull
@@ -66,14 +80,6 @@ public class CallStatus implements Serializable {
             validateUniqueness(callId -> {
                 throw new IllegalStateException("Each call id must be unique - " + callId + " appears more than once");
             });
-
-            if (callStatusBusy == null) {
-                calls.forEach(call -> call.isParticipating().ifPresent(participating -> {
-                    if (callStatusBusy == null || participating) {
-                        callStatusBusy = participating;
-                    }
-                }));
-            }
 
             return new CallStatus(this);
         }

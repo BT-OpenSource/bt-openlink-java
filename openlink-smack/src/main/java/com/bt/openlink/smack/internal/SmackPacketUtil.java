@@ -246,6 +246,7 @@ public final class SmackPacketUtil {
         xml.halfOpenElement(ELEMENT_CALLSTATUS)
                 .attribute(ATTRIBUTE_XMLNS, "http://xmpp.org/protocol/openlink:01:00:00#call-status");
         callStatus.isCallStatusBusy().ifPresent(callStatusBusy -> xml.attribute("busy", String.valueOf(callStatusBusy)));
+        callStatus.getCallForward().ifPresent(callForward -> xml.attribute("fwd", callForward.value()));
         xml.rightAngleBracket();
         for (final Call call : callStatus.getCalls()) {
             xml.openElement("call");
@@ -583,6 +584,7 @@ public final class SmackPacketUtil {
         }
         final CallStatus.Builder builder = CallStatus.Builder.start();
         getBooleanAttribute(parser, "busy", description, errors).ifPresent(builder::setCallStatusBusy);
+        getStringAttribute(parser, "fwd").flatMap(PhoneNumber::from).ifPresent(builder::setCallForward);
         parser.nextTag();
 
         while (parser.getName().equals("call")) {
