@@ -123,24 +123,6 @@ public class CallTest {
     }
 
     @Test
-    public void willNotCreateACallWithoutAProfileId() {
-
-        expectedException.expect(IllegalStateException.class);
-        expectedException.expectMessage("The profile id has not been set");
-
-        Call.Builder.start()
-                .setId(CoreFixtures.CALL_ID)
-                .setSite(CoreFixtures.SITE)
-                .setInterestId(CoreFixtures.INTEREST_ID)
-                .setState(CallState.CALL_ORIGINATED)
-                .setDirection(CallDirection.INCOMING)
-                .setStartTime(startTime)
-                .setDuration(duration)
-                .addAction(RequestAction.ANSWER_CALL)
-                .build();
-    }
-
-    @Test
     public void willNotCreateACallWithoutAnInterestId() {
 
         expectedException.expect(IllegalStateException.class);
@@ -267,7 +249,6 @@ public class CallTest {
         assertThat(errors, contains(
                 "Invalid call status; missing call id is mandatory",
                 "Invalid call status; missing call site is mandatory",
-                "Invalid call status; missing profile id is mandatory",
                 "Invalid call status; missing interest id is mandatory",
                 "Invalid call status; missing call state is mandatory",
                 "Invalid call status; missing call direction is mandatory",
