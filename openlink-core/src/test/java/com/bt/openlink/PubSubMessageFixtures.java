@@ -17,7 +17,7 @@ public class PubSubMessageFixtures {
                     "  <event xmlns='http://jabber.org/protocol/pubsub#event'>\n" +
                     "    <items node='" + NODE_ID + "'>\n" +
                     "      <item id='" + ITEM_ID + "'>\n" +
-                    CoreFixtures.CALL_STATUS_INCOMING_ORIGINATED +
+                    CoreFixtures.CALL_STATUS_OUTGOING_CONFERENCED +
                     "      </item>\n" +
                     "    </items>\n" +
                     "  </event>\n" +

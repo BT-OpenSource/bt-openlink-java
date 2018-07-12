@@ -111,6 +111,7 @@ public final class SmackPacketUtil {
     private static final String ELEMENT_RECORDER_PORT = "recport";
     private static final String ELEMENT_RECORDER_CHANNEL = "recchan";
     private static final String ELEMENT_RECORDER_TYPE = "rectype";
+    private static final String ATTRIBUTE_DEVICENUM = "devicenum";
 
     private SmackPacketUtil() {
     }
@@ -195,7 +196,7 @@ public final class SmackPacketUtil {
 
         final XmlStringBuilder profileElement = deviceStatusElement.halfOpenElement(ELEMENT_PROFILE);
         deviceStatus.isOnline().ifPresent(online -> profileElement.attribute(ATTRIBUTE_ONLINE, String.valueOf(online)));
-        deviceStatus.getDeviceId().ifPresent(deviceId -> profileElement.attribute("devicenum", String.valueOf(deviceId)));
+        deviceStatus.getDeviceId().ifPresent(deviceId -> profileElement.attribute(ATTRIBUTE_DEVICENUM, String.valueOf(deviceId)));
         deviceStatusElement.rightAngleBracket();
         deviceStatus.getProfileId().ifPresent(profileId -> profileElement.escape(profileId.value()));
 
@@ -257,7 +258,13 @@ public final class SmackPacketUtil {
             xml.closeElement(ATTRIBUTE_ID);
             call.getConferenceId().ifPresent(conferenceId -> xml.element("conference", conferenceId.value()));
             call.getSite().ifPresent(site -> addSiteXML(xml, site));
-            call.getProfileId().ifPresent(profileId -> xml.element(ELEMENT_PROFILE, profileId.value()));
+            call.getProfileId().ifPresent(profileId -> {
+                final XmlStringBuilder profileElement = xml.halfOpenElement(ELEMENT_PROFILE);
+                call.getDeviceId().ifPresent(deviceId -> profileElement.attribute(ATTRIBUTE_DEVICENUM, deviceId));
+                xml.rightAngleBracket();
+                profileElement.escape(profileId.value());
+                xml.closeElement(ELEMENT_PROFILE);
+            });
             call.getUserId().ifPresent(userId -> xml.element("user", userId.value()));
             call.getInterestId().ifPresent(interestId -> xml.element("interest", interestId.value()));
             call.getChanged().ifPresent(changed -> xml.element("changed", changed.getId()));
@@ -443,7 +450,7 @@ public final class SmackPacketUtil {
         }
 
         getBooleanAttribute(parser, ATTRIBUTE_ONLINE, ATTRIBUTE_ONLINE, errors).ifPresent(deviceStatusBuilder::setOnline);
-        getStringAttribute(parser, "devicenum").ifPresent(deviceStatusBuilder::setDeviceId);
+        getStringAttribute(parser, ATTRIBUTE_DEVICENUM).ifPresent(deviceStatusBuilder::setDeviceId);
 
         final int inDepth = parser.getDepth();
         parser.nextTag();
@@ -745,6 +752,8 @@ public final class SmackPacketUtil {
     }
 
     private static void addProfileIdToBuilder(@Nonnull final XmlPullParser parser, @Nonnull final Call.Builder callBuilder) throws XmlPullParserException, IOException {
+        getStringAttribute(parser, ATTRIBUTE_DEVICENUM).ifPresent(callBuilder::setDeviceId);
+
         final String profileIdString = parser.nextText();
         final Optional<ProfileId> profileIdOptional = ProfileId.from(profileIdString);
         profileIdOptional.ifPresent(callBuilder::setProfileId);
@@ -928,7 +937,7 @@ public final class SmackPacketUtil {
                 callFeatureBuilder = getBooleanFeatureBuilder(text, description, parseErrors, parser.getName());
                 break;
             }
-        } else if(FeatureType.VOICE_MESSAGE.equals(featureType)) {
+        } else if (FeatureType.VOICE_MESSAGE.equals(featureType)) {
             callFeatureBuilder = getTextFeatureBuilder(text);
             parser.nextTag();
         } else {
@@ -1000,7 +1009,7 @@ public final class SmackPacketUtil {
             @Nonnull final List<String> parseErrors)
             throws XmlPullParserException, IOException {
         final CallFeatureSpeakerChannel.Builder speakerChannelBuilder = CallFeatureSpeakerChannel.Builder.start();
-        final int featureDepth = parser.getDepth() -1;
+        final int featureDepth = parser.getDepth() - 1;
         final int speakerChannelDepth = parser.getDepth();
         parser.nextTag();
         while (parser.getDepth() > speakerChannelDepth) {

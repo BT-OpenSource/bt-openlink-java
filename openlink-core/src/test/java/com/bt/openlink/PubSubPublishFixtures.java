@@ -7,7 +7,7 @@ public class PubSubPublishFixtures {
                     "   <pubsub xmlns='http://jabber.org/protocol/pubsub'>\n" +
                     "    <publish node='" + CoreFixtures.INTEREST_ID + "'>\n" +
                     "      <item>\n" +
-                    CoreFixtures.CALL_STATUS_INCOMING_ORIGINATED +
+                    CoreFixtures.CALL_STATUS_OUTGOING_CONFERENCED +
                     "      </item>\n" +
                     "    </publish>\n" +
                     "  </pubsub>" +

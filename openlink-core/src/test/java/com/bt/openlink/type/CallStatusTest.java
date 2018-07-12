@@ -28,11 +28,11 @@ public class CallStatusTest {
 
         final CallStatus callStatus = CallStatus.Builder.start()
                 .setCallStatusBusy(true)
-                .addCall(CoreFixtures.CALL_INCOMING_ORIGINATED)
+                .addCall(CoreFixtures.CALL_OUTGOING_CONFERENCED)
                 .build();
 
         assertThat(callStatus.isCallStatusBusy().get(), is(true));
-        assertThat(callStatus.getCalls(), contains(CoreFixtures.CALL_INCOMING_ORIGINATED));
+        assertThat(callStatus.getCalls(), contains(CoreFixtures.CALL_OUTGOING_CONFERENCED));
     }
 
     @Test
@@ -52,7 +52,7 @@ public class CallStatusTest {
         expectedException.expectMessage("Each call id must be unique - test-call-id appears more than once");
 
         CallStatus.Builder.start()
-                .addCalls(Arrays.asList(CoreFixtures.CALL_INCOMING_ORIGINATED, CoreFixtures.CALL_INCOMING_ORIGINATED))
+                .addCalls(Arrays.asList(CoreFixtures.CALL_OUTGOING_CONFERENCED, CoreFixtures.CALL_OUTGOING_CONFERENCED))
                 .build();
     }
 
@@ -74,11 +74,11 @@ public class CallStatusTest {
 
         final CallStatus callStatus = CallStatus.Builder.start()
                 .setCallStatusBusy(false)
-                .addCalls(Arrays.asList(CoreFixtures.CALL_INCOMING_ORIGINATED, CoreFixtures.CALL_INCOMING_ORIGINATED))
+                .addCalls(Arrays.asList(CoreFixtures.CALL_OUTGOING_CONFERENCED, CoreFixtures.CALL_OUTGOING_CONFERENCED))
                 .build(errors);
 
         assertThat(callStatus.isCallStatusBusy().get(),is(false));
-        assertThat(callStatus.getCalls(), contains(CoreFixtures.CALL_INCOMING_ORIGINATED, CoreFixtures.CALL_INCOMING_ORIGINATED));
+        assertThat(callStatus.getCalls(), contains(CoreFixtures.CALL_OUTGOING_CONFERENCED, CoreFixtures.CALL_OUTGOING_CONFERENCED));
         assertThat(errors, contains("Invalid callstatus; each call id must be unique - test-call-id appears more than once"));
     }
 }

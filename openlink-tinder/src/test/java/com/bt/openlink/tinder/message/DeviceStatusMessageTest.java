@@ -31,7 +31,7 @@ public class DeviceStatusMessageTest {
                 .setId(CoreFixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
-                .setPubSubNodeId(CoreFixtures.CALL_INCOMING_ORIGINATED.getInterestId().get())
+                .setPubSubNodeId(CoreFixtures.CALL_OUTGOING_CONFERENCED.getInterestId().get())
                 .setItemId(PubSubMessageFixtures.ITEM_ID)
                 .setDeviceStatus(CoreFixtures.DEVICE_STATUS_LOGON)
                 .build();
@@ -52,7 +52,7 @@ public class DeviceStatusMessageTest {
                 .setId(CoreFixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
-                .setPubSubNodeId(CoreFixtures.CALL_INCOMING_ORIGINATED.getInterestId().get())
+                .setPubSubNodeId(CoreFixtures.CALL_OUTGOING_CONFERENCED.getInterestId().get())
                 .setItemId(ItemId.from("test-item-id").get())
                 .setDeviceStatus(CoreFixtures.DEVICE_STATUS_LOGON)
                 .build();

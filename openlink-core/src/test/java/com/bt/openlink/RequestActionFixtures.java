@@ -37,7 +37,7 @@ public class RequestActionFixtures {
                     "  <command xmlns='http://jabber.org/protocol/commands' node='http://xmpp.org/protocol/openlink:01:00:00#request-action' status='completed'>\n" +
                     "    <iodata xmlns='urn:xmpp:tmp:io-data' type='output'>\n" +
                     "      <out>\n" +
-                    CoreFixtures.CALL_STATUS_INCOMING_ORIGINATED +
+                    CoreFixtures.CALL_STATUS_OUTGOING_CONFERENCED +
                     "      </out>\n" +
                     "    </iodata>\n" +
                     "  </command>\n" +
