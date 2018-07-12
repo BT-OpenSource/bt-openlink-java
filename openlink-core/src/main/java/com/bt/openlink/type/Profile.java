@@ -41,7 +41,7 @@ public final class Profile implements Serializable {
     }
 
     /**
-     * Returns the type of the device for this profile. This is stored in the "devicenum" attribute of the XML.
+     * Returns the type of the device for this profile. This is stored in the "device" attribute of the XML.
      * For example;
      * {@code ITS.Netrix}
      * @return the type of device associated with the profile

@@ -32,7 +32,7 @@ public class CallStatusMessageTest {
                 .setId(CoreFixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
-                .setPubSubNodeId(CoreFixtures.CALL_INCOMING_ORIGINATED.getInterestId().get())
+                .setPubSubNodeId(CoreFixtures.CALL_OUTGOING_CONFERENCED.getInterestId().get())
                 .setItemId(PubSubMessageFixtures.ITEM_ID)
                 .setCallStatus(CoreFixtures.CALL_STATUS)
                 .build();
@@ -51,7 +51,7 @@ public class CallStatusMessageTest {
                 .setId(CoreFixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
-                .setPubSubNodeId(CoreFixtures.CALL_INCOMING_ORIGINATED.getInterestId().get())
+                .setPubSubNodeId(CoreFixtures.CALL_OUTGOING_CONFERENCED.getInterestId().get())
                 .setItemId(ItemId.from("test-item-id").get())
                 .setCallStatus(CoreFixtures.CALL_STATUS)
                 .build();
@@ -99,7 +99,7 @@ public class CallStatusMessageTest {
                 .setId(CoreFixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
-                .setPubSubNodeId(CoreFixtures.CALL_INCOMING_ORIGINATED.getInterestId().get())
+                .setPubSubNodeId(CoreFixtures.CALL_OUTGOING_CONFERENCED.getInterestId().get())
                 .setItemId(ItemId.from("test-item-id").get())
                 .setCallStatus(CoreFixtures.CALL_STATUS)
                 .setDelay(PubSubMessageFixtures.DELAYED_FROM)

@@ -124,19 +124,21 @@ public class CoreFixtures {
             .setMicrophoneActive(true)
             .setMuteRequested(true)
             .build();
+    public static final String DEVICE_ID = "test-device-id";
     public static final OriginatorReference ORIGINATOR_REFERENCE = new OriginatorReference("key1", "value1");
-    public static final Call CALL_INCOMING_ORIGINATED = Call.Builder
+    public static final Call CALL_OUTGOING_CONFERENCED = Call.Builder
             .start()
             .setId(CALL_ID)
             .setTelephonyCallId(TELEPHONY_CALL_ID)
             .setConferenceId(CONFERENCE_ID)
             .setSite(SITE)
             .setProfileId(PROFILE_ID)
+            .setDeviceId(DEVICE_ID)
             .setUserId(USER_ID)
             .setInterestId(INTEREST_ID)
             .setChanged(Changed.STATE)
-            .setState(CallState.CALL_ORIGINATED)
-            .setDirection(CallDirection.INCOMING)
+            .setState(CallState.CALL_CONFERENCED)
+            .setDirection(CallDirection.OUTGOING)
             .setCallerNumber(CALLER_NUMBER)
             .setCallerName(CALLER_NAME)
             .addCallerE164Number(CALLER_E164_NUMBER)
@@ -149,7 +151,7 @@ public class CoreFixtures {
             .setStartTime(START_TIME)
             .setDuration(DURATION)
             .addAction(RequestAction.ANSWER_CALL)
-            .addFeature(CallFeatureBoolean.Builder.start().setId(FeatureId.from("hs_1").get()).setType(FeatureType.HANDSET).setLabel("Handset 1").setEnabled(false).build())
+            .addFeature(CallFeatureBoolean.Builder.start().setId(FeatureId.from("hs_1").get()).setType(FeatureType.HANDSET).setLabel("Handset 1").setEnabled(true).build())
             .addFeature(CallFeatureBoolean.Builder.start().setId(FeatureId.from("hs_2").get()).setType(FeatureType.HANDSET).setLabel("Handset 2").setEnabled(false).build())
             .addFeature(CallFeatureBoolean.Builder.start().setId(FeatureId.from("priv_1").get()).setType(FeatureType.PRIVACY).setLabel("Privacy").setEnabled(false).build())
             .addFeature(
@@ -178,7 +180,7 @@ public class CoreFixtures {
             .addParticipant(LOCAL_PARTICIPANT)
             .addParticipant(REMOTE_PARTICIPANT)
             .build();
-    public static final CallStatus CALL_STATUS = CALL_INCOMING_ORIGINATED.toCallStatus(false);
+    public static final CallStatus CALL_STATUS = CALL_OUTGOING_CONFERENCED.toCallStatus(false);
     public static final Interest INTEREST = Interest.Builder.start()
             .setType(INTEREST_TYPE)
             .setDefault(true)
@@ -190,25 +192,25 @@ public class CoreFixtures {
 
     public static final String START_TIME_ISO_8601 = ISO_8601_FORMATTER.format(START_TIME.atZone(ZoneOffset.UTC));
 
-    public static final String DEVICE_ID = "test-device-id";
+
     public static final DeviceStatus DEVICE_STATUS_LOGON = DeviceStatus.Builder.start()
             .setProfileId(PROFILE_ID)
             .setOnline(true)
             .setDeviceId(DEVICE_ID)
             .build();
 
-    public static final String CALL_STATUS_INCOMING_ORIGINATED =
+    public static final String CALL_STATUS_OUTGOING_CONFERENCED =
             "<callstatus xmlns='http://xmpp.org/protocol/openlink:01:00:00#call-status' busy='false'>\n" +
                     "  <call>\n" +
                     "    <id telephony='" + CoreFixtures.TELEPHONY_CALL_ID + "'>" + CoreFixtures.CALL_ID + "</id>\n" +
                     "    <conference>" + CoreFixtures.CONFERENCE_ID + "</conference>\n" +
                     "    <site id='42' type='BTSM' default='true'>test site name</site>\n" +
-                    "    <profile>" + CoreFixtures.PROFILE_ID + "</profile>\n" +
+                    "    <profile devicenum='" + CoreFixtures.DEVICE_ID + "'>" + CoreFixtures.PROFILE_ID + "</profile>\n" +
                     "    <user>" + CoreFixtures.USER_ID + "</user>\n" +
                     "    <interest>" + CoreFixtures.INTEREST_ID + "</interest>\n" +
                     "    <changed>State</changed>\n" +
-                    "    <state>CallOriginated</state>\n" +
-                    "    <direction>Incoming</direction>\n" +
+                    "    <state>CallConferenced</state>\n" +
+                    "    <direction>Outgoing</direction>\n" +
                     "    <caller>\n" +
                     "      <number e164='" + CoreFixtures.CALLER_E164_NUMBER + "'>" + CoreFixtures.CALLER_NUMBER + "</number>\n" +
                     "      <name>" + CoreFixtures.CALLER_NAME + "</name>\n" +
@@ -231,7 +233,7 @@ public class CoreFixtures {
                     "      <AnswerCall/>\n" +
                     "    </actions>\n" +
                     "    <features>\n" +
-                    "      <feature id='hs_1' type='Handset' label='Handset 1'>false</feature>\n" +
+                    "      <feature id='hs_1' type='Handset' label='Handset 1'>true</feature>\n" +
                     "      <feature id='hs_2' type='Handset' label='Handset 2'>false</feature>\n" +
                     "      <feature id='priv_1' type='Privacy' label='Privacy'>false</feature>\n" +
                     "      <feature id='NetrixHiTouch_sales1' type='DeviceKeys' label='NetrixHiTouch'>\n" +

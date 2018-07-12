@@ -333,7 +333,11 @@ public final class TinderPacketUtil {
             call.getTelephonyCallId().ifPresent(telephonyCallId -> idElement.addAttribute("telephony", telephonyCallId.value()));
             call.getConferenceId().ifPresent(conferenceId -> callElement.addElement("conference").setText(conferenceId.value()));
             call.getSite().ifPresent(site -> addSite(callElement, site));
-            call.getProfileId().ifPresent(profileId -> callElement.addElement(ELEMENT_PROFILE).setText(profileId.value()));
+            call.getProfileId().ifPresent(profileId -> {
+                final Element profileElement = callElement.addElement(ELEMENT_PROFILE);
+                call.getDeviceId().ifPresent(deviceId -> profileElement.addAttribute("devicenum", deviceId));
+                profileElement.setText(profileId.value());
+            });
             call.getUserId().ifPresent(userId -> callElement.addElement("user").setText(userId.value()));
             call.getInterestId().ifPresent(interestId -> callElement.addElement("interest").setText(interestId.value()));
             call.getChanged().ifPresent(changed -> callElement.addElement("changed").setText(changed.getId()));
@@ -522,7 +526,15 @@ public final class TinderPacketUtil {
             TelephonyCallId.from(getNullableStringAttribute(getChildElement(callElement, "id"), "telephony")).ifPresent(callBuilder::setTelephonyCallId);
             ConferenceId.from(getNullableChildElementString(callElement, "conference")).ifPresent(callBuilder::setConferenceId);
             getSite(callElement, description, parseErrors).ifPresent(callBuilder::setSite);
-            ProfileId.from(getNullableChildElementString(callElement, ELEMENT_PROFILE)).ifPresent(callBuilder::setProfileId);
+
+            Optional.ofNullable(getChildElement(callElement, ELEMENT_PROFILE))
+                    .ifPresent(profileElement -> {
+                        ProfileId.from(profileElement.getText().trim()).ifPresent(callBuilder::setProfileId);
+
+                        Optional.ofNullable(getNullableStringAttribute(profileElement, "devicenum"))
+                                .ifPresent(callBuilder::setDeviceId);
+                    });
+
             UserId.from(getNullableChildElementString(callElement, "user")).ifPresent(callBuilder::setUserId);
             InterestId.from(getNullableChildElementString(callElement, "interest")).ifPresent(callBuilder::setInterestId);
             Changed.from(getNullableChildElementString(callElement, "changed")).ifPresent(callBuilder::setChanged);
