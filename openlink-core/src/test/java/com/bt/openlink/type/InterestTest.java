@@ -28,6 +28,7 @@ public class InterestTest {
                 .setLabel("test-interest-label")
                 .setDefault(true)
                 .setCallStatus(CoreFixtures.CALL_STATUS)
+                .setNumber(CoreFixtures.INTEREST_NUMBER)
                 .build();
 
         assertThat(interest.getId().get(), is(CoreFixtures.INTEREST_ID));
@@ -35,6 +36,7 @@ public class InterestTest {
         assertThat(interest.getLabel().get(), is("test-interest-label"));
         assertThat(interest.isDefaultInterest().get(), is(true));
         assertThat(interest.getCallStatus().get(), is(CoreFixtures.CALL_STATUS));
+        assertThat(interest.getNumber().get(), is(CoreFixtures.INTEREST_NUMBER));
     }
 
     @Test

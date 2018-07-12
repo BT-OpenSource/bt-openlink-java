@@ -44,7 +44,7 @@ import com.bt.openlink.type.TelephonyCallId;
 import com.bt.openlink.type.UserId;
 import com.bt.openlink.type.VoiceRecorderInfo;
 
-@SuppressWarnings("ConstantConditions")
+@SuppressWarnings({"ConstantConditions", "WeakerAccess"})
 public class CoreFixtures {
 
     static final DateTimeFormatter ISO_8601_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
@@ -73,6 +73,7 @@ public class CoreFixtures {
     public static final UserId USER_ID = UserId.from("test-user-id").get();
     public static final InterestId INTEREST_ID = InterestId.from("test-interest-id").get();
     public static final InterestType INTEREST_TYPE = InterestType.from("test-interest-type").get();
+    public static final PhoneNumber INTEREST_NUMBER = PhoneNumber.from("test-interest-number").get();
     public static final FeatureId FEATURE_ID = FeatureId.from("test-feature-id").get();
     public static final FeatureId SPEAKER_CHANNEL_ID = FeatureId.from("test-speaker-id").get();
     public static final long SPEAKER_CHANNEL_NUMBER = 42;
@@ -188,6 +189,7 @@ public class CoreFixtures {
             .setLabel("test interest label")
             .setCallStatus(CALL_STATUS)
             .setMaxCalls(3)
+            .setNumber(INTEREST_NUMBER)
             .build();
 
     public static final String START_TIME_ISO_8601 = ISO_8601_FORMATTER.format(START_TIME.atZone(ZoneOffset.UTC));

@@ -21,6 +21,7 @@ import com.bt.openlink.smack.internal.SmackPacketUtil;
 import com.bt.openlink.type.Interest;
 import com.bt.openlink.type.InterestId;
 import com.bt.openlink.type.InterestType;
+import com.bt.openlink.type.PhoneNumber;
 
 public class GetInterestsResult extends OpenlinkIQ {
 
@@ -60,6 +61,7 @@ public class GetInterestsResult extends OpenlinkIQ {
             isDefaultInterest.ifPresent(interestBuilder::setDefault);
             final Optional<Integer> maxCalls = SmackPacketUtil.getIntegerAttribute(parser, "maxCalls");
             maxCalls.ifPresent(interestBuilder::setMaxCalls);
+            SmackPacketUtil.getStringAttribute(parser, "number").flatMap(PhoneNumber::from).ifPresent(interestBuilder::setNumber);
             parser.nextTag();
             SmackPacketUtil.getCallStatus(parser, "get-interest result", parseErrors).ifPresent(interestBuilder::setCallStatus);
 
@@ -88,6 +90,7 @@ public class GetInterestsResult extends OpenlinkIQ {
             interest.getLabel().ifPresent(label -> xml.attribute(OpenlinkXmppNamespace.TAG_LABEL, label));
             interest.isDefaultInterest().ifPresent(isDefault -> xml.attribute("default", String.valueOf(isDefault)));
             interest.getMaxCalls().ifPresent(maxCalls -> xml.attribute("maxCalls", String.valueOf(maxCalls)));
+            interest.getNumber().ifPresent(number -> xml.attribute("number", number.value()));
             xml.rightAngleBracket();
             interest.getCallStatus().ifPresent(callStatus -> SmackPacketUtil.addCallStatus(xml, callStatus));
             xml.closeElement(OpenlinkXmppNamespace.TAG_INTEREST);

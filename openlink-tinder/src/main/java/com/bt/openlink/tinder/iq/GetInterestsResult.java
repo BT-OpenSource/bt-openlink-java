@@ -17,6 +17,7 @@ import com.bt.openlink.tinder.internal.TinderPacketUtil;
 import com.bt.openlink.type.Interest;
 import com.bt.openlink.type.InterestId;
 import com.bt.openlink.type.InterestType;
+import com.bt.openlink.type.PhoneNumber;
 
 public class GetInterestsResult extends OpenlinkIQ {
     private static final String DESCRIPTION = "get-interests result";
@@ -35,6 +36,7 @@ public class GetInterestsResult extends OpenlinkIQ {
             interest.getLabel().ifPresent(label -> interestElement.addAttribute("label", label));
             interest.isDefaultInterest().ifPresent(isDefault -> interestElement.addAttribute("default", String.valueOf(isDefault)));
             interest.getMaxCalls().ifPresent(maxCalls -> interestElement.addAttribute("maxCalls", String.valueOf(maxCalls)));
+            interest.getNumber().ifPresent(number->interestElement.addAttribute("number", number.value()));
             interest.getCallStatus().ifPresent(callStatus -> TinderPacketUtil.addCallStatus(interestElement, callStatus));
         }
     }
@@ -60,6 +62,7 @@ public class GetInterestsResult extends OpenlinkIQ {
                 TinderPacketUtil.getStringAttribute(interestElement, "label").ifPresent(interestBuilder::setLabel);
                 TinderPacketUtil.getBooleanAttribute(interestElement, "default", DESCRIPTION, parseErrors).ifPresent(interestBuilder::setDefault);
                 TinderPacketUtil.getIntegerAttribute(interestElement, "maxCalls", DESCRIPTION, parseErrors).ifPresent(interestBuilder::setMaxCalls);
+                TinderPacketUtil.getStringAttribute(interestElement, "number").flatMap(PhoneNumber::from).ifPresent(interestBuilder::setNumber);
                 TinderPacketUtil.getCallStatus(interestElement, DESCRIPTION, parseErrors).ifPresent(interestBuilder::setCallStatus);
                 builder.addInterest(interestBuilder.build(parseErrors));
             }
