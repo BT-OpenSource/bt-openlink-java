@@ -457,12 +457,8 @@ public final class SmackPacketUtil {
         while (parser.getDepth() > inDepth) {
             switch (parser.getName()) {
             case ELEMENT_PROFILE:
-
-                getElementTextString(parser).map(ProfileId::from)
-                        .orElse(Optional.empty())
-                        .ifPresent(deviceStatusBuilder::setProfileId);
+                getElementTextString(parser).flatMap(ProfileId::from).ifPresent(deviceStatusBuilder::setProfileId);
                 break;
-
             case ELEMENT_FEATURES:
                 addDeviceStatusFeaturesToBuilder(parser, deviceStatusBuilder, errors);
                 break;
