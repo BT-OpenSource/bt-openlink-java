@@ -18,6 +18,7 @@ import com.bt.openlink.CoreFixtures;
 import com.bt.openlink.MakeCallFixtures;
 import com.bt.openlink.OpenlinkXmppNamespace;
 import com.bt.openlink.smack.Fixtures;
+import com.bt.openlink.type.RequestAction;
 
 @SuppressWarnings({ "ConstantConditions", "RedundantThrows" })
 public class MakeCallResultTest {
@@ -94,4 +95,30 @@ public class MakeCallResultTest {
                 "Invalid make-call result stanza; missing or invalid callstatus"));
     }
 
+    @Test
+    public void willParseEmptyAndSelfClosingActions() throws Exception {
+
+        final MakeCallResult result = PacketParserUtils.parseStanza("<iq from='" + CoreFixtures.FROM_JID_STRING + "' to='" + CoreFixtures.TO_JID_STRING + "' id='" + CoreFixtures.STANZA_ID + "' type='result'>\n" +
+                "   <command xmlns='http://jabber.org/protocol/commands' node='http://xmpp.org/protocol/openlink:01:00:00#make-call' status='completed'>\n" +
+                "     <iodata xmlns='urn:xmpp:tmp:io-data' type='output'>\n" +
+                "      <out>\n" +
+                "       <callstatus xmlns='http://xmpp.org/protocol/openlink:01:00:00#call-status' busy='false'>\n" +
+                "        <call>\n" +
+                "           <actions>\n" +
+                "               <ClearCall/>\n" +
+                "               <ClearConference/>\n" +
+                "               <HoldCall></HoldCall>\n" +
+                "               <SendDigit></SendDigit>\n" +
+                "           </actions>\n" +
+                "       </call>\n" +
+                "       </callstatus>\n" +
+                "      </out>\n" +
+                "    </iodata>\n" +
+                "  </command>\n" +
+                "</iq>");
+
+        assertThat(result.getCallStatus().get().getCalls().get(0).getActions(),
+                contains(RequestAction.CLEAR_CALL, RequestAction.CLEAR_CONFERENCE, RequestAction.HOLD_CALL, RequestAction.SEND_DIGIT));
+        
+    }
 }

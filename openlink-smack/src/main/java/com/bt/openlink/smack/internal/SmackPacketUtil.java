@@ -19,19 +19,6 @@ import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.bt.openlink.type.CallFeatureTextValue;
-import com.bt.openlink.type.CallFeatureVoiceRecorder;
-import com.bt.openlink.type.DeviceStatus;
-import com.bt.openlink.type.ManageVoiceMessageAction;
-import com.bt.openlink.type.ParticipantCategory;
-import com.bt.openlink.type.RecorderChannel;
-import com.bt.openlink.type.RecorderNumber;
-import com.bt.openlink.type.RecorderPort;
-import com.bt.openlink.type.RecorderType;
-import com.bt.openlink.type.VoiceMessage;
-import com.bt.openlink.type.VoiceMessageFeature;
-import com.bt.openlink.type.VoiceMessageStatus;
-import com.bt.openlink.type.VoiceRecorderInfo;
 import org.jivesoftware.smack.packet.IQ.IQChildElementXmlStringBuilder;
 import org.jivesoftware.smack.util.ParserUtils;
 import org.jivesoftware.smack.util.XmlStringBuilder;
@@ -48,24 +35,37 @@ import com.bt.openlink.type.CallFeature;
 import com.bt.openlink.type.CallFeatureBoolean;
 import com.bt.openlink.type.CallFeatureDeviceKey;
 import com.bt.openlink.type.CallFeatureSpeakerChannel;
+import com.bt.openlink.type.CallFeatureTextValue;
+import com.bt.openlink.type.CallFeatureVoiceRecorder;
 import com.bt.openlink.type.CallId;
 import com.bt.openlink.type.CallState;
 import com.bt.openlink.type.CallStatus;
 import com.bt.openlink.type.Changed;
 import com.bt.openlink.type.ConferenceId;
 import com.bt.openlink.type.DeviceKey;
+import com.bt.openlink.type.DeviceStatus;
 import com.bt.openlink.type.FeatureId;
 import com.bt.openlink.type.FeatureType;
 import com.bt.openlink.type.InterestId;
+import com.bt.openlink.type.ManageVoiceMessageAction;
 import com.bt.openlink.type.OriginatorReference;
 import com.bt.openlink.type.Participant;
+import com.bt.openlink.type.ParticipantCategory;
 import com.bt.openlink.type.ParticipantType;
 import com.bt.openlink.type.PhoneNumber;
 import com.bt.openlink.type.ProfileId;
+import com.bt.openlink.type.RecorderChannel;
+import com.bt.openlink.type.RecorderNumber;
+import com.bt.openlink.type.RecorderPort;
+import com.bt.openlink.type.RecorderType;
 import com.bt.openlink.type.RequestAction;
 import com.bt.openlink.type.Site;
 import com.bt.openlink.type.TelephonyCallId;
 import com.bt.openlink.type.UserId;
+import com.bt.openlink.type.VoiceMessage;
+import com.bt.openlink.type.VoiceMessageFeature;
+import com.bt.openlink.type.VoiceMessageStatus;
+import com.bt.openlink.type.VoiceRecorderInfo;
 
 public final class SmackPacketUtil {
 
@@ -861,14 +861,14 @@ public final class SmackPacketUtil {
         if (parser.getName().equals(ELEMENT_ACTIONS)) {
             final int actionsDepth = parser.getDepth();
             parser.nextTag();
-            while (parser.getDepth() > actionsDepth && parser.isEmptyElementTag()) {
+            while (parser.getDepth() > actionsDepth) {
                 final Optional<RequestAction> requestAction = RequestAction.from(parser.getName());
                 if (requestAction.isPresent()) {
                     callBuilder.addAction(requestAction.get());
                 } else {
                     parseErrors.add("Invalid %s: %s is not a valid action");
                 }
-                parser.nextTag();
+                ParserUtils.forwardToEndTagOfDepth(parser, parser.getDepth());
                 parser.nextTag();
             }
             ParserUtils.forwardToEndTagOfDepth(parser, actionsDepth);
