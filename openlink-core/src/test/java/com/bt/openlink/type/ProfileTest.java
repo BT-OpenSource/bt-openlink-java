@@ -12,6 +12,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import com.bt.openlink.CoreFixtures;
+
 @SuppressWarnings("ConstantConditions")
 public class ProfileTest {
 
@@ -31,8 +33,8 @@ public class ProfileTest {
                 .setSite(SITE)
                 .setId(profileId)
                 .setDefault(true)
-                .setDeviceType("test-device-type")
-                .setDeviceId("test-device-id")
+                .setDeviceType(CoreFixtures.DEVICE_TYPE)
+                .setDeviceId(CoreFixtures.DEVICE_ID)
                 .setLabel("test-label")
                 .addAction(RequestAction.ANSWER_CALL)
                 .setOnline(true)
@@ -41,8 +43,8 @@ public class ProfileTest {
         assertThat(profile.getSite().get(), is(SITE));
         assertThat(profile.getId().get(), is(profileId));
         assertThat(profile.isDefaultProfile().get(), is(true));
-        assertThat(profile.getDeviceType().get(), is("test-device-type"));
-        assertThat(profile.getDeviceId().get(), is("test-device-id"));
+        assertThat(profile.getDeviceType().get(), is(CoreFixtures.DEVICE_TYPE));
+        assertThat(profile.getDeviceId().get(), is(CoreFixtures.DEVICE_ID));
         assertThat(profile.getLabel().get(), is("test-label"));
         assertThat(profile.isOnline().get(), is(true));
         assertThat(profile.getActions().size(), is(1));

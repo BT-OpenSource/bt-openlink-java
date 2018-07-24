@@ -25,12 +25,12 @@ public class DeviceStatusTest {
         final DeviceStatus deviceStatus = DeviceStatus.Builder.start()
                 .setOnline(true)
                 .setProfileId(CoreFixtures.PROFILE_ID)
-                .setDeviceId("test-device-id")
+                .setDeviceId(CoreFixtures.DEVICE_ID)
                 .build();
 
         assertThat(deviceStatus.getProfileId().get(), is(CoreFixtures.PROFILE_ID));
         assertThat(deviceStatus.isOnline().get(), is(true));
-        assertThat(deviceStatus.getDeviceId().get(), is("test-device-id"));
+        assertThat(deviceStatus.getDeviceId().get(), is(CoreFixtures.DEVICE_ID));
     }
 
     @Test

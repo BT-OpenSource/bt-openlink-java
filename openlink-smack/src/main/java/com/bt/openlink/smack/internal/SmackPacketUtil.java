@@ -42,6 +42,7 @@ import com.bt.openlink.type.CallState;
 import com.bt.openlink.type.CallStatus;
 import com.bt.openlink.type.Changed;
 import com.bt.openlink.type.ConferenceId;
+import com.bt.openlink.type.DeviceId;
 import com.bt.openlink.type.DeviceKey;
 import com.bt.openlink.type.DeviceStatus;
 import com.bt.openlink.type.FeatureId;
@@ -260,7 +261,7 @@ public final class SmackPacketUtil {
             call.getSite().ifPresent(site -> addSiteXML(xml, site));
             call.getProfileId().ifPresent(profileId -> {
                 final XmlStringBuilder profileElement = xml.halfOpenElement(ELEMENT_PROFILE);
-                call.getDeviceId().ifPresent(deviceId -> profileElement.attribute(ATTRIBUTE_DEVICENUM, deviceId));
+                call.getDeviceId().ifPresent(deviceId -> profileElement.attribute(ATTRIBUTE_DEVICENUM, deviceId.value()));
                 xml.rightAngleBracket();
                 profileElement.escape(profileId.value());
                 xml.closeElement(ELEMENT_PROFILE);
@@ -450,7 +451,7 @@ public final class SmackPacketUtil {
         }
 
         getBooleanAttribute(parser, ATTRIBUTE_ONLINE, ATTRIBUTE_ONLINE, errors).ifPresent(deviceStatusBuilder::setOnline);
-        getStringAttribute(parser, ATTRIBUTE_DEVICENUM).ifPresent(deviceStatusBuilder::setDeviceId);
+        getStringAttribute(parser, ATTRIBUTE_DEVICENUM).flatMap(DeviceId::from).ifPresent(deviceStatusBuilder::setDeviceId);
 
         final int inDepth = parser.getDepth();
         parser.nextTag();
@@ -748,7 +749,7 @@ public final class SmackPacketUtil {
     }
 
     private static void addProfileIdToBuilder(@Nonnull final XmlPullParser parser, @Nonnull final Call.Builder callBuilder) throws XmlPullParserException, IOException {
-        getStringAttribute(parser, ATTRIBUTE_DEVICENUM).ifPresent(callBuilder::setDeviceId);
+        getStringAttribute(parser, ATTRIBUTE_DEVICENUM).flatMap(DeviceId::from).ifPresent(callBuilder::setDeviceId);
 
         final String profileIdString = parser.nextText();
         final Optional<ProfileId> profileIdOptional = ProfileId.from(profileIdString);

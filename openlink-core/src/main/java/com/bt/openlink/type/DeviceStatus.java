@@ -13,7 +13,7 @@ public final class DeviceStatus implements Serializable {
     private static final long serialVersionUID = -4817479046901684980L;
     @Nullable private final Boolean online;
     @Nullable private final ProfileId profileId;
-    @Nullable private final String deviceId;
+    @Nullable private final DeviceId deviceId;
     @Nonnull private List<VoiceMessageFeature> features;
 
     private DeviceStatus(@Nonnull final Builder builder) {
@@ -34,7 +34,7 @@ public final class DeviceStatus implements Serializable {
     }
 
     @Nonnull
-    public Optional<String> getDeviceId() {
+    public Optional<DeviceId> getDeviceId() {
         return Optional.ofNullable(deviceId);
     }
 
@@ -47,7 +47,7 @@ public final class DeviceStatus implements Serializable {
 
         @Nullable private Boolean online;
         @Nullable private ProfileId profileId;
-        @Nullable private String deviceId;
+        @Nullable private DeviceId deviceId;
         @Nonnull private List<VoiceMessageFeature> features = new ArrayList<>();
 
         private Builder() {
@@ -95,7 +95,7 @@ public final class DeviceStatus implements Serializable {
             return this;
         }
 
-        public Builder setDeviceId(@Nonnull final String deviceId) {
+        public Builder setDeviceId(@Nonnull final DeviceId deviceId) {
             this.deviceId = deviceId;
             return this;
         }

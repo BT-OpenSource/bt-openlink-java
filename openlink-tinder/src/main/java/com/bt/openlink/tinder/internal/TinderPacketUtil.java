@@ -20,14 +20,6 @@ import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.bt.openlink.type.CallFeatureTextValue;
-import com.bt.openlink.type.CallFeatureVoiceRecorder;
-import com.bt.openlink.type.ParticipantCategory;
-import com.bt.openlink.type.RecorderChannel;
-import com.bt.openlink.type.RecorderNumber;
-import com.bt.openlink.type.RecorderPort;
-import com.bt.openlink.type.RecorderType;
-import com.bt.openlink.type.VoiceRecorderInfo;
 import org.dom4j.Element;
 import org.xmpp.packet.IQ;
 import org.xmpp.packet.JID;
@@ -41,11 +33,14 @@ import com.bt.openlink.type.CallFeature;
 import com.bt.openlink.type.CallFeatureBoolean;
 import com.bt.openlink.type.CallFeatureDeviceKey;
 import com.bt.openlink.type.CallFeatureSpeakerChannel;
+import com.bt.openlink.type.CallFeatureTextValue;
+import com.bt.openlink.type.CallFeatureVoiceRecorder;
 import com.bt.openlink.type.CallId;
 import com.bt.openlink.type.CallState;
 import com.bt.openlink.type.CallStatus;
 import com.bt.openlink.type.Changed;
 import com.bt.openlink.type.ConferenceId;
+import com.bt.openlink.type.DeviceId;
 import com.bt.openlink.type.DeviceKey;
 import com.bt.openlink.type.DeviceStatus;
 import com.bt.openlink.type.FeatureId;
@@ -54,14 +49,20 @@ import com.bt.openlink.type.InterestId;
 import com.bt.openlink.type.ItemId;
 import com.bt.openlink.type.OriginatorReference;
 import com.bt.openlink.type.Participant;
+import com.bt.openlink.type.ParticipantCategory;
 import com.bt.openlink.type.ParticipantType;
 import com.bt.openlink.type.PhoneNumber;
 import com.bt.openlink.type.ProfileId;
 import com.bt.openlink.type.PubSubNodeId;
+import com.bt.openlink.type.RecorderChannel;
+import com.bt.openlink.type.RecorderNumber;
+import com.bt.openlink.type.RecorderPort;
+import com.bt.openlink.type.RecorderType;
 import com.bt.openlink.type.RequestAction;
 import com.bt.openlink.type.Site;
 import com.bt.openlink.type.TelephonyCallId;
 import com.bt.openlink.type.UserId;
+import com.bt.openlink.type.VoiceRecorderInfo;
 
 /**
  * This class is for internal use by the library only; users of the API should not access this class directly.
@@ -335,7 +336,7 @@ public final class TinderPacketUtil {
             call.getSite().ifPresent(site -> addSite(callElement, site));
             call.getProfileId().ifPresent(profileId -> {
                 final Element profileElement = callElement.addElement(ELEMENT_PROFILE);
-                call.getDeviceId().ifPresent(deviceId -> profileElement.addAttribute("devicenum", deviceId));
+                call.getDeviceId().ifPresent(deviceId -> profileElement.addAttribute("devicenum", deviceId.value()));
                 profileElement.setText(profileId.value());
             });
             call.getUserId().ifPresent(userId -> callElement.addElement("user").setText(userId.value()));
@@ -532,6 +533,7 @@ public final class TinderPacketUtil {
                         ProfileId.from(profileElement.getText().trim()).ifPresent(callBuilder::setProfileId);
 
                         Optional.ofNullable(getNullableStringAttribute(profileElement, "devicenum"))
+                                .flatMap(DeviceId::from)
                                 .ifPresent(callBuilder::setDeviceId);
                     });
 
@@ -584,7 +586,7 @@ public final class TinderPacketUtil {
         final DeviceStatus.Builder builder = DeviceStatus.Builder.start();
 
         getBooleanAttribute(profileElement, "online", stanzaDescription, parseErrors).ifPresent(builder::setOnline);
-        getStringAttribute(profileElement, "devicenum", false, stanzaDescription, parseErrors).ifPresent(builder::setDeviceId);
+        getStringAttribute(profileElement, "devicenum", false, stanzaDescription, parseErrors).flatMap(DeviceId::from).ifPresent(builder::setDeviceId);
         ProfileId.from(getNullableChildElementString(deviceStatusElement, ELEMENT_PROFILE)).ifPresent(builder::setProfileId);
 
         return Optional.of(builder.build(parseErrors));

@@ -21,8 +21,10 @@ import com.bt.openlink.type.CallState;
 import com.bt.openlink.type.CallStatus;
 import com.bt.openlink.type.Changed;
 import com.bt.openlink.type.ConferenceId;
+import com.bt.openlink.type.DeviceId;
 import com.bt.openlink.type.DeviceKey;
 import com.bt.openlink.type.DeviceStatus;
+import com.bt.openlink.type.DeviceType;
 import com.bt.openlink.type.FeatureId;
 import com.bt.openlink.type.FeatureType;
 import com.bt.openlink.type.Interest;
@@ -70,6 +72,8 @@ public class CoreFixtures {
     public static final TelephonyCallId TELEPHONY_CALL_ID = TelephonyCallId.from("test-telephony-call-id").get();
     public static final ConferenceId CONFERENCE_ID = ConferenceId.from("test-conference-id").get();
     public static final ProfileId PROFILE_ID = ProfileId.from("test-profile-id").get();
+    public static final DeviceId DEVICE_ID = DeviceId.from("test-device-id").get();
+    public static final DeviceType DEVICE_TYPE = DeviceType.from("test-device-type").get();
     public static final UserId USER_ID = UserId.from("test-user-id").get();
     public static final InterestId INTEREST_ID = InterestId.from("test-interest-id").get();
     public static final InterestType INTEREST_TYPE = InterestType.from("test-interest-type").get();
@@ -125,7 +129,6 @@ public class CoreFixtures {
             .setMicrophoneActive(true)
             .setMuteRequested(true)
             .build();
-    public static final String DEVICE_ID = "test-device-id";
     public static final OriginatorReference ORIGINATOR_REFERENCE = new OriginatorReference("key1", "value1");
     public static final Call CALL_OUTGOING_CONFERENCED = Call.Builder
             .start()

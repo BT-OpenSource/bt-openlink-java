@@ -12,8 +12,8 @@ public final class Profile implements Serializable {
     private static final long serialVersionUID = -2429079888059635951L;
     @Nullable private final ProfileId profileId;
     @Nullable private final Boolean isDefault;
-    @Nullable private final String deviceType;
-    @Nullable private final String deviceId;
+    @Nullable private final DeviceType deviceType;
+    @Nullable private final DeviceId deviceId;
     @Nullable private final String label;
     @Nullable private final Boolean online;
     @Nullable private final Site site;
@@ -47,7 +47,7 @@ public final class Profile implements Serializable {
      * @return the type of device associated with the profile
      */
     @Nonnull
-    public Optional<String> getDeviceType() {
+    public Optional<DeviceType> getDeviceType() {
         return Optional.ofNullable(deviceType);
     }
 
@@ -58,7 +58,7 @@ public final class Profile implements Serializable {
      * @return the id of the device associated with the profile
      */
     @Nonnull
-    public Optional<String> getDeviceId() {
+    public Optional<DeviceId> getDeviceId() {
         return Optional.ofNullable(deviceId);
     }
 
@@ -99,8 +99,8 @@ public final class Profile implements Serializable {
         @Nullable private ProfileId profileId = null;
         @Nullable private Site site = null;
         @Nullable private Boolean isDefault;
-        @Nullable private String deviceType;
-        @Nullable private String deviceId;
+        @Nullable private DeviceType deviceType;
+        @Nullable private DeviceId deviceId;
         @Nullable private String label;
         @Nullable private Boolean online;
         @Nonnull private final List<RequestAction> actions = new ArrayList<>();
@@ -169,7 +169,7 @@ public final class Profile implements Serializable {
          * @param deviceType the type of device for the profile
          * @return the builder
          */
-        public Builder setDeviceType(@Nonnull final String deviceType) {
+        public Builder setDeviceType(@Nonnull final DeviceType deviceType) {
             this.deviceType = deviceType;
             return this;
         }
@@ -181,7 +181,7 @@ public final class Profile implements Serializable {
          * @param deviceId the id of the device for the profile
          * @return the builder
          */
-        public Builder setDeviceId(@Nonnull final String deviceId) {
+        public Builder setDeviceId(@Nonnull final DeviceId deviceId) {
             this.deviceId = deviceId;
             return this;
         }

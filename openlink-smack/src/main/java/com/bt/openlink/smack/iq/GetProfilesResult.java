@@ -18,6 +18,8 @@ import org.xmlpull.v1.XmlPullParserException;
 import com.bt.openlink.OpenlinkXmppNamespace;
 import com.bt.openlink.iq.GetProfilesResultBuilder;
 import com.bt.openlink.smack.internal.SmackPacketUtil;
+import com.bt.openlink.type.DeviceId;
+import com.bt.openlink.type.DeviceType;
 import com.bt.openlink.type.Profile;
 import com.bt.openlink.type.ProfileId;
 import com.bt.openlink.type.RequestAction;
@@ -52,9 +54,9 @@ public class GetProfilesResult extends OpenlinkIQ {
             final Optional<Boolean> online = SmackPacketUtil.getBooleanAttribute(parser, "online", STANZA_DESCRIPTION, parseErrors);
             online.ifPresent(profileBuilder::setOnline);
             final Optional<String> deviceType = SmackPacketUtil.getStringAttribute(parser, "device");
-            deviceType.ifPresent(profileBuilder::setDeviceType);
+            deviceType.flatMap(DeviceType::from).ifPresent(profileBuilder::setDeviceType);
             final Optional<String> deviceId = SmackPacketUtil.getStringAttribute(parser, "devicenum");
-            deviceId.ifPresent(profileBuilder::setDeviceId);
+            deviceId.flatMap(DeviceId::from).ifPresent(profileBuilder::setDeviceId);
 
             parser.nextTag();
             do {
@@ -119,8 +121,8 @@ public class GetProfilesResult extends OpenlinkIQ {
             xml.halfOpenElement(OpenlinkXmppNamespace.TAG_PROFILE);
             profile.getId().ifPresent(profileId -> xml.attribute("id", profileId.value()));
             profile.isDefaultProfile().ifPresent(isDefault -> xml.attribute(OpenlinkXmppNamespace.TAG_DEFAULT, isDefault));
-            profile.getDeviceType().ifPresent(deviceType -> xml.attribute("device", deviceType));
-            profile.getDeviceId().ifPresent(deviceId -> xml.attribute("devicenum", deviceId));
+            profile.getDeviceType().ifPresent(deviceType -> xml.attribute("device", deviceType.value()));
+            profile.getDeviceId().ifPresent(deviceId -> xml.attribute("devicenum", deviceId.value()));
             profile.getLabel().ifPresent(label -> xml.attribute(OpenlinkXmppNamespace.TAG_LABEL, label));
             profile.isOnline().ifPresent(online -> xml.attribute("online", online));
             xml.rightAngleBracket();

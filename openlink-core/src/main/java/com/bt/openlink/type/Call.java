@@ -18,20 +18,20 @@ public class Call implements Serializable {
     @Nullable private final ConferenceId conferenceId;
     @Nullable private final Site site;
     @Nullable private final ProfileId profileId;
-    @Nullable private String deviceId;
+    @Nullable private final DeviceId deviceId;
     @Nullable private final UserId userId;
     @Nullable private final InterestId interestId;
     @Nullable private final Changed changed;
     @Nullable private final CallState state;
     @Nullable private final CallDirection direction;
-    @Nullable private PhoneNumber callerNumber;
-    @Nullable private String callerName;
+    @Nullable private final PhoneNumber callerNumber;
+    @Nullable private final String callerName;
     @Nonnull private final List<PhoneNumber> callerE164Numbers;
-    @Nullable private PhoneNumber calledNumber;
-    @Nullable private String calledName;
+    @Nullable private final PhoneNumber calledNumber;
+    @Nullable private final String calledName;
     @Nullable private PhoneNumber calledDestination;
     @Nonnull private final List<PhoneNumber> calledE164Numbers;
-    @Nonnull private List<OriginatorReference> originatorReferences;
+    @Nonnull private final List<OriginatorReference> originatorReferences;
     @SuppressWarnings("squid:S3437") @Nullable private final Instant startTime;
     @SuppressWarnings("squid:S3437") @Nullable private final Duration duration;
     @Nonnull private final List<RequestAction> actions;
@@ -91,7 +91,7 @@ public class Call implements Serializable {
     }
 
     @Nonnull
-    public Optional<String> getDeviceId() {
+    public Optional<DeviceId> getDeviceId() {
         return Optional.ofNullable(deviceId);
     }
 
@@ -298,7 +298,7 @@ public class Call implements Serializable {
         @Nullable private ConferenceId conferenceId;
         @Nullable private Site site;
         @Nullable private ProfileId profileId;
-        @Nullable private String deviceId;
+        @Nullable private DeviceId deviceId;
         @Nullable private UserId userId;
         @Nullable private InterestId interestId;
         @Nullable private Changed changed;
@@ -392,8 +392,16 @@ public class Call implements Serializable {
         }
 
         @Nonnull
-        public Builder setDeviceId(@Nonnull final String deviceId) {
+        public Builder setDeviceId(@Nonnull final DeviceId deviceId) {
             this.deviceId = deviceId;
+            return this;
+        }
+
+        @Nonnull
+        public Builder setProfile(@Nonnull final Profile profile) {
+            profile.getId().ifPresent(profileId -> this.profileId = profileId);
+            profile.getSite().ifPresent(site -> this.site = site);
+            profile.getDeviceId().ifPresent(deviceId -> this.deviceId = deviceId);
             return this;
         }
 
