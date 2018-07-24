@@ -474,7 +474,7 @@ public final class SmackPacketUtil {
             ParserUtils.forwardToEndTagOfDepth(parser, inDepth + 1);
             parser.nextTag();
         }
-        return Optional.of(deviceStatusBuilder.build());
+        return Optional.of(deviceStatusBuilder.build(errors));
     }
 
     private static void addDeviceStatusFeaturesToBuilder(
@@ -502,7 +502,7 @@ public final class SmackPacketUtil {
                     break;
                 }
 
-                deviceStatusBuilder.addFeature(voiceMessageFeatureBuilder.build());
+                deviceStatusBuilder.addFeature(voiceMessageFeatureBuilder.build(errors));
             } while (callDepth != parser.getDepth());
             parser.nextTag();
         }
@@ -571,7 +571,7 @@ public final class SmackPacketUtil {
                 parser.nextTag();
             } while (callDepth != parser.getDepth());
 
-            builder.setVoiceMessage(voiceMessageBuilder.build());
+            builder.setVoiceMessage(voiceMessageBuilder.build(errors));
 
             parser.nextTag();
         }
@@ -660,7 +660,7 @@ public final class SmackPacketUtil {
             parser.nextTag();
         }
 
-        return Optional.of(builder.build());
+        return Optional.of(builder.build(errors));
     }
 
     public static List<OriginatorReference> getOriginatorRefs(final @Nonnull XmlPullParser parser) throws XmlPullParserException, IOException {
@@ -975,7 +975,7 @@ public final class SmackPacketUtil {
             ParserUtils.forwardToEndTagOfDepth(parser, featureDepth + 1);
             parser.nextTag();
         }
-        voiceRecorderBuilder.setVoiceRecorderInfo(voiceRecorderInfoBuilder.build());
+        voiceRecorderBuilder.setVoiceRecorderInfo(voiceRecorderInfoBuilder.build(parseErrors));
         callFeatureBuilder = voiceRecorderBuilder;
         return callFeatureBuilder;
     }

@@ -1,5 +1,11 @@
 package com.bt.openlink;
 
+import java.sql.Timestamp;
+import java.time.Duration;
+import java.time.Instant;
+
+import javax.annotation.Nonnull;
+
 import com.bt.openlink.type.DeviceStatus;
 import com.bt.openlink.type.FeatureId;
 import com.bt.openlink.type.ManageVoiceMessageAction;
@@ -7,11 +13,6 @@ import com.bt.openlink.type.PhoneNumber;
 import com.bt.openlink.type.VoiceMessage;
 import com.bt.openlink.type.VoiceMessageFeature;
 import com.bt.openlink.type.VoiceMessageStatus;
-
-import javax.annotation.Nonnull;
-import java.sql.Timestamp;
-import java.time.Duration;
-import java.time.Instant;
 
 @SuppressWarnings("ConstantConditions")
 public class ManageVoiceMessageFixtures {
@@ -86,6 +87,7 @@ public class ManageVoiceMessageFixtures {
             "                    <features>\n" +
             "                        <feature id=\"MK1047\">\n" +
             "                            <voicemessage xmlns=\"http://xmpp.org/protocol/openlink:01:00:00/features#voice-message\">\n" +
+            "                                <label>test-voice-message-label</label>\n" +
             "                                <status>ok</status>\n" +
             "                                <action>Playback</action>\n" +
             "                                <exten>551603</exten>\n" +
@@ -107,6 +109,7 @@ public class ManageVoiceMessageFixtures {
             "          <features>\n" +
             "            <feature id=\"MK1047\">\n" +
             "              <voicemessage xmlns=\"http://xmpp.org/protocol/openlink:01:00:00/features#voice-message\">\n" +
+            "                <label>test-voice-message-label</label>\n" +
             "                <status>ok</status>\n" +
             "                <action>Edit</action>\n" +
             "              </voicemessage>\n" +
@@ -144,6 +147,7 @@ public class ManageVoiceMessageFixtures {
             .addFeature(VoiceMessageFeature.Builder.start()
                     .setId(FeatureId.from("MK1047").get())
                     .setVoiceMessage(VoiceMessage.Builder.start()
+                            .setLabel("test-voice-message-label")
                             .setStatus(VoiceMessageStatus.OK)
                             .setAction(ManageVoiceMessageAction.EDIT)
                             .build())
@@ -169,6 +173,7 @@ public class ManageVoiceMessageFixtures {
             .addFeature(VoiceMessageFeature.Builder.start()
                     .setId(FeatureId.from("MK1047").get())
                     .setVoiceMessage(VoiceMessage.Builder.start()
+                            .setLabel("test-voice-message-label")
                             .setStatus(VoiceMessageStatus.OK)
                             .setAction(ManageVoiceMessageAction.PLAYBACK)
                             .setExtension(PhoneNumber.from("551603").get())
@@ -201,7 +206,7 @@ public class ManageVoiceMessageFixtures {
                             .build())
                     .build()
             )
-            .build();;
+            .build();
 
     private static Instant parseSqlTimeStamp(@Nonnull final String dateTime) {
         return Instant.from(Timestamp.valueOf(dateTime).toInstant());
