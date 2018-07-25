@@ -6,7 +6,7 @@ plugins {
 
 allprojects {
     group = 'com.bt.openlink'
-    version = '0.0.9-SNAPSHOT'
+    version = '0.0.9'
 }
 
 subprojects {
