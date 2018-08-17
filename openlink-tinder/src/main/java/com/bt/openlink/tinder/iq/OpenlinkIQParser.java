@@ -9,6 +9,7 @@ import javax.annotation.Nullable;
 
 import org.dom4j.Element;
 import org.xmpp.packet.IQ;
+import org.xmpp.packet.Packet;
 
 import com.bt.openlink.OpenlinkXmppNamespace;
 import com.bt.openlink.tinder.internal.TinderPacketUtil;
@@ -55,16 +56,17 @@ public final class OpenlinkIQParser {
             new IQMatcher(OpenlinkXmppNamespace.OPENLINK_REQUEST_ACTION, IQ.Type.result, RequestActionResult::from)
             );
 
+    @SuppressWarnings("unchecked")
     @Nonnull
-    public static IQ parse(@Nonnull final IQ iq) {
+    public static <P extends Packet> P parse(@Nonnull final IQ iq) {
         final String namespace = iq.getChildElement().getNamespaceURI();
         switch (namespace) {
         case "http://jabber.org/protocol/commands":
-            return parseCommand(iq);
+            return (P) parseCommand(iq);
         case "http://jabber.org/protocol/pubsub":
-            return parsePubSub(iq);
+            return (P) parsePubSub(iq);
         default:
-            return iq;
+            return (P) iq;
 
         }
     }

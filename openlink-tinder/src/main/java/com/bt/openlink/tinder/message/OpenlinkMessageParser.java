@@ -6,6 +6,7 @@ import javax.annotation.Nonnull;
 
 import org.dom4j.Element;
 import org.xmpp.packet.Message;
+import org.xmpp.packet.Packet;
 
 import com.bt.openlink.tinder.internal.TinderPacketUtil;
 
@@ -14,19 +15,20 @@ public final class OpenlinkMessageParser {
     private OpenlinkMessageParser() {
     }
 
+    @SuppressWarnings("unchecked")
     @Nonnull
-    public static Message parse(@Nonnull final Message message) {
+    public static <P extends Packet> P parse(@Nonnull final Message message) {
 
         final List elements = message.getElement().elements();
         if (elements.isEmpty()) {
-            return message;
+            return (P) message;
         }
         final Element childElement = (Element) elements.get(0);
         final String namespace = childElement.getNamespaceURI();
         if (namespace.equals("http://jabber.org/protocol/pubsub#event")) {
-            return parsePubSubEvent(message);
+            return (P) parsePubSubEvent(message);
         } else {
-            return message;
+            return (P) message;
         }
     }
 
