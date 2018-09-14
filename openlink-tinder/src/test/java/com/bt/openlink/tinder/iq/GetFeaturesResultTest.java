@@ -18,7 +18,7 @@ import com.bt.openlink.GetFeaturesFixtures;
 import com.bt.openlink.tinder.Fixtures;
 import com.bt.openlink.type.Feature;
 
-@SuppressWarnings({ "OptionalGetWithoutIsPresent", "ConstantConditions" })
+@SuppressWarnings("OptionalGetWithoutIsPresent")
 public class GetFeaturesResultTest {
 
     @Rule public final ExpectedException expectedException = ExpectedException.none();
@@ -97,7 +97,7 @@ public class GetFeaturesResultTest {
     @Test
     public void willParseAnXmppStanza() {
 
-        final GetFeaturesResult result = (GetFeaturesResult) OpenlinkIQParser.parse(Fixtures.iqFrom(GetFeaturesFixtures.GET_FEATURES_RESULT));
+        final GetFeaturesResult result = OpenlinkIQParser.parse(Fixtures.iqFrom(GetFeaturesFixtures.GET_FEATURES_RESULT));
         assertThat(result.getID(), is(CoreFixtures.STANZA_ID));
         assertThat(result.getTo(), is(Fixtures.TO_JID));
         assertThat(result.getFrom(), is(Fixtures.FROM_JID));

@@ -6,6 +6,8 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.xmlunit.matchers.CompareMatcher.isIdenticalTo;
 
+import java.util.Optional;
+
 import org.junit.Test;
 import org.xmpp.packet.IQ;
 
@@ -14,9 +16,7 @@ import com.bt.openlink.RequestActionFixtures;
 import com.bt.openlink.tinder.Fixtures;
 import com.bt.openlink.type.RequestAction;
 
-import java.util.Optional;
-
-@SuppressWarnings("ConstantConditions")
+@SuppressWarnings("OptionalGetWithoutIsPresent")
 public class RequestActionRequestTest {
 
     @Test
@@ -65,7 +65,7 @@ public class RequestActionRequestTest {
 
         final IQ stanza = Fixtures.iqFrom(RequestActionFixtures.REQUEST_ACTION_REQUEST);
 
-        final RequestActionRequest request = (RequestActionRequest) OpenlinkIQParser.parse(stanza);
+        final RequestActionRequest request = OpenlinkIQParser.parse(stanza);
 
         assertThat(request.getID(), is(CoreFixtures.STANZA_ID));
         assertThat(request.getTo(), is(Fixtures.TO_JID));
@@ -78,7 +78,7 @@ public class RequestActionRequestTest {
     }
 
     @Test
-    public void willReturnParsingErrors() throws Exception {
+    public void willReturnParsingErrors() {
 
         final IQ iq = Fixtures.iqFrom(RequestActionFixtures.REQUEST_ACTION_REQUEST_WITH_BAD_VALUES);
 

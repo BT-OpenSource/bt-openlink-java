@@ -16,7 +16,7 @@ import com.bt.openlink.PubSubSubscribeFixtures;
 import com.bt.openlink.tinder.Fixtures;
 import com.bt.openlink.type.SubscriptionState;
 
-@SuppressWarnings("ConstantConditions")
+@SuppressWarnings("OptionalGetWithoutIsPresent")
 public class PubSubSubscriptionResultTest {
 
     @Rule public final ExpectedException expectedException = ExpectedException.none();
@@ -73,7 +73,7 @@ public class PubSubSubscriptionResultTest {
     @Test
     public void willParseASubscribeXmppStanza() {
 
-        final PubSubSubscriptionResult request = (PubSubSubscriptionResult) OpenlinkIQParser.parse(Fixtures.iqFrom(PubSubSubscribeFixtures.SUBSCRIBE_RESULT));
+        final PubSubSubscriptionResult request = OpenlinkIQParser.parse(Fixtures.iqFrom(PubSubSubscribeFixtures.SUBSCRIBE_RESULT));
         assertThat(request.getID(), CoreMatchers.is(CoreFixtures.STANZA_ID));
         assertThat(request.getTo(), CoreMatchers.is(Fixtures.TO_JID));
         assertThat(request.getFrom(), CoreMatchers.is(Fixtures.FROM_JID));
@@ -87,7 +87,7 @@ public class PubSubSubscriptionResultTest {
     @Test
     public void willParseAnUnsubscribeXmppStanza() {
 
-        final PubSubSubscriptionResult request = (PubSubSubscriptionResult) OpenlinkIQParser.parse(Fixtures.iqFrom(PubSubSubscribeFixtures.UNSUBSCRIBE_RESULT));
+        final PubSubSubscriptionResult request = OpenlinkIQParser.parse(Fixtures.iqFrom(PubSubSubscribeFixtures.UNSUBSCRIBE_RESULT));
         assertThat(request.getID(), CoreMatchers.is(CoreFixtures.STANZA_ID));
         assertThat(request.getTo(), CoreMatchers.is(Fixtures.TO_JID));
         assertThat(request.getFrom(), CoreMatchers.is(Fixtures.FROM_JID));
@@ -102,7 +102,7 @@ public class PubSubSubscriptionResultTest {
     public void willRoundTripAnXmppStanza() {
 
         final IQ originalIQ = Fixtures.iqFrom(PubSubSubscribeFixtures.SUBSCRIBE_RESULT);
-        final PubSubSubscriptionResult request = (PubSubSubscriptionResult) OpenlinkIQParser.parse(originalIQ);
+        final PubSubSubscriptionResult request = OpenlinkIQParser.parse(originalIQ);
 
         assertThat(request.toXML(), isIdenticalTo(originalIQ.toXML()).ignoreWhitespace());
     }

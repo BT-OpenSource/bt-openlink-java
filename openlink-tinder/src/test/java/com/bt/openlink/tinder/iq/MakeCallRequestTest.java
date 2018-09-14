@@ -22,13 +22,13 @@ import com.bt.openlink.tinder.Fixtures;
 import com.bt.openlink.type.MakeCallFeature;
 import com.bt.openlink.type.OriginatorReference;
 
-@SuppressWarnings({ "ConstantConditions", "RedundantThrows" })
+@SuppressWarnings("OptionalGetWithoutIsPresent")
 public class MakeCallRequestTest {
 
     @Rule public final ExpectedException expectedException = ExpectedException.none();
 
     @Test
-    public void canCreateAStanza() throws Exception {
+    public void canCreateAStanza() {
 
         final MakeCallRequest request = MakeCallRequest.Builder.start()
                 .setId(CoreFixtures.STANZA_ID)
@@ -54,7 +54,7 @@ public class MakeCallRequestTest {
     }
 
     @Test
-    public void cannotCreateAStanzaWithoutAJID() throws Exception {
+    public void cannotCreateAStanzaWithoutAJID() {
 
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("The make-call request 'jid' has not been set");
@@ -65,7 +65,7 @@ public class MakeCallRequestTest {
     }
 
     @Test
-    public void willGenerateAnXmppStanza() throws Exception {
+    public void willGenerateAnXmppStanza() {
 
         final MakeCallRequest request = MakeCallRequest.Builder.start()
                 .setId(CoreFixtures.STANZA_ID)
@@ -84,9 +84,9 @@ public class MakeCallRequestTest {
     }
 
     @Test
-    public void willParseAnXmppStanza() throws Exception {
+    public void willParseAnXmppStanza() {
 
-        final MakeCallRequest request = (MakeCallRequest) OpenlinkIQParser.parse(Fixtures.iqFrom(MakeCallFixtures.MAKE_CALL_REQUEST));
+        final MakeCallRequest request = OpenlinkIQParser.parse(Fixtures.iqFrom(MakeCallFixtures.MAKE_CALL_REQUEST));
         assertThat(request.getID(), is(CoreFixtures.STANZA_ID));
         assertThat(request.getTo(), is(Fixtures.TO_JID));
         assertThat(request.getFrom(), is(Fixtures.FROM_JID));
@@ -103,7 +103,7 @@ public class MakeCallRequestTest {
     }
 
     @Test
-    public void willReturnParsingErrors() throws Exception {
+    public void willReturnParsingErrors() {
 
         final IQ iq = Fixtures.iqFrom(MakeCallFixtures.MAKE_CALL_REQUEST_WITH_BAD_VALUES);
 
@@ -126,7 +126,7 @@ public class MakeCallRequestTest {
     }
 
     @Test
-    public void willGenerateAStanzaEvenWithParsingErrors() throws Exception {
+    public void willGenerateAStanzaEvenWithParsingErrors() {
 
         final IQ iq = Fixtures.iqFrom(MakeCallFixtures.MAKE_CALL_REQUEST_WITH_BAD_VALUES);
 

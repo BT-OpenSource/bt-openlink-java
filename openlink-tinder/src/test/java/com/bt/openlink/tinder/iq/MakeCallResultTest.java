@@ -14,13 +14,13 @@ import com.bt.openlink.CoreFixtures;
 import com.bt.openlink.MakeCallFixtures;
 import com.bt.openlink.tinder.Fixtures;
 
-@SuppressWarnings({"ConstantConditions", "RedundantThrows"})
+@SuppressWarnings("OptionalGetWithoutIsPresent")
 public class MakeCallResultTest {
 
     @Rule public final ExpectedException expectedException = ExpectedException.none();
 
     @Test
-    public void canBuildAStanza() throws Exception {
+    public void canBuildAStanza() {
 
         final MakeCallResult result = MakeCallResult.Builder.start()
                 .setTo(Fixtures.TO_JID)
@@ -32,7 +32,7 @@ public class MakeCallResultTest {
     }
 
     @Test
-    public void willGenerateAnXmppStanza() throws Exception {
+    public void willGenerateAnXmppStanza() {
 
         final MakeCallResult result = MakeCallResult.Builder.start()
                 .setId(CoreFixtures.STANZA_ID)
@@ -45,7 +45,7 @@ public class MakeCallResultTest {
     }
 
     @Test
-    public void willEnsureTheStanzaHasACall() throws Exception {
+    public void willEnsureTheStanzaHasACall() {
 
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("The make-call result has no calls");
@@ -56,9 +56,9 @@ public class MakeCallResultTest {
     }
 
     @Test
-    public void willParseAnXmppStanza() throws Exception {
+    public void willParseAnXmppStanza() {
 
-        final MakeCallResult result = (MakeCallResult) OpenlinkIQParser.parse(Fixtures.iqFrom(MakeCallFixtures.MAKE_CALL_RESULT));
+        final MakeCallResult result = OpenlinkIQParser.parse(Fixtures.iqFrom(MakeCallFixtures.MAKE_CALL_RESULT));
 
         assertThat(result.getID(), is(CoreFixtures.STANZA_ID));
         assertThat(result.getTo(), is(Fixtures.TO_JID));
@@ -68,7 +68,7 @@ public class MakeCallResultTest {
     }
 
     @Test
-    public void willReturnParsingErrors() throws Exception {
+    public void willReturnParsingErrors() {
 
         final MakeCallResult result = MakeCallResult.from(Fixtures.iqFrom(MakeCallFixtures.MAKE_CALL_RESULT_WITH_BAD_VALUES));
 

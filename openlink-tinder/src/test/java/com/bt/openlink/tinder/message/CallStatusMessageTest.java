@@ -20,7 +20,7 @@ import com.bt.openlink.PubSubMessageFixtures;
 import com.bt.openlink.tinder.Fixtures;
 import com.bt.openlink.type.ItemId;
 
-@SuppressWarnings({ "ConstantConditions" })
+@SuppressWarnings("OptionalGetWithoutIsPresent")
 public class CallStatusMessageTest {
 
     @Rule public final ExpectedException expectedException = ExpectedException.none();
@@ -73,7 +73,7 @@ public class CallStatusMessageTest {
 
         final Message stanza = Fixtures.messageFrom(PubSubMessageFixtures.CALL_STATUS_MESSAGE);
 
-        final CallStatusMessage message = (CallStatusMessage) OpenlinkMessageParser.parse(stanza);
+        final CallStatusMessage message = OpenlinkMessageParser.parse(stanza);
 
         assertThat(message.getID(), is(CoreFixtures.STANZA_ID));
         assertThat(message.getTo(), is(Fixtures.TO_JID));
@@ -112,7 +112,7 @@ public class CallStatusMessageTest {
     public void willParseAMessageWithADelay() {
         final Message stanza = Fixtures.messageFrom(PubSubMessageFixtures.CALL_STATUS_MESSAGE_DELAYED);
 
-        final CallStatusMessage message = (CallStatusMessage) OpenlinkMessageParser.parse(stanza);
+        final CallStatusMessage message = OpenlinkMessageParser.parse(stanza);
         assertThat(message.getDelay().get(), is(PubSubMessageFixtures.DELAYED_FROM));
     }
 
@@ -120,7 +120,7 @@ public class CallStatusMessageTest {
     public void willParseAMessageWithBadFields() {
         final Message stanza = Fixtures.messageFrom(PubSubMessageFixtures.CALL_STATUS_MESSAGE_DELAYED_WITH_BAD_TIMESTAMP);
 
-        final CallStatusMessage message = (CallStatusMessage) OpenlinkMessageParser.parse(stanza);
+        final CallStatusMessage message = OpenlinkMessageParser.parse(stanza);
         assertThat(message.getDelay(), is(Optional.empty()));
         assertThat(
                 message.getParseErrors(),
@@ -131,7 +131,7 @@ public class CallStatusMessageTest {
     public void theLegacyTimestampShouldMatchTheStartTime() {
         final Message stanza = Fixtures.messageFrom(PubSubMessageFixtures.CALL_STATUS_MESSAGE_WITH_MISMATCHED_TIMESTAMPS);
 
-        final CallStatusMessage message = (CallStatusMessage) OpenlinkMessageParser.parse(stanza);
+        final CallStatusMessage message = OpenlinkMessageParser.parse(stanza);
 
         assertThat(message.getParseErrors(), contains("Invalid participant; the legacy timestamp field does not match the start time field", "Invalid participant; the legacy timestamp field does not match the start time field"));
     }

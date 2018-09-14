@@ -15,14 +15,14 @@ import com.bt.openlink.CoreFixtures;
 import com.bt.openlink.GetFeaturesFixtures;
 import com.bt.openlink.tinder.Fixtures;
 
-@SuppressWarnings("ConstantConditions")
+@SuppressWarnings("OptionalGetWithoutIsPresent")
 public class GetFeaturesRequestTest {
 
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
 
     @Test
-    public void canCreateAStanza() throws Exception {
+    public void canCreateAStanza() {
 
         final GetFeaturesRequest request = GetFeaturesRequest.Builder.start()
                 .setId(CoreFixtures.STANZA_ID)
@@ -38,7 +38,7 @@ public class GetFeaturesRequestTest {
     }
 
     @Test
-    public void willGenerateAnXmppStanza() throws Exception {
+    public void willGenerateAnXmppStanza() {
 
         final GetFeaturesRequest request = GetFeaturesRequest.Builder.start()
                 .setId(CoreFixtures.STANZA_ID)
@@ -51,9 +51,9 @@ public class GetFeaturesRequestTest {
     }
 
     @Test
-    public void willParseAnXmppStanza() throws Exception {
+    public void willParseAnXmppStanza() {
 
-        final GetFeaturesRequest request = (GetFeaturesRequest) OpenlinkIQParser.parse(Fixtures.iqFrom(GetFeaturesFixtures.GET_FEATURES_REQUEST));
+        final GetFeaturesRequest request = OpenlinkIQParser.parse(Fixtures.iqFrom(GetFeaturesFixtures.GET_FEATURES_REQUEST));
         assertThat(request.getID(), is(CoreFixtures.STANZA_ID));
         assertThat(request.getTo(), is(Fixtures.TO_JID));
         assertThat(request.getFrom(), is(Fixtures.FROM_JID));
@@ -63,7 +63,7 @@ public class GetFeaturesRequestTest {
     }
 
     @Test
-    public void willReturnParsingErrors() throws Exception {
+    public void willReturnParsingErrors() {
 
         final GetFeaturesRequest request = GetFeaturesRequest.from(Fixtures.iqFrom(GetFeaturesFixtures.GET_FEATURES_REQUEST_WITH_BAD_VALUES));
 
@@ -76,7 +76,7 @@ public class GetFeaturesRequestTest {
     }
 
     @Test
-    public void willGenerateAStanzaEvenWithParsingErrors() throws Exception {
+    public void willGenerateAStanzaEvenWithParsingErrors() {
 
         final IQ iq = Fixtures.iqFrom(GetFeaturesFixtures.GET_FEATURES_REQUEST_WITH_BAD_VALUES);
 

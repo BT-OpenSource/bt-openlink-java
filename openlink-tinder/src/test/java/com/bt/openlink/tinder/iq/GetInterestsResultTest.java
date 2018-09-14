@@ -20,7 +20,7 @@ import com.bt.openlink.type.Interest;
 import com.bt.openlink.type.InterestId;
 import com.bt.openlink.type.InterestType;
 
-@SuppressWarnings({ "OptionalGetWithoutIsPresent", "ConstantConditions" })
+@SuppressWarnings("OptionalGetWithoutIsPresent")
 public class GetInterestsResultTest {
 
     @Rule public final ExpectedException expectedException = ExpectedException.none();
@@ -79,7 +79,7 @@ public class GetInterestsResultTest {
     @Test
     public void willParseAnXmppStanza() {
 
-        final GetInterestsResult result = (GetInterestsResult) OpenlinkIQParser.parse(Fixtures.iqFrom(GetInterestsFixtures.GET_INTERESTS_RESULT));
+        final GetInterestsResult result = OpenlinkIQParser.parse(Fixtures.iqFrom(GetInterestsFixtures.GET_INTERESTS_RESULT));
         assertThat(result.getID(), is(CoreFixtures.STANZA_ID));
         assertThat(result.getTo(), is(Fixtures.TO_JID));
         assertThat(result.getFrom(), is(Fixtures.FROM_JID));

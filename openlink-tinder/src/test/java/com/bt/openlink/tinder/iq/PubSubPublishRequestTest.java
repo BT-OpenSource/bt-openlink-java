@@ -23,7 +23,7 @@ import com.bt.openlink.tinder.Fixtures;
 import com.bt.openlink.type.DeviceStatus;
 import com.bt.openlink.type.PubSubNodeId;
 
-@SuppressWarnings({"ConstantConditions"})
+@SuppressWarnings("OptionalGetWithoutIsPresent")
 public class PubSubPublishRequestTest {
     @Rule public final ExpectedException expectedException = ExpectedException.none();
 
@@ -100,7 +100,7 @@ public class PubSubPublishRequestTest {
     @Test
     public void willParseAnXmppStanza() {
 
-        final PubSubPublishRequest request = (PubSubPublishRequest) OpenlinkIQParser.parse(Fixtures.iqFrom(PubSubPublishFixtures.PUBLISH_REQUEST_CALL_STATUS));
+        final PubSubPublishRequest request = OpenlinkIQParser.parse(Fixtures.iqFrom(PubSubPublishFixtures.PUBLISH_REQUEST_CALL_STATUS));
         assertThat(request.getID(), CoreMatchers.is(CoreFixtures.STANZA_ID));
         assertThat(request.getTo(), CoreMatchers.is(Fixtures.TO_JID));
         assertThat(request.getFrom(), CoreMatchers.is(Fixtures.FROM_JID));
@@ -114,7 +114,7 @@ public class PubSubPublishRequestTest {
     public void willRoundTripAnXmppStanza() {
 
         final IQ originalIQ = Fixtures.iqFrom(PubSubPublishFixtures.PUBLISH_REQUEST_CALL_STATUS);
-        final PubSubPublishRequest request = (PubSubPublishRequest) OpenlinkIQParser.parse(originalIQ);
+        final PubSubPublishRequest request = OpenlinkIQParser.parse(originalIQ);
 
         assertThat(request.toXML(), isIdenticalTo(PubSubPublishFixtures.PUBLISH_REQUEST_CALL_STATUS).ignoreWhitespace());
     }
@@ -154,7 +154,7 @@ public class PubSubPublishRequestTest {
     @Test
     public void willParseADeviceStatusXmppStanza() {
 
-        final PubSubPublishRequest request = (PubSubPublishRequest) OpenlinkIQParser.parse(Fixtures.iqFrom(PubSubPublishFixtures.PUBLISH_REQUEST_DEVICE_STATUS));
+        final PubSubPublishRequest request = OpenlinkIQParser.parse(Fixtures.iqFrom(PubSubPublishFixtures.PUBLISH_REQUEST_DEVICE_STATUS));
 
         final DeviceStatus deviceStatus = request.getDeviceStatus().get();
         assertReflectionEquals(CoreFixtures.DEVICE_STATUS_LOGON, deviceStatus);

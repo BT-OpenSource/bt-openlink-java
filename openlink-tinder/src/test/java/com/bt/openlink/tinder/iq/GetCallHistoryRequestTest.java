@@ -19,13 +19,13 @@ import com.bt.openlink.GetCallHistoryFixtures;
 import com.bt.openlink.tinder.Fixtures;
 import com.bt.openlink.type.CallType;
 
-@SuppressWarnings({ "OptionalGetWithoutIsPresent", "ConstantConditions" })
+@SuppressWarnings("OptionalGetWithoutIsPresent")
 public class GetCallHistoryRequestTest {
 
     @Rule public final ExpectedException expectedException = ExpectedException.none();
 
     @Test
-    public void canCreateAStanza() throws Exception {
+    public void canCreateAStanza() {
 
         final GetCallHistoryRequest request = GetCallHistoryRequest.Builder.start()
                 .setId(CoreFixtures.STANZA_ID)
@@ -47,7 +47,7 @@ public class GetCallHistoryRequestTest {
     }
 
     @Test
-    public void canCreateAStanzaWithoutAJID() throws Exception {
+    public void canCreateAStanzaWithoutAJID() {
 
         final GetCallHistoryRequest request = GetCallHistoryRequest.Builder.start()
                 .setId(CoreFixtures.STANZA_ID)
@@ -59,7 +59,7 @@ public class GetCallHistoryRequestTest {
     }
 
     @Test
-    public void willGenerateAnXmppStanza() throws Exception {
+    public void willGenerateAnXmppStanza() {
 
         final GetCallHistoryRequest request = GetCallHistoryRequest.Builder.start()
                 .setId(CoreFixtures.STANZA_ID)
@@ -72,7 +72,7 @@ public class GetCallHistoryRequestTest {
     }
 
     @Test
-    public void willGenerateAnXmppStanzaWithAllFields() throws Exception {
+    public void willGenerateAnXmppStanzaWithAllFields() {
 
         final GetCallHistoryRequest request = GetCallHistoryRequest.Builder.start()
                 .setId(CoreFixtures.STANZA_ID)
@@ -92,9 +92,9 @@ public class GetCallHistoryRequestTest {
     }
 
     @Test
-    public void willParseAnXmppStanza() throws Exception {
+    public void willParseAnXmppStanza() {
 
-        final GetCallHistoryRequest request = (GetCallHistoryRequest) OpenlinkIQParser.parse(Fixtures.iqFrom(GetCallHistoryFixtures.GET_CALL_HISTORY_REQUEST));
+        final GetCallHistoryRequest request = OpenlinkIQParser.parse(Fixtures.iqFrom(GetCallHistoryFixtures.GET_CALL_HISTORY_REQUEST));
         assertThat(request.getID(), CoreMatchers.is(CoreFixtures.STANZA_ID));
         assertThat(request.getTo(), CoreMatchers.is(Fixtures.TO_JID));
         assertThat(request.getFrom(), CoreMatchers.is(Fixtures.FROM_JID));
@@ -111,9 +111,9 @@ public class GetCallHistoryRequestTest {
     }
 
     @Test
-    public void willParseAnXmppStanzaWithAnEmptyForJid() throws Exception {
+    public void willParseAnXmppStanzaWithAnEmptyForJid() {
 
-        final GetCallHistoryRequest request = (GetCallHistoryRequest) OpenlinkIQParser.parse(Fixtures.iqFrom(GetCallHistoryFixtures.GET_CALL_HISTORY_REQUEST_FOR_ALL_USERS));
+        final GetCallHistoryRequest request = OpenlinkIQParser.parse(Fixtures.iqFrom(GetCallHistoryFixtures.GET_CALL_HISTORY_REQUEST_FOR_ALL_USERS));
         assertThat(request.getID(), is(CoreFixtures.STANZA_ID));
         assertThat(request.getTo(), is(Fixtures.TO_JID));
         assertThat(request.getFrom(), is(Fixtures.FROM_JID));
@@ -130,9 +130,9 @@ public class GetCallHistoryRequestTest {
     }
 
     @Test
-    public void willParseAnXmppStanzaWithAllFields() throws Exception {
+    public void willParseAnXmppStanzaWithAllFields() {
 
-        final GetCallHistoryRequest request = (GetCallHistoryRequest) OpenlinkIQParser.parse(Fixtures.iqFrom(GetCallHistoryFixtures.GET_CALL_HISTORY_REQUEST_WITH_ALL_FIELDS));
+        final GetCallHistoryRequest request = OpenlinkIQParser.parse(Fixtures.iqFrom(GetCallHistoryFixtures.GET_CALL_HISTORY_REQUEST_WITH_ALL_FIELDS));
 
         assertThat(request.getID(), CoreMatchers.is(CoreFixtures.STANZA_ID));
         assertThat(request.getTo(), CoreMatchers.is(Fixtures.TO_JID));
@@ -150,7 +150,7 @@ public class GetCallHistoryRequestTest {
     }
 
     @Test
-    public void willReturnParsingErrors() throws Exception {
+    public void willReturnParsingErrors() {
 
         final GetCallHistoryRequest request = GetCallHistoryRequest.from(Fixtures.iqFrom(GetCallHistoryFixtures.GET_CALL_HISTORY_REQUEST_WITH_BAD_VALUES));
 
@@ -168,10 +168,10 @@ public class GetCallHistoryRequestTest {
     }
 
     @Test
-    public void shouldRoundTripAStanza() throws Exception {
+    public void shouldRoundTripAStanza() {
 
         final IQ originalStanza = Fixtures.iqFrom(GetCallHistoryFixtures.GET_CALL_HISTORY_REQUEST);
-        final GetCallHistoryRequest request = (GetCallHistoryRequest) OpenlinkIQParser.parse(originalStanza);
+        final GetCallHistoryRequest request = OpenlinkIQParser.parse(originalStanza);
 
         assertThat(request.toXML(), isIdenticalTo(originalStanza.toXML()).ignoreWhitespace());
     }

@@ -19,7 +19,6 @@ import com.bt.openlink.GetProfilesFixtures;
 import com.bt.openlink.tinder.Fixtures;
 import com.bt.openlink.type.Profile;
 
-@SuppressWarnings({ "ConstantConditions" })
 public class GetProfilesResultTest {
 
     @Rule public final ExpectedException expectedException = ExpectedException.none();
@@ -56,7 +55,7 @@ public class GetProfilesResultTest {
     @Test
     public void willParseAnXmppStanza() {
 
-        final GetProfilesResult result = (GetProfilesResult) OpenlinkIQParser.parse(Fixtures.iqFrom(GetProfilesFixtures.GET_PROFILES_RESULT_WITH_NO_NOTES));
+        final GetProfilesResult result = OpenlinkIQParser.parse(Fixtures.iqFrom(GetProfilesFixtures.GET_PROFILES_RESULT_WITH_NO_NOTES));
         assertThat(result.getTo(), is(Fixtures.TO_JID));
         assertThat(result.getFrom(), is(Fixtures.FROM_JID));
         assertThat(result.getID(), is(CoreFixtures.STANZA_ID));

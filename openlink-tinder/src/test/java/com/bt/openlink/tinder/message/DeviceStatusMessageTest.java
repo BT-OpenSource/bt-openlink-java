@@ -18,7 +18,7 @@ import com.bt.openlink.tinder.Fixtures;
 import com.bt.openlink.type.DeviceStatus;
 import com.bt.openlink.type.ItemId;
 
-@SuppressWarnings("ConstantConditions")
+@SuppressWarnings("OptionalGetWithoutIsPresent")
 public class DeviceStatusMessageTest {
 
     @Rule
@@ -45,6 +45,7 @@ public class DeviceStatusMessageTest {
         assertThat(deviceStatus.getProfileId().get(), is(CoreFixtures.PROFILE_ID));
     }
 
+    @SuppressWarnings("OptionalGetWithoutIsPresent")
     @Test
     public void willGenerateAnXmppStanza() {
 
@@ -74,7 +75,7 @@ public class DeviceStatusMessageTest {
 
         final Message stanza = Fixtures.messageFrom(PubSubMessageFixtures.DEVICE_STATUS_MESSAGE);
 
-        final DeviceStatusMessage message = (DeviceStatusMessage) OpenlinkMessageParser.parse(stanza);
+        final DeviceStatusMessage message = OpenlinkMessageParser.parse(stanza);
 
         assertThat(message.getID(), is(CoreFixtures.STANZA_ID));
         assertThat(message.getTo(), is(Fixtures.TO_JID));

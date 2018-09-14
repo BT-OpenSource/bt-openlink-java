@@ -16,7 +16,7 @@ import com.bt.openlink.PubSubSubscribeFixtures;
 import com.bt.openlink.tinder.Fixtures;
 import com.bt.openlink.type.SubscriptionState;
 
-@SuppressWarnings("ConstantConditions")
+@SuppressWarnings("OptionalGetWithoutIsPresent")
 public class PubSubSubscriptionRequestTest {
 
     @Rule public final ExpectedException expectedException = ExpectedException.none();
@@ -73,7 +73,7 @@ public class PubSubSubscriptionRequestTest {
     @Test
     public void willParseAnXmppStanza() {
 
-        final PubSubSubscriptionRequest request = (PubSubSubscriptionRequest) OpenlinkIQParser.parse(Fixtures.iqFrom(PubSubSubscribeFixtures.SUBSCRIBE_REQUEST));
+        final PubSubSubscriptionRequest request = OpenlinkIQParser.parse(Fixtures.iqFrom(PubSubSubscribeFixtures.SUBSCRIBE_REQUEST));
         assertThat(request.getID(), CoreMatchers.is(CoreFixtures.STANZA_ID));
         assertThat(request.getTo(), CoreMatchers.is(Fixtures.TO_JID));
         assertThat(request.getFrom(), CoreMatchers.is(Fixtures.FROM_JID));
@@ -88,7 +88,7 @@ public class PubSubSubscriptionRequestTest {
     public void willRoundTripAnXmppStanza() {
 
         final IQ originalIQ = Fixtures.iqFrom(PubSubSubscribeFixtures.SUBSCRIBE_REQUEST);
-        final PubSubSubscriptionRequest request = (PubSubSubscriptionRequest) OpenlinkIQParser.parse(originalIQ);
+        final PubSubSubscriptionRequest request = OpenlinkIQParser.parse(originalIQ);
 
         assertThat(request.toXML(), isIdenticalTo(originalIQ.toXML()).ignoreWhitespace());
     }

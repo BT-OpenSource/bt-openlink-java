@@ -13,7 +13,7 @@ import com.bt.openlink.CoreFixtures;
 import com.bt.openlink.RequestActionFixtures;
 import com.bt.openlink.tinder.Fixtures;
 
-@SuppressWarnings("ConstantConditions")
+@SuppressWarnings("OptionalGetWithoutIsPresent")
 public class RequestActionResultTest {
 
     @Rule
@@ -58,7 +58,7 @@ public class RequestActionResultTest {
     @Test
     public void willParseAnXmppStanza() {
 
-        final RequestActionResult result = (RequestActionResult) OpenlinkIQParser.parse(Fixtures.iqFrom(RequestActionFixtures.REQUEST_ACTION_RESULT));
+        final RequestActionResult result = OpenlinkIQParser.parse(Fixtures.iqFrom(RequestActionFixtures.REQUEST_ACTION_RESULT));
 
         assertThat(result.getID(), is(CoreFixtures.STANZA_ID));
         assertThat(result.getTo(), is(Fixtures.TO_JID));

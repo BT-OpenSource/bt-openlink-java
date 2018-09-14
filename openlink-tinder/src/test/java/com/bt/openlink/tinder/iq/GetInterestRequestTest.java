@@ -17,14 +17,14 @@ import com.bt.openlink.CoreFixtures;
 import com.bt.openlink.GetInterestFixtures;
 import com.bt.openlink.tinder.Fixtures;
 
-@SuppressWarnings("ConstantConditions")
+@SuppressWarnings("OptionalGetWithoutIsPresent")
 public class GetInterestRequestTest {
 
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
 
     @Test
-    public void canCreateAStanza() throws Exception {
+    public void canCreateAStanza() {
 
         final GetInterestRequest request = GetInterestRequest.Builder.start()
                 .setId(CoreFixtures.STANZA_ID)
@@ -40,7 +40,7 @@ public class GetInterestRequestTest {
     }
 
     @Test
-    public void willGenerateAnXmppStanza() throws Exception {
+    public void willGenerateAnXmppStanza() {
 
         final GetInterestRequest request = GetInterestRequest.Builder.start()
                 .setId(CoreFixtures.STANZA_ID)
@@ -53,7 +53,7 @@ public class GetInterestRequestTest {
     }
 
     @Test
-    public void willGenerateAnXmppStanzaWithARandomId() throws Exception {
+    public void willGenerateAnXmppStanzaWithARandomId() {
 
         final GetInterestsRequest request = GetInterestsRequest.Builder.start()
                 .setTo(Fixtures.TO_JID)
@@ -65,9 +65,9 @@ public class GetInterestRequestTest {
     }
 
     @Test
-    public void willParseAnXmppStanza() throws Exception {
+    public void willParseAnXmppStanza() {
 
-        final GetInterestRequest request = (GetInterestRequest) OpenlinkIQParser.parse(Fixtures.iqFrom(GetInterestFixtures.GET_INTEREST_REQUEST));
+        final GetInterestRequest request = OpenlinkIQParser.parse(Fixtures.iqFrom(GetInterestFixtures.GET_INTEREST_REQUEST));
         assertThat(request.getID(), is(CoreFixtures.STANZA_ID));
         assertThat(request.getTo(), is(Fixtures.TO_JID));
         assertThat(request.getFrom(), is(Fixtures.FROM_JID));
@@ -77,7 +77,7 @@ public class GetInterestRequestTest {
     }
 
     @Test
-    public void willReturnParsingErrors() throws Exception {
+    public void willReturnParsingErrors() {
 
         final GetInterestRequest request = GetInterestRequest.from(Fixtures.iqFrom(GetInterestFixtures.GET_INTEREST_REQUEST_WITH_BAD_VALUES));
 
@@ -90,7 +90,7 @@ public class GetInterestRequestTest {
     }
 
     @Test
-    public void willGenerateAStanzaEvenWithParsingErrors() throws Exception {
+    public void willGenerateAStanzaEvenWithParsingErrors() {
 
         final GetInterestRequest request = GetInterestRequest.from(Fixtures.iqFrom(GetInterestFixtures.GET_INTEREST_REQUEST_WITH_BAD_VALUES));
 

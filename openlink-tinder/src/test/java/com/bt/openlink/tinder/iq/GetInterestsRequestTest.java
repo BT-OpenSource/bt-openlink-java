@@ -15,14 +15,14 @@ import com.bt.openlink.CoreFixtures;
 import com.bt.openlink.GetInterestsFixtures;
 import com.bt.openlink.tinder.Fixtures;
 
-@SuppressWarnings("ConstantConditions")
+@SuppressWarnings("OptionalGetWithoutIsPresent")
 public class GetInterestsRequestTest {
 
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
 
     @Test
-    public void canCreateAStanza() throws Exception {
+    public void canCreateAStanza() {
 
         final GetInterestsRequest request = GetInterestsRequest.Builder.start()
                 .setId(CoreFixtures.STANZA_ID)
@@ -38,7 +38,7 @@ public class GetInterestsRequestTest {
     }
 
     @Test
-    public void cannotCreateAStanzaWithoutAProfileId() throws Exception {
+    public void cannotCreateAStanzaWithoutAProfileId() {
 
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("The get-interests request 'profileId' has not been set");
@@ -49,7 +49,7 @@ public class GetInterestsRequestTest {
     }
 
     @Test
-    public void willGenerateAnXmppStanza() throws Exception {
+    public void willGenerateAnXmppStanza() {
 
         final GetInterestsRequest request = GetInterestsRequest.Builder.start()
                 .setId(CoreFixtures.STANZA_ID)
@@ -62,9 +62,9 @@ public class GetInterestsRequestTest {
     }
 
     @Test
-    public void willParseAnXmppStanza() throws Exception {
+    public void willParseAnXmppStanza() {
 
-        final GetInterestsRequest request = (GetInterestsRequest) OpenlinkIQParser.parse(Fixtures.iqFrom(GetInterestsFixtures.GET_INTERESTS_REQUEST));
+        final GetInterestsRequest request = OpenlinkIQParser.parse(Fixtures.iqFrom(GetInterestsFixtures.GET_INTERESTS_REQUEST));
         assertThat(request.getID(), is(CoreFixtures.STANZA_ID));
         assertThat(request.getTo(), is(Fixtures.TO_JID));
         assertThat(request.getFrom(), is(Fixtures.FROM_JID));
@@ -74,7 +74,7 @@ public class GetInterestsRequestTest {
     }
 
     @Test
-    public void willReturnParsingErrors() throws Exception {
+    public void willReturnParsingErrors() {
 
         final IQ iq = Fixtures.iqFrom(GetInterestsFixtures.GET_INTERESTS_REQUEST_WITH_BAD_VALUES);
 
@@ -89,7 +89,7 @@ public class GetInterestsRequestTest {
     }
 
     @Test
-    public void willGenerateAStanzaEvenWithParsingErrors() throws Exception {
+    public void willGenerateAStanzaEvenWithParsingErrors() {
 
         final IQ iq = Fixtures.iqFrom(GetInterestsFixtures.GET_INTERESTS_REQUEST_WITH_BAD_VALUES);
 
