@@ -25,7 +25,7 @@ public class GetProfilesRequestTest {
     @Rule public final ExpectedException expectedException = ExpectedException.none();
 
     @Test
-    public void canCreateAStanza() throws Exception {
+    public void canCreateAStanza() {
 
         final GetProfilesRequest request = GetProfilesRequest.Builder.start()
                 .setId(CoreFixtures.STANZA_ID)
@@ -41,7 +41,7 @@ public class GetProfilesRequestTest {
     }
 
     @Test
-    public void cannotCreateAStanzaWithoutAToField() throws Exception {
+    public void cannotCreateAStanzaWithoutAToField() {
 
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("The stanza 'to' has not been set");
@@ -50,7 +50,7 @@ public class GetProfilesRequestTest {
     }
 
     @Test
-    public void cannotCreateAStanzaWithoutAJID() throws Exception {
+    public void cannotCreateAStanzaWithoutAJID() {
 
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("The get-profiles request 'jid' has not been set");
@@ -61,7 +61,7 @@ public class GetProfilesRequestTest {
     }
 
     @Test
-    public void willGenerateAnXmppStanza() throws Exception {
+    public void willGenerateAnXmppStanza() {
 
         final GetProfilesRequest request = GetProfilesRequest.Builder.start()
                 .setId(CoreFixtures.STANZA_ID)
@@ -74,7 +74,7 @@ public class GetProfilesRequestTest {
     }
 
     @Test
-    public void willGenerateAnXmppStanzaWithARandomId() throws Exception {
+    public void willGenerateAnXmppStanzaWithARandomId() {
 
         final GetProfilesRequest request = GetProfilesRequest.Builder.start()
                 .setTo(Fixtures.TO_JID)
@@ -86,9 +86,9 @@ public class GetProfilesRequestTest {
     }
 
     @Test
-    public void willParseAnXmppStanza() throws Exception {
+    public void willParseAnXmppStanza() {
 
-        final GetProfilesRequest request = (GetProfilesRequest) OpenlinkIQParser.parse(Fixtures.iqFrom(GetProfilesFixtures.GET_PROFILES_REQUEST));
+        final GetProfilesRequest request = OpenlinkIQParser.parse(Fixtures.iqFrom(GetProfilesFixtures.GET_PROFILES_REQUEST));
         assertThat(request.getID(), is(CoreFixtures.STANZA_ID));
         assertThat(request.getTo(), is(Fixtures.TO_JID));
         assertThat(request.getFrom(), is(Fixtures.FROM_JID));
@@ -98,7 +98,7 @@ public class GetProfilesRequestTest {
     }
 
     @Test
-    public void willReturnParsingErrors() throws Exception {
+    public void willReturnParsingErrors() {
 
         final IQ iq = Fixtures.iqFrom(GetProfilesFixtures.GET_PROFILES_REQUEST_WITH_BAD_VALUES);
 
@@ -119,7 +119,7 @@ public class GetProfilesRequestTest {
     }
 
     @Test
-    public void willGenerateAStanzaEvenWithParsingErrors() throws Exception {
+    public void willGenerateAStanzaEvenWithParsingErrors() {
 
         final IQ iq = Fixtures.iqFrom(GetProfilesFixtures.GET_PROFILES_REQUEST_WITH_BAD_VALUES);
 
@@ -128,4 +128,13 @@ public class GetProfilesRequestTest {
         assertThat(request.toXML(), isIdenticalTo(iq.toXML()).ignoreWhitespace());
     }
 
+    @Test
+    public void willParseAnErrorPacket() {
+
+        final IQ iq = Fixtures.iqFrom(GetProfilesFixtures.GET_PROFILES_ERROR);
+
+        final GetProfilesRequest request = OpenlinkIQParser.parse(iq);
+
+        assertThat(request.toXML(), isIdenticalTo(iq.toXML()).ignoreWhitespace());
+    }
 }

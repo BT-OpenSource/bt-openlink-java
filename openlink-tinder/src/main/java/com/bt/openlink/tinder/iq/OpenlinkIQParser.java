@@ -2,14 +2,13 @@ package com.bt.openlink.tinder.iq;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import org.dom4j.Element;
 import org.xmpp.packet.IQ;
 import org.xmpp.packet.Packet;
+import org.xmpp.packet.PacketError;
 
 import com.bt.openlink.OpenlinkXmppNamespace;
 import com.bt.openlink.tinder.internal.TinderPacketUtil;
@@ -25,36 +24,42 @@ public final class OpenlinkIQParser {
 
     private static class IQMatcher {
 
-        private final OpenlinkXmppNamespace namespace;
-        private final IQ.Type type;
+        private final String namespace;
+        private final String attribute;
+        private final String value;
         private final StanzaFactory stanzaFactory;
 
-        IQMatcher(final OpenlinkXmppNamespace namespace, final IQ.Type type, final StanzaFactory stanzaFactory) {
-            this.namespace = namespace;
-            this.type = type;
+        IQMatcher(final OpenlinkXmppNamespace namespace, final String attribute, final String value, final StanzaFactory stanzaFactory) {
+            this.namespace = namespace.uri();
+            this.attribute = attribute;
+            this.value = value;
             this.stanzaFactory = stanzaFactory;
         }
 
-        boolean matches(@Nullable final String namespace, @Nullable final IQ.Type type) {
-            return this.type == type && this.namespace.uri().equals(namespace);
+        boolean matches(final Element commandElement) {
+            return namespace.equals(TinderPacketUtil.getNullableStringAttribute(commandElement, "node"))
+                    && value.equals(TinderPacketUtil.getNullableStringAttribute(commandElement, attribute));
         }
     }
 
+    private static final String ATTRIBUTE_ACTION = "action";
+    private static final String ATTRIBUTE_STATUS = "status";
+    private static final String ACTION_EXECUTE = "execute";
+    private static final String ACTION_COMPLETED = "completed";
     private static final List<IQMatcher> STANZA_TYPE_MATCHER_LIST = Arrays.asList(
-            new IQMatcher(OpenlinkXmppNamespace.OPENLINK_GET_PROFILES, IQ.Type.set, GetProfilesRequest::from),
-            new IQMatcher(OpenlinkXmppNamespace.OPENLINK_GET_PROFILES, IQ.Type.result, GetProfilesResult::from),
-            new IQMatcher(OpenlinkXmppNamespace.OPENLINK_GET_INTERESTS, IQ.Type.set, GetInterestsRequest::from),
-            new IQMatcher(OpenlinkXmppNamespace.OPENLINK_GET_INTERESTS, IQ.Type.result, GetInterestsResult::from),
-            new IQMatcher(OpenlinkXmppNamespace.OPENLINK_GET_INTEREST, IQ.Type.set, GetInterestRequest::from),
-            new IQMatcher(OpenlinkXmppNamespace.OPENLINK_GET_INTEREST, IQ.Type.result, GetInterestResult::from),
-            new IQMatcher(OpenlinkXmppNamespace.OPENLINK_GET_FEATURES, IQ.Type.set, GetFeaturesRequest::from),
-            new IQMatcher(OpenlinkXmppNamespace.OPENLINK_GET_FEATURES, IQ.Type.result, GetFeaturesResult::from),
-            new IQMatcher(OpenlinkXmppNamespace.OPENLINK_GET_CALL_HISTORY, IQ.Type.set, GetCallHistoryRequest::from),
-            new IQMatcher(OpenlinkXmppNamespace.OPENLINK_MAKE_CALL, IQ.Type.set, MakeCallRequest::from),
-            new IQMatcher(OpenlinkXmppNamespace.OPENLINK_MAKE_CALL, IQ.Type.result, MakeCallResult::from),
-            new IQMatcher(OpenlinkXmppNamespace.OPENLINK_REQUEST_ACTION, IQ.Type.set, RequestActionRequest::from),
-            new IQMatcher(OpenlinkXmppNamespace.OPENLINK_REQUEST_ACTION, IQ.Type.result, RequestActionResult::from)
-            );
+            new IQMatcher(OpenlinkXmppNamespace.OPENLINK_GET_PROFILES, ATTRIBUTE_ACTION, ACTION_EXECUTE, GetProfilesRequest::from),
+            new IQMatcher(OpenlinkXmppNamespace.OPENLINK_GET_PROFILES, ATTRIBUTE_STATUS, ACTION_COMPLETED, GetProfilesResult::from),
+            new IQMatcher(OpenlinkXmppNamespace.OPENLINK_GET_INTERESTS, ATTRIBUTE_ACTION, ACTION_EXECUTE, GetInterestsRequest::from),
+            new IQMatcher(OpenlinkXmppNamespace.OPENLINK_GET_INTERESTS, ATTRIBUTE_STATUS, ACTION_COMPLETED, GetInterestsResult::from),
+            new IQMatcher(OpenlinkXmppNamespace.OPENLINK_GET_INTEREST, ATTRIBUTE_ACTION, ACTION_EXECUTE, GetInterestRequest::from),
+            new IQMatcher(OpenlinkXmppNamespace.OPENLINK_GET_INTEREST, ATTRIBUTE_STATUS, ACTION_COMPLETED, GetInterestResult::from),
+            new IQMatcher(OpenlinkXmppNamespace.OPENLINK_GET_FEATURES, ATTRIBUTE_ACTION, ACTION_EXECUTE, GetFeaturesRequest::from),
+            new IQMatcher(OpenlinkXmppNamespace.OPENLINK_GET_FEATURES, ATTRIBUTE_STATUS, ACTION_COMPLETED, GetFeaturesResult::from),
+            new IQMatcher(OpenlinkXmppNamespace.OPENLINK_GET_CALL_HISTORY, ATTRIBUTE_ACTION, ACTION_EXECUTE, GetCallHistoryRequest::from),
+            new IQMatcher(OpenlinkXmppNamespace.OPENLINK_MAKE_CALL, ATTRIBUTE_ACTION, ACTION_EXECUTE, MakeCallRequest::from),
+            new IQMatcher(OpenlinkXmppNamespace.OPENLINK_MAKE_CALL, ATTRIBUTE_STATUS, ACTION_COMPLETED, MakeCallResult::from),
+            new IQMatcher(OpenlinkXmppNamespace.OPENLINK_REQUEST_ACTION, ATTRIBUTE_ACTION, ACTION_EXECUTE, RequestActionRequest::from),
+            new IQMatcher(OpenlinkXmppNamespace.OPENLINK_REQUEST_ACTION, ATTRIBUTE_STATUS, ACTION_COMPLETED, RequestActionResult::from));
 
     @SuppressWarnings("unchecked")
     @Nonnull
@@ -73,14 +78,14 @@ public final class OpenlinkIQParser {
 
     private static IQ parseCommand(@Nonnull final IQ iq) {
         final Element commandElement = iq.getChildElement();
-        final Optional<String> node = TinderPacketUtil.getStringAttribute(commandElement, "node");
-        if (!node.isPresent()) {
-            return iq;
-        }
-        final IQ.Type type = iq.getType();
         for (final IQMatcher iqMatcher : STANZA_TYPE_MATCHER_LIST) {
-            if (iqMatcher.matches(node.get(), type)) {
-                return iqMatcher.stanzaFactory.from(iq);
+            if (iqMatcher.matches(commandElement)) {
+                final IQ parsedIQ = iqMatcher.stanzaFactory.from(iq);
+                final PacketError packetError = iq.getError();
+                if (packetError != null) {
+                    parsedIQ.setError(new PacketError(packetError.getElement().createCopy()));
+                }
+                return parsedIQ;
             }
         }
         return iq;

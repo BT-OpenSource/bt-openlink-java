@@ -5,7 +5,7 @@ import com.bt.openlink.type.ProfileId;
 import com.bt.openlink.type.RequestAction;
 import com.bt.openlink.type.Site;
 
-@SuppressWarnings("ConstantConditions")
+@SuppressWarnings({"ConstantConditions", "OptionalGetWithoutIsPresent", "WeakerAccess"})
 public class GetProfilesFixtures {
 
     public static final String GET_PROFILES_REQUEST =
@@ -88,6 +88,20 @@ public class GetProfilesFixtures {
                     "      </out>\n" +
                     "    </iodata>\n" +
                     "  </command>\n" +
+                    "</iq>\n";
+
+    public static final String GET_PROFILES_ERROR =
+            "<iq type='error' id='" + CoreFixtures.STANZA_ID + "' to='" + CoreFixtures.TO_JID_STRING + "' from='" + CoreFixtures.FROM_JID_STRING + "'>\n" +
+                    "  <command xmlns='http://jabber.org/protocol/commands' action='execute' node='http://xmpp.org/protocol/openlink:01:00:00#get-profiles'>\n" +
+                    "    <iodata xmlns='urn:xmpp:tmp:io-data' type='input'>\n" +
+                    "      <in>\n" +
+                    "        <jid>" + CoreFixtures.USER_BARE_JID_STRING + "</jid>\n" +
+                    "      </in>\n" +
+                    "    </iodata>\n" +
+                    "  </command>\n" +
+                    "  <error code='404' type='cancel'>\n" +
+                    "    <remote-server-not-found xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>\n" +
+                    "  </error>\n" +
                     "</iq>\n";
 
 }
