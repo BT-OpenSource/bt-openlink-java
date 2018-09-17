@@ -32,7 +32,8 @@ public enum OpenlinkXmppNamespace {
     OPENLINK_DEVICE_STATUS("http://xmpp.org/protocol/openlink:01:00:00#device-status", "Device status message"),
     OPENLINK_DEVICE_KEY("http://xmpp.org/protocol/openlink:01:00:00/features#device-keys", "Device key feature"),
     OPENLINK_SPEAKER_CHANNEL("http://xmpp.org/protocol/openlink:01:00:00/features#speaker-channel", "Speaker channel feature"),
-    OPENLINK_VOICE_RECORDER("http://xmpp.org/protocol/openlink:01:00:00/features#voice-recorder", "Voice recorder feature");
+    OPENLINK_VOICE_RECORDER("http://xmpp.org/protocol/openlink:01:00:00/features#voice-recorder", "Voice recorder feature"),
+    OPENLINK_CALL_HISTORY("http://xmpp.org/protocol/openlink:01:00:00/callhistory", "Call history");
 
     public static final String TAG_IODATA = "iodata";
     public static final String TAG_IN = "in";

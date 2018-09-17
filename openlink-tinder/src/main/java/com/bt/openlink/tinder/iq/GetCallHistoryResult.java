@@ -1,0 +1,158 @@
+package com.bt.openlink.tinder.iq;
+
+import java.sql.Timestamp;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
+import org.dom4j.Element;
+import org.xmpp.packet.IQ;
+import org.xmpp.packet.JID;
+
+import com.bt.openlink.OpenlinkXmppNamespace;
+import com.bt.openlink.iq.GetCallHistoryResultBuilder;
+import com.bt.openlink.tinder.internal.TinderPacketUtil;
+import com.bt.openlink.type.CallDirection;
+import com.bt.openlink.type.CallId;
+import com.bt.openlink.type.CallState;
+import com.bt.openlink.type.HistoricalCall;
+import com.bt.openlink.type.InterestId;
+import com.bt.openlink.type.PhoneNumber;
+import com.bt.openlink.type.ProfileId;
+
+public class GetCallHistoryResult extends OpenlinkIQ {
+    private static final String STANZA_DESCRIPTION = "get-call-history result";
+
+    @Nullable private final Long totalRecordCount;
+    @Nullable private final Long firstRecordNumber;
+    @Nullable private final Long recordCountInBatch;
+    @Nonnull private List<HistoricalCall> calls;
+
+    private GetCallHistoryResult(@Nonnull Builder builder, @Nullable List<String> parseErrors) {
+        super(builder, parseErrors);
+        this.totalRecordCount = builder.getTotalRecordCount().orElse(null);
+        this.firstRecordNumber = builder.getFirstRecordNumber().orElse(null);
+        this.recordCountInBatch = builder.getRecordCountInBatch().orElse(null);
+        this.calls = new ArrayList<>(builder.getCalls());
+        final Element outElement = TinderPacketUtil.addCommandIOOutputElement(this, OpenlinkXmppNamespace.OPENLINK_GET_CALL_HISTORY);
+        final Element callHistoryElement = outElement.addElement("callhistory", OpenlinkXmppNamespace.OPENLINK_CALL_HISTORY.uri());
+        getTotalRecordCount().ifPresent(total -> callHistoryElement.addAttribute("total", String.valueOf(total)));
+        getFirstRecordNumber().ifPresent(start -> callHistoryElement.addAttribute("start", String.valueOf(start)));
+        getRecordCountInBatch().ifPresent(count -> callHistoryElement.addAttribute("count", String.valueOf(count)));
+        this.calls.forEach(call -> {
+            final Element callElement = callHistoryElement.addElement("call");
+            call.getId().ifPresent(id -> TinderPacketUtil.addElementWithTextIfNotNull(callElement, "id", id));
+            call.getProfileId().ifPresent(profileId -> TinderPacketUtil.addElementWithTextIfNotNull(callElement, "profile", profileId));
+            call.getInterestId().ifPresent(interest -> TinderPacketUtil.addElementWithTextIfNotNull(callElement, "interest", interest));
+            call.getState().ifPresent(state -> TinderPacketUtil.addElementWithTextIfNotNull(callElement, "state", state.getLabel()));
+            call.getDirection().ifPresent(direction -> TinderPacketUtil.addElementWithTextIfNotNull(callElement, "direction", direction.getLabel()));
+            call.getCallerNumber().ifPresent(caller -> TinderPacketUtil.addElementWithTextIfNotNull(callElement, "caller", caller));
+            call.getCallerName().ifPresent(callerName -> TinderPacketUtil.addElementWithTextIfNotNull(callElement, "callername", callerName));
+            call.getCalledNumber().ifPresent(called -> TinderPacketUtil.addElementWithTextIfNotNull(callElement, "called", called));
+            call.getCalledName().ifPresent(calledName -> TinderPacketUtil.addElementWithTextIfNotNull(callElement, "calledname", calledName));
+            call.getStartTime().ifPresent(timestamp -> TinderPacketUtil.addElementWithTextIfNotNull(callElement, "timestamp", Timestamp.from(timestamp).toString()));
+            call.getDuration().ifPresent(duration -> TinderPacketUtil.addElementWithTextIfNotNull(callElement, "duration", duration.toMillis()));
+            call.getTsc().ifPresent(tsc -> TinderPacketUtil.addElementWithTextIfNotNull(callElement, "tsc", tsc));
+        });
+    }
+
+    @SuppressWarnings("unchecked")
+    @Nonnull
+    public static GetCallHistoryResult from(@Nonnull IQ iq) {
+        final List<String> parseErrors = new ArrayList<>();
+        final GetCallHistoryResult.Builder builder = GetCallHistoryResult.Builder.start(iq);
+        final Element outElement = TinderPacketUtil.getIOOutElement(iq);
+        final Element callHistoryElement = TinderPacketUtil.getChildElement(outElement, "callhistory");
+        TinderPacketUtil.getIntegerAttribute(callHistoryElement, "total", STANZA_DESCRIPTION, parseErrors).ifPresent(builder::setTotalRecordCount);
+        TinderPacketUtil.getIntegerAttribute(callHistoryElement, "start", STANZA_DESCRIPTION, parseErrors).ifPresent(builder::setFirstRecordNumber);
+        TinderPacketUtil.getIntegerAttribute(callHistoryElement, "count", STANZA_DESCRIPTION, parseErrors).ifPresent(builder::setRecordCountInBatch);
+        if (callHistoryElement != null) {
+            final List<Element> calls = callHistoryElement.elements("call");
+            calls.forEach(callElement -> {
+                final HistoricalCall.Builder historicalCallBuilder = HistoricalCall.Builder.start();
+                TinderPacketUtil.getOptionalChildElementString(callElement, "id").flatMap(CallId::from).ifPresent(historicalCallBuilder::setId);
+                TinderPacketUtil.getOptionalChildElementString(callElement, "profile").flatMap(ProfileId::from).ifPresent(historicalCallBuilder::setProfileId);
+                TinderPacketUtil.getOptionalChildElementString(callElement, "interest").flatMap(InterestId::from).ifPresent(historicalCallBuilder::setInterestId);
+                TinderPacketUtil.getOptionalChildElementString(callElement, "state").flatMap(CallState::from).ifPresent(historicalCallBuilder::setState);
+                TinderPacketUtil.getOptionalChildElementString(callElement, "direction").flatMap(CallDirection::from).ifPresent(historicalCallBuilder::setDirection);
+                TinderPacketUtil.getOptionalChildElementString(callElement, "caller").flatMap(PhoneNumber::from).ifPresent(historicalCallBuilder::setCallerNumber);
+                TinderPacketUtil.getOptionalChildElementString(callElement, "callername").ifPresent(historicalCallBuilder::setCallerName);
+                TinderPacketUtil.getOptionalChildElementString(callElement, "called").flatMap(PhoneNumber::from).ifPresent(historicalCallBuilder::setCalledNumber);
+                TinderPacketUtil.getOptionalChildElementString(callElement, "calledname").ifPresent(historicalCallBuilder::setCalledName);
+                TinderPacketUtil.getChildElementLong(callElement, "duration", STANZA_DESCRIPTION, parseErrors).map(Duration::ofMillis).ifPresent(historicalCallBuilder::setDuration);
+                final Optional<String> optionalTimestamp = TinderPacketUtil.getOptionalChildElementString(callElement, "timestamp");
+                optionalTimestamp.ifPresent(timestamp -> {
+                    try {
+                        historicalCallBuilder.setStartTime(Timestamp.valueOf(timestamp).toInstant());
+                    } catch (final IllegalArgumentException ignored) {
+                        parseErrors.add(String.format("Invalid %s; invalid timestamp '%s'; please supply a valid timestamp", STANZA_DESCRIPTION, timestamp));
+                    }
+                });
+                TinderPacketUtil.getOptionalChildElementString(callElement, "tsc").ifPresent(historicalCallBuilder::setTsc);
+                builder.addCall(historicalCallBuilder.build(parseErrors));
+            });
+        }
+
+        return builder.build(parseErrors);
+    }
+
+    @SuppressWarnings("WeakerAccess")
+    @Nonnull
+    public Optional<Long> getTotalRecordCount() {
+        return Optional.ofNullable(totalRecordCount);
+    }
+
+    @SuppressWarnings("WeakerAccess")
+    @Nonnull
+    public Optional<Long> getFirstRecordNumber() {
+        return Optional.ofNullable(firstRecordNumber);
+    }
+
+    @SuppressWarnings("WeakerAccess")
+    @Nonnull
+    public Optional<Long> getRecordCountInBatch() {
+        return Optional.ofNullable(recordCountInBatch);
+    }
+
+    @SuppressWarnings("WeakerAccess")
+    @Nonnull
+    public List<HistoricalCall> getCalls() {
+        return calls;
+    }
+
+    public static final class Builder extends GetCallHistoryResultBuilder<Builder, JID, Type> {
+
+        @Nonnull
+        public static Builder start() {
+            return new Builder();
+        }
+
+        @Nonnull
+        private static Builder start(@Nonnull final IQ iq) {
+            final Builder builder = start();
+            TinderIQBuilder.setIQBuilder(builder, iq);
+            return builder;
+        }
+
+        private Builder() {
+            super(Type.class);
+        }
+
+        @Nonnull
+        public GetCallHistoryResult build() {
+            super.validate();
+            return new GetCallHistoryResult(this, null);
+        }
+
+        @Nonnull
+        private GetCallHistoryResult build(@Nonnull final List<String> errors) {
+            super.validate(errors, true);
+            return new GetCallHistoryResult(this, errors);
+        }
+    }
+
+}

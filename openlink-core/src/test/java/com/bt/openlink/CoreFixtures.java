@@ -46,7 +46,7 @@ import com.bt.openlink.type.TelephonyCallId;
 import com.bt.openlink.type.UserId;
 import com.bt.openlink.type.VoiceRecorderInfo;
 
-@SuppressWarnings({"ConstantConditions", "WeakerAccess"})
+@SuppressWarnings({"OptionalGetWithoutIsPresent", "WeakerAccess"})
 public class CoreFixtures {
 
     static final DateTimeFormatter ISO_8601_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
@@ -61,6 +61,7 @@ public class CoreFixtures {
     private static final String USER_NAME = "test-user";
     private static final String DOMAIN = "test-domain";
     private static final String RESOURCE = "test-resource";
+    public static final String TSC = "component42." + DOMAIN;
     public static final String USER_BARE_JID_STRING = String.format("%s@%s", USER_NAME, DOMAIN);
     public static final String USER_FULL_JID_STRING = String.format("%s/%s", USER_BARE_JID_STRING, RESOURCE);
     public static final String TO_JID_STRING = String.format("test-to-user@%s/%s", DOMAIN, RESOURCE);
