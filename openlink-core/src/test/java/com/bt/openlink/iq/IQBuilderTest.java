@@ -18,7 +18,7 @@ import org.junit.rules.ExpectedException;
 
 import com.bt.openlink.CoreFixtures;
 
-@SuppressWarnings("ConstantConditions")
+@SuppressWarnings("OptionalGetWithoutIsPresent")
 public class IQBuilderTest {
 
     private static class Builder extends IQBuilder<Builder, String, CoreFixtures.typeEnum> {
@@ -38,12 +38,12 @@ public class IQBuilderTest {
     private Builder builder;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         builder = new Builder();
     }
 
     @Test
-    public void willValidateAPopulatedBuilder() throws Exception {
+    public void willValidateAPopulatedBuilder() {
 
         final List<String> errors = new ArrayList<>();
         builder.setTo("to");
@@ -62,7 +62,7 @@ public class IQBuilderTest {
     }
 
     @Test
-    public void willValidateThatToIsSet() throws Exception {
+    public void willValidateThatToIsSet() {
         builder.setFrom("from");
         builder.setId("id");
         builder.setIQType(CoreFixtures.typeEnum.set);
@@ -73,7 +73,7 @@ public class IQBuilderTest {
     }
 
     @Test
-    public void willValidateThatFromIsSet() throws Exception {
+    public void willValidateThatFromIsSet() {
         builder.setTo("to");
         builder.setId("id");
         builder.setIQType(CoreFixtures.typeEnum.set);
@@ -84,7 +84,7 @@ public class IQBuilderTest {
     }
 
     @Test
-    public void willCheckThatIdAndFromAndTypeAreSet() throws Exception {
+    public void willCheckThatIdAndFromAndTypeAreSet() {
 
         final List<String> errors = new ArrayList<>();
         builder.setIQType(CoreFixtures.typeEnum.MY_UNEXPECTED_TYPE);
@@ -95,7 +95,7 @@ public class IQBuilderTest {
                 "Invalid stanza; missing 'to' attribute is mandatory",
                 "Invalid stanza; missing 'from' attribute is mandatory",
                 "Invalid stanza; missing 'id' attribute is mandatory",
-                "Invalid stanza; missing or incorrect 'type' attribute"));
+                "Invalid stanza; incorrect 'type' attribute: MY_UNEXPECTED_TYPE"));
         assertThat(builder.getTo(), is(Optional.empty()));
         assertThat(builder.getFrom(), is(Optional.empty()));
         assertThat(builder.getId(), is(Optional.empty()));

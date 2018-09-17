@@ -71,7 +71,7 @@ public class GetFeaturesRequestTest {
                 "Invalid stanza; missing 'to' attribute is mandatory",
                 "Invalid stanza; missing 'from' attribute is mandatory",
                 "Invalid stanza; missing 'id' attribute is mandatory",
-                "Invalid stanza; missing or incorrect 'type' attribute",
+                "Invalid stanza; incorrect 'type' attribute: get",
                 "Invalid get-features request stanza; missing profile id"));
     }
 

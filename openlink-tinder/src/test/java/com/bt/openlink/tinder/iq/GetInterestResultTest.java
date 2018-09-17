@@ -82,7 +82,7 @@ public class GetInterestResultTest {
                 "Invalid stanza; missing 'to' attribute is mandatory",
                 "Invalid stanza; missing 'from' attribute is mandatory",
                 "Invalid stanza; missing 'id' attribute is mandatory",
-                "Invalid stanza; missing or incorrect 'type' attribute",
+                "Invalid stanza; incorrect 'type' attribute: set",
                 "Invalid get-interest result stanza; missing 'interest'"));
     }
 

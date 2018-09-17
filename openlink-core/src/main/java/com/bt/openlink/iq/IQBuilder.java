@@ -52,8 +52,10 @@ public abstract class IQBuilder<B extends IQBuilder, J, T extends Enum<T>> exten
         if (!getId().isPresent()) {
             errors.add("Invalid stanza; missing 'id' attribute is mandatory");
         }
-        if (iqType == null || !iqType.name().equals(getExpectedIQType())) {
-            errors.add("Invalid stanza; missing or incorrect 'type' attribute");
+        if (iqType == null) {
+            errors.add("Invalid stanza; missing 'type' attribute");
+        } else if (!iqType.name().equals(getExpectedIQType()) && !("set".equals(getExpectedIQType()) && "error".equals(iqType.name()))) {
+            errors.add("Invalid stanza; incorrect 'type' attribute: " + iqType.name());
         }
     }
 

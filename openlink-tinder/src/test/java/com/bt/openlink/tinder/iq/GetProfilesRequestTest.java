@@ -108,7 +108,7 @@ public class GetProfilesRequestTest {
                 "Invalid stanza; missing 'to' attribute is mandatory",
                 "Invalid stanza; missing 'from' attribute is mandatory",
                 "Invalid stanza; missing 'id' attribute is mandatory",
-                "Invalid stanza; missing or incorrect 'type' attribute",
+                "Invalid stanza; incorrect 'type' attribute: get",
                 "Invalid get-profiles request stanza; missing or invalid 'jid'"
         ));
         assertThat(request.getTo(), is(nullValue()));
@@ -136,5 +136,6 @@ public class GetProfilesRequestTest {
         final GetProfilesRequest request = OpenlinkIQParser.parse(iq);
 
         assertThat(request.toXML(), isIdenticalTo(iq.toXML()).ignoreWhitespace());
+        assertThat(request.getParseErrors().isEmpty(),is(true));
     }
 }
