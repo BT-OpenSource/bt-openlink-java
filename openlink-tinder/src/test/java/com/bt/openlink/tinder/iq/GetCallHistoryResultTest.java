@@ -10,7 +10,10 @@ import static org.xmlunit.matchers.CompareMatcher.isIdenticalTo;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Optional;
+import java.util.TimeZone;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -24,6 +27,18 @@ import com.bt.openlink.type.HistoricalCall;
 public class GetCallHistoryResultTest {
 
     @Rule public final ExpectedException expectedException = ExpectedException.none();
+    private TimeZone defaultTimeZone;
+
+    @Before
+    public void setUp() {
+        defaultTimeZone = TimeZone.getDefault();
+        TimeZone.setDefault(TimeZone.getTimeZone("Europe/London"));
+    }
+
+    @After
+    public void tearDown() {
+        TimeZone.setDefault(defaultTimeZone);
+    }
 
     @Test
     public void canCreateAStanza() {
@@ -76,7 +91,7 @@ public class GetCallHistoryResultTest {
         assertThat(result.getRecordCountInBatch(), is(Optional.of(1L)));
         assertThat(result.getTotalRecordCount(), is(Optional.of(2L)));
         assertReflectionEquals(Collections.singletonList(CallHistoryFixtures.CALL), result.getCalls());
-        assertThat(result.getParseErrors(),is(empty()));
+        assertThat(result.getParseErrors(), is(empty()));
     }
 
     @Test
@@ -88,7 +103,7 @@ public class GetCallHistoryResultTest {
         assertThat(result.getRecordCountInBatch(), is(Optional.of(2L)));
         assertThat(result.getTotalRecordCount(), is(Optional.empty()));
         assertReflectionEquals(Collections.singletonList(HistoricalCall.Builder.start().build(new ArrayList<>())), result.getCalls());
-        assertThat(result.getParseErrors(),contains(
+        assertThat(result.getParseErrors(), contains(
                 "Invalid get-call-history result; invalid duration 'not-a-duration'; please supply an integer",
                 "Invalid get-call-history result; invalid timestamp 'not-a-timestamp'; please supply a valid timestamp",
                 "Invalid historical call; missing call id is mandatory",
@@ -109,7 +124,6 @@ public class GetCallHistoryResultTest {
                 "Invalid stanza; incorrect 'type' attribute: get",
                 "Invalid call history; missing or invalid total record count",
                 "Invalid call history; missing or invalid first record number",
-                "Invalid call history; incorrect batch record count"
-                ));
+                "Invalid call history; incorrect batch record count"));
     }
 }
