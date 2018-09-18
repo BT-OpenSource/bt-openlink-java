@@ -4,7 +4,7 @@ import com.bt.openlink.type.Feature;
 import com.bt.openlink.type.FeatureId;
 import com.bt.openlink.type.FeatureType;
 
-@SuppressWarnings("ConstantConditions")
+@SuppressWarnings("OptionalGetWithoutIsPresent")
 public class GetFeaturesFixtures {
 
     public static final String GET_FEATURES_REQUEST =
