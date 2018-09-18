@@ -59,64 +59,68 @@ public class GetCallHistoryRequest extends OpenlinkIQ {
 
         parser.nextTag();
         while (parser.getDepth() > inDepth) {
-            final Optional<String> elementText = SmackPacketUtil.getElementTextString(parser);
-            switch (parser.getName()) {
-            case "jid":
-                elementText.flatMap(SmackPacketUtil::getSmackJid).ifPresent(builder::setJID);
-                break;
-            case "caller":
-                elementText.ifPresent(builder::setCaller);
-                break;
-            case "called":
-                elementText.ifPresent(builder::setCalled);
-                break;
-            case "calltype":
-                elementText.ifPresent(calltype -> {
-                    final Optional<CallType> optionalCallType = CallType.from(calltype);
-                    if(optionalCallType.isPresent()) {
-                        builder.setCallType(optionalCallType.get());
-                    } else {
-                        parseErrors.add("Invalid get-call-history request; invalid calltype - 'not-a-call-type' should be 'in', 'out' or 'missed'");
-                    }
-                });
-                break;
-            case "fromdate":
-                try {
-                    elementText.map(fromdate -> LocalDate.parse(fromdate, DATE_FORMATTER)).ifPresent(builder::setFromDate);
-                } catch (final DateTimeParseException ignored) {
-                    parseErrors.add(String.format("Invalid %s; invalid fromdate '%s'; date format is '%s'", STANZA_DESCRIPTION, elementText.get(), DATE_PATTERN));
-                }
-                break;
-            case "uptodate":
-                try {
-                    elementText.map(todate -> LocalDate.parse(todate, DATE_FORMATTER)).ifPresent(builder::setUpToDate);
-                } catch (final DateTimeParseException ignored) {
-                    parseErrors.add(String.format("Invalid %s; invalid uptodate '%s'; date format is '%s'", STANZA_DESCRIPTION, elementText.get(), DATE_PATTERN));
-                }
-                break;
-            case "start":
-                try {
-                    elementText.map(Long::valueOf).ifPresent(builder::setStart);
-                } catch (final NumberFormatException ignored) {
-                    parseErrors.add(String.format("Invalid %s; invalid start '%s'; please supply an integer", STANZA_DESCRIPTION, elementText.get()));
-                }
-                break;
-            case "count":
-                try {
-                    elementText.map(Long::valueOf).ifPresent(builder::setCount);
-                } catch (final NumberFormatException ignored) {
-                    parseErrors.add(String.format("Invalid %s; invalid count '%s'; please supply an integer", STANZA_DESCRIPTION, elementText.get()));
-                }
-                break;
-            default:
-                parseErrors.add("Unrecognised element:" + parser.getName());
-                break;
-            }
+            parseRequestBlock(parser, builder, parseErrors);
             ParserUtils.forwardToEndTagOfDepth(parser, inDepth + 1);
             parser.nextTag();
         }
 
         return builder.build(parseErrors);
+    }
+
+    private static void parseRequestBlock(@Nonnull final XmlPullParser parser, final Builder builder, final List<String> parseErrors) throws IOException, XmlPullParserException {
+        final Optional<String> elementText = SmackPacketUtil.getElementTextString(parser);
+        switch (parser.getName()) {
+        case "jid":
+            elementText.flatMap(SmackPacketUtil::getSmackJid).ifPresent(builder::setJID);
+            break;
+        case "caller":
+            elementText.ifPresent(builder::setCaller);
+            break;
+        case "called":
+            elementText.ifPresent(builder::setCalled);
+            break;
+        case "calltype":
+            elementText.ifPresent(calltype -> {
+                final Optional<CallType> optionalCallType = CallType.from(calltype);
+                if(optionalCallType.isPresent()) {
+                    builder.setCallType(optionalCallType.get());
+                } else {
+                    parseErrors.add("Invalid get-call-history request; invalid calltype - 'not-a-call-type' should be 'in', 'out' or 'missed'");
+                }
+            });
+            break;
+        case "fromdate":
+            try {
+                elementText.map(fromdate -> LocalDate.parse(fromdate, DATE_FORMATTER)).ifPresent(builder::setFromDate);
+            } catch (final DateTimeParseException ignored) {
+                parseErrors.add(String.format("Invalid %s; invalid fromdate '%s'; date format is '%s'", STANZA_DESCRIPTION, elementText.get(), DATE_PATTERN));
+            }
+            break;
+        case "uptodate":
+            try {
+                elementText.map(todate -> LocalDate.parse(todate, DATE_FORMATTER)).ifPresent(builder::setUpToDate);
+            } catch (final DateTimeParseException ignored) {
+                parseErrors.add(String.format("Invalid %s; invalid uptodate '%s'; date format is '%s'", STANZA_DESCRIPTION, elementText.get(), DATE_PATTERN));
+            }
+            break;
+        case "start":
+            try {
+                elementText.map(Long::valueOf).ifPresent(builder::setStart);
+            } catch (final NumberFormatException ignored) {
+                parseErrors.add(String.format("Invalid %s; invalid start '%s'; please supply an integer", STANZA_DESCRIPTION, elementText.get()));
+            }
+            break;
+        case "count":
+            try {
+                elementText.map(Long::valueOf).ifPresent(builder::setCount);
+            } catch (final NumberFormatException ignored) {
+                parseErrors.add(String.format("Invalid %s; invalid count '%s'; please supply an integer", STANZA_DESCRIPTION, elementText.get()));
+            }
+            break;
+        default:
+            parseErrors.add("Unrecognised element:" + parser.getName());
+            break;
+        }
     }
 
     @Override

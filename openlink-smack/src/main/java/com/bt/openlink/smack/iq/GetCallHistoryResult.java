@@ -29,6 +29,7 @@ import com.bt.openlink.type.ProfileId;
 
 public class GetCallHistoryResult extends OpenlinkIQ {
     private static final String STANZA_DESCRIPTION = "get-call-history result";
+    private static final String ELEMENT_NAME_CALL_HISTORY = "callhistory";
 
     @Nullable private final Long totalRecordCount;
     @Nullable private final Long firstRecordNumber;
@@ -53,7 +54,7 @@ public class GetCallHistoryResult extends OpenlinkIQ {
         final int inDepth = parser.getDepth();
 
         parser.nextTag();
-        if ("callhistory".equals(parser.getName())) {
+        if (ELEMENT_NAME_CALL_HISTORY.equals(parser.getName())) {
             final int callHistoryDepth = parser.getDepth();
             SmackPacketUtil.getLongAttribute(parser, "total").ifPresent(builder::setTotalRecordCount);
             SmackPacketUtil.getLongAttribute(parser, "start").ifPresent(builder::setFirstRecordNumber);
@@ -65,62 +66,7 @@ public class GetCallHistoryResult extends OpenlinkIQ {
                     parser.nextTag();
                     final HistoricalCall.Builder callBuilder = HistoricalCall.Builder.start();
                     while (parser.getDepth() > callDepth) {
-                        final Optional<String> elementText = SmackPacketUtil.getElementTextString(parser);
-                        switch (parser.getName()) {
-                        case "id":
-                            elementText.flatMap(CallId::from).ifPresent(callBuilder::setId);
-                            break;
-                        case "profile":
-                            elementText.flatMap(ProfileId::from).ifPresent(callBuilder::setProfileId);
-                            break;
-                        case "interest":
-                            elementText.flatMap(InterestId::from).ifPresent(callBuilder::setInterestId);
-                            break;
-                        case "state":
-                            elementText.flatMap(CallState::from).ifPresent(callBuilder::setState);
-                            break;
-                        case "direction":
-                            elementText.flatMap(CallDirection::from).ifPresent(callBuilder::setDirection);
-                            break;
-                        case "caller":
-                            elementText.flatMap(PhoneNumber::from).ifPresent(callBuilder::setCallerNumber);
-                            break;
-                        case "callername":
-                            elementText.ifPresent(callBuilder::setCallerName);
-                            break;
-                        case "called":
-                            elementText.flatMap(PhoneNumber::from).ifPresent(callBuilder::setCalledNumber);
-                            break;
-                        case "calledname":
-                            elementText.ifPresent(callBuilder::setCalledName);
-                            break;
-                        case "duration":
-                            elementText.ifPresent(duration -> {
-                                try {
-                                    callBuilder.setDuration(Duration.ofMillis(Long.parseLong(duration)));
-                                } catch (final NumberFormatException ignored) {
-                                    parseErrors.add(String.format("Invalid %s; invalid duration '%s'; please supply an integer", STANZA_DESCRIPTION, duration));
-                                }
-                            });
-                            break;
-                        case "timestamp":
-                            elementText.ifPresent(timestamp -> {
-                                try {
-                                    callBuilder.setStartTime(Timestamp.valueOf(timestamp).toInstant());
-                                } catch (final IllegalArgumentException ignored) {
-                                    parseErrors.add(String.format("Invalid %s; invalid timestamp '%s'; please supply a valid timestamp", STANZA_DESCRIPTION, timestamp));
-                                }
-                            });
-                            break;
-                        case "tsc":
-                            elementText.ifPresent(callBuilder::setTsc);
-                            break;
-                        default:
-                            parseErrors.add("Unrecognised element:" + parser.getName());
-                            break;
-                        }
-                        ParserUtils.forwardToEndTagOfDepth(parser, callDepth + 1);
-                        parser.nextTag();
+                        parseHistoricalCall(parser, parseErrors, callDepth, callBuilder);
                     }
                     builder.addCall(callBuilder.build(parseErrors));
                 }
@@ -129,6 +75,65 @@ public class GetCallHistoryResult extends OpenlinkIQ {
         }
         ParserUtils.forwardToEndTagOfDepth(parser, inDepth + 1);
         return builder.build(parseErrors);
+    }
+
+    private static void parseHistoricalCall(@Nonnull final XmlPullParser parser, final List<String> parseErrors, final int callDepth, final HistoricalCall.Builder callBuilder) throws IOException, XmlPullParserException {
+        final Optional<String> elementText = SmackPacketUtil.getElementTextString(parser);
+        switch (parser.getName()) {
+        case "id":
+            elementText.flatMap(CallId::from).ifPresent(callBuilder::setId);
+            break;
+        case "profile":
+            elementText.flatMap(ProfileId::from).ifPresent(callBuilder::setProfileId);
+            break;
+        case "interest":
+            elementText.flatMap(InterestId::from).ifPresent(callBuilder::setInterestId);
+            break;
+        case "state":
+            elementText.flatMap(CallState::from).ifPresent(callBuilder::setState);
+            break;
+        case "direction":
+            elementText.flatMap(CallDirection::from).ifPresent(callBuilder::setDirection);
+            break;
+        case "caller":
+            elementText.flatMap(PhoneNumber::from).ifPresent(callBuilder::setCallerNumber);
+            break;
+        case "callername":
+            elementText.ifPresent(callBuilder::setCallerName);
+            break;
+        case "called":
+            elementText.flatMap(PhoneNumber::from).ifPresent(callBuilder::setCalledNumber);
+            break;
+        case "calledname":
+            elementText.ifPresent(callBuilder::setCalledName);
+            break;
+        case "duration":
+            elementText.ifPresent(duration -> {
+                try {
+                    callBuilder.setDuration(Duration.ofMillis(Long.parseLong(duration)));
+                } catch (final NumberFormatException ignored) {
+                    parseErrors.add(String.format("Invalid %s; invalid duration '%s'; please supply an integer", STANZA_DESCRIPTION, duration));
+                }
+            });
+            break;
+        case "timestamp":
+            elementText.ifPresent(timestamp -> {
+                try {
+                    callBuilder.setStartTime(Timestamp.valueOf(timestamp).toInstant());
+                } catch (final IllegalArgumentException ignored) {
+                    parseErrors.add(String.format("Invalid %s; invalid timestamp '%s'; please supply a valid timestamp", STANZA_DESCRIPTION, timestamp));
+                }
+            });
+            break;
+        case "tsc":
+            elementText.ifPresent(callBuilder::setTsc);
+            break;
+        default:
+            parseErrors.add("Unrecognised element:" + parser.getName());
+            break;
+        }
+        ParserUtils.forwardToEndTagOfDepth(parser, callDepth + 1);
+        parser.nextTag();
     }
 
     @Override
@@ -141,7 +146,7 @@ public class GetCallHistoryResult extends OpenlinkIQ {
                 .attribute("type", "output")
                 .rightAngleBracket();
         xml.openElement(OpenlinkXmppNamespace.TAG_OUT);
-        xml.halfOpenElement("callhistory")
+        xml.halfOpenElement(ELEMENT_NAME_CALL_HISTORY)
                 .attribute("xmlns", OpenlinkXmppNamespace.OPENLINK_CALL_HISTORY.uri())
                 .optLongAttribute("total", totalRecordCount)
                 .optLongAttribute("start", firstRecordNumber)
@@ -163,7 +168,7 @@ public class GetCallHistoryResult extends OpenlinkIQ {
             xml.element("tsc", call.getTsc().orElse(""));
             xml.closeElement("call");
         });
-        xml.closeElement("callhistory");
+        xml.closeElement(ELEMENT_NAME_CALL_HISTORY);
         xml.closeElement(OpenlinkXmppNamespace.TAG_OUT);
         xml.closeElement(OpenlinkXmppNamespace.TAG_IODATA);
         return xml;
