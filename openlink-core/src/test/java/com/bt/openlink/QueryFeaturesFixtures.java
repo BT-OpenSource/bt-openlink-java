@@ -25,7 +25,7 @@ public class QueryFeaturesFixtures {
             "  </command>\n" +
             "</iq>\n";
 
-    public static final String QUERY_FEATURES_RESULT = "<iq type='result'>\n" +
+    public static final String QUERY_FEATURES_RESULT = "<iq type='result' id='" + CoreFixtures.STANZA_ID + "' to='" + CoreFixtures.TO_JID_STRING + "' from='" + CoreFixtures.FROM_JID_STRING + "'>\n" +
             "  <command xmlns='http://jabber.org/protocol/commands' node='http://xmpp.org/protocol/openlink:01:00:00#query-features' status='completed'>\n" +
             "    <iodata xmlns='urn:xmpp:tmp:io-data' type='output'>\n" +
             "      <out>\n" +
@@ -37,7 +37,7 @@ public class QueryFeaturesFixtures {
             "  </command>\n" +
             "</iq>";
 
-    public static final String CALL_HISTORY_RESULT_WITH_BAD_VALUES = "<iq type='get' id='" + CoreFixtures.STANZA_ID + "' to='" + CoreFixtures.TO_JID_STRING + "' from='" + CoreFixtures.FROM_JID_STRING + "'>\n" +
+    public static final String CALL_HISTORY_RESULT_WITH_BAD_VALUES = "<iq type='get'>\n" +
             "  <command xmlns='http://jabber.org/protocol/commands' node='http://xmpp.org/protocol/openlink:01:00:00#query-features' status='completed'>\n" +
             "    <iodata xmlns='urn:xmpp:tmp:io-data' type='output'>\n" +
             "      <out>\n" +
