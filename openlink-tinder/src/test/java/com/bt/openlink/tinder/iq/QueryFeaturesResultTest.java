@@ -1,4 +1,4 @@
-package com.bt.openlink.smack.iq;
+package com.bt.openlink.tinder.iq;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.contains;
@@ -11,30 +11,15 @@ import static org.xmlunit.matchers.CompareMatcher.isIdenticalTo;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import org.jivesoftware.smack.packet.IQ;
-import org.jivesoftware.smack.provider.ProviderManager;
-import org.jivesoftware.smack.util.PacketParserUtils;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
+import org.xmpp.packet.IQ;
 
 import com.bt.openlink.CoreFixtures;
-import com.bt.openlink.OpenlinkXmppNamespace;
 import com.bt.openlink.QueryFeaturesFixtures;
-import com.bt.openlink.smack.Fixtures;
+import com.bt.openlink.tinder.Fixtures;
 import com.bt.openlink.type.ActiveFeature;
 
 public class QueryFeaturesResultTest {
-
-    @Before
-    public void setUp() {
-        ProviderManager.addIQProvider("command", OpenlinkXmppNamespace.XMPP_COMMANDS.uri(), new OpenlinkIQProvider());
-    }
-
-    @After
-    public void tearDown() {
-        ProviderManager.removeIQProvider("command", OpenlinkXmppNamespace.XMPP_COMMANDS.uri());
-    }
 
     @Test
     public void canCreateAStanza() {
@@ -47,7 +32,7 @@ public class QueryFeaturesResultTest {
                 .build();
 
         assertThat(result.getType(), is(IQ.Type.result));
-        assertThat(result.getStanzaId(), is(CoreFixtures.STANZA_ID));
+        assertThat(result.getID(), is(CoreFixtures.STANZA_ID));
         assertThat(result.getTo(), is(Fixtures.TO_JID));
         assertThat(result.getFrom(), is(Fixtures.FROM_JID));
         assertThat(result.getFeatures(), contains(QueryFeaturesFixtures.CALL_FORWARD_ACTIVE_FEATURE));
@@ -63,15 +48,15 @@ public class QueryFeaturesResultTest {
                 .addFeature(QueryFeaturesFixtures.CALL_FORWARD_ACTIVE_FEATURE)
                 .build();
 
-        assertThat(result.toXML().toString(), isIdenticalTo(QueryFeaturesFixtures.QUERY_FEATURES_RESULT).ignoreWhitespace());
+        assertThat(result.toXML(), isIdenticalTo(QueryFeaturesFixtures.QUERY_FEATURES_RESULT).ignoreWhitespace());
     }
 
     @Test
-    public void willParseAnXMPPStanza() throws Exception {
-        final QueryFeaturesResult result = PacketParserUtils.parseStanza(QueryFeaturesFixtures.QUERY_FEATURES_RESULT);
+    public void willParseAnXMPPStanza() {
+        final QueryFeaturesResult result = OpenlinkIQParser.parse(Fixtures.iqFrom(QueryFeaturesFixtures.QUERY_FEATURES_RESULT));
 
         assertThat(result.getType(), is(IQ.Type.result));
-        assertThat(result.getStanzaId(), is(CoreFixtures.STANZA_ID));
+        assertThat(result.getID(), is(CoreFixtures.STANZA_ID));
         assertThat(result.getTo(), is(Fixtures.TO_JID));
         assertThat(result.getFrom(), is(Fixtures.FROM_JID));
         assertReflectionEquals(Collections.singletonList(QueryFeaturesFixtures.CALL_FORWARD_ACTIVE_FEATURE), result.getFeatures());
@@ -79,15 +64,24 @@ public class QueryFeaturesResultTest {
     }
 
     @Test
-    public void willReturnParsingErrors() throws Exception {
-        final QueryFeaturesResult result = PacketParserUtils.parseStanza(QueryFeaturesFixtures.QUERY_FEATURES_RESULT_WITH_BAD_VALUES);
+    public void willReturnParsingErrors() {
+        final QueryFeaturesResult result = OpenlinkIQParser.parse(Fixtures.iqFrom(QueryFeaturesFixtures.QUERY_FEATURES_RESULT_WITH_BAD_VALUES));
 
         assertThat(result.getType(), is(IQ.Type.get));
         assertReflectionEquals(Collections.singletonList(ActiveFeature.Builder.start().build(new ArrayList<>())), result.getFeatures());
+        System.out.println(result.getParseErrors());
         assertThat(result.getParseErrors(), containsInAnyOrder(
+                "Invalid stanza; missing 'id' attribute is mandatory",
+                "Invalid stanza; missing 'to' attribute is mandatory",
+                "Invalid stanza; missing 'from' attribute is mandatory",
+                "Invalid stanza; incorrect 'type' attribute: get",
+                "Invalid query-features result; missing 'id' attribute is mandatory",
+                "Invalid query-features result; missing 'type' attribute is mandatory",
+                "Invalid query-features result; missing 'label' attribute is mandatory",
                 "Invalid feature; missing feature id is mandatory",
                 "Invalid feature; missing feature type is mandatory",
                 "Invalid feature; missing feature label is mandatory"));
     }
+
 
 }
