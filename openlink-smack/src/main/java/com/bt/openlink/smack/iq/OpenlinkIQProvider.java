@@ -54,6 +54,8 @@ public class OpenlinkIQProvider extends IQProvider<IQ> {
             new IQMatcher(OpenlinkXmppNamespace.OPENLINK_GET_INTEREST, ATTRIBUTE_STATUS, ACTION_COMPLETED, GetInterestResult::from),
             new IQMatcher(OpenlinkXmppNamespace.OPENLINK_GET_FEATURES, ATTRIBUTE_ACTION, ACTION_EXECUTE, GetFeaturesRequest::from),
             new IQMatcher(OpenlinkXmppNamespace.OPENLINK_GET_FEATURES, ATTRIBUTE_STATUS, ACTION_COMPLETED, GetFeaturesResult::from),
+            new IQMatcher(OpenlinkXmppNamespace.OPENLINK_GET_CALL_HISTORY, ATTRIBUTE_ACTION, ACTION_EXECUTE, GetCallHistoryRequest::from),
+            new IQMatcher(OpenlinkXmppNamespace.OPENLINK_GET_CALL_HISTORY, ATTRIBUTE_STATUS, ACTION_COMPLETED, GetCallHistoryResult::from),
             new IQMatcher(OpenlinkXmppNamespace.OPENLINK_QUERY_FEATURES, ATTRIBUTE_ACTION, ACTION_EXECUTE, QueryFeaturesRequest::from),
             new IQMatcher(OpenlinkXmppNamespace.OPENLINK_SET_FEATURES, ATTRIBUTE_ACTION, ACTION_EXECUTE, SetFeaturesRequest::from),
             new IQMatcher(OpenlinkXmppNamespace.OPENLINK_SET_FEATURES, ATTRIBUTE_STATUS, ACTION_COMPLETED, SetFeaturesResult::from),

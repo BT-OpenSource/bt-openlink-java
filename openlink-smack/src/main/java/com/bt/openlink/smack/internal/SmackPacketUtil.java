@@ -146,7 +146,7 @@ public final class SmackPacketUtil {
     }
 
     @Nonnull
-    private static Optional<Long> getLongAttribute(@Nonnull final XmlPullParser parser, @Nonnull final String attributeName) {
+    public static Optional<Long> getLongAttribute(@Nonnull final XmlPullParser parser, @Nonnull final String attributeName) {
         final String attributeValue = parser.getAttributeValue("", attributeName);
         if (attributeValue == null || attributeValue.isEmpty()) {
             return Optional.empty();
