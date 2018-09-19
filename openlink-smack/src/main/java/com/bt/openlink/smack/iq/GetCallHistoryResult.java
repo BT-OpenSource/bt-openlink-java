@@ -238,10 +238,7 @@ public class GetCallHistoryResult extends OpenlinkIQ {
         @SuppressWarnings("WeakerAccess")
         @Nonnull
         public static Builder createResultBuilder(@Nonnull final IQ request) {
-            final Builder builder = start().setId(request.getStanzaId());
-            return builder
-                    .setFrom(request.getTo())
-                    .setTo(request.getFrom());
+            return SmackPacketUtil.createResultBuilder(start(), request);
         }
 
 

@@ -140,7 +140,7 @@ public class GetFeaturesResultTest {
                 .setProfileId(CoreFixtures.PROFILE_ID)
                 .build();
 
-        final GetFeaturesResult result = GetFeaturesResult.Builder.start(request)
+        final GetFeaturesResult result = GetFeaturesResult.Builder.createResultBuilder(request)
                 .build();
 
         assertThat(result.getID(), is(request.getID()));

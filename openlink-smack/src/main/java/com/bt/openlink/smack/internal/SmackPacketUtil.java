@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.packet.IQ.IQChildElementXmlStringBuilder;
 import org.jivesoftware.smack.util.ParserUtils;
 import org.jivesoftware.smack.util.XmlStringBuilder;
@@ -29,6 +30,7 @@ import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
 import com.bt.openlink.OpenlinkXmppNamespace;
+import com.bt.openlink.iq.IQBuilder;
 import com.bt.openlink.type.Call;
 import com.bt.openlink.type.CallDirection;
 import com.bt.openlink.type.CallFeature;
@@ -1110,5 +1112,18 @@ public final class SmackPacketUtil {
         } else {
             return Optional.of(value);
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <B extends IQBuilder> B createResultBuilder(final B builder, final IQ request) {
+        if (!(request.getType() == IQ.Type.get || request.getType() == IQ.Type.set)) {
+            throw new IllegalArgumentException("IQ must be of type 'set' or 'get'. Original IQ: " + request.toXML());
+        }
+        if (!builder.getExpectedIQType().equals("result")) {
+            throw new IllegalArgumentException("IQ must be of type 'result'. Actual type: " + builder.getExpectedIQType());
+        }
+        return (B) builder.setFrom(request.getTo())
+                .setTo(request.getFrom())
+                .setId(request.getStanzaId());
     }
 }

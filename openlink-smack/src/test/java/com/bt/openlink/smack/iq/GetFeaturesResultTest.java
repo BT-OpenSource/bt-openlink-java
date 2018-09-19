@@ -23,7 +23,7 @@ import com.bt.openlink.OpenlinkXmppNamespace;
 import com.bt.openlink.smack.Fixtures;
 import com.bt.openlink.type.Feature;
 
-@SuppressWarnings("ConstantConditions")
+@SuppressWarnings("OptionalGetWithoutIsPresent")
 public class GetFeaturesResultTest {
     @Rule public final ExpectedException expectedException = ExpectedException.none();
 
@@ -154,7 +154,7 @@ public class GetFeaturesResultTest {
                 .setProfileId(CoreFixtures.PROFILE_ID)
                 .build();
 
-        final GetFeaturesResult result = GetFeaturesResult.Builder.start(request)
+        final GetFeaturesResult result = GetFeaturesResult.Builder.createResultBuilder(request)
                 .build();
 
         assertThat(result.getStanzaId(), is(request.getStanzaId()));

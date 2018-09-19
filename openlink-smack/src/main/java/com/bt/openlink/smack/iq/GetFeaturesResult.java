@@ -127,13 +127,31 @@ public class GetFeaturesResult extends OpenlinkIQ {
             return new Builder();
         }
 
+        /**
+         * Convenience method to create a new {@link Builder} based on a {@link Type#get IQ.Type.get} or {@link Type#set
+         * IQ.Type.set} IQ. The new packet will be initialized with:
+         * <ul>
+         *
+         * <li>The sender set to the recipient of the originating IQ.
+         * <li>The recipient set to the sender of the originating IQ.
+         * <li>The type set to {@link Type#result IQ.Type.result}.
+         * <li>The id set to the id of the originating IQ.
+         * </ul>
+         *
+         * @param request
+         *            the {@link Type#get IQ.Type.get} or {@link Type#set IQ.Type.set} IQ packet.
+         * @throws IllegalArgumentException
+         *             if the IQ packet does not have a type of {@link Type#get IQ.Type.get} or {@link Type#set IQ.Type.set}.
+         * @return a new {@link Type#result IQ.Type.result} IQ based on the originating IQ.
+         */
+        @SuppressWarnings("WeakerAccess")
         @Nonnull
-        public static Builder start(@Nonnull final GetFeaturesRequest request) {
-            final Builder builder = start().setId(request.getStanzaId());
-            request.getProfileId().ifPresent(builder::setProfileId);
-            return builder
-                    .setFrom(request.getTo())
-                    .setTo(request.getFrom());
+        public static Builder createResultBuilder(@Nonnull final IQ request) {
+            final Builder builder = SmackPacketUtil.createResultBuilder(start(), request);
+            if (request instanceof GetFeaturesRequest) {
+                ((GetFeaturesRequest) request).getProfileId().ifPresent(builder::setProfileId);
+            }
+            return builder;
         }
 
         private Builder() {
