@@ -108,7 +108,7 @@ public class GetInterestResultTest {
                 .setInterestId(CoreFixtures.INTEREST_ID)
                 .build();
 
-        final GetInterestResult result = GetInterestResult.Builder.start(request)
+        final GetInterestResult result = GetInterestResult.Builder.createResultBuilder(request)
                 .setInterest(CoreFixtures.INTEREST)
                 .build();
 
