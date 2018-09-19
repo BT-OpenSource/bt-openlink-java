@@ -90,4 +90,23 @@ public class QueryFeaturesResultTest {
                 "Invalid feature; missing feature label is mandatory"));
     }
 
+    @Test
+    public void willBuildAResultFromARequest() {
+
+        final QueryFeaturesRequest request = QueryFeaturesRequest.Builder.start()
+                .setId(CoreFixtures.STANZA_ID)
+                .setTo(Fixtures.TO_JID)
+                .setFrom(Fixtures.FROM_JID)
+                .setProfileId(CoreFixtures.PROFILE_ID)
+                .build();
+
+        final QueryFeaturesResult result = QueryFeaturesResult.Builder.createResultBuilder(request)
+                .build();
+
+        assertThat(result.getStanzaId(), is(request.getStanzaId()));
+        assertThat(result.getTo(), is(request.getFrom()));
+        assertThat(result.getFrom(), is(request.getTo()));
+    }
+
+
 }

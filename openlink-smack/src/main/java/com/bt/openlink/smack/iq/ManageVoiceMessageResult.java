@@ -109,7 +109,6 @@ public class ManageVoiceMessageResult extends OpenlinkIQ {
             return SmackPacketUtil.createResultBuilder(start(), request);
         }
 
-
         private Builder() {
             super(Type.class);
         }
