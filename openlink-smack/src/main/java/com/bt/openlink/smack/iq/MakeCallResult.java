@@ -27,6 +27,7 @@ public class MakeCallResult extends OpenlinkIQ {
         this.callStatus = builder.getCallStatus().orElse(null);
     }
 
+    @SuppressWarnings("WeakerAccess")
     @Nonnull
     public Optional<CallStatus> getCallStatus() {
         return Optional.ofNullable(callStatus);
@@ -63,6 +64,28 @@ public class MakeCallResult extends OpenlinkIQ {
         @Nonnull
         public static Builder start() {
             return new Builder();
+        }
+
+        /**
+         * Convenience method to create a new {@link Builder} based on a {@link Type#get IQ.Type.get} or {@link Type#set
+         * IQ.Type.set} IQ. The new builder will be initialized with:
+         * <ul>
+         *
+         * <li>The sender set to the recipient of the originating IQ.
+         * <li>The recipient set to the sender of the originating IQ.
+         * <li>The id set to the id of the originating IQ.
+         * </ul>
+         *
+         * @param request
+         *            the {@link Type#get IQ.Type.get} or {@link Type#set IQ.Type.set} IQ packet.
+         * @throws IllegalArgumentException
+         *             if the IQ packet does not have a type of {@link Type#get IQ.Type.get} or {@link Type#set IQ.Type.set}.
+         * @return a new {@link Builder} based on the originating IQ.
+         */
+        @SuppressWarnings("WeakerAccess")
+        @Nonnull
+        public static Builder createResultBuilder(@Nonnull final IQ request) {
+            return SmackPacketUtil.createResultBuilder(start(), request);
         }
 
         private Builder() {

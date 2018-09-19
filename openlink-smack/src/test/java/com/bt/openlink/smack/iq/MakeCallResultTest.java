@@ -20,22 +20,22 @@ import com.bt.openlink.OpenlinkXmppNamespace;
 import com.bt.openlink.smack.Fixtures;
 import com.bt.openlink.type.RequestAction;
 
-@SuppressWarnings({ "ConstantConditions", "RedundantThrows" })
+@SuppressWarnings("OptionalGetWithoutIsPresent")
 public class MakeCallResultTest {
     @Rule public final ExpectedException expectedException = ExpectedException.none();
 
     @BeforeClass
-    public static void setUpClass() throws Exception {
+    public static void setUpClass() {
         ProviderManager.addIQProvider("command", OpenlinkXmppNamespace.XMPP_COMMANDS.uri(), new OpenlinkIQProvider());
     }
 
     @AfterClass
-    public static void tearDownClass() throws Exception {
+    public static void tearDownClass() {
         ProviderManager.removeIQProvider("command", OpenlinkXmppNamespace.XMPP_COMMANDS.uri());
     }
 
     @Test
-    public void canBuildAStanza() throws Exception {
+    public void canBuildAStanza() {
 
         final MakeCallResult result = MakeCallResult.Builder.start()
                 .setTo(Fixtures.TO_JID)
@@ -47,7 +47,7 @@ public class MakeCallResultTest {
     }
 
     @Test
-    public void willGenerateAnXmppStanza() throws Exception {
+    public void willGenerateAnXmppStanza() {
 
         final MakeCallResult result = MakeCallResult.Builder.start()
                 .setId(CoreFixtures.STANZA_ID)
@@ -60,7 +60,7 @@ public class MakeCallResultTest {
     }
 
     @Test
-    public void willEnsureTheStanzaHasACall() throws Exception {
+    public void willEnsureTheStanzaHasACall() {
 
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("The make-call result has no calls");
@@ -121,4 +121,24 @@ public class MakeCallResultTest {
                 contains(RequestAction.CLEAR_CALL, RequestAction.CLEAR_CONFERENCE, RequestAction.HOLD_CALL, RequestAction.SEND_DIGIT));
         
     }
+
+    @Test
+    public void willBuildAResultFromARequest() {
+
+        final MakeCallRequest request = MakeCallRequest.Builder.start()
+                .setTo(Fixtures.TO_JID)
+                .setFrom(Fixtures.FROM_JID)
+                .setId(CoreFixtures.STANZA_ID)
+                .setJID(Fixtures.USER_FULL_JID)
+                .build();
+
+        final MakeCallResult result = MakeCallResult.Builder.createResultBuilder(request)
+                .setCallStatus(CoreFixtures.CALL_STATUS)
+                .build();
+
+        assertThat(result.getStanzaId(), is(request.getStanzaId()));
+        assertThat(result.getTo(), is(request.getFrom()));
+        assertThat(result.getFrom(), is(request.getTo()));
+    }
+
 }

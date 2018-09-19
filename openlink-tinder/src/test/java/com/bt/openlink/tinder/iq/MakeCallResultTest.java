@@ -79,4 +79,24 @@ public class MakeCallResultTest {
                 "Invalid stanza; incorrect 'type' attribute: get",
                 "Invalid make-call result stanza; missing or invalid callstatus"));
     }
+
+    @Test
+    public void willBuildAResultFromARequest() {
+
+        final MakeCallRequest request = MakeCallRequest.Builder.start()
+                .setTo(Fixtures.TO_JID)
+                .setFrom(Fixtures.FROM_JID)
+                .setId(CoreFixtures.STANZA_ID)
+                .setJID(Fixtures.USER_FULL_JID)
+                .build();
+
+        final MakeCallResult result = MakeCallResult.Builder.createResultBuilder(request)
+                .setCallStatus(CoreFixtures.CALL_STATUS)
+                .build();
+
+        assertThat(result.getID(), is(request.getID()));
+        assertThat(result.getTo(), is(request.getFrom()));
+        assertThat(result.getFrom(), is(request.getTo()));
+    }
+
 }
