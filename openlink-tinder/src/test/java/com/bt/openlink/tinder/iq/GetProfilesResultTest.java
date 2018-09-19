@@ -106,7 +106,7 @@ public class GetProfilesResultTest {
                 .setJID(Fixtures.USER_FULL_JID)
                 .build();
 
-        final GetProfilesResult result = GetProfilesResult.Builder.start(request)
+        final GetProfilesResult result = GetProfilesResult.Builder.createResultBuilder(request)
                 .build();
 
         assertThat(result.getID(), is(request.getID()));
