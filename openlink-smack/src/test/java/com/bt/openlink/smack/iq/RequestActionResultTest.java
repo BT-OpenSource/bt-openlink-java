@@ -1,9 +1,11 @@
 package com.bt.openlink.smack.iq;
 
-import com.bt.openlink.CoreFixtures;
-import com.bt.openlink.OpenlinkXmppNamespace;
-import com.bt.openlink.RequestActionFixtures;
-import com.bt.openlink.smack.Fixtures;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
+import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
+import static org.xmlunit.matchers.CompareMatcher.isIdenticalTo;
+
+import org.hamcrest.CoreMatchers;
 import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.provider.ProviderManager;
 import org.jivesoftware.smack.util.PacketParserUtils;
@@ -13,29 +15,30 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.*;
-import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
-import static org.xmlunit.matchers.CompareMatcher.isIdenticalTo;
+import com.bt.openlink.CoreFixtures;
+import com.bt.openlink.OpenlinkXmppNamespace;
+import com.bt.openlink.RequestActionFixtures;
+import com.bt.openlink.smack.Fixtures;
+import com.bt.openlink.type.RequestAction;
 
-@SuppressWarnings({ "ConstantConditions", "RedundantThrows" })
+@SuppressWarnings("OptionalGetWithoutIsPresent")
 public class RequestActionResultTest {
 
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
 
     @BeforeClass
-    public static void setUpClass() throws Exception {
+    public static void setUpClass() {
         ProviderManager.addIQProvider("command", OpenlinkXmppNamespace.XMPP_COMMANDS.uri(), new OpenlinkIQProvider());
     }
 
     @AfterClass
-    public static void tearDownClass() throws Exception {
+    public static void tearDownClass() {
         ProviderManager.removeIQProvider("command", OpenlinkXmppNamespace.XMPP_COMMANDS.uri());
     }
 
     @Test
-    public void canCreateAStanza() throws Exception {
+    public void canCreateAStanza() {
         final RequestActionResult result = RequestActionResult.Builder.start()
                 .setId(CoreFixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
@@ -50,7 +53,7 @@ public class RequestActionResultTest {
     }
 
     @Test
-    public void willGenerateAnXmppStanza() throws Exception {
+    public void willGenerateAnXmppStanza() {
 
         final RequestActionResult result = RequestActionResult.Builder.start()
                 .setId(CoreFixtures.STANZA_ID)
@@ -71,4 +74,28 @@ public class RequestActionResultTest {
         assertThat(result.getType(), is(IQ.Type.result));
         assertReflectionEquals(CoreFixtures.CALL_STATUS, result.getCallStatus().get());
     }
+
+    @Test
+    public void willBuildAResultFromARequest() {
+
+        final RequestActionRequest request = RequestActionRequest.Builder.start()
+                .setId(CoreFixtures.STANZA_ID)
+                .setTo(Fixtures.TO_JID)
+                .setFrom(Fixtures.FROM_JID)
+                .setAction(RequestAction.START_VOICE_DROP)
+                .setCallId(CoreFixtures.CALL_ID)
+                .setInterestId(CoreFixtures.INTEREST_ID)
+                .setValue1(RequestActionFixtures.REQUEST_ACTION_VALUE_1)
+                .setValue2(RequestActionFixtures.REQUEST_ACTION_VALUE_2)
+                .build();
+
+        final RequestActionResult result = RequestActionResult.Builder.createResultBuilder(request)
+                .setCallStatus(CoreFixtures.CALL_STATUS)
+                .build();
+
+        assertThat(result.getStanzaId(), CoreMatchers.is(request.getStanzaId()));
+        assertThat(result.getTo(), CoreMatchers.is(request.getFrom()));
+        assertThat(result.getFrom(), CoreMatchers.is(request.getTo()));
+    }
+
 }
