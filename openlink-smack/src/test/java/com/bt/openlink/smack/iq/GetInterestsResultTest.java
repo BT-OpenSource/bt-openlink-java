@@ -132,7 +132,7 @@ public class GetInterestsResultTest {
                 .setProfileId(CoreFixtures.PROFILE_ID)
                 .build();
 
-        final GetInterestsResult result = GetInterestsResult.Builder.start(request)
+        final GetInterestsResult result = GetInterestsResult.Builder.createResultBuilder(request)
                 .build();
 
         assertThat(result.getStanzaId(), is(request.getStanzaId()));

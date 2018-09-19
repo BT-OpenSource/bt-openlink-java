@@ -166,7 +166,7 @@ public class GetCallHistoryResult extends OpenlinkIQ {
          * @param request the {@link Type#get IQ.Type.get} or {@link Type#set IQ.Type.set} IQ packet.
          * @throws IllegalArgumentException if the IQ packet does not have a type of
          *      {@link Type#get IQ.Type.get} or {@link Type#set IQ.Type.set}.
-         * @return a new {@link Type#result IQ.Type.result} IQ based on the originating IQ.
+         * @return a new {@link Builder} based on the originating IQ.
          */
         @SuppressWarnings("WeakerAccess")
         @Nonnull
