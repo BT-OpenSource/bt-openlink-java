@@ -35,6 +35,7 @@ public class QueryFeaturesResult extends OpenlinkIQ {
             feature.getLabel().ifPresent(label -> featureElement.addAttribute("label", label));
             feature.getValue1().ifPresent(value1 -> featureElement.addAttribute("value1", value1));
             feature.getValue2().ifPresent(value2 -> featureElement.addAttribute("value2", value2));
+            feature.getValue3().ifPresent(value3 -> featureElement.addAttribute("value3", value3));
         }
     }
 
@@ -70,6 +71,7 @@ public class QueryFeaturesResult extends OpenlinkIQ {
                 TinderPacketUtil.getStringAttribute(featureElement, "label", true, DESCRIPTION, parseErrors).ifPresent(featureBuilder::setLabel);
                 TinderPacketUtil.getStringAttribute(featureElement, "value1").ifPresent(featureBuilder::setValue1);
                 TinderPacketUtil.getStringAttribute(featureElement, "value2").ifPresent(featureBuilder::setValue2);
+                TinderPacketUtil.getStringAttribute(featureElement, "value3").ifPresent(featureBuilder::setValue3);
                 builder.addFeature(featureBuilder.build(parseErrors));
             }
         }

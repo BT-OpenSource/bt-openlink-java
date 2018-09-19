@@ -51,6 +51,7 @@ public class QueryFeaturesResult extends OpenlinkIQ {
                 SmackPacketUtil.getStringAttribute(parser, "label").ifPresent(featureBuilder::setLabel);
                 SmackPacketUtil.getStringAttribute(parser, "value1").ifPresent(featureBuilder::setValue1);
                 SmackPacketUtil.getStringAttribute(parser, "value2").ifPresent(featureBuilder::setValue2);
+                SmackPacketUtil.getStringAttribute(parser, "value3").ifPresent(featureBuilder::setValue3);
                 builder.addFeature(featureBuilder.build(parseErrors));
                 ParserUtils.forwardToEndTagOfDepth(parser, featuresDepth + 1);
             }
@@ -77,6 +78,7 @@ public class QueryFeaturesResult extends OpenlinkIQ {
                 .optAttribute("label", feature.getLabel().orElse(null))
                 .optAttribute("value1", feature.getValue1().orElse(null))
                 .optAttribute("value2", feature.getValue2().orElse(null))
+                .optAttribute("value3", feature.getValue3().orElse(null))
                 .closeEmptyElement());
         xml.closeElement(OpenlinkXmppNamespace.TAG_FEATURES);
         xml.closeElement(OpenlinkXmppNamespace.TAG_OUT);

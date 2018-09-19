@@ -30,7 +30,7 @@ public class QueryFeaturesFixtures {
             "    <iodata xmlns='urn:xmpp:tmp:io-data' type='output'>\n" +
             "      <out>\n" +
             "        <features>\n" +
-            "          <feature id='fwd_1' type='CallForward' label='Call Forward' value1='+44 800 328 9393' value2='immediate'/>\n" +
+            "          <feature id='fwd_1' type='CallForward' label='Call Forward' value1='" + CoreFixtures.INTEREST_ID + "' value2='+44 800 328 9393' value3='immediate'/>\n" +
             "        </features>\n" +
             "      </out>\n" +
             "    </iodata>\n" +
@@ -53,7 +53,8 @@ public class QueryFeaturesFixtures {
             .setType(FeatureType.CALL_FORWARD)
             .setId(FeatureId.from("fwd_1").get())
             .setLabel("Call Forward")
-            .setValue1("+44 800 328 9393")
-            .setValue2("immediate")
+            .setValue1(CoreFixtures.INTEREST_ID)
+            .setValue2("+44 800 328 9393")
+            .setValue3("immediate")
             .build();
 }
