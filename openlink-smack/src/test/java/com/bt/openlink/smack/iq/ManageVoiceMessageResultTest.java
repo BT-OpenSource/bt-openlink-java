@@ -1,9 +1,10 @@
 package com.bt.openlink.smack.iq;
 
-import com.bt.openlink.CoreFixtures;
-import com.bt.openlink.ManageVoiceMessageFixtures;
-import com.bt.openlink.OpenlinkXmppNamespace;
-import com.bt.openlink.smack.Fixtures;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
+import static org.xmlunit.matchers.CompareMatcher.isIdenticalTo;
+
 import org.jivesoftware.smack.provider.ProviderManager;
 import org.jivesoftware.smack.util.PacketParserUtils;
 import org.junit.AfterClass;
@@ -12,30 +13,32 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.*;
-import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
-import static org.xmlunit.matchers.CompareMatcher.isIdenticalTo;
+import com.bt.openlink.CoreFixtures;
+import com.bt.openlink.ManageVoiceMessageFixtures;
+import com.bt.openlink.OpenlinkXmppNamespace;
+import com.bt.openlink.smack.Fixtures;
+import com.bt.openlink.type.ManageVoiceMessageAction;
 
-public class ManageVoiceMessageResponseTest {
+@SuppressWarnings("OptionalGetWithoutIsPresent")
+public class ManageVoiceMessageResultTest {
 
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
 
     @BeforeClass
-    public static void setUpClass() throws Exception {
+    public static void setUpClass() {
         ProviderManager.addIQProvider("command", OpenlinkXmppNamespace.XMPP_COMMANDS.uri(), new OpenlinkIQProvider());
     }
 
     @AfterClass
-    public static void tearDownClass() throws Exception {
+    public static void tearDownClass() {
         ProviderManager.removeIQProvider("command", OpenlinkXmppNamespace.XMPP_COMMANDS.uri());
     }
 
     @Test
-    public void canBuildAManageVoiceMessageQueryStanza() throws Exception {
+    public void canBuildAManageVoiceMessageQueryStanza() {
 
-        final ManageVoiceMessageResponse result = ManageVoiceMessageResponse.Builder.start()
+        final ManageVoiceMessageResult result = ManageVoiceMessageResult.Builder.start()
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
                 .setDeviceStatus(ManageVoiceMessageFixtures.DEVICE_STATUS_QUERY)
@@ -45,9 +48,9 @@ public class ManageVoiceMessageResponseTest {
     }
 
     @Test
-    public void willGenerateAnXmppManageVoiceMessageQueryStanza() throws Exception {
+    public void willGenerateAnXmppManageVoiceMessageQueryStanza() {
 
-        final ManageVoiceMessageResponse result = ManageVoiceMessageResponse.Builder.start()
+        final ManageVoiceMessageResult result = ManageVoiceMessageResult.Builder.start()
                 .setId(CoreFixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
@@ -58,9 +61,9 @@ public class ManageVoiceMessageResponseTest {
     }
 
     @Test
-    public void willGenerateAnXmppManageVoiceMessagePlaybackStanza() throws Exception {
+    public void willGenerateAnXmppManageVoiceMessagePlaybackStanza() {
 
-        final ManageVoiceMessageResponse result = ManageVoiceMessageResponse.Builder.start()
+        final ManageVoiceMessageResult result = ManageVoiceMessageResult.Builder.start()
                 .setId(CoreFixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
@@ -71,9 +74,9 @@ public class ManageVoiceMessageResponseTest {
     }
 
     @Test
-    public void willGenerateAnXmppManageVoiceMessageEditStanza() throws Exception {
+    public void willGenerateAnXmppManageVoiceMessageEditStanza() {
 
-        final ManageVoiceMessageResponse result = ManageVoiceMessageResponse.Builder.start()
+        final ManageVoiceMessageResult result = ManageVoiceMessageResult.Builder.start()
                 .setId(CoreFixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
@@ -84,9 +87,9 @@ public class ManageVoiceMessageResponseTest {
     }
 
     @Test
-    public void willGenerateAnXmppManageVoiceMessageRecordStanza() throws Exception {
+    public void willGenerateAnXmppManageVoiceMessageRecordStanza() {
 
-        final ManageVoiceMessageResponse result = ManageVoiceMessageResponse.Builder.start()
+        final ManageVoiceMessageResult result = ManageVoiceMessageResult.Builder.start()
                 .setId(CoreFixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
@@ -97,11 +100,11 @@ public class ManageVoiceMessageResponseTest {
     }
 
     @Test
-    public void willEnsureTheStanzaHasADeviceStatus() throws Exception {
+    public void willEnsureTheStanzaHasADeviceStatus() {
 
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("The stanza 'deviceStatus' has not been set");
-        ManageVoiceMessageResponse.Builder.start()
+        ManageVoiceMessageResult.Builder.start()
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
                 .build();
@@ -110,7 +113,7 @@ public class ManageVoiceMessageResponseTest {
     @Test
     public void willParseAManageVoiceMessageQueryStanza() throws Exception {
 
-        final ManageVoiceMessageResponse result = PacketParserUtils.parseStanza(ManageVoiceMessageFixtures.MANAGE_VOICE_MESSAGE_QUERY_RESULT);
+        final ManageVoiceMessageResult result = PacketParserUtils.parseStanza(ManageVoiceMessageFixtures.MANAGE_VOICE_MESSAGE_QUERY_RESULT);
 
         assertThat(result.getStanzaId(), is(CoreFixtures.STANZA_ID));
         assertThat(result.getTo(), is(Fixtures.TO_JID));
@@ -122,7 +125,7 @@ public class ManageVoiceMessageResponseTest {
     @Test
     public void willParseAManageVoiceMessagePlaybackStanza() throws Exception {
 
-        final ManageVoiceMessageResponse result = PacketParserUtils.parseStanza(ManageVoiceMessageFixtures.MANAGE_VOICE_MESSAGE_PLAYBACK_RESULT);
+        final ManageVoiceMessageResult result = PacketParserUtils.parseStanza(ManageVoiceMessageFixtures.MANAGE_VOICE_MESSAGE_PLAYBACK_RESULT);
 
         assertThat(result.getStanzaId(), is(CoreFixtures.STANZA_ID));
         assertThat(result.getTo(), is(Fixtures.TO_JID));
@@ -134,7 +137,7 @@ public class ManageVoiceMessageResponseTest {
     @Test
     public void willParseAManageVoiceMessageEditStanza() throws Exception {
 
-        final ManageVoiceMessageResponse result = PacketParserUtils.parseStanza(ManageVoiceMessageFixtures.MANAGE_VOICE_MESSAGE_EDIT_RESULT);
+        final ManageVoiceMessageResult result = PacketParserUtils.parseStanza(ManageVoiceMessageFixtures.MANAGE_VOICE_MESSAGE_EDIT_RESULT);
 
         assertThat(result.getStanzaId(), is(CoreFixtures.STANZA_ID));
         assertThat(result.getTo(), is(Fixtures.TO_JID));
@@ -142,4 +145,27 @@ public class ManageVoiceMessageResponseTest {
         assertReflectionEquals(ManageVoiceMessageFixtures.DEVICE_STATUS_EDIT, result.getDeviceStatus().get());
         assertThat(result.getParseErrors().size(), is(0));
     }
+
+    @Test
+    public void willBuildAResultFromARequest() {
+
+        final ManageVoiceMessageRequest request = ManageVoiceMessageRequest.Builder.start()
+                .setTo(Fixtures.TO_JID)
+                .setFrom(Fixtures.FROM_JID)
+                .setId(CoreFixtures.STANZA_ID)
+                .setProfile(CoreFixtures.PROFILE_ID)
+                .setAction(ManageVoiceMessageAction.RECORD)
+                .setLabel("test-label")
+                .build();
+
+        final ManageVoiceMessageResult result = ManageVoiceMessageResult.Builder.createResultBuilder(request)
+                .setDeviceStatus(ManageVoiceMessageFixtures.DEVICE_STATUS_QUERY)
+                .build();
+
+        assertThat(result.getStanzaId(), is(request.getStanzaId()));
+        assertThat(result.getTo(), is(request.getFrom()));
+        assertThat(result.getFrom(), is(request.getTo()));
+    }
+
+
 }
