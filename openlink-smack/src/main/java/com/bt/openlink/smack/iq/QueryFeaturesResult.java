@@ -104,6 +104,13 @@ public class QueryFeaturesResult extends OpenlinkIQ {
         }
 
         @Nonnull
+        public static Builder start(@Nonnull final QueryFeaturesRequest request) {
+            return start().setId(request.getStanzaId())
+                    .setFrom(request.getTo())
+                    .setTo(request.getFrom());
+        }
+
+        @Nonnull
         private QueryFeaturesResult build(@Nonnull final List<String> errors) {
             super.validate(errors, false);
             return new QueryFeaturesResult(this, errors);

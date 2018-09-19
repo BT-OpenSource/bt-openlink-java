@@ -95,6 +95,11 @@ public class QueryFeaturesResult extends OpenlinkIQ {
             return builder;
         }
 
+        @Nonnull
+        public static Builder start(@Nonnull final QueryFeaturesRequest request) {
+            return start(IQ.createResultIQ(request));
+        }
+
         private Builder() {
             super(Type.class);
         }
