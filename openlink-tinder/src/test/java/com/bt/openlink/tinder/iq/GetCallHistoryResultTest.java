@@ -21,8 +21,8 @@ import org.junit.rules.ExpectedException;
 import org.xmpp.packet.IQ;
 import org.xmpp.packet.JID;
 
-import com.bt.openlink.CallHistoryFixtures;
 import com.bt.openlink.CoreFixtures;
+import com.bt.openlink.GetCallHistoryFixtures;
 import com.bt.openlink.tinder.Fixtures;
 import com.bt.openlink.type.HistoricalCall;
 
@@ -52,7 +52,7 @@ public class GetCallHistoryResultTest {
                 .setFirstRecordNumber(0)
                 .setRecordCountInBatch(1)
                 .setTotalRecordCount(2)
-                .addCall(CallHistoryFixtures.getHistoricalCall(new JID(CoreFixtures.TSC)))
+                .addCall(GetCallHistoryFixtures.getHistoricalCall(new JID(CoreFixtures.TSC)))
                 .build();
 
         assertThat(result.getType(), is(IQ.Type.result));
@@ -62,7 +62,7 @@ public class GetCallHistoryResultTest {
         assertThat(result.getFirstRecordNumber(), is(Optional.of(0L)));
         assertThat(result.getRecordCountInBatch(), is(Optional.of(1L)));
         assertThat(result.getTotalRecordCount(), is(Optional.of(2L)));
-        assertReflectionEquals(Collections.singletonList(CallHistoryFixtures.getHistoricalCall(new JID(CoreFixtures.TSC))), result.getCalls());
+        assertReflectionEquals(Collections.singletonList(GetCallHistoryFixtures.getHistoricalCall(new JID(CoreFixtures.TSC))), result.getCalls());
     }
 
     @Test
@@ -75,15 +75,15 @@ public class GetCallHistoryResultTest {
                 .setFirstRecordNumber(0)
                 .setRecordCountInBatch(1)
                 .setTotalRecordCount(2)
-                .addCall(CallHistoryFixtures.getHistoricalCall(new JID(CoreFixtures.TSC)))
+                .addCall(GetCallHistoryFixtures.getHistoricalCall(new JID(CoreFixtures.TSC)))
                 .build();
 
-        assertThat(result.toXML(), isIdenticalTo(CallHistoryFixtures.CALL_HISTORY_RESULT).ignoreWhitespace());
+        assertThat(result.toXML(), isIdenticalTo(GetCallHistoryFixtures.CALL_HISTORY_RESULT).ignoreWhitespace());
     }
 
     @Test
     public void willParseAnXMPPStanza() {
-        final GetCallHistoryResult result = OpenlinkIQParser.parse(Fixtures.iqFrom(CallHistoryFixtures.CALL_HISTORY_RESULT));
+        final GetCallHistoryResult result = OpenlinkIQParser.parse(Fixtures.iqFrom(GetCallHistoryFixtures.CALL_HISTORY_RESULT));
 
         assertThat(result.getType(), is(IQ.Type.result));
         assertThat(result.getID(), is(CoreFixtures.STANZA_ID));
@@ -92,13 +92,13 @@ public class GetCallHistoryResultTest {
         assertThat(result.getFirstRecordNumber(), is(Optional.of(0L)));
         assertThat(result.getRecordCountInBatch(), is(Optional.of(1L)));
         assertThat(result.getTotalRecordCount(), is(Optional.of(2L)));
-        assertReflectionEquals(Collections.singletonList(CallHistoryFixtures.getHistoricalCall(new JID(CoreFixtures.TSC))), result.getCalls());
+        assertReflectionEquals(Collections.singletonList(GetCallHistoryFixtures.getHistoricalCall(new JID(CoreFixtures.TSC))), result.getCalls());
         assertThat(result.getParseErrors(), is(empty()));
     }
 
     @Test
     public void willReturnParsingErrors() {
-        final GetCallHistoryResult result = OpenlinkIQParser.parse(Fixtures.iqFrom(CallHistoryFixtures.CALL_HISTORY_RESULT_WITH_BAD_VALUES));
+        final GetCallHistoryResult result = OpenlinkIQParser.parse(Fixtures.iqFrom(GetCallHistoryFixtures.CALL_HISTORY_RESULT_WITH_BAD_VALUES));
 
         assertThat(result.getType(), is(IQ.Type.get));
         assertThat(result.getFirstRecordNumber(), is(Optional.empty()));
@@ -133,9 +133,20 @@ public class GetCallHistoryResultTest {
     @Test
     public void willPreferStartTimeOverTimestamp() {
 
-        final GetCallHistoryResult result = OpenlinkIQParser.parse(Fixtures.iqFrom(CallHistoryFixtures.CALL_HISTORY_RESULT_WITH_MISMATCHED_TIMES));
+        final GetCallHistoryResult result = OpenlinkIQParser.parse(Fixtures.iqFrom(GetCallHistoryFixtures.CALL_HISTORY_RESULT_WITH_MISMATCHED_TIMES));
 
         assertThat(result.getCalls().get(0).getStartTime(), is(Optional.of(Instant.parse("2011-12-13T14:15:16.178Z"))));
     }
 
+    @Test
+    public void willCreateAResultFromARequest() {
+
+        final GetCallHistoryRequest request = OpenlinkIQParser.parse(Fixtures.iqFrom(GetCallHistoryFixtures.GET_CALL_HISTORY_REQUEST_FOR_ALL_USERS));
+        final GetCallHistoryResult result = GetCallHistoryResult.Builder.createResultBuilder(request).setTotalRecordCount(0).build();
+
+        assertThat(result.getID(), is(request.getID()));
+        assertThat(result.getTo(), is(request.getFrom()));
+        assertThat(result.getFrom(), is(request.getTo()));
+        assertThat(result.getType(), is(IQ.Type.result));
+    }
 }

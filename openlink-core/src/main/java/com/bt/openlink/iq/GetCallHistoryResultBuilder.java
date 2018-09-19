@@ -52,7 +52,7 @@ public abstract class GetCallHistoryResultBuilder<B extends GetCallHistoryResult
         return (B) this;
     }
 
-    @SuppressWarnings({"unchecked", "WeakerAccess"})
+    @SuppressWarnings({ "unchecked", "WeakerAccess" })
     @Nonnull
     public B addCalls(@Nonnull final List<HistoricalCall<J>> calls) {
         this.calls.addAll(calls);
@@ -85,7 +85,7 @@ public abstract class GetCallHistoryResultBuilder<B extends GetCallHistoryResult
         if (totalRecordCount == null) {
             throw new IllegalStateException("The total record count of the get-call-history result has not been set");
         }
-        if (firstRecordNumber == null) {
+        if (firstRecordNumber == null && calls.size() > 0) {
             throw new IllegalStateException("The first record number of the get-call-history result has not been set");
         }
         if (recordCountInBatch == null) {
@@ -107,7 +107,7 @@ public abstract class GetCallHistoryResultBuilder<B extends GetCallHistoryResult
         if (totalRecordCount == null) {
             errors.add("Invalid call history; missing or invalid total record count");
         }
-        if (firstRecordNumber == null) {
+        if (firstRecordNumber == null && calls.size() > 0) {
             errors.add("Invalid call history; missing or invalid first record number");
         }
         if (recordCountInBatch == null) {
