@@ -3,6 +3,9 @@ package com.bt.openlink.smack.iq;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.Duration;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -77,7 +80,8 @@ public class GetCallHistoryResult extends OpenlinkIQ {
         return builder.build(parseErrors);
     }
 
-    private static void parseHistoricalCall(@Nonnull final XmlPullParser parser, final List<String> parseErrors, final int callDepth, final HistoricalCall.Builder<Jid> callBuilder) throws IOException, XmlPullParserException {
+    private static void parseHistoricalCall(@Nonnull final XmlPullParser parser, final List<String> parseErrors, final int callDepth, final HistoricalCall.Builder<Jid> callBuilder)
+            throws IOException, XmlPullParserException {
         final Optional<String> elementText = SmackPacketUtil.getElementTextString(parser);
         switch (parser.getName()) {
         case "id":
@@ -108,22 +112,27 @@ public class GetCallHistoryResult extends OpenlinkIQ {
             elementText.ifPresent(callBuilder::setCalledName);
             break;
         case "duration":
-            elementText.ifPresent(duration -> {
-                try {
-                    callBuilder.setDuration(Duration.ofMillis(Long.parseLong(duration)));
-                } catch (final NumberFormatException ignored) {
-                    parseErrors.add(String.format("Invalid %s; invalid duration '%s'; please supply an integer", STANZA_DESCRIPTION, duration));
-                }
-            });
+            try {
+                elementText.map(Long::parseLong).map(Duration::ofMillis).ifPresent(callBuilder::setDuration);
+            } catch (final NumberFormatException ignored) {
+                parseErrors.add(String.format("Invalid %s; invalid duration '%s'; please supply an integer", STANZA_DESCRIPTION, elementText.get()));
+            }
             break;
         case "timestamp":
-            elementText.ifPresent(timestamp -> {
+            if (callBuilder.isStartTimeNull()) {
                 try {
-                    callBuilder.setStartTime(Timestamp.valueOf(timestamp).toInstant());
+                    elementText.map(Timestamp::valueOf).map(Timestamp::toInstant).ifPresent(callBuilder::setStartTime);
                 } catch (final IllegalArgumentException ignored) {
-                    parseErrors.add(String.format("Invalid %s; invalid timestamp '%s'; please supply a valid timestamp", STANZA_DESCRIPTION, timestamp));
+                    parseErrors.add(String.format("Invalid %s; invalid timestamp '%s'; please supply a valid timestamp", STANZA_DESCRIPTION, elementText.get()));
                 }
-            });
+            }
+            break;
+        case "starttime":
+            try {
+                elementText.map(Instant::parse).ifPresent(callBuilder::setStartTime);
+            } catch(final DateTimeParseException ignored) {
+                parseErrors.add(String.format("Invalid %s; invalid starttime '%s'; please supply a valid starttime", STANZA_DESCRIPTION, elementText.get()));
+            }             
             break;
         case "tsc":
             elementText.flatMap(SmackPacketUtil::getSmackJid).ifPresent(callBuilder::setTsc);
@@ -154,18 +163,19 @@ public class GetCallHistoryResult extends OpenlinkIQ {
                 .rightAngleBracket();
         calls.forEach(call -> {
             xml.openElement("call");
-            xml.element("id", call.getId().map(CallId::value).orElse(""));
-            xml.element("profile", call.getProfileId().map(ProfileId::value).orElse(""));
-            xml.element("interest", call.getInterestId().map(InterestId::value).orElse(""));
-            xml.element("state", call.getState().map(CallState::getLabel).orElse(""));
-            xml.element("direction", call.getDirection().map(CallDirection::getLabel).orElse(""));
-            xml.element("caller", call.getCallerNumber().map(PhoneNumber::value).orElse(""));
-            xml.element("callername", call.getCallerName().orElse(""));
-            xml.element("called", call.getCalledNumber().map(PhoneNumber::value).orElse(""));
-            xml.element("calledname", call.getCalledName().orElse(""));
-            xml.element("timestamp", call.getStartTime().map(Timestamp::from).map(Timestamp::toString).orElse(""));
-            xml.element("duration", call.getDuration().map(Duration::toMillis).map(String::valueOf).orElse(""));
-            xml.element("tsc", call.getTsc().map(Jid::toString).orElse(""));
+            xml.optElement("id", call.getId().map(CallId::value).orElse(null));
+            xml.optElement("profile", call.getProfileId().map(ProfileId::value).orElse(null));
+            xml.optElement("interest", call.getInterestId().map(InterestId::value).orElse(null));
+            xml.optElement("state", call.getState().map(CallState::getLabel).orElse(null));
+            xml.optElement("direction", call.getDirection().map(CallDirection::getLabel).orElse(null));
+            xml.optElement("caller", call.getCallerNumber().map(PhoneNumber::value).orElse(null));
+            xml.optElement("callername", call.getCallerName().orElse(null));
+            xml.optElement("called", call.getCalledNumber().map(PhoneNumber::value).orElse(null));
+            xml.optElement("calledname", call.getCalledName().orElse(null));
+            xml.optElement("timestamp", call.getStartTime().map(Timestamp::from).map(Timestamp::toString).orElse(null));
+            xml.optElement("starttime", call.getStartTime().map(startTime -> SmackPacketUtil.ISO_8601_FORMATTER.format(startTime.atZone(ZoneOffset.UTC))).orElse(null));
+            xml.optElement("duration", call.getDuration().map(Duration::toMillis).map(String::valueOf).orElse(null));
+            xml.optElement("tsc", call.getTsc().map(Jid::toString).orElse(null));
             xml.closeElement("call");
         });
         xml.closeElement(ELEMENT_NAME_CALL_HISTORY);

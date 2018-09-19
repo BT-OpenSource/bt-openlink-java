@@ -265,6 +265,10 @@ public class HistoricalCall<J> implements Serializable {
             return this;
         }
 
+        public boolean isStartTimeNull() {
+            return this.startTime == null;
+        }
+
         @Nonnull
         public Builder<J> setDuration(@Nonnull final Duration duration) {
             this.duration = duration;

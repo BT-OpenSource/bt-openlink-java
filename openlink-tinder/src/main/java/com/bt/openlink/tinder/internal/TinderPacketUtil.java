@@ -69,7 +69,7 @@ import com.bt.openlink.type.VoiceRecorderInfo;
  */
 public final class TinderPacketUtil {
 
-    private static final DateTimeFormatter ISO_8601_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+    public static final DateTimeFormatter ISO_8601_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
     private static final DateTimeFormatter JAVA_UTIL_DATE_FORMATTER = DateTimeFormatter.ofPattern("EEE MMM dd HH:mm:ss zzz yyyy");
     private static final String ATTRIBUTE_DIRECTION = "direction";
     private static final String ATTRIBUTE_DESTINATION = "destination";

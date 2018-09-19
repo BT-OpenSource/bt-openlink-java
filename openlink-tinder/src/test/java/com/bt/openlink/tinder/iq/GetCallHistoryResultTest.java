@@ -7,6 +7,7 @@ import static org.junit.Assert.assertThat;
 import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
 import static org.xmlunit.matchers.CompareMatcher.isIdenticalTo;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Optional;
@@ -107,6 +108,7 @@ public class GetCallHistoryResultTest {
         assertThat(result.getParseErrors(), contains(
                 "Invalid get-call-history result; invalid duration 'not-a-duration'; please supply an integer",
                 "Invalid get-call-history result; invalid timestamp 'not-a-timestamp'; please supply a valid timestamp",
+                "Invalid get-call-history result; invalid starttime 'not-a-starttime'; please supply a valid starttime",
                 "Invalid historical call; missing call id is mandatory",
                 "Invalid historical call; missing profile id is mandatory",
                 "Invalid historical call; missing interest id is mandatory",
@@ -127,4 +129,13 @@ public class GetCallHistoryResultTest {
                 "Invalid call history; missing or invalid first record number",
                 "Invalid call history; incorrect batch record count"));
     }
+
+    @Test
+    public void willPreferStartTimeOverTimestamp() {
+
+        final GetCallHistoryResult result = OpenlinkIQParser.parse(Fixtures.iqFrom(CallHistoryFixtures.CALL_HISTORY_RESULT_WITH_MISMATCHED_TIMES));
+
+        assertThat(result.getCalls().get(0).getStartTime(), is(Optional.of(Instant.parse("2011-12-13T14:15:16.178Z"))));
+    }
+
 }

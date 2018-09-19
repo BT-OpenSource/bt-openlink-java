@@ -2,6 +2,9 @@ package com.bt.openlink.tinder.iq;
 
 import java.sql.Timestamp;
 import java.time.Duration;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -54,7 +57,9 @@ public class GetCallHistoryResult extends OpenlinkIQ {
             call.getCallerName().ifPresent(callerName -> TinderPacketUtil.addElementWithTextIfNotNull(callElement, "callername", callerName));
             call.getCalledNumber().ifPresent(called -> TinderPacketUtil.addElementWithTextIfNotNull(callElement, "called", called));
             call.getCalledName().ifPresent(calledName -> TinderPacketUtil.addElementWithTextIfNotNull(callElement, "calledname", calledName));
-            call.getStartTime().ifPresent(timestamp -> TinderPacketUtil.addElementWithTextIfNotNull(callElement, "timestamp", Timestamp.from(timestamp).toString()));
+            call.getStartTime().map(Timestamp::from).ifPresent(timestamp -> TinderPacketUtil.addElementWithTextIfNotNull(callElement, "timestamp", timestamp));
+            call.getStartTime().map(startTime -> TinderPacketUtil.ISO_8601_FORMATTER.format(startTime.atZone(ZoneOffset.UTC)))
+                    .ifPresent(startTime -> TinderPacketUtil.addElementWithTextIfNotNull(callElement, "starttime", startTime));
             call.getDuration().ifPresent(duration -> TinderPacketUtil.addElementWithTextIfNotNull(callElement, "duration", duration.toMillis()));
             call.getTsc().ifPresent(tsc -> TinderPacketUtil.addElementWithTextIfNotNull(callElement, "tsc", tsc));
         });
@@ -84,14 +89,23 @@ public class GetCallHistoryResult extends OpenlinkIQ {
                 TinderPacketUtil.getOptionalChildElementString(callElement, "called").flatMap(PhoneNumber::from).ifPresent(historicalCallBuilder::setCalledNumber);
                 TinderPacketUtil.getOptionalChildElementString(callElement, "calledname").ifPresent(historicalCallBuilder::setCalledName);
                 TinderPacketUtil.getChildElementLong(callElement, "duration", STANZA_DESCRIPTION, parseErrors).map(Duration::ofMillis).ifPresent(historicalCallBuilder::setDuration);
-                final Optional<String> optionalTimestamp = TinderPacketUtil.getOptionalChildElementString(callElement, "timestamp");
-                optionalTimestamp.ifPresent(timestamp -> {
+                if (historicalCallBuilder.isStartTimeNull()) {
+                    final Optional<String> optionalTimestamp = TinderPacketUtil.getOptionalChildElementString(callElement, "timestamp");
                     try {
-                        historicalCallBuilder.setStartTime(Timestamp.valueOf(timestamp).toInstant());
+                        optionalTimestamp
+                                .map(Timestamp::valueOf)
+                                .map(Timestamp::toInstant)
+                                .ifPresent(historicalCallBuilder::setStartTime);
                     } catch (final IllegalArgumentException ignored) {
-                        parseErrors.add(String.format("Invalid %s; invalid timestamp '%s'; please supply a valid timestamp", STANZA_DESCRIPTION, timestamp));
+                        parseErrors.add(String.format("Invalid %s; invalid timestamp '%s'; please supply a valid timestamp", STANZA_DESCRIPTION, optionalTimestamp.get()));
                     }
-                });
+                }
+                final Optional<String> optionalStartTime = TinderPacketUtil.getOptionalChildElementString(callElement, "starttime");
+                try {
+                    optionalStartTime.map(Instant::parse).ifPresent(historicalCallBuilder::setStartTime);
+                } catch (final DateTimeParseException ignored) {
+                    parseErrors.add(String.format("Invalid %s; invalid starttime '%s'; please supply a valid starttime", STANZA_DESCRIPTION, optionalStartTime.get()));
+                }
                 TinderPacketUtil.getJID(TinderPacketUtil.getNullableChildElementString(callElement, "tsc")).ifPresent(historicalCallBuilder::setTsc);
                 builder.addCall(historicalCallBuilder.build(parseErrors));
             });
