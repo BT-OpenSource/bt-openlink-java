@@ -18,6 +18,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.xmpp.packet.IQ;
+import org.xmpp.packet.JID;
 
 import com.bt.openlink.CallHistoryFixtures;
 import com.bt.openlink.CoreFixtures;
@@ -50,7 +51,7 @@ public class GetCallHistoryResultTest {
                 .setFirstRecordNumber(0)
                 .setRecordCountInBatch(1)
                 .setTotalRecordCount(2)
-                .addCall(CallHistoryFixtures.CALL)
+                .addCall(CallHistoryFixtures.getHistoricalCall(new JID(CoreFixtures.TSC)))
                 .build();
 
         assertThat(result.getType(), is(IQ.Type.result));
@@ -60,7 +61,7 @@ public class GetCallHistoryResultTest {
         assertThat(result.getFirstRecordNumber(), is(Optional.of(0L)));
         assertThat(result.getRecordCountInBatch(), is(Optional.of(1L)));
         assertThat(result.getTotalRecordCount(), is(Optional.of(2L)));
-        assertThat(result.getCalls(), contains(CallHistoryFixtures.CALL));
+        assertReflectionEquals(Collections.singletonList(CallHistoryFixtures.getHistoricalCall(new JID(CoreFixtures.TSC))), result.getCalls());
     }
 
     @Test
@@ -73,7 +74,7 @@ public class GetCallHistoryResultTest {
                 .setFirstRecordNumber(0)
                 .setRecordCountInBatch(1)
                 .setTotalRecordCount(2)
-                .addCall(CallHistoryFixtures.CALL)
+                .addCall(CallHistoryFixtures.getHistoricalCall(new JID(CoreFixtures.TSC)))
                 .build();
 
         assertThat(result.toXML(), isIdenticalTo(CallHistoryFixtures.CALL_HISTORY_RESULT).ignoreWhitespace());
@@ -90,7 +91,7 @@ public class GetCallHistoryResultTest {
         assertThat(result.getFirstRecordNumber(), is(Optional.of(0L)));
         assertThat(result.getRecordCountInBatch(), is(Optional.of(1L)));
         assertThat(result.getTotalRecordCount(), is(Optional.of(2L)));
-        assertReflectionEquals(Collections.singletonList(CallHistoryFixtures.CALL), result.getCalls());
+        assertReflectionEquals(Collections.singletonList(CallHistoryFixtures.getHistoricalCall(new JID(CoreFixtures.TSC))), result.getCalls());
         assertThat(result.getParseErrors(), is(empty()));
     }
 

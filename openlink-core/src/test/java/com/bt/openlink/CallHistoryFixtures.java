@@ -46,19 +46,20 @@ public class CallHistoryFixtures {
             "  </command>\n" +
             "</iq>";
 
-    public static final HistoricalCall CALL = HistoricalCall.Builder.start()
-            .setId(CoreFixtures.CALL_ID)
-            .setProfileId(CoreFixtures.PROFILE_ID)
-            .setInterestId(CoreFixtures.INTEREST_ID)
-            .setState(CallState.CALL_ESTABLISHED)
-            .setDirection(CallDirection.OUTGOING)
-            .setCallerNumber(CoreFixtures.CALLER_NUMBER)
-            .setCallerName(CoreFixtures.CALLER_NAME)
-            .setCalledNumber(CoreFixtures.CALLED_NUMBER)
-            .setCalledName(CoreFixtures.CALLED_NAME)
-            .setStartTime(CoreFixtures.START_TIME)
-            .setDuration(CoreFixtures.DURATION)
-            .setTsc(CoreFixtures.TSC)
-            .build();
-
+    public static <J> HistoricalCall<J> getHistoricalCall(final J tsc) {
+        return HistoricalCall.Builder.<J>start()
+                .setId(CoreFixtures.CALL_ID)
+                .setProfileId(CoreFixtures.PROFILE_ID)
+                .setInterestId(CoreFixtures.INTEREST_ID)
+                .setState(CallState.CALL_ESTABLISHED)
+                .setDirection(CallDirection.OUTGOING)
+                .setCallerNumber(CoreFixtures.CALLER_NUMBER)
+                .setCallerName(CoreFixtures.CALLER_NAME)
+                .setCalledNumber(CoreFixtures.CALLED_NUMBER)
+                .setCalledName(CoreFixtures.CALLED_NAME)
+                .setStartTime(CoreFixtures.START_TIME)
+                .setDuration(CoreFixtures.DURATION)
+                .setTsc(tsc)
+                .build();
+    }
 }

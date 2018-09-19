@@ -30,7 +30,7 @@ public class GetCallHistoryResult extends OpenlinkIQ {
     @Nullable private final Long totalRecordCount;
     @Nullable private final Long firstRecordNumber;
     @Nullable private final Long recordCountInBatch;
-    @Nonnull private List<HistoricalCall> calls;
+    @Nonnull private List<HistoricalCall<JID>> calls;
 
     private GetCallHistoryResult(@Nonnull Builder builder, @Nullable List<String> parseErrors) {
         super(builder, parseErrors);
@@ -73,7 +73,7 @@ public class GetCallHistoryResult extends OpenlinkIQ {
         if (callHistoryElement != null) {
             final List<Element> calls = callHistoryElement.elements("call");
             calls.forEach(callElement -> {
-                final HistoricalCall.Builder historicalCallBuilder = HistoricalCall.Builder.start();
+                final HistoricalCall.Builder<JID> historicalCallBuilder = HistoricalCall.Builder.start();
                 TinderPacketUtil.getOptionalChildElementString(callElement, "id").flatMap(CallId::from).ifPresent(historicalCallBuilder::setId);
                 TinderPacketUtil.getOptionalChildElementString(callElement, "profile").flatMap(ProfileId::from).ifPresent(historicalCallBuilder::setProfileId);
                 TinderPacketUtil.getOptionalChildElementString(callElement, "interest").flatMap(InterestId::from).ifPresent(historicalCallBuilder::setInterestId);
@@ -92,7 +92,7 @@ public class GetCallHistoryResult extends OpenlinkIQ {
                         parseErrors.add(String.format("Invalid %s; invalid timestamp '%s'; please supply a valid timestamp", STANZA_DESCRIPTION, timestamp));
                     }
                 });
-                TinderPacketUtil.getOptionalChildElementString(callElement, "tsc").ifPresent(historicalCallBuilder::setTsc);
+                TinderPacketUtil.getJID(TinderPacketUtil.getNullableChildElementString(callElement, "tsc")).ifPresent(historicalCallBuilder::setTsc);
                 builder.addCall(historicalCallBuilder.build(parseErrors));
             });
         }
@@ -120,7 +120,7 @@ public class GetCallHistoryResult extends OpenlinkIQ {
 
     @SuppressWarnings("WeakerAccess")
     @Nonnull
-    public List<HistoricalCall> getCalls() {
+    public List<HistoricalCall<JID>> getCalls() {
         return calls;
     }
 

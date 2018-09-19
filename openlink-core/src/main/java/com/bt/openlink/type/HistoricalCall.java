@@ -9,7 +9,7 @@ import java.util.Optional;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class HistoricalCall implements Serializable {
+public class HistoricalCall<J> implements Serializable {
 
     private static final long serialVersionUID = 1886581027951185824L;
     @Nullable private final CallId callId;
@@ -23,9 +23,9 @@ public class HistoricalCall implements Serializable {
     @Nullable private final String calledName;
     @Nullable private final Instant startTime;
     @Nullable private final Duration duration;
-    @Nullable private final String tsc;
+    @Nullable private final J tsc;
 
-    private HistoricalCall(@Nonnull final Builder builder) {
+    private HistoricalCall(@Nonnull final Builder<J> builder) {
         this.callId = builder.callId;
         this.profileId = builder.profileId;
         this.interestId = builder.interestId;
@@ -96,11 +96,11 @@ public class HistoricalCall implements Serializable {
     }
 
     @Nonnull
-    public Optional<String> getTsc() {
+    public Optional<J> getTsc() {
         return Optional.ofNullable(tsc);
     }
 
-    public static final class Builder {
+    public static final class Builder<J> {
         @Nullable private CallId callId;
         @Nullable private ProfileId profileId;
         @Nullable private InterestId interestId;
@@ -112,18 +112,18 @@ public class HistoricalCall implements Serializable {
         @Nullable private String calledName;
         @Nullable private Instant startTime;
         @Nullable private Duration duration;
-        @Nullable private String tsc;
+        @Nullable private J tsc;
 
         private Builder() {
         }
 
         @Nonnull
-        public static Builder start() {
-            return new Builder();
+        public static <J> Builder<J> start() {
+            return new Builder<>();
         }
 
         @Nonnull
-        public HistoricalCall build() {
+        public HistoricalCall<J> build() {
             if (callId == null) {
                 throw new IllegalStateException("The call id has not been set");
             }
@@ -161,11 +161,11 @@ public class HistoricalCall implements Serializable {
                 throw new IllegalStateException("The call tsc has not been set");
             }
 
-            return new HistoricalCall(this);
+            return new HistoricalCall<>(this);
         }
 
         @Nonnull
-        public HistoricalCall build(@Nonnull final List<String> errors) {
+        public HistoricalCall<J> build(@Nonnull final List<String> errors) {
             if (callId == null) {
                 errors.add("Invalid historical call; missing call id is mandatory");
             }
@@ -203,76 +203,76 @@ public class HistoricalCall implements Serializable {
                 errors.add("Invalid historical call; missing TSC is mandatory");
             }
 
-            return new HistoricalCall(this);
+            return new HistoricalCall<>(this);
         }
 
         @Nonnull
-        public Builder setId(@Nonnull final CallId callId) {
+        public Builder<J> setId(@Nonnull final CallId callId) {
             this.callId = callId;
             return this;
         }
 
         @Nonnull
-        public Builder setProfileId(@Nonnull final ProfileId profileId) {
+        public Builder<J> setProfileId(@Nonnull final ProfileId profileId) {
             this.profileId = profileId;
             return this;
         }
 
         @Nonnull
-        public Builder setInterestId(@Nonnull final InterestId interestId) {
+        public Builder<J> setInterestId(@Nonnull final InterestId interestId) {
             this.interestId = interestId;
             return this;
         }
 
         @Nonnull
-        public Builder setState(@Nonnull final CallState state) {
+        public Builder<J> setState(@Nonnull final CallState state) {
             this.state = state;
             return this;
         }
 
         @Nonnull
-        public Builder setDirection(@Nonnull final CallDirection direction) {
+        public Builder<J> setDirection(@Nonnull final CallDirection direction) {
             this.direction = direction;
             return this;
         }
 
         @Nonnull
-        public Builder setCallerNumber(@Nonnull final PhoneNumber callerNumber) {
+        public Builder<J> setCallerNumber(@Nonnull final PhoneNumber callerNumber) {
             this.callerNumber = callerNumber;
             return this;
         }
 
         @Nonnull
-        public Builder setCallerName(@Nonnull final String callerName) {
+        public Builder<J> setCallerName(@Nonnull final String callerName) {
             this.callerName = callerName;
             return this;
         }
 
-        public Builder setCalledNumber(@Nonnull final PhoneNumber calledNumber) {
+        public Builder<J> setCalledNumber(@Nonnull final PhoneNumber calledNumber) {
             this.calledNumber = calledNumber;
             return this;
         }
 
         @Nonnull
-        public Builder setCalledName(@Nonnull final String calledName) {
+        public Builder<J> setCalledName(@Nonnull final String calledName) {
             this.calledName = calledName;
             return this;
         }
 
         @Nonnull
-        public Builder setStartTime(@Nonnull final Instant startTime) {
+        public Builder<J> setStartTime(@Nonnull final Instant startTime) {
             this.startTime = startTime;
             return this;
         }
 
         @Nonnull
-        public Builder setDuration(@Nonnull final Duration duration) {
+        public Builder<J> setDuration(@Nonnull final Duration duration) {
             this.duration = duration;
             return this;
         }
 
         @Nonnull
-        public Builder setTsc(@Nonnull final String tsc) {
+        public Builder<J> setTsc(@Nonnull final J tsc) {
             this.tsc = tsc;
             return this;
         }

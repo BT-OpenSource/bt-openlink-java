@@ -1,7 +1,6 @@
 package com.bt.openlink.smack.iq;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
 import static org.junit.Assert.assertThat;
@@ -21,6 +20,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.jxmpp.jid.impl.JidCreate;
 
 import com.bt.openlink.CallHistoryFixtures;
 import com.bt.openlink.CoreFixtures;
@@ -46,7 +46,7 @@ public class GetCallHistoryResultTest {
     }
 
     @Test
-    public void canCreateAStanza() {
+    public void canCreateAStanza() throws Exception {
 
         final GetCallHistoryResult result = GetCallHistoryResult.Builder.start()
                 .setId(CoreFixtures.STANZA_ID)
@@ -55,7 +55,7 @@ public class GetCallHistoryResultTest {
                 .setFirstRecordNumber(0)
                 .setRecordCountInBatch(1)
                 .setTotalRecordCount(2)
-                .addCall(CallHistoryFixtures.CALL)
+                .addCall(CallHistoryFixtures.getHistoricalCall(JidCreate.from(CoreFixtures.TSC)))
                 .build();
 
         assertThat(result.getType(), is(IQ.Type.result));
@@ -65,11 +65,11 @@ public class GetCallHistoryResultTest {
         assertThat(result.getFirstRecordNumber(), is(Optional.of(0L)));
         assertThat(result.getRecordCountInBatch(), is(Optional.of(1L)));
         assertThat(result.getTotalRecordCount(), is(Optional.of(2L)));
-        assertThat(result.getCalls(), contains(CallHistoryFixtures.CALL));
+        assertReflectionEquals(Collections.singletonList(CallHistoryFixtures.getHistoricalCall(JidCreate.from(CoreFixtures.TSC))), result.getCalls());
     }
 
     @Test
-    public void willGenerateAnXmppStanza() {
+    public void willGenerateAnXmppStanza() throws Exception {
 
         final GetCallHistoryResult result = GetCallHistoryResult.Builder.start()
                 .setId(CoreFixtures.STANZA_ID)
@@ -78,7 +78,7 @@ public class GetCallHistoryResultTest {
                 .setFirstRecordNumber(0)
                 .setRecordCountInBatch(1)
                 .setTotalRecordCount(2)
-                .addCall(CallHistoryFixtures.CALL)
+                .addCall(CallHistoryFixtures.getHistoricalCall(JidCreate.from(CoreFixtures.TSC)))
                 .build();
 
         assertThat(result.toXML().toString(), isIdenticalTo(CallHistoryFixtures.CALL_HISTORY_RESULT).ignoreWhitespace());
@@ -95,7 +95,7 @@ public class GetCallHistoryResultTest {
         assertThat(result.getFirstRecordNumber(), is(Optional.of(0L)));
         assertThat(result.getRecordCountInBatch(), is(Optional.of(1L)));
         assertThat(result.getTotalRecordCount(), is(Optional.of(2L)));
-        assertReflectionEquals(Collections.singletonList(CallHistoryFixtures.CALL), result.getCalls());
+        assertReflectionEquals(Collections.singletonList(CallHistoryFixtures.getHistoricalCall(JidCreate.from(CoreFixtures.TSC))), result.getCalls());
         assertThat(result.getParseErrors(), is(empty()));
     }
 

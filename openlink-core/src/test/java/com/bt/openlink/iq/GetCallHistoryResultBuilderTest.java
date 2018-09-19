@@ -47,7 +47,7 @@ public class GetCallHistoryResultBuilderTest {
         builder.setFirstRecordNumber(0)
                 .setRecordCountInBatch(1)
                 .setTotalRecordCount(2)
-                .addCalls(Collections.singletonList(CallHistoryFixtures.CALL))
+                .addCalls(Collections.singletonList(CallHistoryFixtures.getHistoricalCall(CoreFixtures.TSC)))
                 .validate();
 
         builder.validate(errors);
@@ -69,7 +69,7 @@ public class GetCallHistoryResultBuilderTest {
 
         builder.setRecordCountInBatch(1)
                 .setTotalRecordCount(2)
-                .addCall(CallHistoryFixtures.CALL)
+                .addCall(CallHistoryFixtures.getHistoricalCall(CoreFixtures.TSC))
                 .validate();
     }
 
@@ -80,7 +80,7 @@ public class GetCallHistoryResultBuilderTest {
 
         builder.setRecordCountInBatch(1)
                 .setTotalRecordCount(2)
-                .addCall(CallHistoryFixtures.CALL)
+                .addCall(CallHistoryFixtures.getHistoricalCall(CoreFixtures.TSC))
                 .validate(errors);
 
         assertThat(errors, contains("Invalid call history; missing or invalid first record number"));
@@ -95,7 +95,7 @@ public class GetCallHistoryResultBuilderTest {
         builder.setFirstRecordNumber(0)
                 .setRecordCountInBatch(2)
                 .setTotalRecordCount(3)
-                .addCall(CallHistoryFixtures.CALL)
+                .addCall(CallHistoryFixtures.getHistoricalCall(CoreFixtures.TSC))
                 .validate();
     }
 
@@ -107,7 +107,7 @@ public class GetCallHistoryResultBuilderTest {
         builder.setFirstRecordNumber(0)
                 .setRecordCountInBatch(2)
                 .setTotalRecordCount(3)
-                .addCall(CallHistoryFixtures.CALL)
+                .addCall(CallHistoryFixtures.getHistoricalCall(CoreFixtures.TSC))
                 .validate(errors);
 
         assertThat(errors, contains("Invalid call history; incorrect batch record count"));
@@ -118,7 +118,7 @@ public class GetCallHistoryResultBuilderTest {
 
         builder.setFirstRecordNumber(0)
                 .setTotalRecordCount(2)
-                .addCall(CallHistoryFixtures.CALL)
+                .addCall(CallHistoryFixtures.getHistoricalCall(CoreFixtures.TSC))
                 .validate();
 
         assertThat(builder.getRecordCountInBatch(), is(Optional.of(1L)));
@@ -131,7 +131,7 @@ public class GetCallHistoryResultBuilderTest {
 
         builder.setFirstRecordNumber(0)
                 .setTotalRecordCount(2)
-                .addCall(CallHistoryFixtures.CALL)
+                .addCall(CallHistoryFixtures.getHistoricalCall(CoreFixtures.TSC))
                 .validate(errors);
 
         assertThat(builder.getRecordCountInBatch(), is(Optional.of(1L)));
@@ -146,7 +146,7 @@ public class GetCallHistoryResultBuilderTest {
 
         builder.setFirstRecordNumber(0)
                 .setRecordCountInBatch(1)
-                .addCall(CallHistoryFixtures.CALL)
+                .addCall(CallHistoryFixtures.getHistoricalCall(CoreFixtures.TSC))
                 .validate();
     }
 
@@ -157,7 +157,7 @@ public class GetCallHistoryResultBuilderTest {
 
         builder.setFirstRecordNumber(0)
                 .setRecordCountInBatch(1)
-                .addCall(CallHistoryFixtures.CALL)
+                .addCall(CallHistoryFixtures.getHistoricalCall(CoreFixtures.TSC))
                 .validate(errors);
 
         assertThat(errors, contains("Invalid call history; missing or invalid total record count"));

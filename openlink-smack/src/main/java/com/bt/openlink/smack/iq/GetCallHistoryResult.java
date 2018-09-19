@@ -34,7 +34,7 @@ public class GetCallHistoryResult extends OpenlinkIQ {
     @Nullable private final Long totalRecordCount;
     @Nullable private final Long firstRecordNumber;
     @Nullable private final Long recordCountInBatch;
-    @Nonnull private List<HistoricalCall> calls;
+    @Nonnull private List<HistoricalCall<Jid>> calls;
 
     private GetCallHistoryResult(@Nonnull Builder builder, @Nullable List<String> parseErrors) {
         super("command", OpenlinkXmppNamespace.XMPP_COMMANDS.uri(), builder, parseErrors);
@@ -64,7 +64,7 @@ public class GetCallHistoryResult extends OpenlinkIQ {
                 while (parser.getEventType() == XmlPullParser.START_TAG && "call".equals(parser.getName())) {
                     final int callDepth = parser.getDepth();
                     parser.nextTag();
-                    final HistoricalCall.Builder callBuilder = HistoricalCall.Builder.start();
+                    final HistoricalCall.Builder<Jid> callBuilder = HistoricalCall.Builder.start();
                     while (parser.getDepth() > callDepth) {
                         parseHistoricalCall(parser, parseErrors, callDepth, callBuilder);
                     }
@@ -77,7 +77,7 @@ public class GetCallHistoryResult extends OpenlinkIQ {
         return builder.build(parseErrors);
     }
 
-    private static void parseHistoricalCall(@Nonnull final XmlPullParser parser, final List<String> parseErrors, final int callDepth, final HistoricalCall.Builder callBuilder) throws IOException, XmlPullParserException {
+    private static void parseHistoricalCall(@Nonnull final XmlPullParser parser, final List<String> parseErrors, final int callDepth, final HistoricalCall.Builder<Jid> callBuilder) throws IOException, XmlPullParserException {
         final Optional<String> elementText = SmackPacketUtil.getElementTextString(parser);
         switch (parser.getName()) {
         case "id":
@@ -126,7 +126,7 @@ public class GetCallHistoryResult extends OpenlinkIQ {
             });
             break;
         case "tsc":
-            elementText.ifPresent(callBuilder::setTsc);
+            elementText.flatMap(SmackPacketUtil::getSmackJid).ifPresent(callBuilder::setTsc);
             break;
         default:
             parseErrors.add("Unrecognised element:" + parser.getName());
@@ -165,7 +165,7 @@ public class GetCallHistoryResult extends OpenlinkIQ {
             xml.element("calledname", call.getCalledName().orElse(""));
             xml.element("timestamp", call.getStartTime().map(Timestamp::from).map(Timestamp::toString).orElse(""));
             xml.element("duration", call.getDuration().map(Duration::toMillis).map(String::valueOf).orElse(""));
-            xml.element("tsc", call.getTsc().orElse(""));
+            xml.element("tsc", call.getTsc().map(Jid::toString).orElse(""));
             xml.closeElement("call");
         });
         xml.closeElement(ELEMENT_NAME_CALL_HISTORY);
@@ -194,7 +194,7 @@ public class GetCallHistoryResult extends OpenlinkIQ {
 
     @SuppressWarnings("WeakerAccess")
     @Nonnull
-    public List<HistoricalCall> getCalls() {
+    public List<HistoricalCall<Jid>> getCalls() {
         return calls;
     }
 

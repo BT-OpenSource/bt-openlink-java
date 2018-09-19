@@ -14,7 +14,7 @@ public abstract class GetCallHistoryResultBuilder<B extends GetCallHistoryResult
     @Nullable private Long totalRecordCount;
     @Nullable private Long firstRecordNumber;
     @Nullable private Long recordCountInBatch;
-    @Nonnull private List<HistoricalCall> calls = new ArrayList<>();
+    @Nonnull private List<HistoricalCall<J>> calls = new ArrayList<>();
 
     protected GetCallHistoryResultBuilder(final Class<T> typeClass) {
         super(typeClass);
@@ -46,14 +46,14 @@ public abstract class GetCallHistoryResultBuilder<B extends GetCallHistoryResult
 
     @SuppressWarnings("unchecked")
     @Nonnull
-    public B addCall(@Nonnull final HistoricalCall call) {
+    public B addCall(@Nonnull final HistoricalCall<J> call) {
         calls.add(call);
         return (B) this;
     }
 
     @SuppressWarnings({"unchecked", "WeakerAccess"})
     @Nonnull
-    public B addCalls(@Nonnull final List<HistoricalCall> calls) {
+    public B addCalls(@Nonnull final List<HistoricalCall<J>> calls) {
         this.calls.addAll(calls);
         return (B) this;
     }
@@ -74,7 +74,7 @@ public abstract class GetCallHistoryResultBuilder<B extends GetCallHistoryResult
     }
 
     @Nonnull
-    public List<HistoricalCall> getCalls() {
+    public List<HistoricalCall<J>> getCalls() {
         return calls;
     }
 
