@@ -5,7 +5,6 @@ import static org.hamcrest.Matchers.empty;
 import static org.junit.Assert.assertThat;
 import static org.xmlunit.matchers.CompareMatcher.isIdenticalTo;
 
-import com.bt.openlink.SetFeaturesFixtures;
 import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.provider.ProviderManager;
 import org.jivesoftware.smack.util.PacketParserUtils;
@@ -17,6 +16,7 @@ import org.junit.rules.ExpectedException;
 
 import com.bt.openlink.CoreFixtures;
 import com.bt.openlink.OpenlinkXmppNamespace;
+import com.bt.openlink.SetFeaturesFixtures;
 import com.bt.openlink.smack.Fixtures;
 
 @SuppressWarnings({ "ConstantConditions" })
@@ -72,5 +72,26 @@ public class SetFeaturesResultTest {
 
         assertThat(result.getParseErrors(), is(empty()));
     }
+
+    @Test
+    public void willBuildAResultFromARequest() {
+
+        final SetFeaturesRequest request = SetFeaturesRequest.Builder.start()
+                .setId(CoreFixtures.STANZA_ID)
+                .setTo(Fixtures.TO_JID)
+                .setFrom(Fixtures.FROM_JID)
+                .setProfileId(CoreFixtures.PROFILE_ID)
+                .setFeatureId(CoreFixtures.FEATURE_ID)
+                .setValue1(true)
+                .build();
+
+        final SetFeaturesResult result = SetFeaturesResult.Builder.createResultBuilder(request)
+                .build();
+
+        assertThat(result.getStanzaId(), is(request.getStanzaId()));
+        assertThat(result.getTo(), is(request.getFrom()));
+        assertThat(result.getFrom(), is(request.getTo()));
+    }
+
 
 }
