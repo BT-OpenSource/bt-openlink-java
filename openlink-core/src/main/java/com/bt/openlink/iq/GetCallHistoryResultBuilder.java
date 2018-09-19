@@ -1,5 +1,6 @@
 package com.bt.openlink.iq;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -9,7 +10,7 @@ import javax.annotation.Nullable;
 
 import com.bt.openlink.type.HistoricalCall;
 
-public abstract class GetCallHistoryResultBuilder<B extends GetCallHistoryResultBuilder, J, T extends Enum<T>> extends IQBuilder<B, J, T> {
+public abstract class GetCallHistoryResultBuilder<B extends GetCallHistoryResultBuilder, J extends Serializable, T extends Enum<T>> extends IQBuilder<B, J, T> {
 
     @Nullable private Long totalRecordCount;
     @Nullable private Long firstRecordNumber;

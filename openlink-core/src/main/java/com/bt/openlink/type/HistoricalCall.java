@@ -9,9 +9,9 @@ import java.util.Optional;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class HistoricalCall<J> implements Serializable {
+public class HistoricalCall<J extends Serializable> implements Serializable {
 
-    private static final long serialVersionUID = 1886581027951185824L;
+    private static final long serialVersionUID = 6147895706303266956L;
     @Nullable private final CallId callId;
     @Nullable private final ProfileId profileId;
     @Nullable private final InterestId interestId;
@@ -100,7 +100,7 @@ public class HistoricalCall<J> implements Serializable {
         return Optional.ofNullable(tsc);
     }
 
-    public static final class Builder<J> {
+    public static final class Builder<J extends Serializable> {
         @Nullable private CallId callId;
         @Nullable private ProfileId profileId;
         @Nullable private InterestId interestId;
@@ -118,7 +118,7 @@ public class HistoricalCall<J> implements Serializable {
         }
 
         @Nonnull
-        public static <J> Builder<J> start() {
+        public static <J extends Serializable> Builder<J> start() {
             return new Builder<>();
         }
 

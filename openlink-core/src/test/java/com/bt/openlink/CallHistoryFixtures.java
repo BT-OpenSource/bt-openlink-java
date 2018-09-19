@@ -1,5 +1,7 @@
 package com.bt.openlink;
 
+import java.io.Serializable;
+
 import com.bt.openlink.type.CallDirection;
 import com.bt.openlink.type.CallState;
 import com.bt.openlink.type.HistoricalCall;
@@ -74,7 +76,7 @@ public class CallHistoryFixtures {
             "  </command>\n" +
             "</iq>";
 
-    public static <J> HistoricalCall<J> getHistoricalCall(final J tsc) {
+    public static <J extends Serializable> HistoricalCall<J> getHistoricalCall(final J tsc) {
         return HistoricalCall.Builder.<J>start()
                 .setId(CoreFixtures.CALL_ID)
                 .setProfileId(CoreFixtures.PROFILE_ID)
