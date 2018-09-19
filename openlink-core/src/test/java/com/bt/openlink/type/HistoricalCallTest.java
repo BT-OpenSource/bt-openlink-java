@@ -29,7 +29,7 @@ public class HistoricalCallTest {
 
         final HistoricalCall call = HistoricalCall.Builder.start()
                 .setId(CoreFixtures.CALL_ID)
-                .setProfileId(CoreFixtures.PROFILE_ID)
+                .setUserId(CoreFixtures.USER_ID)
                 .setInterestId(CoreFixtures.INTEREST_ID)
                 .setState(CallState.CALL_ORIGINATED)
                 .setDirection(CallDirection.INCOMING)
@@ -43,7 +43,7 @@ public class HistoricalCallTest {
                 .build();
 
         assertThat(call.getId().get(), is(CoreFixtures.CALL_ID));
-        assertThat(call.getProfileId().get(), is(CoreFixtures.PROFILE_ID));
+        assertThat(call.getUserId().get(), is(CoreFixtures.USER_ID));
         assertThat(call.getInterestId().get(), is(CoreFixtures.INTEREST_ID));
         assertThat(call.getState().get(), is(CallState.CALL_ORIGINATED));
         assertThat(call.getDirection().get(), is(CallDirection.INCOMING));
@@ -63,7 +63,7 @@ public class HistoricalCallTest {
         expectedException.expectMessage("The call id has not been set");
 
         HistoricalCall.Builder.start()
-                .setProfileId(CoreFixtures.PROFILE_ID)
+                .setUserId(CoreFixtures.USER_ID)
                 .setInterestId(CoreFixtures.INTEREST_ID)
                 .setState(CallState.CALL_ORIGINATED)
                 .setDirection(CallDirection.INCOMING)
@@ -78,10 +78,10 @@ public class HistoricalCallTest {
     }
 
     @Test
-    public void willNotCreateACallWithoutAProfile() {
+    public void willNotCreateACallWithoutAUser() {
 
         expectedException.expect(IllegalStateException.class);
-        expectedException.expectMessage("The call profile has not been set");
+        expectedException.expectMessage("The user id has not been set");
 
         HistoricalCall.Builder.start()
                 .setId(CoreFixtures.CALL_ID)
@@ -106,7 +106,7 @@ public class HistoricalCallTest {
 
         HistoricalCall.Builder.start()
                 .setId(CoreFixtures.CALL_ID)
-                .setProfileId(CoreFixtures.PROFILE_ID)
+                .setUserId(CoreFixtures.USER_ID)
                 .setState(CallState.CALL_ORIGINATED)
                 .setDirection(CallDirection.INCOMING)
                 .setCallerNumber(CoreFixtures.CALLER_NUMBER)
@@ -127,7 +127,7 @@ public class HistoricalCallTest {
 
         HistoricalCall.Builder.start()
                 .setId(CoreFixtures.CALL_ID)
-                .setProfileId(CoreFixtures.PROFILE_ID)
+                .setUserId(CoreFixtures.USER_ID)
                 .setInterestId(CoreFixtures.INTEREST_ID)
                 .setDirection(CallDirection.INCOMING)
                 .setCallerNumber(CoreFixtures.CALLER_NUMBER)
@@ -148,7 +148,7 @@ public class HistoricalCallTest {
 
         HistoricalCall.Builder.start()
                 .setId(CoreFixtures.CALL_ID)
-                .setProfileId(CoreFixtures.PROFILE_ID)
+                .setUserId(CoreFixtures.USER_ID)
                 .setInterestId(CoreFixtures.INTEREST_ID)
                 .setState(CallState.CALL_ORIGINATED)
                 .setCallerNumber(CoreFixtures.CALLER_NUMBER)
@@ -169,7 +169,7 @@ public class HistoricalCallTest {
 
         HistoricalCall.Builder.start()
                 .setId(CoreFixtures.CALL_ID)
-                .setProfileId(CoreFixtures.PROFILE_ID)
+                .setUserId(CoreFixtures.USER_ID)
                 .setInterestId(CoreFixtures.INTEREST_ID)
                 .setState(CallState.CALL_ORIGINATED)
                 .setDirection(CallDirection.INCOMING)
@@ -190,7 +190,7 @@ public class HistoricalCallTest {
 
         HistoricalCall.Builder.start()
                 .setId(CoreFixtures.CALL_ID)
-                .setProfileId(CoreFixtures.PROFILE_ID)
+                .setUserId(CoreFixtures.USER_ID)
                 .setInterestId(CoreFixtures.INTEREST_ID)
                 .setState(CallState.CALL_ORIGINATED)
                 .setDirection(CallDirection.INCOMING)
@@ -211,7 +211,7 @@ public class HistoricalCallTest {
 
         HistoricalCall.Builder.start()
                 .setId(CoreFixtures.CALL_ID)
-                .setProfileId(CoreFixtures.PROFILE_ID)
+                .setUserId(CoreFixtures.USER_ID)
                 .setInterestId(CoreFixtures.INTEREST_ID)
                 .setState(CallState.CALL_ORIGINATED)
                 .setDirection(CallDirection.INCOMING)
@@ -232,7 +232,7 @@ public class HistoricalCallTest {
 
         HistoricalCall.Builder.start()
                 .setId(CoreFixtures.CALL_ID)
-                .setProfileId(CoreFixtures.PROFILE_ID)
+                .setUserId(CoreFixtures.USER_ID)
                 .setInterestId(CoreFixtures.INTEREST_ID)
                 .setState(CallState.CALL_ORIGINATED)
                 .setDirection(CallDirection.INCOMING)
@@ -253,7 +253,7 @@ public class HistoricalCallTest {
 
         HistoricalCall.Builder.start()
                 .setId(CoreFixtures.CALL_ID)
-                .setProfileId(CoreFixtures.PROFILE_ID)
+                .setUserId(CoreFixtures.USER_ID)
                 .setInterestId(CoreFixtures.INTEREST_ID)
                 .setState(CallState.CALL_ORIGINATED)
                 .setDirection(CallDirection.INCOMING)
@@ -274,7 +274,7 @@ public class HistoricalCallTest {
 
         HistoricalCall.Builder.start()
                 .setId(CoreFixtures.CALL_ID)
-                .setProfileId(CoreFixtures.PROFILE_ID)
+                .setUserId(CoreFixtures.USER_ID)
                 .setInterestId(CoreFixtures.INTEREST_ID)
                 .setState(CallState.CALL_ORIGINATED)
                 .setDirection(CallDirection.INCOMING)
@@ -295,7 +295,7 @@ public class HistoricalCallTest {
 
         HistoricalCall.Builder.start()
                 .setId(CoreFixtures.CALL_ID)
-                .setProfileId(CoreFixtures.PROFILE_ID)
+                .setUserId(CoreFixtures.USER_ID)
                 .setInterestId(CoreFixtures.INTEREST_ID)
                 .setState(CallState.CALL_ORIGINATED)
                 .setDirection(CallDirection.INCOMING)
@@ -316,7 +316,7 @@ public class HistoricalCallTest {
                 .build(errors);
 
         assertThat(call.getId(), is(Optional.empty()));
-        assertThat(call.getProfileId(), is(Optional.empty()));
+        assertThat(call.getUserId(), is(Optional.empty()));
         assertThat(call.getInterestId(), is(Optional.empty()));
         assertThat(call.getState(), is(Optional.empty()));
         assertThat(call.getDirection(), is(Optional.empty()));
@@ -329,7 +329,7 @@ public class HistoricalCallTest {
         assertThat(call.getTsc(), is(Optional.empty()));
         assertThat(errors, contains(
                 "Invalid historical call; missing call id is mandatory",
-                "Invalid historical call; missing profile id is mandatory",
+                "Invalid historical call; missing user id is mandatory",
                 "Invalid historical call; missing interest id is mandatory",
                 "Invalid historical call; missing state is mandatory",
                 "Invalid historical call; missing direction is mandatory",

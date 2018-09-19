@@ -25,7 +25,7 @@ import com.bt.openlink.type.CallState;
 import com.bt.openlink.type.HistoricalCall;
 import com.bt.openlink.type.InterestId;
 import com.bt.openlink.type.PhoneNumber;
-import com.bt.openlink.type.ProfileId;
+import com.bt.openlink.type.UserId;
 
 public class GetCallHistoryResult extends OpenlinkIQ {
     private static final String STANZA_DESCRIPTION = "get-call-history result";
@@ -49,7 +49,7 @@ public class GetCallHistoryResult extends OpenlinkIQ {
         this.calls.forEach(call -> {
             final Element callElement = callHistoryElement.addElement("call");
             call.getId().ifPresent(id -> TinderPacketUtil.addElementWithTextIfNotNull(callElement, "id", id));
-            call.getProfileId().ifPresent(profileId -> TinderPacketUtil.addElementWithTextIfNotNull(callElement, "profile", profileId));
+            call.getUserId().ifPresent(profileId -> TinderPacketUtil.addElementWithTextIfNotNull(callElement, "profile", profileId));
             call.getInterestId().ifPresent(interest -> TinderPacketUtil.addElementWithTextIfNotNull(callElement, "interest", interest));
             call.getState().ifPresent(state -> TinderPacketUtil.addElementWithTextIfNotNull(callElement, "state", state.getLabel()));
             call.getDirection().ifPresent(direction -> TinderPacketUtil.addElementWithTextIfNotNull(callElement, "direction", direction.getLabel()));
@@ -80,7 +80,7 @@ public class GetCallHistoryResult extends OpenlinkIQ {
             calls.forEach(callElement -> {
                 final HistoricalCall.Builder<JID> historicalCallBuilder = HistoricalCall.Builder.start();
                 TinderPacketUtil.getOptionalChildElementString(callElement, "id").flatMap(CallId::from).ifPresent(historicalCallBuilder::setId);
-                TinderPacketUtil.getOptionalChildElementString(callElement, "profile").flatMap(ProfileId::from).ifPresent(historicalCallBuilder::setProfileId);
+                TinderPacketUtil.getOptionalChildElementString(callElement, "profile").flatMap(UserId::from).ifPresent(historicalCallBuilder::setUserId);
                 TinderPacketUtil.getOptionalChildElementString(callElement, "interest").flatMap(InterestId::from).ifPresent(historicalCallBuilder::setInterestId);
                 TinderPacketUtil.getOptionalChildElementString(callElement, "state").flatMap(CallState::from).ifPresent(historicalCallBuilder::setState);
                 TinderPacketUtil.getOptionalChildElementString(callElement, "direction").flatMap(CallDirection::from).ifPresent(historicalCallBuilder::setDirection);

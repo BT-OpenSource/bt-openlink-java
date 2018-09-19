@@ -28,7 +28,7 @@ import com.bt.openlink.type.CallState;
 import com.bt.openlink.type.HistoricalCall;
 import com.bt.openlink.type.InterestId;
 import com.bt.openlink.type.PhoneNumber;
-import com.bt.openlink.type.ProfileId;
+import com.bt.openlink.type.UserId;
 
 public class GetCallHistoryResult extends OpenlinkIQ {
     private static final String STANZA_DESCRIPTION = "get-call-history result";
@@ -88,7 +88,7 @@ public class GetCallHistoryResult extends OpenlinkIQ {
             elementText.flatMap(CallId::from).ifPresent(callBuilder::setId);
             break;
         case "profile":
-            elementText.flatMap(ProfileId::from).ifPresent(callBuilder::setProfileId);
+            elementText.flatMap(UserId::from).ifPresent(callBuilder::setUserId);
             break;
         case "interest":
             elementText.flatMap(InterestId::from).ifPresent(callBuilder::setInterestId);
@@ -164,7 +164,7 @@ public class GetCallHistoryResult extends OpenlinkIQ {
         calls.forEach(call -> {
             xml.openElement("call");
             xml.optElement("id", call.getId().map(CallId::value).orElse(null));
-            xml.optElement("profile", call.getProfileId().map(ProfileId::value).orElse(null));
+            xml.optElement("profile", call.getUserId().map(UserId::value).orElse(null));
             xml.optElement("interest", call.getInterestId().map(InterestId::value).orElse(null));
             xml.optElement("state", call.getState().map(CallState::getLabel).orElse(null));
             xml.optElement("direction", call.getDirection().map(CallDirection::getLabel).orElse(null));

@@ -15,7 +15,7 @@ public class CallHistoryFixtures {
             "        <callhistory xmlns='http://xmpp.org/protocol/openlink:01:00:00/callhistory' count='1' start='0' total='2'>\n" +
             "          <call>\n" +
             "            <id>test-call-id</id>\n" +
-            "            <profile>test-profile-id</profile>\n" +
+            "            <profile>test-user-id</profile>\n" +
             "            <interest>test-interest-id</interest>\n" +
             "            <state>CallEstablished</state>\n" +
             "            <direction>Outgoing</direction>\n" +
@@ -41,7 +41,7 @@ public class CallHistoryFixtures {
             "        <callhistory xmlns='http://xmpp.org/protocol/openlink:01:00:00/callhistory' count='1' start='0' total='2'>\n" +
             "          <call>\n" +
             "            <id>test-call-id</id>\n" +
-            "            <profile>test-profile-id</profile>\n" +
+            "            <profile>test-user-id</profile>\n" +
             "            <interest>test-interest-id</interest>\n" +
             "            <state>CallEstablished</state>\n" +
             "            <direction>Outgoing</direction>\n" +
@@ -79,7 +79,7 @@ public class CallHistoryFixtures {
     public static <J extends Serializable> HistoricalCall<J> getHistoricalCall(final J tsc) {
         return HistoricalCall.Builder.<J>start()
                 .setId(CoreFixtures.CALL_ID)
-                .setProfileId(CoreFixtures.PROFILE_ID)
+                .setUserId(CoreFixtures.USER_ID)
                 .setInterestId(CoreFixtures.INTEREST_ID)
                 .setState(CallState.CALL_ESTABLISHED)
                 .setDirection(CallDirection.OUTGOING)

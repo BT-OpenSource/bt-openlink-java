@@ -13,7 +13,7 @@ public class HistoricalCall<J extends Serializable> implements Serializable {
 
     private static final long serialVersionUID = 6147895706303266956L;
     @Nullable private final CallId callId;
-    @Nullable private final ProfileId profileId;
+    @Nullable private final UserId userId;
     @Nullable private final InterestId interestId;
     @Nullable private final CallState state;
     @Nullable private final CallDirection direction;
@@ -27,7 +27,7 @@ public class HistoricalCall<J extends Serializable> implements Serializable {
 
     private HistoricalCall(@Nonnull final Builder<J> builder) {
         this.callId = builder.callId;
-        this.profileId = builder.profileId;
+        this.userId = builder.userId;
         this.interestId = builder.interestId;
         this.state = builder.state;
         this.direction = builder.direction;
@@ -46,8 +46,8 @@ public class HistoricalCall<J extends Serializable> implements Serializable {
     }
 
     @Nonnull
-    public Optional<ProfileId> getProfileId() {
-        return Optional.ofNullable(profileId);
+    public Optional<UserId> getUserId() {
+        return Optional.ofNullable(userId);
     }
 
     @Nonnull
@@ -102,7 +102,7 @@ public class HistoricalCall<J extends Serializable> implements Serializable {
 
     public static final class Builder<J extends Serializable> {
         @Nullable private CallId callId;
-        @Nullable private ProfileId profileId;
+        @Nullable private UserId userId;
         @Nullable private InterestId interestId;
         @Nullable private CallState state;
         @Nullable private CallDirection direction;
@@ -127,8 +127,8 @@ public class HistoricalCall<J extends Serializable> implements Serializable {
             if (callId == null) {
                 throw new IllegalStateException("The call id has not been set");
             }
-            if (profileId == null) {
-                throw new IllegalStateException("The call profile has not been set");
+            if (userId == null) {
+                throw new IllegalStateException("The user id has not been set");
             }
             if (interestId == null) {
                 throw new IllegalStateException("The call interest has not been set");
@@ -169,8 +169,8 @@ public class HistoricalCall<J extends Serializable> implements Serializable {
             if (callId == null) {
                 errors.add("Invalid historical call; missing call id is mandatory");
             }
-            if (profileId == null) {
-                errors.add("Invalid historical call; missing profile id is mandatory");
+            if (userId == null) {
+                errors.add("Invalid historical call; missing user id is mandatory");
             }
             if (interestId == null) {
                 errors.add("Invalid historical call; missing interest id is mandatory");
@@ -213,8 +213,8 @@ public class HistoricalCall<J extends Serializable> implements Serializable {
         }
 
         @Nonnull
-        public Builder<J> setProfileId(@Nonnull final ProfileId profileId) {
-            this.profileId = profileId;
+        public Builder<J> setUserId(@Nonnull final UserId userId) {
+            this.userId = userId;
             return this;
         }
 

@@ -114,7 +114,7 @@ public class GetCallHistoryResultTest {
                 "Invalid get-call-history result; invalid timestamp 'not-a-timestamp'; please supply a valid timestamp",
                 "Invalid get-call-history result; invalid starttime 'not-a-starttime'; please supply a valid starttime",
                 "Invalid historical call; missing call id is mandatory",
-                "Invalid historical call; missing profile id is mandatory",
+                "Invalid historical call; missing user id is mandatory",
                 "Invalid historical call; missing interest id is mandatory",
                 "Invalid historical call; missing state is mandatory",
                 "Invalid historical call; missing direction is mandatory",

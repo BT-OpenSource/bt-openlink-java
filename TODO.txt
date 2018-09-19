@@ -1,2 +1,2 @@
 * Ensure smack and tinder have all the same messages
-* Check "profile" is right in get-call-history result
+* Ensure all result builders can start with a request
