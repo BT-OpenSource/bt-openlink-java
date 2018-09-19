@@ -137,4 +137,17 @@ public class GetCallHistoryResultTest {
 
         assertThat(result.getCalls().get(0).getStartTime(), is(Optional.of(Instant.parse("2011-12-13T14:15:16.178Z"))));
     }
+
+    @Test
+    public void willCreateAResultFromARequest() throws Exception {
+
+        final GetCallHistoryRequest request = PacketParserUtils.parseStanza(GetCallHistoryFixtures.GET_CALL_HISTORY_REQUEST_FOR_ALL_USERS);
+        final GetCallHistoryResult result = GetCallHistoryResult.Builder.createResultBuilder(request).setTotalRecordCount(0).build();
+
+        assertThat(result.getStanzaId(), is(request.getStanzaId()));
+        assertThat(result.getTo(), is(request.getFrom()));
+        assertThat(result.getFrom(), is(request.getTo()));
+        assertThat(result.getType(), is(IQ.Type.result));
+    }
+
 }
