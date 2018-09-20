@@ -29,14 +29,14 @@ public class OpenlinkIQProvider extends IQProvider<IQ> {
         @Nonnull private final String value;
         @Nonnull private final StanzaFactory stanzaFactory;
 
-        IQMatcher(@Nonnull final OpenlinkXmppNamespace namespace, @Nonnull final String attribute, @Nonnull final String value, @Nonnull final StanzaFactory stanzaFactory) {
+        private IQMatcher(@Nonnull final OpenlinkXmppNamespace namespace, @Nonnull final String attribute, @Nonnull final String value, @Nonnull final StanzaFactory stanzaFactory) {
             this.namespace = namespace;
             this.attribute = attribute;
             this.value = value;
             this.stanzaFactory = stanzaFactory;
         }
 
-        boolean matches(@Nullable final String namespace, @Nullable final String value) {
+        private boolean matches(@Nullable final String namespace, @Nullable final String value) {
             return this.value.equals(value) && this.namespace.uri().equals(namespace);
         }
     }

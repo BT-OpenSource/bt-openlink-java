@@ -29,14 +29,14 @@ public final class OpenlinkIQParser {
         private final String value;
         private final StanzaFactory stanzaFactory;
 
-        IQMatcher(final OpenlinkXmppNamespace namespace, final String attribute, final String value, final StanzaFactory stanzaFactory) {
+        private IQMatcher(final OpenlinkXmppNamespace namespace, final String attribute, final String value, final StanzaFactory stanzaFactory) {
             this.namespace = namespace.uri();
             this.attribute = attribute;
             this.value = value;
             this.stanzaFactory = stanzaFactory;
         }
 
-        boolean matches(final Element commandElement) {
+        private boolean matches(final Element commandElement) {
             return namespace.equals(TinderPacketUtil.getNullableStringAttribute(commandElement, "node"))
                     && value.equals(TinderPacketUtil.getNullableStringAttribute(commandElement, attribute));
         }
