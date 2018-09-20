@@ -1,11 +1,15 @@
 package com.bt.openlink.smack.iq;
 
-import com.bt.openlink.CoreFixtures;
-import com.bt.openlink.ManageVoiceMessageFixtures;
-import com.bt.openlink.OpenlinkXmppNamespace;
-import com.bt.openlink.smack.Fixtures;
-import com.bt.openlink.type.FeatureId;
-import com.bt.openlink.type.ManageVoiceMessageAction;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.emptyCollectionOf;
+import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.core.Is.is;
+import static org.xmlunit.matchers.CompareMatcher.isIdenticalTo;
+
+import java.util.Optional;
+
 import org.hamcrest.CoreMatchers;
 import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.provider.ProviderManager;
@@ -17,43 +21,39 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import java.util.Optional;
+import com.bt.openlink.CoreFixtures;
+import com.bt.openlink.ManageVoiceMessageFixtures;
+import com.bt.openlink.OpenlinkXmppNamespace;
+import com.bt.openlink.smack.Fixtures;
+import com.bt.openlink.type.FeatureId;
+import com.bt.openlink.type.ManageVoiceMessageAction;
 
-import static com.bt.openlink.ManageVoiceMessageFixtures.VOICE_MESSAGE_LABEL;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.emptyCollectionOf;
-import static org.hamcrest.Matchers.nullValue;
-import static org.hamcrest.core.Is.is;
-import static org.xmlunit.matchers.CompareMatcher.isIdenticalTo;
-
-@SuppressWarnings("ConstantConditions")
+@SuppressWarnings("OptionalGetWithoutIsPresent")
 public class ManageVoiceMessageRequestTest {
 
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
 
     @BeforeClass
-    public static void setUpClass() throws Exception {
+    public static void setUpClass() {
         ProviderManager.addIQProvider("command", OpenlinkXmppNamespace.XMPP_COMMANDS.uri(), new OpenlinkIQProvider());
     }
 
     @AfterClass
-    public static void tearDownClass() throws Exception {
+    public static void tearDownClass() {
         ProviderManager.removeIQProvider("command", OpenlinkXmppNamespace.XMPP_COMMANDS.uri());
     }
 
     @Test
-    public void canCreateAStanza() throws Exception {
+    public void canCreateAStanza() {
 
         final ManageVoiceMessageRequest request = ManageVoiceMessageRequest.Builder.start().setId(CoreFixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
                 .setAction(ManageVoiceMessageAction.CREATE)
-                .setProfile(CoreFixtures.PROFILE_ID)
+                .setProfileId(CoreFixtures.PROFILE_ID)
                 .addFeature(ManageVoiceMessageFixtures.VOICE_MESSAGE_ID_FEATURE)
-                .setLabel(VOICE_MESSAGE_LABEL)
+                .setLabel(ManageVoiceMessageFixtures.VOICE_MESSAGE_LABEL)
                 .build();
 
         assertThat(request.getStanzaId(), is(CoreFixtures.STANZA_ID));
@@ -61,19 +61,19 @@ public class ManageVoiceMessageRequestTest {
         assertThat(request.getFrom(), is(Fixtures.FROM_JID));
         assertThat(request.getAction().get(), CoreMatchers.is(ManageVoiceMessageAction.CREATE));
         assertThat(request.getProfileId().get(), CoreMatchers.is(CoreFixtures.PROFILE_ID));
-        assertThat(request.getLabel().get(), CoreMatchers.is(VOICE_MESSAGE_LABEL));
+        assertThat(request.getLabel().get(), CoreMatchers.is(ManageVoiceMessageFixtures.VOICE_MESSAGE_LABEL));
         assertThat(request.getFeatures(), contains(ManageVoiceMessageFixtures.VOICE_MESSAGE_ID_FEATURE));
     }
 
 
     @Test
-    public void willGenerateAnXmppStanza() throws Exception {
+    public void willGenerateAnXmppStanza() {
 
         final ManageVoiceMessageRequest request = ManageVoiceMessageRequest.Builder.start().setId(CoreFixtures.STANZA_ID)
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
                 .setAction(ManageVoiceMessageAction.PLAYBACK)
-                .setProfile(CoreFixtures.PROFILE_ID)
+                .setProfileId(CoreFixtures.PROFILE_ID)
                 .addFeature(ManageVoiceMessageFixtures.VOICE_MESSAGE_ID_FEATURE)
                 .build();
 

@@ -120,7 +120,7 @@ public abstract class ManageVoiceMessageRequestBuilder<B extends ManageVoiceMess
 
     @Nonnull
     @SuppressWarnings("unchecked")
-    public B setProfile(@Nonnull final ProfileId profileId) {
+    public B setProfileId(@Nonnull final ProfileId profileId) {
         this.profileId = profileId;
         return (B) this;
     }

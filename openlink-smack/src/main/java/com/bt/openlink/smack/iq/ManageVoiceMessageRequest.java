@@ -1,23 +1,25 @@
 package com.bt.openlink.smack.iq;
 
-import com.bt.openlink.OpenlinkXmppNamespace;
-import com.bt.openlink.iq.ManageVoiceMessageRequestBuilder;
-import com.bt.openlink.type.FeatureId;
-import com.bt.openlink.type.ManageVoiceMessageAction;
-import com.bt.openlink.type.ProfileId;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.util.ParserUtils;
 import org.jxmpp.jid.Jid;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import com.bt.openlink.OpenlinkXmppNamespace;
+import com.bt.openlink.iq.ManageVoiceMessageRequestBuilder;
+import com.bt.openlink.type.FeatureId;
+import com.bt.openlink.type.ManageVoiceMessageAction;
+import com.bt.openlink.type.ProfileId;
 
 public class ManageVoiceMessageRequest extends OpenlinkIQ {
 
@@ -27,7 +29,7 @@ public class ManageVoiceMessageRequest extends OpenlinkIQ {
     @Nonnull private final List<FeatureId> features;
 
 
-    private ManageVoiceMessageRequest(@Nonnull ManageVoiceMessageRequest.Builder builder, @Nullable List<String> parseErrors) {
+    private ManageVoiceMessageRequest(@Nonnull Builder builder, @Nullable List<String> parseErrors) {
         super("command", OpenlinkXmppNamespace.XMPP_COMMANDS.uri(), builder, parseErrors);
         this.profileId = builder.getProfileId().orElse(null);
         this.label = builder.getLabel().orElse(null);
@@ -79,7 +81,7 @@ public class ManageVoiceMessageRequest extends OpenlinkIQ {
 
             switch (parser.getName()) {
                 case OpenlinkXmppNamespace.TAG_PROFILE:
-                    ProfileId.from(parser.nextText()).ifPresent(builder::setProfile);
+                    ProfileId.from(parser.nextText()).ifPresent(builder::setProfileId);
                     break;
                 case OpenlinkXmppNamespace.TAG_ACTION:
                     ManageVoiceMessageAction.from(parser.nextText()).ifPresent(builder::setAction);

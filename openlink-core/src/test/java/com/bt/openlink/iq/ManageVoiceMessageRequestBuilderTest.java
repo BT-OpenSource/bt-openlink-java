@@ -43,7 +43,7 @@ public class ManageVoiceMessageRequestBuilderTest {
 
         builder
                 .setAction(ManageVoiceMessageAction.CREATE)
-                .setProfile(CoreFixtures.PROFILE_ID)
+                .setProfileId(CoreFixtures.PROFILE_ID)
                 .addFeature(ManageVoiceMessageFixtures.VOICE_MESSAGE_ID_FEATURE)
                 .setLabel(VOICE_MESSAGE_LABEL)
                 .validate();
@@ -71,7 +71,7 @@ public class ManageVoiceMessageRequestBuilderTest {
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("Invalid manage-voice-message stanza; missing or invalid 'action'");
 
-        builder.setProfile(CoreFixtures.PROFILE_ID)
+        builder.setProfileId(CoreFixtures.PROFILE_ID)
                 .validate();
     }
 
@@ -94,7 +94,7 @@ public class ManageVoiceMessageRequestBuilderTest {
 
         final List<String> errors = new ArrayList<>();
 
-        builder.setProfile(CoreFixtures.PROFILE_ID);
+        builder.setProfileId(CoreFixtures.PROFILE_ID);
         builder.addFeature(ManageVoiceMessageFixtures.VOICE_MESSAGE_ID_FEATURE);
         builder.validate(errors);
 
@@ -117,7 +117,7 @@ public class ManageVoiceMessageRequestBuilderTest {
             final List<String> errors = new ArrayList<>();
 
             final Builder builder = builderWithBasicIQFieldsSet();
-            builder.setProfile(CoreFixtures.PROFILE_ID);
+            builder.setProfileId(CoreFixtures.PROFILE_ID);
             builder.setAction(action);
             builder.setLabel(ManageVoiceMessageFixtures.VOICE_MESSAGE_LABEL);
             builder.validate(errors);
@@ -139,7 +139,7 @@ public class ManageVoiceMessageRequestBuilderTest {
             final List<String> errors = new ArrayList<>();
 
             final Builder builder = builderWithBasicIQFieldsSet();
-            builder.setProfile(CoreFixtures.PROFILE_ID);
+            builder.setProfileId(CoreFixtures.PROFILE_ID);
             builder.addFeature(VOICE_MESSAGE_ID_FEATURE);
             builder.setAction(action);
             builder.validate(errors);
@@ -159,7 +159,7 @@ public class ManageVoiceMessageRequestBuilderTest {
             final List<String> errors = new ArrayList<>();
 
             final Builder builder = builderWithBasicIQFieldsSet();
-            builder.setProfile(CoreFixtures.PROFILE_ID);
+            builder.setProfileId(CoreFixtures.PROFILE_ID);
             builder.setAction(action);
 
             builder.addFeature(ManageVoiceMessageFixtures.VOICE_MESSAGE_ID_FEATURE);

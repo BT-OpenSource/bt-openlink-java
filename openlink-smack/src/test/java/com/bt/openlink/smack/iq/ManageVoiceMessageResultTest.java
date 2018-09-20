@@ -153,7 +153,7 @@ public class ManageVoiceMessageResultTest {
                 .setTo(Fixtures.TO_JID)
                 .setFrom(Fixtures.FROM_JID)
                 .setId(CoreFixtures.STANZA_ID)
-                .setProfile(CoreFixtures.PROFILE_ID)
+                .setProfileId(CoreFixtures.PROFILE_ID)
                 .setAction(ManageVoiceMessageAction.RECORD)
                 .setLabel("test-label")
                 .build();
