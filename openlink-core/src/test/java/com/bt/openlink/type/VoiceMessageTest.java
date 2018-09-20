@@ -31,7 +31,7 @@ public class VoiceMessageTest {
     public void willNotBuildVoiceMessageQueryWithoutAMsgLength() {
 
         expectedException.expect(IllegalStateException.class);
-        expectedException.expectMessage("The VoiceMessage msgLength has not been set");
+        expectedException.expectMessage("The VoiceMessage messageLength has not been set");
 
         VoiceMessage.Builder.start()
                 .setAction(ManageVoiceMessageAction.QUERY)
@@ -50,7 +50,7 @@ public class VoiceMessageTest {
                 .setAction(ManageVoiceMessageAction.QUERY)
                 .setLabel("test-label")
                 .setStatus(VoiceMessageStatus.OK)
-                .setMsgLength(Duration.ZERO)
+                .setMessageLength(Duration.ZERO)
                 .build();
     }
 

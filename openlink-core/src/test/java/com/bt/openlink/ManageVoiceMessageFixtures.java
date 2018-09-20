@@ -190,7 +190,7 @@ public class ManageVoiceMessageFixtures {
                             .setLabel("testVD10Apr2015")
                             .setStatus(VoiceMessageStatus.OK)
                             .setAction(ManageVoiceMessageAction.QUERY)
-                            .setMsgLength(Duration.ofMillis(4073))
+                            .setMessageLength(Duration.ofMillis(4073))
                             .setCreationDate(parseSqlTimeStamp("2015-04-10 21:42:29.0"))
                             .build())
                     .build()
@@ -201,7 +201,7 @@ public class ManageVoiceMessageFixtures {
                             .setLabel("VM20150822")
                             .setStatus(VoiceMessageStatus.OK)
                             .setAction(ManageVoiceMessageAction.QUERY)
-                            .setMsgLength(Duration.ofMillis(6713))
+                            .setMessageLength(Duration.ofMillis(6713))
                             .setCreationDate(parseSqlTimeStamp("2015-08-22 17:09:58.0"))
                             .build())
                     .build()
@@ -209,6 +209,6 @@ public class ManageVoiceMessageFixtures {
             .build();
 
     private static Instant parseSqlTimeStamp(@Nonnull final String dateTime) {
-        return Instant.from(Timestamp.valueOf(dateTime).toInstant());
+        return Timestamp.valueOf(dateTime).toInstant();
     }
 }

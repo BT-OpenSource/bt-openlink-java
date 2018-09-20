@@ -407,7 +407,7 @@ public final class TinderPacketUtil {
                     voiceMessage.getStatus().map(VoiceMessageStatus::getLabel).ifPresent(status -> TinderPacketUtil.addElementWithTextIfNotNull(voiceMessageElement, "status", status));
                     voiceMessage.getAction().map(ManageVoiceMessageAction::getId).ifPresent(action -> TinderPacketUtil.addElementWithTextIfNotNull(voiceMessageElement, "action", action));
                     voiceMessage.getExtension().ifPresent(exten -> TinderPacketUtil.addElementWithTextIfNotNull(voiceMessageElement, "exten", exten));
-                    voiceMessage.getMsgLength().map(duration -> duration.toMillis() / 1000f).ifPresent(msglen -> TinderPacketUtil.addElementWithTextIfNotNull(voiceMessageElement, "msglen", msglen));
+                    voiceMessage.getMessageLength().map(duration -> duration.toMillis() / 1000f).ifPresent(msglen -> TinderPacketUtil.addElementWithTextIfNotNull(voiceMessageElement, "msglen", msglen));
                     voiceMessage.getCreationDate().map(Timestamp::from).ifPresent(creationdate -> TinderPacketUtil.addElementWithTextIfNotNull(voiceMessageElement, "creationdate", creationdate));
                 });
             });
@@ -631,7 +631,7 @@ public final class TinderPacketUtil {
                                 .map(value -> value * 1000)
                                 .map(Float::longValue)
                                 .map(Duration::ofMillis)
-                                .ifPresent(messageBuilder::setMsgLength);
+                                .ifPresent(messageBuilder::setMessageLength);
                     } catch (final NumberFormatException ignored) {
                         parseErrors.add(String.format("Invalid %s; invalid msglen '%s'; please supply an integer", stanzaDescription, optionalMsgLen.get()));
                     }

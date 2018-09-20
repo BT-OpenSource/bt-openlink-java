@@ -235,7 +235,7 @@ public final class SmackPacketUtil {
         voiceMessage.getStatus().ifPresent(voiceMessageStatus -> voiceMessageElement.element(ELEMENT_STATUS, voiceMessageStatus.getLabel()));
         voiceMessage.getAction().ifPresent(action -> voiceMessageElement.element(ELEMENT_ACTION, action.getId()));
         voiceMessage.getExtension().ifPresent(extension -> voiceMessageElement.element(ELEMENT_EXTENSION, extension.value()));
-        voiceMessage.getMsgLength().ifPresent(msgLength -> voiceMessageElement.element(ELEMENT_MESSAGE_LENGTH, formatVoiceMessageLength(msgLength)));
+        voiceMessage.getMessageLength().ifPresent(msgLength -> voiceMessageElement.element(ELEMENT_MESSAGE_LENGTH, formatVoiceMessageLength(msgLength)));
 
         voiceMessage.getCreationDate().ifPresent(creationDate -> voiceMessageElement.element(ELEMENT_CREATION_DATE, Timestamp.from(creationDate).toString()));
 
@@ -545,7 +545,7 @@ public final class SmackPacketUtil {
                                     return Optional.empty();
                                 }
                             })
-                            .ifPresent(voiceMessageBuilder::setMsgLength);
+                            .ifPresent(voiceMessageBuilder::setMessageLength);
 
                     break;
                 case ELEMENT_CREATION_DATE:

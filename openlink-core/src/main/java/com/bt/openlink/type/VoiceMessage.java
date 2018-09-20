@@ -16,7 +16,7 @@ public class VoiceMessage implements Serializable {
     @Nullable private final String label;
     @Nullable private final VoiceMessageStatus status;
     @Nullable private final ManageVoiceMessageAction action;
-    @Nullable private final Duration msgLength;
+    @Nullable private final Duration messageLength;
     @Nullable private final Instant creationDate;
     @Nullable private final PhoneNumber extension;
 
@@ -24,7 +24,7 @@ public class VoiceMessage implements Serializable {
         this.label = builder.label;
         this.status = builder.status;
         this.action = builder.action;
-        this.msgLength = builder.msgLength;
+        this.messageLength = builder.messageLength;
         this.creationDate = builder.creationDate;
         this.extension = builder.extension;
     }
@@ -35,8 +35,8 @@ public class VoiceMessage implements Serializable {
     }
 
     @Nonnull
-    public Optional<Duration> getMsgLength() {
-        return Optional.ofNullable(msgLength);
+    public Optional<Duration> getMessageLength() {
+        return Optional.ofNullable(messageLength);
     }
 
     @Nonnull
@@ -71,7 +71,7 @@ public class VoiceMessage implements Serializable {
         @Nullable private String label = null;
         @Nullable private VoiceMessageStatus status = null;
         @Nullable private ManageVoiceMessageAction action = null;
-        @Nullable private Duration msgLength = null;
+        @Nullable private Duration messageLength = null;
         @Nullable private Instant creationDate = null;
         @Nullable private PhoneNumber extension = null;
 
@@ -85,8 +85,8 @@ public class VoiceMessage implements Serializable {
             return this;
         }
 
-        public Builder setMsgLength(@Nonnull final Duration msgLength) {
-            this.msgLength = msgLength;
+        public Builder setMessageLength(@Nonnull final Duration messageLength) {
+            this.messageLength = messageLength;
             return this;
         }
 
@@ -116,8 +116,8 @@ public class VoiceMessage implements Serializable {
                     if (label == null) {
                         throw new IllegalStateException("The VoiceMessage label has not been set");
                     }
-                    if (msgLength == null) {
-                        throw new IllegalStateException("The VoiceMessage msgLength has not been set");
+                    if (messageLength == null) {
+                        throw new IllegalStateException("The VoiceMessage messageLength has not been set");
                     }
                     if (creationDate == null) {
                         throw new IllegalStateException("The VoiceMessage creationDate has not been set");
@@ -141,8 +141,8 @@ public class VoiceMessage implements Serializable {
                     errors.add("Invalid VoiceMessage; missing label is mandatory");
                 }
                 if (action == ManageVoiceMessageAction.QUERY) {
-                    if (msgLength == null) {
-                        errors.add("Invalid VoiceMessage; missing msgLength is mandatory");
+                    if (messageLength == null) {
+                        errors.add("Invalid VoiceMessage; missing messageLength is mandatory");
                     }
                     if (creationDate == null) {
                         errors.add("Invalid VoiceMessage; missing creationDate is mandatory");
