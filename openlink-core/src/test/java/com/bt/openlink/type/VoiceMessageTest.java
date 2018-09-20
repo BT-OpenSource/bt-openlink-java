@@ -1,25 +1,24 @@
 package com.bt.openlink.type;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.junit.Assert.assertThat;
 
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.junit.Assert.assertThat;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
-@SuppressWarnings("ConstantConditions")
 public class VoiceMessageTest {
 
     @Rule public final ExpectedException expectedException = ExpectedException.none();
 
     @Test
-    public void willNotBuildAVoiceMessageWithoutAStatus() throws Exception {
+    public void willNotBuildAVoiceMessageWithoutAStatus() {
 
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("The VoiceMessage status has not been set");
@@ -29,7 +28,7 @@ public class VoiceMessageTest {
     }
 
     @Test
-    public void willNotBuildVoiceMessageQueryWithoutAMsgLength() throws Exception {
+    public void willNotBuildVoiceMessageQueryWithoutAMsgLength() {
 
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("The VoiceMessage msgLength has not been set");
@@ -42,7 +41,7 @@ public class VoiceMessageTest {
     }
 
     @Test
-    public void willNotBuildVoiceMessageQueryWithoutACreationDate() throws Exception {
+    public void willNotBuildVoiceMessageQueryWithoutACreationDate() {
 
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("The VoiceMessage creationDate has not been set");
@@ -56,7 +55,7 @@ public class VoiceMessageTest {
     }
 
     @Test
-    public void willNotBuildVoiceMessageQueryWithoutAnExtension() throws Exception {
+    public void willNotBuildVoiceMessageQueryWithoutAnExtension() {
 
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("The VoiceMessage extension has not been set");
@@ -68,7 +67,7 @@ public class VoiceMessageTest {
     }
 
     @Test
-    public void willBuildAVoiceMessageWithoutMandatoryValues() throws Exception {
+    public void willBuildAVoiceMessageWithoutMandatoryValues() {
 
         final List<String> errors = new ArrayList<>();
 

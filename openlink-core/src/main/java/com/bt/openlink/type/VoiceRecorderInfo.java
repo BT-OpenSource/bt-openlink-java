@@ -1,10 +1,11 @@
 package com.bt.openlink.type;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public class VoiceRecorderInfo implements Serializable {
 
@@ -15,7 +16,7 @@ public class VoiceRecorderInfo implements Serializable {
     @Nullable private final RecorderChannel recorderChannel;
     @Nullable private final RecorderType recorderType;
 
-    VoiceRecorderInfo(@Nonnull final VoiceRecorderInfo.Builder builder) {
+    private VoiceRecorderInfo(@Nonnull final VoiceRecorderInfo.Builder builder) {
         this.recorderNumber = builder.recorderNumber;
         this.recorderPort = builder.recorderPort;
         this.recorderChannel = builder.recorderChannel;
@@ -42,7 +43,7 @@ public class VoiceRecorderInfo implements Serializable {
         return Optional.ofNullable(recorderType);
     }
 
-    public static final class Builder<B extends VoiceRecorderInfo.Builder> {
+    public static final class Builder {
 
         @Nullable private RecorderNumber recorderNumber;
         @Nullable private RecorderPort recorderPort;
@@ -53,8 +54,8 @@ public class VoiceRecorderInfo implements Serializable {
         }
 
         @Nonnull
-        public static VoiceRecorderInfo.Builder start() {
-            return new VoiceRecorderInfo.Builder();
+        public static Builder start() {
+            return new Builder();
         }
 
         @Nonnull
@@ -91,28 +92,24 @@ public class VoiceRecorderInfo implements Serializable {
             return new VoiceRecorderInfo(this);
         }
 
-        @SuppressWarnings("unchecked")
-        public B setRecorderNumber(@Nullable final RecorderNumber recorderNumber) {
+        public Builder setRecorderNumber(@Nullable final RecorderNumber recorderNumber) {
             this.recorderNumber = recorderNumber;
-            return (B) this;
+            return this;
         }
 
-        @SuppressWarnings("unchecked")
-        public B setRecorderPort(@Nullable final RecorderPort recorderPort) {
+        public Builder setRecorderPort(@Nullable final RecorderPort recorderPort) {
             this.recorderPort = recorderPort;
-            return (B) this;
+            return this;
         }
 
-        @SuppressWarnings("unchecked")
-        public B setRecorderChannel(@Nullable final RecorderChannel recorderChannel) {
+        public Builder setRecorderChannel(@Nullable final RecorderChannel recorderChannel) {
             this.recorderChannel = recorderChannel;
-            return (B) this;
+            return this;
         }
 
-        @SuppressWarnings("unchecked")
-        public B setRecorderType(@Nullable final RecorderType recorderType) {
+        public Builder setRecorderType(@Nullable final RecorderType recorderType) {
             this.recorderType = recorderType;
-            return (B) this;
+            return this;
         }
     }
 }

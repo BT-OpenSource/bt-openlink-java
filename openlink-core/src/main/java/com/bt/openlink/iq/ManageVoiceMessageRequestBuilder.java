@@ -1,16 +1,17 @@
 package com.bt.openlink.iq;
 
-import com.bt.openlink.type.FeatureId;
-import com.bt.openlink.type.ManageVoiceMessageAction;
-import com.bt.openlink.type.ProfileId;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class ManageVoiceMessageRequestBuilder<B extends ManageVoiceMessageRequestBuilder, J, T extends Enum<T>> extends IQBuilder<B, J, T> {
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
+import com.bt.openlink.type.FeatureId;
+import com.bt.openlink.type.ManageVoiceMessageAction;
+import com.bt.openlink.type.ProfileId;
+
+public abstract class ManageVoiceMessageRequestBuilder<B extends ManageVoiceMessageRequestBuilder, J, T extends Enum<T>> extends IQBuilder<B, J, T> {
 
     @Nullable private ProfileId profileId;
     @Nullable private ManageVoiceMessageAction action;

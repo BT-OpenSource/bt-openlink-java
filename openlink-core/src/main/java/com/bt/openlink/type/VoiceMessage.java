@@ -1,12 +1,13 @@
 package com.bt.openlink.type;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.io.Serializable;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public class VoiceMessage implements Serializable {
 
@@ -19,7 +20,7 @@ public class VoiceMessage implements Serializable {
     @Nullable private final Instant creationDate;
     @Nullable private final PhoneNumber extension;
 
-    VoiceMessage(@Nonnull final Builder builder) {
+    private VoiceMessage(@Nonnull final Builder builder) {
         this.label = builder.label;
         this.status = builder.status;
         this.action = builder.action;
@@ -58,13 +59,13 @@ public class VoiceMessage implements Serializable {
         return Optional.ofNullable(status);
     }
 
-    public static final class Builder<B extends VoiceMessage.Builder> {
+    public static final class Builder {
         private Builder() {
         }
 
         @Nonnull
-        public static VoiceMessage.Builder start() {
-            return new VoiceMessage.Builder();
+        public static Builder start() {
+            return new Builder();
         }
 
         @Nullable private String label = null;
@@ -74,40 +75,34 @@ public class VoiceMessage implements Serializable {
         @Nullable private Instant creationDate = null;
         @Nullable private PhoneNumber extension = null;
 
-        @SuppressWarnings("unchecked")
-        public B setExtension(@Nullable final PhoneNumber extension) {
+        public Builder setExtension(@Nullable final PhoneNumber extension) {
             this.extension = extension;
-            return (B) this;
+            return this;
         }
 
-        @SuppressWarnings("unchecked")
-        public B setCreationDate(@Nonnull final Instant creationDate) {
+        public Builder setCreationDate(@Nonnull final Instant creationDate) {
             this.creationDate = creationDate;
-            return (B) this;
+            return this;
         }
 
-        @SuppressWarnings("unchecked")
-        public B setMsgLength(@Nonnull final Duration msgLength) {
+        public Builder setMsgLength(@Nonnull final Duration msgLength) {
             this.msgLength = msgLength;
-            return (B) this;
+            return this;
         }
 
-        @SuppressWarnings("unchecked")
-        public B setAction(@Nonnull final ManageVoiceMessageAction action) {
+        public Builder setAction(@Nonnull final ManageVoiceMessageAction action) {
             this.action = action;
-            return (B) this;
+            return this;
         }
 
-        @SuppressWarnings("unchecked")
-        public B setLabel(@Nonnull final String label) {
+        public Builder setLabel(@Nonnull final String label) {
             this.label = label;
-            return (B) this;
+            return this;
         }
 
-        @SuppressWarnings("unchecked")
-        public B setStatus(@Nonnull final VoiceMessageStatus status) {
+        public Builder setStatus(@Nonnull final VoiceMessageStatus status) {
             this.status = status;
-            return (B) this;
+            return this;
         }
 
         protected void validate() {

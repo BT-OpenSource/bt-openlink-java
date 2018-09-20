@@ -1,21 +1,20 @@
 package com.bt.openlink.type;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public class VoiceMessageFeature implements Serializable {
 
     private static final long serialVersionUID = -6035782720503631606L;
 
-    @Nullable
-    private final FeatureId featureId;
-    @Nullable
-    private final VoiceMessage voiceMessage;
+    @Nullable private final FeatureId featureId;
+    @Nullable private final VoiceMessage voiceMessage;
 
-    VoiceMessageFeature(@Nonnull final Builder builder) {
+    private VoiceMessageFeature(@Nonnull final Builder builder) {
 
         this.featureId = builder.featureId;
         this.voiceMessage = builder.voiceMessage;
@@ -26,19 +25,18 @@ public class VoiceMessageFeature implements Serializable {
         return Optional.ofNullable(featureId);
     }
 
-    @Nonnull public Optional<VoiceMessage> getVoiceMessage() {
+    @Nonnull
+    public Optional<VoiceMessage> getVoiceMessage() {
         return Optional.ofNullable(voiceMessage);
     }
 
-    public static final class Builder <B extends VoiceMessageFeature.Builder> {
+    public static final class Builder {
 
-        private Builder() { }
+        private Builder() {
+        }
 
-        @Nullable
-        private FeatureId featureId = null;
-        @Nullable
-        private VoiceMessage voiceMessage;
-
+        @Nullable private FeatureId featureId = null;
+        @Nullable private VoiceMessage voiceMessage;
 
         protected void validate() {
             if (featureId == null) {
@@ -52,17 +50,14 @@ public class VoiceMessageFeature implements Serializable {
             }
         }
 
-        @SuppressWarnings("unchecked")
-        public B setVoiceMessage(@Nonnull final VoiceMessage voiceMessage) {
+        public Builder setVoiceMessage(@Nonnull final VoiceMessage voiceMessage) {
             this.voiceMessage = voiceMessage;
-            return (B) this;
+            return this;
         }
 
-
-        @SuppressWarnings("unchecked")
-        public B setId(@Nonnull final FeatureId featureId) {
+        public Builder setId(@Nonnull final FeatureId featureId) {
             this.featureId = featureId;
-            return (B) this;
+            return this;
         }
 
         @Nonnull

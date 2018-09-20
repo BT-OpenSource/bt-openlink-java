@@ -1,28 +1,29 @@
 package com.bt.openlink.iq;
 
-import com.bt.openlink.CoreFixtures;
-import com.bt.openlink.ManageVoiceMessageFixtures;
-import com.bt.openlink.type.FeatureId;
-import com.bt.openlink.type.ManageVoiceMessageAction;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
 import static com.bt.openlink.ManageVoiceMessageFixtures.VOICE_MESSAGE_ID_FEATURE;
 import static com.bt.openlink.ManageVoiceMessageFixtures.VOICE_MESSAGE_LABEL;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 
-@SuppressWarnings("ConstantConditions")
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+
+import com.bt.openlink.CoreFixtures;
+import com.bt.openlink.ManageVoiceMessageFixtures;
+import com.bt.openlink.type.FeatureId;
+import com.bt.openlink.type.ManageVoiceMessageAction;
+
+@SuppressWarnings("OptionalGetWithoutIsPresent")
 public class ManageVoiceMessageRequestBuilderTest {
 
-    private static class Builder extends ManageVoiceMessageRequestBuilder<ManageVoiceMessageRequestBuilder, String, CoreFixtures.typeEnum> {
+    private static class Builder extends ManageVoiceMessageRequestBuilder<Builder, String, CoreFixtures.typeEnum> {
         protected Builder() {
             super(CoreFixtures.typeEnum.class);
         }
@@ -54,7 +55,7 @@ public class ManageVoiceMessageRequestBuilderTest {
     }
 
     @Test
-    public void willValidateTheProfileIsSet() throws Exception {
+    public void willValidateTheProfileIsSet() {
 
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("The manage-voice-message request 'profileId' has not been set");
@@ -65,7 +66,7 @@ public class ManageVoiceMessageRequestBuilderTest {
     }
 
     @Test
-    public void willValidateTheActionIsSet() throws Exception {
+    public void willValidateTheActionIsSet() {
 
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("Invalid manage-voice-message stanza; missing or invalid 'action'");
@@ -75,7 +76,7 @@ public class ManageVoiceMessageRequestBuilderTest {
     }
 
     @Test
-    public void willCheckThatTheProfileIsSet() throws Exception {
+    public void willCheckThatTheProfileIsSet() {
 
         final List<String> errors = new ArrayList<>();
 
@@ -89,7 +90,7 @@ public class ManageVoiceMessageRequestBuilderTest {
     }
 
     @Test
-    public void willCheckThatTheActionIsSet() throws Exception {
+    public void willCheckThatTheActionIsSet() {
 
         final List<String> errors = new ArrayList<>();
 
@@ -102,7 +103,7 @@ public class ManageVoiceMessageRequestBuilderTest {
     }
 
     @Test
-    public void withCheckThatAtLeastOneFeatureIsSetForGivenActions() throws Exception {
+    public void withCheckThatAtLeastOneFeatureIsSetForGivenActions() {
         final ManageVoiceMessageAction[] actions = {
                 ManageVoiceMessageAction.ARCHIVE,
                 ManageVoiceMessageAction.CREATE,
@@ -126,7 +127,7 @@ public class ManageVoiceMessageRequestBuilderTest {
     }
 
     @Test
-    public void withCheckThatALabelSetForGivenActions() throws Exception {
+    public void withCheckThatALabelSetForGivenActions() {
         final ManageVoiceMessageAction[] actions = {
                 ManageVoiceMessageAction.CREATE,
                 ManageVoiceMessageAction.RECORD,
@@ -148,7 +149,7 @@ public class ManageVoiceMessageRequestBuilderTest {
     }
 
     @Test
-    public void withCheckThatNoMoreThanOneFeatureAllowedForGivenActions() throws Exception {
+    public void withCheckThatNoMoreThanOneFeatureAllowedForGivenActions() {
         final ManageVoiceMessageAction[] actions = {
                 ManageVoiceMessageAction.RECORD,
                 ManageVoiceMessageAction.EDIT

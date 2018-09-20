@@ -1,17 +1,17 @@
 package com.bt.openlink.type;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.*;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
-@SuppressWarnings("ConstantConditions")
+@SuppressWarnings("OptionalGetWithoutIsPresent")
 public class VoiceRecorderInfoTest {
 
     private static final RecorderNumber RECORDER_NUMBER = RecorderNumber.from("001").get();
