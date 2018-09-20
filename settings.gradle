@@ -1,3 +1,5 @@
+enableFeaturePreview('STABLE_PUBLISHING') // Remove with Gradle 5.0
+
 rootProject.name = 'bt-openlink'
 
 include 'openlink-core'
