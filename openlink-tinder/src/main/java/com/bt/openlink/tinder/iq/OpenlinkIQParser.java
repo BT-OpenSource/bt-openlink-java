@@ -60,6 +60,7 @@ public final class OpenlinkIQParser {
             new IQMatcher(OpenlinkXmppNamespace.OPENLINK_QUERY_FEATURES, ATTRIBUTE_ACTION, ACTION_EXECUTE, QueryFeaturesRequest::from),
             new IQMatcher(OpenlinkXmppNamespace.OPENLINK_QUERY_FEATURES, ATTRIBUTE_STATUS, ACTION_COMPLETED, QueryFeaturesResult::from),
             new IQMatcher(OpenlinkXmppNamespace.OPENLINK_SET_FEATURES, ATTRIBUTE_ACTION, ACTION_EXECUTE, SetFeaturesRequest::from),
+            new IQMatcher(OpenlinkXmppNamespace.OPENLINK_SET_FEATURES, ATTRIBUTE_STATUS, ACTION_COMPLETED, SetFeaturesResult::from),
             new IQMatcher(OpenlinkXmppNamespace.OPENLINK_MAKE_CALL, ATTRIBUTE_ACTION, ACTION_EXECUTE, MakeCallRequest::from),
             new IQMatcher(OpenlinkXmppNamespace.OPENLINK_MAKE_CALL, ATTRIBUTE_STATUS, ACTION_COMPLETED, MakeCallResult::from),
             new IQMatcher(OpenlinkXmppNamespace.OPENLINK_REQUEST_ACTION, ATTRIBUTE_ACTION, ACTION_EXECUTE, RequestActionRequest::from),

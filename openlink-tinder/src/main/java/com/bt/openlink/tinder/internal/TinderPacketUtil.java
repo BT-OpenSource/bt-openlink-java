@@ -294,7 +294,7 @@ public final class TinderPacketUtil {
     }
 
     @Nonnull
-    private static Element addCommandElement(@Nonnull final IQ request) {
+    public static Element addCommandElement(@Nonnull final IQ request) {
         return request.getElement().addElement("command", OpenlinkXmppNamespace.XMPP_COMMANDS.uri());
     }
 
