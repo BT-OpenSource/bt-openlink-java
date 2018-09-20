@@ -1,5 +1,6 @@
 package com.bt.openlink.tinder.internal;
 
+import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -47,6 +48,7 @@ import com.bt.openlink.type.FeatureId;
 import com.bt.openlink.type.FeatureType;
 import com.bt.openlink.type.InterestId;
 import com.bt.openlink.type.ItemId;
+import com.bt.openlink.type.ManageVoiceMessageAction;
 import com.bt.openlink.type.OriginatorReference;
 import com.bt.openlink.type.Participant;
 import com.bt.openlink.type.ParticipantCategory;
@@ -62,6 +64,9 @@ import com.bt.openlink.type.RequestAction;
 import com.bt.openlink.type.Site;
 import com.bt.openlink.type.TelephonyCallId;
 import com.bt.openlink.type.UserId;
+import com.bt.openlink.type.VoiceMessage;
+import com.bt.openlink.type.VoiceMessageFeature;
+import com.bt.openlink.type.VoiceMessageStatus;
 import com.bt.openlink.type.VoiceRecorderInfo;
 
 /**
@@ -390,6 +395,23 @@ public final class TinderPacketUtil {
         deviceStatus.isOnline().ifPresent(online -> profileElement.addAttribute("online", String.valueOf(online)));
         deviceStatus.getProfileId().ifPresent(profileId -> profileElement.setText(profileId.value()));
         deviceStatus.getDeviceId().ifPresent(deviceId -> profileElement.addAttribute("devicenum", String.valueOf(deviceId)));
+        final List<VoiceMessageFeature> voiceMessageFeatures = deviceStatus.getFeatures();
+        if (!voiceMessageFeatures.isEmpty()) {
+            final Element featuresElement = deviceStatusElement.addElement("features");
+            voiceMessageFeatures.forEach(feature -> {
+                final Element featureElement = featuresElement.addElement("feature");
+                feature.getId().map(FeatureId::value).ifPresent(id -> featureElement.addAttribute("id", id));
+                feature.getVoiceMessage().ifPresent(voiceMessage -> {
+                    final Element voiceMessageElement = featureElement.addElement("voicemessage", OpenlinkXmppNamespace.OPENLINK_VOICE_MESSAGE.uri());
+                    voiceMessage.getLabel().ifPresent(label -> TinderPacketUtil.addElementWithTextIfNotNull(voiceMessageElement, "label", label));
+                    voiceMessage.getStatus().map(VoiceMessageStatus::getLabel).ifPresent(status -> TinderPacketUtil.addElementWithTextIfNotNull(voiceMessageElement, "status", status));
+                    voiceMessage.getAction().map(ManageVoiceMessageAction::getId).ifPresent(action -> TinderPacketUtil.addElementWithTextIfNotNull(voiceMessageElement, "action", action));
+                    voiceMessage.getExtension().ifPresent(exten -> TinderPacketUtil.addElementWithTextIfNotNull(voiceMessageElement, "exten", exten));
+                    voiceMessage.getMsgLength().map(duration -> duration.toMillis() / 1000f).ifPresent(msglen -> TinderPacketUtil.addElementWithTextIfNotNull(voiceMessageElement, "msglen", msglen));
+                    voiceMessage.getCreationDate().map(Timestamp::from).ifPresent(creationdate -> TinderPacketUtil.addElementWithTextIfNotNull(voiceMessageElement, "creationdate", creationdate));
+                });
+            });
+        }
     }
 
     private static void addFeatures(@Nonnull final Call call, @Nonnull final Element callElement) {
@@ -579,7 +601,8 @@ public final class TinderPacketUtil {
 
     public static Optional<DeviceStatus> getDeviceStatus(@Nullable final Element deviceStatusElement, @Nonnull final String stanzaDescription, @Nonnull final List<String> parseErrors) {
         final Element profileElement = getChildElement(deviceStatusElement, ELEMENT_PROFILE);
-        if (profileElement == null) {
+        final Element featuresElement = getChildElement(deviceStatusElement, OpenlinkXmppNamespace.TAG_FEATURES);
+        if (profileElement == null && featuresElement == null) {
             return Optional.empty();
         }
 
@@ -588,6 +611,45 @@ public final class TinderPacketUtil {
         getBooleanAttribute(profileElement, "online", stanzaDescription, parseErrors).ifPresent(builder::setOnline);
         getStringAttribute(profileElement, "devicenum", false, stanzaDescription, parseErrors).flatMap(DeviceId::from).ifPresent(builder::setDeviceId);
         ProfileId.from(getNullableChildElementString(deviceStatusElement, ELEMENT_PROFILE)).ifPresent(builder::setProfileId);
+
+        if (featuresElement != null) {
+            final List featureElements = featuresElement.elements(OpenlinkXmppNamespace.TAG_FEATURE);
+            for (Object featureElementObject : featureElements) {
+                final Element featureElement = (Element) featureElementObject;
+                final VoiceMessageFeature.Builder featureBuilder = VoiceMessageFeature.Builder.start();
+                TinderPacketUtil.getStringAttribute(featureElement, "id", true, stanzaDescription, parseErrors).flatMap(FeatureId::from).ifPresent(featureBuilder::setId);
+                final Element voiceMessageElement = featureElement.element("voicemessage");
+                if (voiceMessageElement != null) {
+                    final VoiceMessage.Builder messageBuilder = VoiceMessage.Builder.start();
+                    TinderPacketUtil.getOptionalChildElementString(voiceMessageElement, "label").ifPresent(messageBuilder::setLabel);
+                    TinderPacketUtil.getOptionalChildElementString(voiceMessageElement, "status").flatMap(VoiceMessageStatus::from).ifPresent(messageBuilder::setStatus);
+                    TinderPacketUtil.getOptionalChildElementString(voiceMessageElement, "action").flatMap(ManageVoiceMessageAction::from).ifPresent(messageBuilder::setAction);
+                    final Optional<String> optionalMsgLen = TinderPacketUtil.getOptionalChildElementString(voiceMessageElement, "msglen");
+                    try {
+                        optionalMsgLen
+                                .map(Float::valueOf)
+                                .map(value -> value * 1000)
+                                .map(Float::longValue)
+                                .map(Duration::ofMillis)
+                                .ifPresent(messageBuilder::setMsgLength);
+                    } catch (final NumberFormatException ignored) {
+                        parseErrors.add(String.format("Invalid %s; invalid msglen '%s'; please supply an integer", stanzaDescription, optionalMsgLen.get()));
+                    }
+                    final Optional<String> optionalCreationDate = TinderPacketUtil.getOptionalChildElementString(voiceMessageElement, "creationdate");
+                    try {
+                        optionalCreationDate
+                                .map(Timestamp::valueOf)
+                                .map(Timestamp::toInstant)
+                                .ifPresent(messageBuilder::setCreationDate);
+                    } catch( final DateTimeParseException ignored) {
+                        parseErrors.add(String.format("Invalid %s; invalid creationdate '%s'; please supply an integer", stanzaDescription, optionalCreationDate.get()));
+                    }
+                    TinderPacketUtil.getOptionalChildElementString(voiceMessageElement, "exten").flatMap(PhoneNumber::from).ifPresent(messageBuilder::setExtension);
+                    featureBuilder.setVoiceMessage(messageBuilder.build(parseErrors));
+                }
+                builder.addFeature(featureBuilder.build(parseErrors));
+            }
+        }
 
         return Optional.of(builder.build(parseErrors));
     }
