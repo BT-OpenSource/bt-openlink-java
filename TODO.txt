@@ -1,2 +1,1 @@
 * Ensure smack and tinder have all the same messages
-* Ensure all result builders can start with a request
