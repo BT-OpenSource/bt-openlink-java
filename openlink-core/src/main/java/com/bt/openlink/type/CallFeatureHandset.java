@@ -58,7 +58,7 @@ public final class CallFeatureHandset extends CallFeature {
         protected void validate() {
             super.validate();
             if (enabled == null) {
-                throw new IllegalStateException("The enabled flag has not been set");
+                throw new IllegalStateException("The handset enabled flag has not been set");
             }
         }
 
@@ -66,7 +66,7 @@ public final class CallFeatureHandset extends CallFeature {
         public void validate(final List<String> errors) {
             super.validate(errors);
             if (enabled == null ) {
-                errors.add("Invalid feature; the enabled flag has not been set");
+                errors.add("Invalid feature; the handset enabled flag has not been set");
             }
         }
 

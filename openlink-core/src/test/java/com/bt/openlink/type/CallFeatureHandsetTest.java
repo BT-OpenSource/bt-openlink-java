@@ -35,7 +35,7 @@ public class CallFeatureHandsetTest {
     public void willNotBuildAHandsetThatHasNotHadTheEnabledFlagSet() {
 
         expectedException.expect(IllegalStateException.class);
-        expectedException.expectMessage("The enabled flag has not been set");
+        expectedException.expectMessage("The handset enabled flag has not been set");
 
         CallFeatureHandset.Builder.start()
                 .setId(FeatureId.from("HS1").get())
@@ -56,6 +56,6 @@ public class CallFeatureHandsetTest {
 
         assertThat(handset.isEnabled(), is(Optional.empty()));
         assertThat(handset.isMicrophoneEnabled(), is(Optional.empty()));
-        assertThat(errors, contains("Invalid feature; the enabled flag has not been set"));
+        assertThat(errors, contains("Invalid feature; the handset enabled flag has not been set"));
     }
 }
