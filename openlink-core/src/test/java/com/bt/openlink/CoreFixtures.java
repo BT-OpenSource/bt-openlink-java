@@ -282,40 +282,40 @@ public final class CoreFixtures {
 
     public static final String CALL_STATUS_LEGACY_FEATURES =
             "<callstatus xmlns='http://xmpp.org/protocol/openlink:01:00:00#call-status' busy='false'>\n" +
-                    "  <call>\n" +
-                    "    <id telephony='" + CoreFixtures.TELEPHONY_CALL_ID + "'>" + CoreFixtures.CALL_ID + "</id>\n" +
-                    "    <changed>State</changed>\n" +
-                    "    <state>CallConferenced</state>\n" +
-                    "    <direction>Outgoing</direction>\n" +
-                    "    <duration>60000</duration>\n" +
-                    "    <features>\n" +
-                    "      <feature id='hs_1'>true</feature>\n" +
-                    "      <feature id='hs_2'>false</feature>\n" +
-                    "      <feature id='priv_1'>false</feature>\n" +
-                    "      <feature id='NetrixHiTouch_sales1'>\n" +
-                    "        <devicekeys xmlns='http://xmpp.org/protocol/openlink:01:00:00/features#device-keys'>\n" +
-                    "          <key>key_1:1:1</key>\n" +
-                    "        </devicekeys>\n" +
-                    "      </feature>\n" +
-                    "      <feature id='" + SPEAKER_CHANNEL_ID + "'>\n" +
-                    "        <speakerchannel xmlns='http://xmpp.org/protocol/openlink:01:00:00/features#speaker-channel'>\n" +
-                    "          <channel>" + SPEAKER_CHANNEL_NUMBER + "</channel>\n" +
-                    "          <microphone>true</microphone>\n" +
-                    "          <mute>true</mute>\n" +
-                    "        </speakerchannel>\n" +
-                    "      </feature>\n" +
-                    "      <feature id=\"MK1021\" type='VoiceMessage'>VoiceMessage</feature>\n" +
-                    "      <feature id='voicerecorder_1'>\n" +
-                    "           <voicerecorder xmlns='http://xmpp.org/protocol/openlink:01:00:00/features#voice-recorder'>\n" +
-                    "               <recnumber>011</recnumber>\n" +
-                    "               <recport>5</recport>\n" +
-                    "               <recchan>2</recchan>\n" +
-                    "               <rectype>V</rectype>\n" +
-                    "           </voicerecorder>\n" +
-                    "       </feature>\n" +
-                    "    </features>\n" +
-                    "  </call>\n" +
-                    "</callstatus>\n";
+            "  <call>\n" +
+            "    <id telephony='" + CoreFixtures.TELEPHONY_CALL_ID + "'>" + CoreFixtures.CALL_ID + "</id>\n" +
+            "    <changed>State</changed>\n" +
+            "    <state>CallConferenced</state>\n" +
+            "    <direction>Outgoing</direction>\n" +
+            "    <duration>60000</duration>\n" +
+            "    <features>\n" +
+            "      <feature id='hs_1'>true</feature>\n" +
+            "      <feature id='hs_2'>false</feature>\n" +
+            "      <feature id='priv_1'>false</feature>\n" +
+            "      <feature id='NetrixHiTouch_sales1'>\n" +
+            "        <devicekeys xmlns='http://xmpp.org/protocol/openlink:01:00:00/features#device-keys'>\n" +
+            "          <key>key_1:1:1</key>\n" +
+            "        </devicekeys>\n" +
+            "      </feature>\n" +
+            "      <feature id='" + SPEAKER_CHANNEL_ID + "'>\n" +
+            "        <speakerchannel xmlns='http://xmpp.org/protocol/openlink:01:00:00/features#speaker-channel'>\n" +
+            "          <channel>" + SPEAKER_CHANNEL_NUMBER + "</channel>\n" +
+            "          <microphone>true</microphone>\n" +
+            "          <mute>true</mute>\n" +
+            "        </speakerchannel>\n" +
+            "      </feature>\n" +
+            "      <feature id=\"MK1021\">VoiceMessage</feature>\n" +
+            "      <feature id='voicerecorder_1'>\n" +
+            "           <voicerecorder xmlns='http://xmpp.org/protocol/openlink:01:00:00/features#voice-recorder'>\n" +
+            "               <recnumber>011</recnumber>\n" +
+            "               <recport>5</recport>\n" +
+            "               <recchan>2</recchan>\n" +
+            "               <rectype>V</rectype>\n" +
+            "           </voicerecorder>\n" +
+            "       </feature>\n" +
+            "    </features>\n" +
+            "  </call>\n" +
+            "</callstatus>\n";
 
     public static final List<Feature> LEGACY_FEATURE_LIST;
     static {
@@ -349,7 +349,7 @@ public final class CoreFixtures {
                 .build(new ArrayList<>()));
         features.add(CallFeatureVoiceRecorder.Builder.start()
                 .setId(FeatureId.from("voicerecorder_1").get())
-                .setVoiceRecorderInfo(                            VoiceRecorderInfo.Builder.start()
+                .setVoiceRecorderInfo(VoiceRecorderInfo.Builder.start()
                         .setRecorderNumber(RecorderNumber.from("011").get())
                         .setRecorderPort(RecorderPort.from("5").get())
                         .setRecorderChannel(RecorderChannel.from("2").get())

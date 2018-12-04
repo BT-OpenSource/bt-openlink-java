@@ -723,7 +723,11 @@ public final class TinderPacketUtil {
         if (elementText.equalsIgnoreCase("true") || elementText.equalsIgnoreCase("false")) {
             return CallFeatureBoolean.Builder.start().setEnabled(Boolean.parseBoolean(elementText));
         } else {
-            return CallFeatureTextValue.Builder.start().setValue(elementText);
+            final CallFeatureTextValue.Builder builder = CallFeatureTextValue.Builder.start().setValue(elementText);
+            if ("VoiceMessage".equalsIgnoreCase(elementText)) {
+                builder.setType(FeatureType.VOICE_MESSAGE);
+            }
+            return builder;
         }
     }
 

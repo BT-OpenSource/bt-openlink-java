@@ -948,7 +948,11 @@ public final class SmackPacketUtil {
         if ("true".equalsIgnoreCase(tagText) || "false".equalsIgnoreCase(tagText)) {
             return CallFeatureBoolean.Builder.start().setEnabled(Boolean.parseBoolean(tagText));
         } else {
-            return CallFeatureTextValue.Builder.start().setValue(tagText);
+            final CallFeatureTextValue.Builder builder = CallFeatureTextValue.Builder.start().setValue(tagText);
+            if ("VoiceMessage".equalsIgnoreCase(tagText)) {
+                builder.setType(FeatureType.VOICE_MESSAGE);
+            }
+            return builder;
         }
     }
 
