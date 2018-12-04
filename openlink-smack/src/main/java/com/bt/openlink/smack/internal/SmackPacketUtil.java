@@ -36,6 +36,7 @@ import com.bt.openlink.type.CallDirection;
 import com.bt.openlink.type.CallFeature;
 import com.bt.openlink.type.CallFeatureBoolean;
 import com.bt.openlink.type.CallFeatureDeviceKey;
+import com.bt.openlink.type.CallFeatureHandset;
 import com.bt.openlink.type.CallFeatureSpeakerChannel;
 import com.bt.openlink.type.CallFeatureTextValue;
 import com.bt.openlink.type.CallFeatureVoiceRecorder;
@@ -120,7 +121,7 @@ public final class SmackPacketUtil {
     }
 
     @Nonnull
-    public static Optional<Jid> getSmackJid(@Nullable String jidString) {
+    public static Optional<Jid> getSmackJid(@Nullable final String jidString) {
         try {
             return jidString == null || jidString.isEmpty() ? Optional.empty() : Optional.of(JidCreate.from(jidString));
         } catch (final XmppStringprepException ignored) {
@@ -192,7 +193,7 @@ public final class SmackPacketUtil {
         }
     }
 
-    public static void addDeviceStatus(@Nonnull IQChildElementXmlStringBuilder xml, @Nonnull final DeviceStatus deviceStatus) {
+    public static void addDeviceStatus(@Nonnull final IQChildElementXmlStringBuilder xml, @Nonnull final DeviceStatus deviceStatus) {
         final XmlStringBuilder deviceStatusElement = xml.halfOpenElement(ELEMENT_DEVICESTATUS)
                 .attribute(ATTRIBUTE_XMLNS, OpenlinkXmppNamespace.OPENLINK_DEVICE_STATUS.uri());
         xml.rightAngleBracket();
@@ -209,7 +210,7 @@ public final class SmackPacketUtil {
         if (!voiceMessageFeatures.isEmpty()) {
             xml.openElement(ELEMENT_FEATURES);
 
-            for (VoiceMessageFeature voiceMessageFeature : voiceMessageFeatures) {
+            for (final VoiceMessageFeature voiceMessageFeature : voiceMessageFeatures) {
                 final XmlStringBuilder featureElement = xml.halfOpenElement(ELEMENT_FEATURE);
                 voiceMessageFeature.getId().ifPresent(featureId -> featureElement.attribute(ATTRIBUTE_ID, featureId.value()));
                 featureElement.rightAngleBracket();
@@ -246,7 +247,7 @@ public final class SmackPacketUtil {
         return Float.toString(duration.toMillis() / 1000f);
     }
 
-    public static void addCallStatus(@Nonnull IQChildElementXmlStringBuilder xml, @Nonnull final CallStatus callStatus) {
+    public static void addCallStatus(@Nonnull final IQChildElementXmlStringBuilder xml, @Nonnull final CallStatus callStatus) {
         xml.halfOpenElement(ELEMENT_CALLSTATUS)
                 .attribute(ATTRIBUTE_XMLNS, "http://xmpp.org/protocol/openlink:01:00:00#call-status");
         callStatus.isCallStatusBusy().ifPresent(callStatusBusy -> xml.attribute("busy", String.valueOf(callStatusBusy)));
@@ -325,11 +326,11 @@ public final class SmackPacketUtil {
     }
 
     @Nullable
-    private static String joinList(@Nonnull List<?> numbers) {
+    private static String joinList(@Nonnull final List<?> numbers) {
         if (numbers.isEmpty()) {
             return null;
         } else {
-            return String.join(",", numbers.stream().map(Object::toString).collect(Collectors.toList()));
+            return numbers.stream().map(Object::toString).collect(Collectors.joining(","));
         }
     }
 
@@ -395,7 +396,7 @@ public final class SmackPacketUtil {
                     feature.getLabel().ifPresent(label -> xml.attribute(ATTRIBUTE_LABEL, label));
                     xml.rightAngleBracket();
                     final CallFeatureTextValue callFeatureText = (CallFeatureTextValue) feature;
-                    callFeatureText.getValue().ifPresent(enabled -> xml.escape(String.valueOf(enabled)));
+                    callFeatureText.getValue().ifPresent(xml::escape);
                 } else if (feature instanceof CallFeatureDeviceKey) {
                     feature.getLabel().ifPresent(label -> xml.attribute(ATTRIBUTE_LABEL, label));
                     xml.rightAngleBracket();
@@ -431,6 +432,12 @@ public final class SmackPacketUtil {
                             });
 
                     xml.closeElement(ELEMENT_VOICERECORDER);
+                } else if (feature instanceof CallFeatureHandset) {
+                    feature.getLabel().ifPresent(label -> xml.attribute(ATTRIBUTE_LABEL, label));
+                    final CallFeatureHandset callFeatureHandset = (CallFeatureHandset) feature;
+                    callFeatureHandset.isMicrophoneEnabled().ifPresent(microphone -> xml.attribute("microphone", microphone));
+                    xml.rightAngleBracket();
+                    callFeatureHandset.isEnabled().ifPresent(enabled -> xml.escape(String.valueOf(enabled)));
                 } else {
                     feature.getLabel().ifPresent(label -> xml.attribute(ATTRIBUTE_LABEL, label));
                     xml.rightAngleBracket();
@@ -441,7 +448,6 @@ public final class SmackPacketUtil {
         }
     }
 
-    @SuppressWarnings("unchecked")
     public static Optional<DeviceStatus> getDeviceStatus(
             @Nonnull final XmlPullParser parser,
             @Nonnull final List<String> errors) throws IOException, XmlPullParserException {
@@ -495,13 +501,10 @@ public final class SmackPacketUtil {
             final int callDepth = parser.getDepth();
             parser.nextTag();
             do {
-                switch (parser.getName()) {
-                case ELEMENT_VOICE_MESSAGE:
+                if (ELEMENT_VOICE_MESSAGE.equals(parser.getName())) {
                     addVoiceMessagesToBuilder(parser, voiceMessageFeatureBuilder, errors);
-                    break;
-                default:
+                } else {
                     errors.add("Unrecognised tag: " + parser.getName());
-                    break;
                 }
 
                 deviceStatusBuilder.addFeature(voiceMessageFeatureBuilder.build(errors));
@@ -579,7 +582,6 @@ public final class SmackPacketUtil {
         }
     }
 
-    @SuppressWarnings("unchecked")
     public static Optional<CallStatus> getCallStatus(
             @Nonnull final XmlPullParser parser,
             @Nonnull final String description,
@@ -759,7 +761,7 @@ public final class SmackPacketUtil {
     }
 
     private static void addSiteToBuilder(@Nonnull final XmlPullParser parser, @Nonnull final List<String> errors, final Call.Builder callBuilder, final String description) throws IOException, XmlPullParserException {
-        Optional<Site> site = getSite(parser, errors, description);
+        final Optional<Site> site = getSite(parser, errors, description);
         site.ifPresent(callBuilder::setSite);
     }
 
@@ -776,7 +778,7 @@ public final class SmackPacketUtil {
         CallId.from(callIdString).ifPresent(callBuilder::setId);
     }
 
-    private static List<PhoneNumber> getPhoneNumbers(final XmlPullParser parser, String attributeName) {
+    private static List<PhoneNumber> getPhoneNumbers(final XmlPullParser parser, final String attributeName) {
         final Optional<String> e164String = SmackPacketUtil.getStringAttribute(parser, attributeName);
         final List<PhoneNumber> phoneNumbers = new ArrayList<>();
         e164String.ifPresent(string -> Arrays.stream(string.split(",")).map(String::trim).map(PhoneNumber::from)
@@ -784,7 +786,6 @@ public final class SmackPacketUtil {
         return phoneNumbers;
     }
 
-    @SuppressWarnings("unchecked")
     private static void getParticipants(
             @Nonnull final Call.Builder callBuilder,
             @Nonnull final XmlPullParser parser,
@@ -854,7 +855,6 @@ public final class SmackPacketUtil {
         }
     }
 
-    @SuppressWarnings("unchecked")
     private static void getActions(@Nonnull final Call.Builder callBuilder, final XmlPullParser parser,
             @Nonnull final List<String> parseErrors) throws IOException, XmlPullParserException {
         if (parser.getName().equals(ELEMENT_ACTIONS)) {
@@ -874,7 +874,6 @@ public final class SmackPacketUtil {
         }
     }
 
-    @SuppressWarnings("unchecked")
     private static void getFeatures(
             @Nonnull final Call.Builder callBuilder,
             @Nonnull final XmlPullParser parser,
@@ -886,6 +885,7 @@ public final class SmackPacketUtil {
             parser.nextTag();
             while (OpenlinkXmppNamespace.TAG_FEATURE.equals(parser.getName())) {
                 final Optional<FeatureId> featureId = FeatureId.from(parser.getAttributeValue("", ATTRIBUTE_ID));
+                final Optional<String> label = SmackPacketUtil.getStringAttribute(parser, OpenlinkXmppNamespace.TAG_LABEL);
                 final Optional<FeatureType> optFeatureType = SmackPacketUtil.getStringAttribute(parser, "type")
                         .flatMap(featureType -> {
                             final Optional<FeatureType> type = FeatureType.from(featureType);
@@ -895,161 +895,194 @@ public final class SmackPacketUtil {
                             return type;
                         });
 
-                final Optional<String> label = SmackPacketUtil.getStringAttribute(parser, OpenlinkXmppNamespace.TAG_LABEL);
-                String text = "";
-                while (parser.next() == XmlPullParser.TEXT) {
-                    text = parser.getText();
+                final CallFeature.AbstractCallFeatureBuilder featureBuilder;
+                if(optFeatureType.isPresent()) {
+                    featureBuilder = getCallFeatureBuilder(parser, optFeatureType.get(), description, parseErrors);
+                } else {
+                    featureBuilder = getLegacyCallFeatureBuilder(parser, description, parseErrors);
                 }
-                final CallFeature.AbstractCallFeatureBuilder callFeatureBuilder = getCallFeatureBuilder(parser, optFeatureType.orElse(null), description, parseErrors, text);
-                featureId.ifPresent(callFeatureBuilder::setId);
-                label.ifPresent(callFeatureBuilder::setLabel);
-                optFeatureType.ifPresent(callFeatureBuilder::setType);
+                parser.nextTag();
 
-                callBuilder.addFeature(callFeatureBuilder.build(parseErrors));
+                featureId.ifPresent(featureBuilder::setId);
+                label.ifPresent(featureBuilder::setLabel);
+                callBuilder.addFeature(featureBuilder.build(parseErrors));
             }
             ParserUtils.forwardToEndTagOfDepth(parser, featuresDepth);
         }
     }
 
-    @Nonnull
-    private static CallFeature.AbstractCallFeatureBuilder getCallFeatureBuilder(
-            @Nonnull final XmlPullParser parser,
-            @Nullable FeatureType featureType,
-            @Nonnull final String description,
-            @Nonnull final List<String> parseErrors,
-            @Nonnull final String text)
-            throws XmlPullParserException, IOException {
-        final CallFeature.AbstractCallFeatureBuilder callFeatureBuilder;
-        if (parser.getEventType() == XmlPullParser.START_TAG) {
-            switch (parser.getName()) {
-            case ELEMENT_DEVICEKEYS:
-                callFeatureBuilder = getDeviceKeyFeatureBuilder(parser);
+    private static CallFeature.AbstractCallFeatureBuilder getLegacyCallFeatureBuilder(final XmlPullParser parser, final String description, final List<String> parseErrors) throws IOException, XmlPullParserException {
+        final int initialDepth = parser.getDepth();
+        final CallFeature.AbstractCallFeatureBuilder builder;
+        final String tagText = getTextValue(parser);
+        if (parser.getEventType() == XmlPullParser.START_TAG && parser.getDepth() > initialDepth) {
+            switch (parser.getName().toLowerCase()) {
+            case "devicekeys":
+                final CallFeatureDeviceKey.Builder deviceKeyBuilder = CallFeatureDeviceKey.Builder.start();
+                addKeysToDeviceKeyBuilder(parser, deviceKeyBuilder);
+                builder = deviceKeyBuilder;
                 break;
-            case ELEMENT_SPEAKERCHANNEL:
-                callFeatureBuilder = getSpeakerChannelFeatureBuilder(parser, description, parseErrors);
+            case "speakerchannel":
+                final CallFeatureSpeakerChannel.Builder speakerChannelBuilder = CallFeatureSpeakerChannel.Builder.start();
+                configureSpeakerChannelBuilder(parser, description, parseErrors, speakerChannelBuilder);
+                builder = speakerChannelBuilder;
                 break;
-            case ELEMENT_VOICERECORDER:
-                callFeatureBuilder = getVoiceRecorderFeatureBuilder(parser, parseErrors);
+            case "voicerecorder":
+                final VoiceRecorderInfo.Builder voiceRecorderInfoBuilder = VoiceRecorderInfo.Builder.start();
+                configureVoiceRecorderBuilder(parser, parseErrors, voiceRecorderInfoBuilder);
+                builder = CallFeatureVoiceRecorder.Builder.start()
+                        .setVoiceRecorderInfo(voiceRecorderInfoBuilder.build());
                 break;
             default:
-                // Assume a simple true/false feature
-                callFeatureBuilder = getBooleanFeatureBuilder(text, description, parseErrors, parser.getName());
-                break;
+                builder = getBooleanOrTextCallFeatureBuilder(tagText);
             }
-        } else if (FeatureType.VOICE_MESSAGE.equals(featureType)) {
-            callFeatureBuilder = getTextFeatureBuilder(text);
-            parser.nextTag();
         } else {
-            // Assume a simple true/false feature
-            callFeatureBuilder = getBooleanFeatureBuilder(text, description, parseErrors, parser.getName());
-            parser.nextTag();
+            builder = getBooleanOrTextCallFeatureBuilder(tagText);
         }
-        return callFeatureBuilder;
+        ParserUtils.forwardToEndTagOfDepth(parser, initialDepth);
+        return builder;
     }
 
-    private static CallFeature.AbstractCallFeatureBuilder getVoiceRecorderFeatureBuilder(
+    @Nonnull
+    private static CallFeature.AbstractCallFeatureBuilder getBooleanOrTextCallFeatureBuilder(final String tagText) {
+        if ("true".equalsIgnoreCase(tagText) || "false".equalsIgnoreCase(tagText)) {
+            return CallFeatureBoolean.Builder.start().setEnabled(Boolean.parseBoolean(tagText));
+        } else {
+            return CallFeatureTextValue.Builder.start().setValue(tagText);
+        }
+    }
+
+    @Nonnull
+    private static CallFeatureBoolean.Builder getCallFeatureBooleanBuilder(final XmlPullParser parser) throws IOException, XmlPullParserException {
+        return CallFeatureBoolean.Builder.start()
+            .setEnabled(Boolean.parseBoolean(getTextValue(parser)));
+    }
+
+    private static String getTextValue(final XmlPullParser parser) throws XmlPullParserException, IOException {
+        String text = "";
+        while (parser.next() == XmlPullParser.TEXT) {
+            text = parser.getText();
+        }
+        return text;
+    }
+
+
+    @Nonnull
+    private static CallFeature.AbstractCallFeatureBuilder getCallFeatureBuilder(final XmlPullParser parser, final FeatureType featureType, final String description, final List<String> parseErrors)
+            throws IOException, XmlPullParserException {
+        switch (featureType) {
+        case HANDSET:
+            final Optional<Boolean> microphoneOn = getBooleanAttribute(parser, "microphone", description, parseErrors);
+            final CallFeatureHandset.Builder handsetBuilder = CallFeatureHandset.Builder.start().setEnabled(Boolean.parseBoolean(getTextValue(parser)));
+            microphoneOn.ifPresent(handsetBuilder::setMicrophoneEnabled);
+            return handsetBuilder;
+        case VOICE_MESSAGE:
+            return CallFeatureTextValue.Builder.start().setType(FeatureType.VOICE_MESSAGE).setValue(getTextValue(parser));
+        case DEVICE_KEYS:
+            return getDeviceKeyFeatureBuilder(parser);
+        case SPEAKER_CHANNEL:
+            return getSpeakerChannelFeatureBuilder(parser, description, parseErrors);
+        case VOICE_RECORDER:
+            return getVoiceRecorderFeatureBuilder(parser, parseErrors);
+        default:
+            return getCallFeatureBooleanBuilder(parser).setType(featureType);
+        }
+    }
+
+
+    private static CallFeatureVoiceRecorder.Builder getVoiceRecorderFeatureBuilder(
             @Nonnull final XmlPullParser parser,
             @Nonnull final List<String> parseErrors) throws XmlPullParserException, IOException {
-        CallFeature.AbstractCallFeatureBuilder callFeatureBuilder;
-        final CallFeatureVoiceRecorder.Builder voiceRecorderBuilder = CallFeatureVoiceRecorder.Builder.start();
+        final int initialDepth = parser.getDepth();
         final VoiceRecorderInfo.Builder voiceRecorderInfoBuilder = VoiceRecorderInfo.Builder.start();
 
-        final int featureDepth = parser.getDepth();
-        parser.nextTag();
-        while (parser.getDepth() > featureDepth) {
-            switch (parser.getName()) {
-            case ELEMENT_RECORDER_NUMBER:
-                getElementTextString(parser).flatMap(RecorderNumber::from).ifPresent(voiceRecorderInfoBuilder::setRecorderNumber);
-                break;
-            case ELEMENT_RECORDER_CHANNEL:
-                getElementTextString(parser).flatMap(RecorderChannel::from).ifPresent(voiceRecorderInfoBuilder::setRecorderChannel);
-                break;
-            case ELEMENT_RECORDER_PORT:
-                getElementTextString(parser).flatMap(RecorderPort::from).ifPresent(voiceRecorderInfoBuilder::setRecorderPort);
-                break;
-            case ELEMENT_RECORDER_TYPE:
-                getElementTextString(parser).flatMap(RecorderType::from).ifPresent(voiceRecorderInfoBuilder::setRecorderType);
-                break;
-            default:
-                parseErrors.add("Unrecognised element:" + parser.getName());
-                break;
-            }
-            ParserUtils.forwardToEndTagOfDepth(parser, featureDepth + 1);
-            parser.nextTag();
+        if (parser.nextTag() == XmlPullParser.START_TAG && "voicerecorder".equalsIgnoreCase(parser.getName())) {
+            configureVoiceRecorderBuilder(parser, parseErrors, voiceRecorderInfoBuilder);
         }
-        voiceRecorderBuilder.setVoiceRecorderInfo(voiceRecorderInfoBuilder.build(parseErrors));
-        callFeatureBuilder = voiceRecorderBuilder;
-        return callFeatureBuilder;
+        final CallFeatureVoiceRecorder.Builder voiceRecorderBuilder = CallFeatureVoiceRecorder.Builder.start()
+                .setVoiceRecorderInfo(voiceRecorderInfoBuilder.build(parseErrors));
+        ParserUtils.forwardToEndTagOfDepth(parser, initialDepth);
+        return voiceRecorderBuilder;
+    }
+
+    private static void configureVoiceRecorderBuilder(@Nonnull final XmlPullParser parser, @Nonnull final List<String> parseErrors, final VoiceRecorderInfo.Builder voiceRecorderInfoBuilder) throws XmlPullParserException, IOException {
+        final int enclosedTagDepth = parser.getDepth() + 1;
+        while (parser.nextTag() == XmlPullParser.START_TAG && parser.getDepth() == enclosedTagDepth) {
+            switch (parser.getName()) {
+                case ELEMENT_RECORDER_NUMBER:
+                    getElementTextString(parser).flatMap(RecorderNumber::from).ifPresent(voiceRecorderInfoBuilder::setRecorderNumber);
+                    break;
+                case ELEMENT_RECORDER_CHANNEL:
+                    getElementTextString(parser).flatMap(RecorderChannel::from).ifPresent(voiceRecorderInfoBuilder::setRecorderChannel);
+                    break;
+                case ELEMENT_RECORDER_PORT:
+                    getElementTextString(parser).flatMap(RecorderPort::from).ifPresent(voiceRecorderInfoBuilder::setRecorderPort);
+                    break;
+                case ELEMENT_RECORDER_TYPE:
+                    getElementTextString(parser).flatMap(RecorderType::from).ifPresent(voiceRecorderInfoBuilder::setRecorderType);
+                    break;
+                default:
+                    parseErrors.add("Unrecognised element:" + parser.getName());
+                    break;
+            }
+            ParserUtils.forwardToEndTagOfDepth(parser, enclosedTagDepth);
+        }
     }
 
     @Nonnull
-    private static CallFeature.AbstractCallFeatureBuilder getTextFeatureBuilder(
-            @Nullable final String text) {
-        final CallFeatureTextValue.Builder textValueBuiler = CallFeatureTextValue.Builder.start();
-        textValueBuiler.setValue(text);
-        return textValueBuiler;
-    }
-
-    @Nonnull
-    private static CallFeature.AbstractCallFeatureBuilder getBooleanFeatureBuilder(
-            @Nullable final String text,
-            @Nonnull final String description,
-            @Nonnull final List<String> parseErrors,
-            @Nonnull final String elementName) {
-        final CallFeatureBoolean.Builder booleanBuilder = CallFeatureBoolean.Builder.start();
-        getBoolean(text, elementName, description, parseErrors).ifPresent(booleanBuilder::setEnabled);
-        return booleanBuilder;
-    }
-
-    @Nonnull
-    private static CallFeature.AbstractCallFeatureBuilder getSpeakerChannelFeatureBuilder(
+    private static CallFeatureSpeakerChannel.Builder getSpeakerChannelFeatureBuilder(
             @Nonnull final XmlPullParser parser,
             @Nonnull final String description,
             @Nonnull final List<String> parseErrors)
             throws XmlPullParserException, IOException {
+        final int initialDepth = parser.getDepth();
         final CallFeatureSpeakerChannel.Builder speakerChannelBuilder = CallFeatureSpeakerChannel.Builder.start();
-        final int featureDepth = parser.getDepth() - 1;
-        final int speakerChannelDepth = parser.getDepth();
-        parser.nextTag();
-        while (parser.getDepth() > speakerChannelDepth) {
-            switch (parser.getName()) {
-            case ELEMENT_CHANNEL:
-                getElementTextLong(ELEMENT_CHANNEL, parser, description, parseErrors).ifPresent(speakerChannelBuilder::setChannel);
-                break;
-            case ELEMENT_MICROPHONE:
-                getElementTextBoolean(ELEMENT_MICROPHONE, parser, description, parseErrors).ifPresent(speakerChannelBuilder::setMicrophoneActive);
-                break;
-            case ELEMENT_MUTE:
-                getElementTextBoolean(ELEMENT_MUTE, parser, description, parseErrors).ifPresent(speakerChannelBuilder::setMuteRequested);
-                break;
-            default:
-                parseErrors.add("Unrecognised element:" + parser.getName());
-                break;
-            }
-            ParserUtils.forwardToEndTagOfDepth(parser, speakerChannelDepth + 1);
-            parser.nextTag();
+        if (parser.nextTag() == XmlPullParser.START_TAG && "speakerchannel".equalsIgnoreCase(parser.getName())) {
+            configureSpeakerChannelBuilder(parser, description, parseErrors, speakerChannelBuilder);
         }
-        ParserUtils.forwardToEndTagOfDepth(parser, featureDepth);
-        parser.nextTag();
+        ParserUtils.forwardToEndTagOfDepth(parser, initialDepth);
         return speakerChannelBuilder;
     }
 
-    @Nonnull
-    private static CallFeature.AbstractCallFeatureBuilder getDeviceKeyFeatureBuilder(@Nonnull final XmlPullParser parser) throws XmlPullParserException, IOException {
-        final int featureDepth = parser.getDepth() - 1;
-        final CallFeatureDeviceKey.Builder deviceKeyBuilder = CallFeatureDeviceKey.Builder.start();
-        if (parser.nextTag() == XmlPullParser.START_TAG) {
-            while ("key".equalsIgnoreCase(parser.getName())) {
-                DeviceKey.from(parser.nextText()).ifPresent(deviceKeyBuilder::addDeviceKey);
-                parser.nextTag();
+    private static void configureSpeakerChannelBuilder(@Nonnull final XmlPullParser parser, @Nonnull final String description, @Nonnull final List<String> parseErrors, final CallFeatureSpeakerChannel.Builder speakerChannelBuilder) throws XmlPullParserException, IOException {
+        final int enclosedTagDepth = parser.getDepth() + 1;
+        while (parser.nextTag() == XmlPullParser.START_TAG && parser.getDepth() == enclosedTagDepth) {
+            switch (parser.getName()) {
+                case ELEMENT_CHANNEL:
+                    getElementTextLong(ELEMENT_CHANNEL, parser, description, parseErrors).ifPresent(speakerChannelBuilder::setChannel);
+                    break;
+                case ELEMENT_MICROPHONE:
+                    getElementTextBoolean(ELEMENT_MICROPHONE, parser, description, parseErrors).ifPresent(speakerChannelBuilder::setMicrophoneActive);
+                    break;
+                case ELEMENT_MUTE:
+                    getElementTextBoolean(ELEMENT_MUTE, parser, description, parseErrors).ifPresent(speakerChannelBuilder::setMuteRequested);
+                    break;
+                default:
+                    parseErrors.add("Unrecognised element:" + parser.getName());
+                    break;
             }
+            ParserUtils.forwardToEndTagOfDepth(parser, enclosedTagDepth);
         }
-        ParserUtils.forwardToEndTagOfDepth(parser, featureDepth);
-        parser.nextTag();
+    }
+
+    @Nonnull
+    private static CallFeatureDeviceKey.Builder getDeviceKeyFeatureBuilder(@Nonnull final XmlPullParser parser) throws XmlPullParserException, IOException {
+        final int initialDepth = parser.getDepth();
+        final CallFeatureDeviceKey.Builder deviceKeyBuilder = CallFeatureDeviceKey.Builder.start();
+        if (parser.nextTag() == XmlPullParser.START_TAG && "devicekeys".equalsIgnoreCase(parser.getName())) {
+            addKeysToDeviceKeyBuilder(parser, deviceKeyBuilder);
+        }
+        ParserUtils.forwardToEndTagOfDepth(parser, initialDepth);
         return deviceKeyBuilder;
     }
 
-    private static Optional<Boolean> getBoolean(String booleanText, final String childElementName, final String description, final List<String> parseErrors) {
+    private static void addKeysToDeviceKeyBuilder(@Nonnull final XmlPullParser parser, final CallFeatureDeviceKey.Builder deviceKeyBuilder) throws XmlPullParserException, IOException {
+        while (parser.nextTag() == XmlPullParser.START_TAG && "key".equalsIgnoreCase(parser.getName())) {
+            DeviceKey.from(parser.nextText()).ifPresent(deviceKeyBuilder::addDeviceKey);
+        }
+    }
+
+    private static Optional<Boolean> getBoolean(final String booleanText, final String childElementName, final String description, final List<String> parseErrors) {
         if ("true".equals(booleanText)) {
             return Optional.of(Boolean.TRUE);
         } else if ("false".equals(booleanText)) {

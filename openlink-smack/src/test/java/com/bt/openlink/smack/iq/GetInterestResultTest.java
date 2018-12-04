@@ -21,7 +21,7 @@ import com.bt.openlink.OpenlinkXmppNamespace;
 import com.bt.openlink.smack.Fixtures;
 import com.bt.openlink.type.Interest;
 
-@SuppressWarnings({ "OptionalGetWithoutIsPresent", "ConstantConditions" })
+@SuppressWarnings({ "OptionalGetWithoutIsPresent"})
 public class GetInterestResultTest {
     @Rule public final ExpectedException expectedException = ExpectedException.none();
 

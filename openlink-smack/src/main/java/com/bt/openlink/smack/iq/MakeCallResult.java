@@ -18,11 +18,11 @@ import com.bt.openlink.iq.MakeCallResultBuilder;
 import com.bt.openlink.smack.internal.SmackPacketUtil;
 import com.bt.openlink.type.CallStatus;
 
-public class MakeCallResult extends OpenlinkIQ {
+public final class MakeCallResult extends OpenlinkIQ {
     private static final String ELEMENT_CALLSTATUS = "callstatus";
     @Nullable private final CallStatus callStatus;
 
-    private MakeCallResult(@Nonnull Builder builder, @Nullable List<String> parseErrors) {
+    private MakeCallResult(@Nonnull final Builder builder, @Nullable final List<String> parseErrors) {
         super("command", OpenlinkXmppNamespace.XMPP_COMMANDS.uri(), builder, parseErrors);
         this.callStatus = builder.getCallStatus().orElse(null);
     }
@@ -34,7 +34,7 @@ public class MakeCallResult extends OpenlinkIQ {
     }
 
     @Nonnull
-    static IQ from(XmlPullParser parser) throws IOException, XmlPullParserException {
+    static IQ from(final XmlPullParser parser) throws IOException, XmlPullParserException {
 
         moveToStartOfTag(parser, OpenlinkXmppNamespace.TAG_IODATA, OpenlinkXmppNamespace.TAG_OUT, ELEMENT_CALLSTATUS);
 
@@ -45,7 +45,7 @@ public class MakeCallResult extends OpenlinkIQ {
     }
 
     @Override
-    protected IQChildElementXmlStringBuilder getIQChildElementBuilder(IQChildElementXmlStringBuilder xml) {
+    protected IQChildElementXmlStringBuilder getIQChildElementBuilder(final IQChildElementXmlStringBuilder xml) {
         xml.attribute("status", "completed")
                 .attribute("node", OpenlinkXmppNamespace.OPENLINK_MAKE_CALL.uri())
                 .rightAngleBracket();
@@ -82,7 +82,6 @@ public class MakeCallResult extends OpenlinkIQ {
          *             if the IQ packet does not have a type of {@link Type#get IQ.Type.get} or {@link Type#set IQ.Type.set}.
          * @return a new {@link Builder} based on the originating IQ.
          */
-        @SuppressWarnings("WeakerAccess")
         @Nonnull
         public static Builder createResultBuilder(@Nonnull final IQ request) {
             return SmackPacketUtil.createResultBuilder(start(), request);

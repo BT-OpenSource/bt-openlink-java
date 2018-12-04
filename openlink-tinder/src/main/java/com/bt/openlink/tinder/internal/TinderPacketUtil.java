@@ -33,6 +33,7 @@ import com.bt.openlink.type.CallDirection;
 import com.bt.openlink.type.CallFeature;
 import com.bt.openlink.type.CallFeatureBoolean;
 import com.bt.openlink.type.CallFeatureDeviceKey;
+import com.bt.openlink.type.CallFeatureHandset;
 import com.bt.openlink.type.CallFeatureSpeakerChannel;
 import com.bt.openlink.type.CallFeatureTextValue;
 import com.bt.openlink.type.CallFeatureVoiceRecorder;
@@ -108,6 +109,24 @@ public final class TinderPacketUtil {
             childElement = childElement.element(elementName);
         }
         return childElement;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static List<Element> getChildElements(@Nullable final Element element, @Nonnull final String... elementNames) {
+        // Navigate to penultimate element
+        Element parentElement = element;
+        for (int i = 0; i < elementNames.length - 1; i++) {
+            if (parentElement == null) {
+                break;
+            }
+            parentElement = parentElement.element(elementNames[i]);
+        }
+        final List<Element> childElements = new ArrayList<>();
+        if (parentElement != null) {
+            final List<Element> elements = (List<Element>) parentElement.elements(elementNames[elementNames.length - 1]);
+            childElements.addAll(elements);
+        }
+        return childElements;
     }
 
     public static void addElementWithTextIfNotNull(
@@ -324,7 +343,7 @@ public final class TinderPacketUtil {
     }
 
     @Nonnull
-    public static Optional<JID> getJID(String jidString) {
+    public static Optional<JID> getJID(final String jidString) {
         return jidString == null || jidString.isEmpty() ? Optional.empty() : Optional.of(new JID(jidString));
     }
 
@@ -371,8 +390,8 @@ public final class TinderPacketUtil {
         });
     }
 
-    private static void addList(Element element, List<?> list, String attributeName) {
-        final String string = String.join(",", list.stream().map(Object::toString).collect(Collectors.toList()));
+    private static void addList(final Element element, final List<?> list, final String attributeName) {
+        final String string = list.stream().map(Object::toString).collect(Collectors.joining(","));
         if (!string.isEmpty()) {
             element.addAttribute(attributeName, string);
         }
@@ -427,9 +446,14 @@ public final class TinderPacketUtil {
                     final CallFeatureBoolean callFeatureBoolean = (CallFeatureBoolean) feature;
                     callFeatureBoolean.isEnabled().ifPresent(enabled -> featureElement.setText(String.valueOf(enabled)));
                     featureLabel = feature.getLabel();
+                } else if (feature instanceof CallFeatureHandset) {
+                    final CallFeatureHandset callFeatureHandset = (CallFeatureHandset) feature;
+                    callFeatureHandset.isEnabled().ifPresent(enabled -> featureElement.setText(String.valueOf(enabled)));
+                    callFeatureHandset.isMicrophoneEnabled().ifPresent(enabled -> featureElement.addAttribute("microphone", String.valueOf(enabled)));
+                    featureLabel = feature.getLabel();
                 } else if (feature instanceof CallFeatureTextValue) {
                     final CallFeatureTextValue callFeatureText = (CallFeatureTextValue) feature;
-                    callFeatureText.getValue().ifPresent(enabled -> featureElement.setText(String.valueOf(enabled)));
+                    callFeatureText.getValue().ifPresent(featureElement::setText);
                     featureLabel = feature.getLabel();
                 } else if (feature instanceof CallFeatureDeviceKey) {
                     final CallFeatureDeviceKey callFeatureDeviceKey = (CallFeatureDeviceKey) feature;
@@ -518,7 +542,7 @@ public final class TinderPacketUtil {
         return Optional.of(siteBuilder.build(parseErrors));
     }
 
-    private static List<PhoneNumber> getPhoneNumbers(@Nullable final Element parentElement, String attributeName) {
+    private static List<PhoneNumber> getPhoneNumbers(@Nullable final Element parentElement, final String attributeName) {
         final Optional<String> e164String = getStringAttribute(parentElement, attributeName);
         final List<PhoneNumber> phoneNumbers = new ArrayList<>();
         e164String.ifPresent(string -> Arrays.stream(string.split(","))
@@ -614,7 +638,7 @@ public final class TinderPacketUtil {
 
         if (featuresElement != null) {
             final List featureElements = featuresElement.elements(OpenlinkXmppNamespace.TAG_FEATURE);
-            for (Object featureElementObject : featureElements) {
+            for (final Object featureElementObject : featureElements) {
                 final Element featureElement = (Element) featureElementObject;
                 final VoiceMessageFeature.Builder featureBuilder = VoiceMessageFeature.Builder.start();
                 TinderPacketUtil.getStringAttribute(featureElement, "id", true, stanzaDescription, parseErrors).flatMap(FeatureId::from).ifPresent(featureBuilder::setId);
@@ -633,6 +657,7 @@ public final class TinderPacketUtil {
                                 .map(Duration::ofMillis)
                                 .ifPresent(messageBuilder::setMessageLength);
                     } catch (final NumberFormatException ignored) {
+                        //noinspection OptionalGetWithoutIsPresent - seems to be a bug in IntelliJ
                         parseErrors.add(String.format("Invalid %s; invalid msglen '%s'; please supply an integer", stanzaDescription, optionalMsgLen.get()));
                     }
                     final Optional<String> optionalCreationDate = TinderPacketUtil.getOptionalChildElementString(voiceMessageElement, "creationdate");
@@ -642,6 +667,7 @@ public final class TinderPacketUtil {
                                 .map(Timestamp::toInstant)
                                 .ifPresent(messageBuilder::setCreationDate);
                     } catch( final DateTimeParseException ignored) {
+                        //noinspection OptionalGetWithoutIsPresent - seems to be a bug in IntelliJ
                         parseErrors.add(String.format("Invalid %s; invalid creationdate '%s'; please supply an integer", stanzaDescription, optionalCreationDate.get()));
                     }
                     TinderPacketUtil.getOptionalChildElementString(voiceMessageElement, "exten").flatMap(PhoneNumber::from).ifPresent(messageBuilder::setExtension);
@@ -655,84 +681,123 @@ public final class TinderPacketUtil {
     }
 
     @SuppressWarnings("unchecked")
-    private static void getFeatures(@Nonnull final Element callElement, @Nonnull final Call.Builder callBuilder, final String description, List<String> parseErrors) {
+    private static void getFeatures(@Nonnull final Element callElement, @Nonnull final Call.Builder callBuilder, final String description, final List<String> parseErrors) {
         final Element featuresElement = callElement.element("features");
         if (featuresElement != null) {
             final List<Element> featureElements = featuresElement.elements("feature");
             for (final Element featureElement : featureElements) {
                 final Optional<FeatureId> featureId = FeatureId.from(featureElement.attributeValue("id"));
-                Optional<String> label = Optional.ofNullable(featureElement.attributeValue("label"));
+                final Optional<String> label = Optional.ofNullable(featureElement.attributeValue("label"));
                 final Optional<FeatureType> featureType = FeatureType.from(featureElement.attributeValue("type"));
-
-                final Iterator<Element> elementIterator = featureElement.elementIterator();
-                final boolean hasChildElement = elementIterator.hasNext();
                 final CallFeature.AbstractCallFeatureBuilder callFeatureBuilder;
-                if (hasChildElement) {
-                    final Element childElement = elementIterator.next();
-                    final String childElementName = childElement.getName();
-                    switch (childElementName) {
-                    case "devicekeys":
-                        final CallFeatureDeviceKey.Builder deviceKeyBuilder = CallFeatureDeviceKey.Builder.start();
-                        final List<Element> keysElements = childElement.elements("key");
-                        for (Element keyElement : keysElements) {
-                            DeviceKey.from(Optional.ofNullable(keyElement.getText()).map(String::trim).orElse(null))
-                                    .ifPresent(deviceKeyBuilder::addDeviceKey);
-                        }
-                        callFeatureBuilder = deviceKeyBuilder;
-                        break;
-                    case "speakerchannel":
-                        final CallFeatureSpeakerChannel.Builder speakerChannelBuilder = CallFeatureSpeakerChannel.Builder.start();
-                        getChildElementLong(childElement, "channel", description, parseErrors).ifPresent(speakerChannelBuilder::setChannel);
-                        getChildElementBoolean(childElement, "microphone", description, parseErrors).ifPresent(speakerChannelBuilder::setMicrophoneActive);
-                        getChildElementBoolean(childElement, "mute", description, parseErrors).ifPresent(speakerChannelBuilder::setMuteRequested);
-                        callFeatureBuilder = speakerChannelBuilder;
-                        break;
-                    case "voicerecorder":
-                        final CallFeatureVoiceRecorder.Builder voiceRecorderBuilder = CallFeatureVoiceRecorder.Builder.start();
-                        final VoiceRecorderInfo.Builder voiceRecorderInfoBuilder = VoiceRecorderInfo.Builder.start();
-
-                        RecorderNumber.from(getNullableChildElementString(childElement, "recnumber"))
-                                .ifPresent(voiceRecorderInfoBuilder::setRecorderNumber);
-                        RecorderPort.from(getNullableChildElementString(childElement, "recport"))
-                                .ifPresent(voiceRecorderInfoBuilder::setRecorderPort);
-                        RecorderChannel.from(getNullableChildElementString(childElement, "recchan"))
-                                .ifPresent(voiceRecorderInfoBuilder::setRecorderChannel);
-                        RecorderType.from(getNullableChildElementString(childElement, "rectype"))
-                                .ifPresent(voiceRecorderInfoBuilder::setRecorderType);
-                        voiceRecorderBuilder.setVoiceRecorderInfo(voiceRecorderInfoBuilder.build(parseErrors));
-
-                        callFeatureBuilder = voiceRecorderBuilder;
-                        break;
-                    default:
-
-                        // Assume it's a simple true/false call feature
-                        final CallFeatureBoolean.Builder booleanBuilder = CallFeatureBoolean.Builder.start();
-                        getBoolean(featureElement.getText(), description, parseErrors).ifPresent(booleanBuilder::setEnabled);
-                        callFeatureBuilder = booleanBuilder;
-                        break;
-                    }
+                if (featureType.isPresent()) {
+                    callFeatureBuilder = getCallFeatureBuilder(featureElement, featureType.get(), description, parseErrors);
                 } else {
-                    if (FeatureType.VOICE_MESSAGE.equals(featureType.orElse(null))) {
-                        final CallFeatureTextValue.Builder textValueBuilder = CallFeatureTextValue.Builder.start();
-                        textValueBuilder.setValue(featureElement.getText());
-                        callFeatureBuilder = textValueBuilder;
-                    } else {
-                        // It's a simple true/false call feature
-                        final CallFeatureBoolean.Builder booleanBuilder = CallFeatureBoolean.Builder.start();
-                        getBoolean(featureElement.getText(), description, parseErrors).ifPresent(booleanBuilder::setEnabled);
-                        callFeatureBuilder = booleanBuilder;
-                    }
+                    callFeatureBuilder = getLegacyCallFeature(featureElement, description, parseErrors);
                 }
                 featureId.ifPresent(callFeatureBuilder::setId);
                 label.ifPresent(callFeatureBuilder::setLabel);
-                featureType.ifPresent(callFeatureBuilder::setType);
                 callBuilder.addFeature(callFeatureBuilder.build(parseErrors));
             }
         }
     }
 
+    private static CallFeature.AbstractCallFeatureBuilder getLegacyCallFeature(final Element featureElement, final String description, final List<String> parseErrors) {
+        final Iterator iterator = featureElement.elementIterator();
+        if (iterator.hasNext()) {
+            switch (((Element) iterator.next()).getName().toLowerCase()) {
+            case "devicekeys":
+                return getCallFeatureBuilder(featureElement, FeatureType.DEVICE_KEYS, description, parseErrors);
+            case "speakerchannel":
+                return getCallFeatureBuilder(featureElement, FeatureType.SPEAKER_CHANNEL, description, parseErrors);
+            case "voicerecorder":
+                return getCallFeatureBuilder(featureElement, FeatureType.VOICE_RECORDER, description, parseErrors);
+            default:
+                return getBooleanOrTextCallFeatureBuilder(featureElement.getText());
+            }
+        }
+        return getBooleanOrTextCallFeatureBuilder(featureElement.getText());
+    }
+
+    private static CallFeature.AbstractCallFeatureBuilder getBooleanOrTextCallFeatureBuilder(final String elementText) {
+        if (elementText.equalsIgnoreCase("true") || elementText.equalsIgnoreCase("false")) {
+            return CallFeatureBoolean.Builder.start().setEnabled(Boolean.parseBoolean(elementText));
+        } else {
+            return CallFeatureTextValue.Builder.start().setValue(elementText);
+        }
+    }
+
+    private static CallFeature.AbstractCallFeatureBuilder getCallFeatureBuilder(final Element featureElement, final FeatureType featureType, final String description, final List<String> parseErrors) {
+        switch (featureType) {
+        case HANDSET:
+            final Optional<Boolean> microphoneOn = getBooleanAttribute(featureElement, "microphone", description, parseErrors);
+            final CallFeatureHandset.Builder handsetBuilder = CallFeatureHandset.Builder.start().setEnabled(Boolean.parseBoolean(featureElement.getText()));
+            microphoneOn.ifPresent(handsetBuilder::setMicrophoneEnabled);
+            return handsetBuilder;
+        case VOICE_MESSAGE:
+            return CallFeatureTextValue.Builder.start().setType(FeatureType.VOICE_MESSAGE).setValue(featureElement.getText());
+        case DEVICE_KEYS:
+            return getDeviceKeyFeatureBuilder(featureElement);
+        case SPEAKER_CHANNEL:
+            return getSpeakerChannelFeatureBuilder(featureElement, description, parseErrors);
+        case VOICE_RECORDER:
+            return getVoiceRecorderFeatureBuilder(featureElement, parseErrors);
+        default:
+            return getBooleanFeatureBuilder(featureElement, description, parseErrors).setType(featureType);
+        }
+    }
+
+    private static CallFeatureBoolean.Builder getBooleanFeatureBuilder(final Element featureElement, final String description, final List<String> parseErrors) {
+        final CallFeatureBoolean.Builder booleanBuilder = CallFeatureBoolean.Builder.start();
+        getBoolean(featureElement.getText(), description, parseErrors).ifPresent(booleanBuilder::setEnabled);
+
+        return booleanBuilder;
+    }
+
+    private static CallFeatureVoiceRecorder.Builder getVoiceRecorderFeatureBuilder(final Element featureElement, final List<String> parseErrors) {
+        final Element voiceRecorderElement = getChildElement(featureElement, "voicerecorder");
+
+        final CallFeatureVoiceRecorder.Builder voiceRecorderBuilder = CallFeatureVoiceRecorder.Builder.start();
+        final VoiceRecorderInfo.Builder voiceRecorderInfoBuilder = VoiceRecorderInfo.Builder.start();
+        RecorderNumber.from(getNullableChildElementString(voiceRecorderElement, "recnumber"))
+                .ifPresent(voiceRecorderInfoBuilder::setRecorderNumber);
+        RecorderPort.from(getNullableChildElementString(voiceRecorderElement, "recport"))
+                .ifPresent(voiceRecorderInfoBuilder::setRecorderPort);
+        RecorderChannel.from(getNullableChildElementString(voiceRecorderElement, "recchan"))
+                .ifPresent(voiceRecorderInfoBuilder::setRecorderChannel);
+        RecorderType.from(getNullableChildElementString(voiceRecorderElement, "rectype"))
+                .ifPresent(voiceRecorderInfoBuilder::setRecorderType);
+        voiceRecorderBuilder.setVoiceRecorderInfo(voiceRecorderInfoBuilder.build(parseErrors));
+
+        return voiceRecorderBuilder;
+    }
+
+    private static CallFeatureSpeakerChannel.Builder getSpeakerChannelFeatureBuilder(final Element featureElement, final String description, final List<String> parseErrors) {
+
+        final Element speakerChannelElement = getChildElement(featureElement, "speakerchannel");
+
+        final CallFeatureSpeakerChannel.Builder speakerChannelBuilder = CallFeatureSpeakerChannel.Builder.start();
+        getChildElementLong(speakerChannelElement, "channel", description, parseErrors).ifPresent(speakerChannelBuilder::setChannel);
+        getChildElementBoolean(speakerChannelElement, "microphone", description, parseErrors).ifPresent(speakerChannelBuilder::setMicrophoneActive);
+        getChildElementBoolean(speakerChannelElement, "mute", description, parseErrors).ifPresent(speakerChannelBuilder::setMuteRequested);
+
+        return speakerChannelBuilder;
+    }
+
+    private static CallFeatureDeviceKey.Builder getDeviceKeyFeatureBuilder(final Element featureElement) {
+
+        final CallFeatureDeviceKey.Builder deviceKeyBuilder = CallFeatureDeviceKey.Builder.start();
+        final List<Element> keysElements = getChildElements(featureElement, "devicekeys", "key");
+        for (final Element keyElement : keysElements) {
+            DeviceKey.from(Optional.ofNullable(keyElement.getText()).map(String::trim).orElse(null))
+                    .ifPresent(deviceKeyBuilder::addDeviceKey);
+        }
+
+        return deviceKeyBuilder;
+    }
+
     @Nonnull
-    private static Optional<Boolean> getBoolean(@Nullable final String value, String description, List<String> parseErrors) {
+    private static Optional<Boolean> getBoolean(@Nullable final String value, final String description, final List<String> parseErrors) {
         if ("true".equalsIgnoreCase(value)) {
             return Optional.of(Boolean.TRUE);
         } else if ("false".equalsIgnoreCase(value)) {
@@ -806,7 +871,7 @@ public final class TinderPacketUtil {
     @Nullable
     public static Element setPubSubMetaData(
             @Nonnull final Message message,
-            @Nonnull PubSubMessageBuilder<?, JID> builder,
+            @Nonnull final PubSubMessageBuilder<?, JID> builder,
             @Nonnull final String description,
             @Nonnull final List<String> parseErrors) {
         builder.setId(message.getID());

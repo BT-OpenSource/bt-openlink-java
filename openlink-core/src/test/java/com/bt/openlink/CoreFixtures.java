@@ -6,6 +6,9 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.TimeZone;
 
 import com.bt.openlink.type.Call;
@@ -13,6 +16,7 @@ import com.bt.openlink.type.CallDirection;
 import com.bt.openlink.type.CallFeature;
 import com.bt.openlink.type.CallFeatureBoolean;
 import com.bt.openlink.type.CallFeatureDeviceKey;
+import com.bt.openlink.type.CallFeatureHandset;
 import com.bt.openlink.type.CallFeatureSpeakerChannel;
 import com.bt.openlink.type.CallFeatureTextValue;
 import com.bt.openlink.type.CallFeatureVoiceRecorder;
@@ -25,6 +29,7 @@ import com.bt.openlink.type.DeviceId;
 import com.bt.openlink.type.DeviceKey;
 import com.bt.openlink.type.DeviceStatus;
 import com.bt.openlink.type.DeviceType;
+import com.bt.openlink.type.Feature;
 import com.bt.openlink.type.FeatureId;
 import com.bt.openlink.type.FeatureType;
 import com.bt.openlink.type.Interest;
@@ -47,7 +52,7 @@ import com.bt.openlink.type.UserId;
 import com.bt.openlink.type.VoiceRecorderInfo;
 
 @SuppressWarnings({"OptionalGetWithoutIsPresent", "WeakerAccess"})
-public class CoreFixtures {
+public final class CoreFixtures {
 
     static final DateTimeFormatter ISO_8601_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
     private static final DateTimeFormatter JAVA_UTIL_DATE_FORMATTER = DateTimeFormatter.ofPattern("EEE MMM dd HH:mm:ss zzz yyyy");
@@ -156,8 +161,8 @@ public class CoreFixtures {
             .setStartTime(START_TIME)
             .setDuration(DURATION)
             .addAction(RequestAction.ANSWER_CALL)
-            .addFeature(CallFeatureBoolean.Builder.start().setId(FeatureId.from("hs_1").get()).setType(FeatureType.HANDSET).setLabel("Handset 1").setEnabled(true).build())
-            .addFeature(CallFeatureBoolean.Builder.start().setId(FeatureId.from("hs_2").get()).setType(FeatureType.HANDSET).setLabel("Handset 2").setEnabled(false).build())
+            .addFeature(CallFeatureHandset.Builder.start().setId(FeatureId.from("hs_1").get()).setType(FeatureType.HANDSET).setMicrophoneEnabled(true).setLabel("Handset 1").setEnabled(true).build())
+            .addFeature(CallFeatureHandset.Builder.start().setId(FeatureId.from("hs_2").get()).setType(FeatureType.HANDSET).setLabel("Handset 2").setEnabled(false).build())
             .addFeature(CallFeatureBoolean.Builder.start().setId(FeatureId.from("priv_1").get()).setType(FeatureType.PRIVACY).setLabel("Privacy").setEnabled(false).build())
             .addFeature(
                     CallFeatureDeviceKey.Builder.start().setId(FeatureId.from("NetrixHiTouch_sales1").get()).setType(FeatureType.DEVICE_KEYS).setLabel("NetrixHiTouch").addDeviceKey(DeviceKey.from("key_1:1:1").get())
@@ -239,7 +244,7 @@ public class CoreFixtures {
                     "      <AnswerCall/>\n" +
                     "    </actions>\n" +
                     "    <features>\n" +
-                    "      <feature id='hs_1' type='Handset' label='Handset 1'>true</feature>\n" +
+                    "      <feature id='hs_1' type='Handset' label='Handset 1' microphone='true'>true</feature>\n" +
                     "      <feature id='hs_2' type='Handset' label='Handset 2'>false</feature>\n" +
                     "      <feature id='priv_1' type='Privacy' label='Privacy'>false</feature>\n" +
                     "      <feature id='NetrixHiTouch_sales1' type='DeviceKeys' label='NetrixHiTouch'>\n" +
@@ -274,5 +279,84 @@ public class CoreFixtures {
                     "    </participants>\n" +
                     "  </call>\n" +
                     "</callstatus>\n";
+
+    public static final String CALL_STATUS_LEGACY_FEATURES =
+            "<callstatus xmlns='http://xmpp.org/protocol/openlink:01:00:00#call-status' busy='false'>\n" +
+                    "  <call>\n" +
+                    "    <id telephony='" + CoreFixtures.TELEPHONY_CALL_ID + "'>" + CoreFixtures.CALL_ID + "</id>\n" +
+                    "    <changed>State</changed>\n" +
+                    "    <state>CallConferenced</state>\n" +
+                    "    <direction>Outgoing</direction>\n" +
+                    "    <duration>60000</duration>\n" +
+                    "    <features>\n" +
+                    "      <feature id='hs_1'>true</feature>\n" +
+                    "      <feature id='hs_2'>false</feature>\n" +
+                    "      <feature id='priv_1'>false</feature>\n" +
+                    "      <feature id='NetrixHiTouch_sales1'>\n" +
+                    "        <devicekeys xmlns='http://xmpp.org/protocol/openlink:01:00:00/features#device-keys'>\n" +
+                    "          <key>key_1:1:1</key>\n" +
+                    "        </devicekeys>\n" +
+                    "      </feature>\n" +
+                    "      <feature id='" + SPEAKER_CHANNEL_ID + "'>\n" +
+                    "        <speakerchannel xmlns='http://xmpp.org/protocol/openlink:01:00:00/features#speaker-channel'>\n" +
+                    "          <channel>" + SPEAKER_CHANNEL_NUMBER + "</channel>\n" +
+                    "          <microphone>true</microphone>\n" +
+                    "          <mute>true</mute>\n" +
+                    "        </speakerchannel>\n" +
+                    "      </feature>\n" +
+                    "      <feature id=\"MK1021\" type='VoiceMessage'>VoiceMessage</feature>\n" +
+                    "      <feature id='voicerecorder_1'>\n" +
+                    "           <voicerecorder xmlns='http://xmpp.org/protocol/openlink:01:00:00/features#voice-recorder'>\n" +
+                    "               <recnumber>011</recnumber>\n" +
+                    "               <recport>5</recport>\n" +
+                    "               <recchan>2</recchan>\n" +
+                    "               <rectype>V</rectype>\n" +
+                    "           </voicerecorder>\n" +
+                    "       </feature>\n" +
+                    "    </features>\n" +
+                    "  </call>\n" +
+                    "</callstatus>\n";
+
+    public static final List<Feature> LEGACY_FEATURE_LIST;
+    static {
+        final List<Feature> features = new ArrayList<>();
+        features.add(CallFeatureBoolean.Builder.start()
+                .setId(FeatureId.from("hs_1").get())
+                .setEnabled(true)
+                .build(new ArrayList<>()));
+        features.add(CallFeatureBoolean.Builder.start()
+                .setId(FeatureId.from("hs_2").get())
+                .setEnabled(false)
+                .build(new ArrayList<>()));
+        features.add(CallFeatureBoolean.Builder.start()
+                .setId(FeatureId.from("priv_1").get())
+                .setEnabled(false)
+                .build(new ArrayList<>()));
+        features.add(CallFeatureDeviceKey.Builder.start()
+                .setId(FeatureId.from("NetrixHiTouch_sales1").get())
+                .addDeviceKey(DeviceKey.from("key_1:1:1").get())
+                .build(new ArrayList<>()));
+        features.add(CallFeatureSpeakerChannel.Builder.start()
+                .setId(FeatureId.from("test-speaker-id").get())
+                .setChannel(42)
+                .setMicrophoneActive(true)
+                .setMuteRequested(true)
+                .build(new ArrayList<>()));
+        features.add(CallFeatureTextValue.Builder.start()
+                .setId(FeatureId.from("MK1021").get())
+                .setValue("VoiceMessage")
+                .setType(FeatureType.VOICE_MESSAGE)
+                .build(new ArrayList<>()));
+        features.add(CallFeatureVoiceRecorder.Builder.start()
+                .setId(FeatureId.from("voicerecorder_1").get())
+                .setVoiceRecorderInfo(                            VoiceRecorderInfo.Builder.start()
+                        .setRecorderNumber(RecorderNumber.from("011").get())
+                        .setRecorderPort(RecorderPort.from("5").get())
+                        .setRecorderChannel(RecorderChannel.from("2").get())
+                        .setRecorderType(RecorderType.from("V").get())
+                        .build())
+                .build(new ArrayList<>()));
+        LEGACY_FEATURE_LIST = Collections.unmodifiableList(features);
+    }
 
 }

@@ -6,6 +6,8 @@ import static org.junit.Assert.assertThat;
 import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
 import static org.xmlunit.matchers.CompareMatcher.isIdenticalTo;
 
+import java.util.List;
+
 import org.jivesoftware.smack.provider.ProviderManager;
 import org.jivesoftware.smack.util.PacketParserUtils;
 import org.junit.AfterClass;
@@ -18,6 +20,7 @@ import com.bt.openlink.CoreFixtures;
 import com.bt.openlink.MakeCallFixtures;
 import com.bt.openlink.OpenlinkXmppNamespace;
 import com.bt.openlink.smack.Fixtures;
+import com.bt.openlink.type.CallFeature;
 import com.bt.openlink.type.RequestAction;
 
 @SuppressWarnings("OptionalGetWithoutIsPresent")
@@ -141,4 +144,20 @@ public class MakeCallResultTest {
         assertThat(result.getFrom(), is(request.getTo()));
     }
 
+    @Test
+    public void willParseLegacyStyleFeatures() throws Exception {
+        final MakeCallResult result = PacketParserUtils.parseStanza("<iq from='" + CoreFixtures.FROM_JID_STRING + "' to='" + CoreFixtures.TO_JID_STRING + "' id='" + CoreFixtures.STANZA_ID + "' type='result'>\n" +
+                "   <command xmlns='http://jabber.org/protocol/commands' node='http://xmpp.org/protocol/openlink:01:00:00#make-call' status='completed'>\n" +
+                "     <iodata xmlns='urn:xmpp:tmp:io-data' type='output'>\n" +
+                "      <out>\n" +
+                CoreFixtures.CALL_STATUS_LEGACY_FEATURES +
+                "      </out>\n" +
+                "    </iodata>\n" +
+                "  </command>\n" +
+                "</iq>");
+
+        final List<CallFeature> features = result.getCallStatus().get().getCalls().get(0).getFeatures();
+
+        assertReflectionEquals(features, CoreFixtures.LEGACY_FEATURE_LIST);
+    }
 }

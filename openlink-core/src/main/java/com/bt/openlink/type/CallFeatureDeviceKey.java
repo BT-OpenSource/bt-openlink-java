@@ -6,11 +6,11 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 
-public class CallFeatureDeviceKey extends CallFeature {
+public final class CallFeatureDeviceKey extends CallFeature {
     private static final long serialVersionUID = -1837276539059039203L;
     @Nonnull private final List<DeviceKey> deviceKeys;
 
-    protected CallFeatureDeviceKey(@Nonnull final Builder builder) {
+    private CallFeatureDeviceKey(@Nonnull final Builder builder) {
         super(builder);
         this.deviceKeys = Collections.unmodifiableList(builder.deviceKeys);
     }
@@ -34,12 +34,14 @@ public class CallFeatureDeviceKey extends CallFeature {
 
         @Nonnull
         public CallFeatureDeviceKey build() {
+            setType(FeatureType.DEVICE_KEYS);
             validate();
             return new CallFeatureDeviceKey(this);
         }
 
         @Nonnull
         public CallFeatureDeviceKey build(final List<String> errors) {
+            setType(FeatureType.DEVICE_KEYS);
             validate(errors);
             return new CallFeatureDeviceKey(this);
         }
@@ -60,7 +62,6 @@ public class CallFeatureDeviceKey extends CallFeature {
             }
         }
 
-        @SuppressWarnings("unchecked")
         @Nonnull
         public Builder addDeviceKey(@Nonnull final DeviceKey deviceKey) {
             this.deviceKeys.add(deviceKey);
