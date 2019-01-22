@@ -1,1 +1,0 @@
-* Ensure smack and tinder have all the same messages
