@@ -12,6 +12,7 @@ public enum OpenlinkXmppNamespace {
     OPENLINK_GET_PROFILES("http://xmpp.org/protocol/openlink:01:00:00#get-profiles", "Get profiles"),
     OPENLINK_GET_PROFILE("http://xmpp.org/protocol/openlink:01:00:00#get-profile", "Get profile"),
     OPENLINK_PROFILES("http://xmpp.org/protocol/openlink:01:00:00/profiles", "Profiles"),
+    OPENLINK_PROFILE("http://xmpp.org/protocol/openlink:01:00:00/profile/Netrix+Button", "Profile"),
     OPENLINK_GET_INTERESTS("http://xmpp.org/protocol/openlink:01:00:00#get-interests", "Get interests"),
     OPENLINK_GET_INTEREST("http://xmpp.org/protocol/openlink:01:00:00#get-interest", "Get interest"),
     OPENLINK_INTERESTS("http://xmpp.org/protocol/openlink:01:00:00/interests", "Interests"),
@@ -41,6 +42,9 @@ public enum OpenlinkXmppNamespace {
     public static final String TAG_JID = "jid";
     public static final String TAG_PROFILES = "profiles";
     public static final String TAG_PROFILE = "profile";
+    public static final String TAG_KEYPAGES = "keypages";
+    public static final String TAG_KEYPAGE = "keypage";
+    public static final String TAG_KEY = "key";
     public static final String TAG_DEFAULT = "default";
     public static final String TAG_LABEL = "label";
     public static final String TAG_ACTIONS = "actions";

@@ -35,6 +35,19 @@ import com.bt.openlink.type.FeatureType;
 import com.bt.openlink.type.Interest;
 import com.bt.openlink.type.InterestId;
 import com.bt.openlink.type.InterestType;
+import com.bt.openlink.type.Key;
+import com.bt.openlink.type.KeyColor;
+import com.bt.openlink.type.KeyFunction;
+import com.bt.openlink.type.KeyId;
+import com.bt.openlink.type.KeyInterest;
+import com.bt.openlink.type.KeyLabel;
+import com.bt.openlink.type.KeyModifier;
+import com.bt.openlink.type.KeyPage;
+import com.bt.openlink.type.KeyPageId;
+import com.bt.openlink.type.KeyPageLabel;
+import com.bt.openlink.type.KeyPageLocalKeyPage;
+import com.bt.openlink.type.KeyPageModule;
+import com.bt.openlink.type.KeyQualifier;
 import com.bt.openlink.type.OriginatorReference;
 import com.bt.openlink.type.Participant;
 import com.bt.openlink.type.ParticipantType;
@@ -122,6 +135,69 @@ public final class CoreFixtures {
             .setOnline(true)
             .setDefault(true)
             .setSite(SITE)
+            .build();
+    public static final Key KEY_1 = Key.Builder.start()
+            .setId(KeyId.from("key_1:2:1").get())
+            .setLabel(KeyLabel.from("Key Label 1").get())
+            .setFunction(KeyFunction.from("14").get())
+            .setColor(KeyColor.from("5").get())
+            .setModifier(KeyModifier.from("0").get())
+            .setQualifier(KeyQualifier.from("553").get())
+            .setInterest(KeyInterest.from("L553").get())
+            .build();
+    public static final Key KEY_2 = Key.Builder.start()
+            .setId(KeyId.from("key_1:3:1").get())
+            .setLabel(KeyLabel.from("Key Label 2").get())
+            .setFunction(KeyFunction.from("14").get())
+            .setColor(KeyColor.from("5").get())
+            .setModifier(KeyModifier.from("0").get())
+            .setQualifier(KeyQualifier.from("554").get())
+            .setInterest(KeyInterest.from("L554").get())
+            .build();
+    public static final Key KEY_3 = Key.Builder.start()
+            .setId(KeyId.from("key_2:3:1").get())
+            .setLabel(KeyLabel.from("Key Label 3").get())
+            .setFunction(KeyFunction.from("14").get())
+            .setColor(KeyColor.from("5").get())
+            .setModifier(KeyModifier.from("0").get())
+            .setQualifier(KeyQualifier.from("555").get())
+            .setInterest(KeyInterest.from("L555").get())
+            .build();
+    public static final Key KEY_4 = Key.Builder.start()
+            .setId(KeyId.from("key_2:3:2").get())
+            .setLabel(KeyLabel.from("Key Label 4").get())
+            .setFunction(KeyFunction.from("14").get())
+            .setColor(KeyColor.from("5").get())
+            .setModifier(KeyModifier.from("0").get())
+            .setQualifier(KeyQualifier.from("556").get())
+            .setInterest(KeyInterest.from("L556").get())
+            .build();
+    public static final KeyPage KEY_PAGE_1 = KeyPage.Builder.start()
+            .setkeypageId(KeyPageId.from("300").get())
+            .setKeypageLabel(KeyPageLabel.from("KeyPage 1").get())
+            .setKeypageModule(KeyPageModule.from("1").get())
+            .setLocalKeypage(KeyPageLocalKeyPage.from("2").get())
+            .addKey(KEY_1)
+            .addKey(KEY_2)
+            .build();
+    public static final KeyPage KEY_PAGE_2 = KeyPage.Builder.start()
+            .setkeypageId(KeyPageId.from("301").get())
+            .setKeypageLabel(KeyPageLabel.from("KeyPage 2").get())
+            .setKeypageModule(KeyPageModule.from("2").get())
+            .setLocalKeypage(KeyPageLocalKeyPage.from("3").get())
+            .addKey(KEY_3)
+            .addKey(KEY_4)
+            .build();
+    public static final Profile KEYPAGE_PROFILE = Profile.Builder.start()
+            .setOnline(true)
+            .setDeviceId(DeviceId.from("271").get())
+            .addKeyPage(KEY_PAGE_1)
+            .addKeyPage(KEY_PAGE_2)
+            .build();
+    public static final Profile KEYPAGE_PROFILE_NO_KEYPAGES = Profile.Builder.start()
+            .setOnline(true)
+            .setDeviceId(DeviceId.from("271").get())
+            .addKeyPages(new ArrayList<>())
             .build();
     public static final CallFeature CALL_FEATURE = CallFeatureBoolean.Builder.start()
             .setType(FeatureType.CALL_BACK)
