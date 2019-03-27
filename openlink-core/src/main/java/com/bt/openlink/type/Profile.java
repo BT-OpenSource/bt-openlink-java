@@ -18,6 +18,7 @@ public final class Profile implements Serializable {
     @Nullable private final Boolean online;
     @Nullable private final Site site;
     @Nonnull private final List<RequestAction> actions;
+    @Nonnull private final List<KeyPage> keyPages;
 
     private Profile(@Nonnull final Builder builder) {
         this.profileId = builder.profileId;
@@ -28,6 +29,7 @@ public final class Profile implements Serializable {
         this.online = builder.online;
         this.site = builder.site;
         this.actions = builder.actions;
+        this.keyPages = builder.keyPages;
     }
 
     @Nonnull
@@ -82,6 +84,11 @@ public final class Profile implements Serializable {
         return actions;
     }
 
+    @Nonnull
+    public List<KeyPage> getKeyPages() {
+        return keyPages;
+    }
+
     @Override
     public String toString() {
         return "Profile[" +
@@ -103,7 +110,9 @@ public final class Profile implements Serializable {
         @Nullable private DeviceId deviceId;
         @Nullable private String label;
         @Nullable private Boolean online;
+        private boolean keyPageProfile;
         @Nonnull private final List<RequestAction> actions = new ArrayList<>();
+        @Nonnull private final List<KeyPage> keyPages = new ArrayList<>();
 
         private Builder() {
         }
@@ -115,16 +124,16 @@ public final class Profile implements Serializable {
 
         @Nonnull
         public Profile build() {
-            if (profileId == null) {
+            if (profileId == null && !keyPageProfile) {
                 throw new IllegalStateException("The profile id has not been set");
             }
-            if (site == null) {
+            if (site == null && !keyPageProfile) {
                 throw new IllegalStateException("The site has not been set");
             }
-            if (isDefault == null) {
+            if (isDefault == null && !keyPageProfile) {
                 throw new IllegalStateException("The default indicator has not been set");
             }
-            if (label == null) {
+            if (label == null && !keyPageProfile) {
                 throw new IllegalStateException("The label has not been set");
             }
             if (online == null) {
@@ -135,16 +144,16 @@ public final class Profile implements Serializable {
 
         @Nonnull
         public Profile build(@Nonnull final List<String> errors) {
-            if (profileId == null) {
+            if (profileId == null && !keyPageProfile) {
                 errors.add("Invalid profile; missing profile id is mandatory");
             }
-            if (site == null) {
+            if (site == null && !keyPageProfile) {
                 errors.add("Invalid profile; missing site is mandatory");
             }
-            if (isDefault == null) {
+            if (isDefault == null && !keyPageProfile) {
                 errors.add("Invalid profile; missing default indicator is mandatory");
             }
-            if (label == null) {
+            if (label == null && !keyPageProfile) {
                 errors.add("Invalid profile; missing label is mandatory");
             }
             if (online == null) {
@@ -197,12 +206,26 @@ public final class Profile implements Serializable {
         }
 
         public Builder setSite(@Nonnull Site site) {
+            this.keyPageProfile = false;
             this.site = site;
             return this;
         }
 
         public Builder addAction(@Nonnull RequestAction action) {
+            this.keyPageProfile = false;
             actions.add(action);
+            return this;
+        }
+
+        public Builder addKeyPage(@Nonnull KeyPage keyPage) {
+            this.keyPageProfile = true;
+            keyPages.add(keyPage);
+            return this;
+        }
+
+        public Builder addKeyPages(@Nonnull final List<KeyPage> keyPages) {
+            this.keyPageProfile = true;
+            this.keyPages.addAll(keyPages);
             return this;
         }
     }
