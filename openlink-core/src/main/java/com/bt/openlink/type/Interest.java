@@ -16,6 +16,7 @@ public final class Interest implements Serializable {
     @Nullable private final CallStatus callStatus;
     @Nullable private final Integer maxCalls;
     @Nullable private final PhoneNumber number;
+    @Nullable private final PhoneNumber callForward;
 
     private Interest(@Nonnull final Builder builder) {
         this.interestId = builder.interestId;
@@ -25,6 +26,7 @@ public final class Interest implements Serializable {
         this.callStatus = builder.callStatus;
         this.maxCalls = builder.maxCalls;
         this.number = builder.number;
+        this.callForward = builder.callForward;
     }
 
     @Nonnull
@@ -62,6 +64,11 @@ public final class Interest implements Serializable {
         return Optional.ofNullable(number);
     }
 
+    @Nonnull
+    public Optional<PhoneNumber> getCallForward() {
+        return Optional.ofNullable(callForward);
+    }
+
     @Override
     public String toString() {
         return "Interest[" +
@@ -81,6 +88,7 @@ public final class Interest implements Serializable {
         @Nullable private CallStatus callStatus = null;
         @Nullable private Integer maxCalls = null;
         @Nullable private PhoneNumber number = null;
+        @Nullable private PhoneNumber callForward = null;
 
         private Builder() {
         }
@@ -156,6 +164,11 @@ public final class Interest implements Serializable {
 
         public Builder setNumber(@Nonnull final PhoneNumber number) {
             this.number = number;
+            return this;
+        }
+
+        public Builder setCallForward(@Nonnull final PhoneNumber callForward) {
+            this.callForward = callForward;
             return this;
         }
     }

@@ -49,7 +49,7 @@ public class GetProfileFixtures {
                     "  <command xmlns='http://jabber.org/protocol/commands' node='http://xmpp.org/protocol/openlink:01:00:00#get-profile' status='completed'>\n" +
                     "    <iodata xmlns='urn:xmpp:tmp:io-data' type='output'>\n" +
                     "       <out>\n" +
-                    "        <profile xmlns='http://xmpp.org/protocol/openlink:01:00:00/profile/Netrix+Button' online='true' devicenum='271'>\n" +
+                    "        <profile xmlns='http://xmpp.org/protocol/openlink:01:00:00/profile/Netrix+Button' online='true' >\n" +
                     "          <keypages/>\n" +
                     "        </profile>\n" +
                     "      </out>" +

@@ -37,6 +37,7 @@ public class GetInterestsResult extends OpenlinkIQ {
             interest.isDefaultInterest().ifPresent(isDefault -> interestElement.addAttribute("default", String.valueOf(isDefault)));
             interest.getMaxCalls().ifPresent(maxCalls -> interestElement.addAttribute("maxCalls", String.valueOf(maxCalls)));
             interest.getNumber().ifPresent(number->interestElement.addAttribute("number", number.value()));
+            interest.getCallForward().ifPresent(callForward->interestElement.addAttribute("fwd", callForward.value()));
             interest.getCallStatus().ifPresent(callStatus -> TinderPacketUtil.addCallStatus(interestElement, callStatus));
         }
     }
@@ -64,6 +65,7 @@ public class GetInterestsResult extends OpenlinkIQ {
                 TinderPacketUtil.getBooleanAttribute(interestElement, "default", DESCRIPTION, parseErrors).ifPresent(interestBuilder::setDefault);
                 TinderPacketUtil.getIntegerAttribute(interestElement, "maxCalls", DESCRIPTION, parseErrors).ifPresent(interestBuilder::setMaxCalls);
                 TinderPacketUtil.getStringAttribute(interestElement, "number").flatMap(PhoneNumber::from).ifPresent(interestBuilder::setNumber);
+                TinderPacketUtil.getStringAttribute(interestElement, "fwd").flatMap(PhoneNumber::from).ifPresent(interestBuilder::setCallForward);
                 TinderPacketUtil.getCallStatus(interestElement, DESCRIPTION, parseErrors).ifPresent(interestBuilder::setCallStatus);
                 builder.addInterest(interestBuilder.build(parseErrors));
             }
@@ -104,7 +106,6 @@ public class GetInterestsResult extends OpenlinkIQ {
          *             if the IQ packet does not have a type of {@link Type#get IQ.Type.get} or {@link Type#set IQ.Type.set}.
          * @return a new {@link Builder} based on the originating IQ.
          */
-        @SuppressWarnings("WeakerAccess")
         @Nonnull
         public static Builder createResultBuilder(@Nonnull final IQ request) {
             return start(IQ.createResultIQ(request));

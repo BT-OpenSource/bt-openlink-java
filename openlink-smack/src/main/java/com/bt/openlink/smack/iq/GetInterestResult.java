@@ -56,6 +56,7 @@ public class GetInterestResult extends OpenlinkIQ {
             final Optional<Integer> maxCalls = SmackPacketUtil.getIntegerAttribute(parser, "maxCalls");
             maxCalls.ifPresent(interestBuilder::setMaxCalls);
             SmackPacketUtil.getStringAttribute(parser, "number").flatMap(PhoneNumber::from).ifPresent(interestBuilder::setNumber);
+            SmackPacketUtil.getStringAttribute(parser, "fwd").flatMap(PhoneNumber::from).ifPresent(interestBuilder::setCallForward);
             parser.nextTag();
             SmackPacketUtil.getCallStatus(parser, "get-interest result", parseErrors).ifPresent(interestBuilder::setCallStatus);
             builder.setInterest(interestBuilder.build(parseErrors));
@@ -82,6 +83,7 @@ public class GetInterestResult extends OpenlinkIQ {
             interest.isDefaultInterest().ifPresent(isDefault -> xml.attribute("default", String.valueOf(isDefault)));
             interest.getMaxCalls().ifPresent(maxCalls -> xml.attribute("maxCalls", String.valueOf(maxCalls)));
             interest.getNumber().ifPresent(number -> xml.attribute("number", number.value()));
+            interest.getCallForward().ifPresent(callForward -> xml.attribute("fwd", callForward.value()));
             xml.rightAngleBracket();
             interest.getCallStatus().ifPresent(callStatus -> SmackPacketUtil.addCallStatus(xml, callStatus));
             xml.closeElement(OpenlinkXmppNamespace.TAG_INTEREST);
@@ -115,7 +117,6 @@ public class GetInterestResult extends OpenlinkIQ {
          *             if the IQ packet does not have a type of {@link Type#get IQ.Type.get} or {@link Type#set IQ.Type.set}.
          * @return a new {@link Builder} based on the originating IQ.
          */
-        @SuppressWarnings("WeakerAccess")
         @Nonnull
         public static Builder createResultBuilder(@Nonnull final IQ request) {
             return SmackPacketUtil.createResultBuilder(start(), request);
