@@ -2,17 +2,14 @@ package com.bt.openlink.smack.iq;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
 import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
 import static org.xmlunit.matchers.CompareMatcher.isIdenticalTo;
-
-import java.util.ArrayList;
 
 import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.provider.ProviderManager;
 import org.jivesoftware.smack.util.PacketParserUtils;
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -22,20 +19,6 @@ import com.bt.openlink.CoreFixtures;
 import com.bt.openlink.GetProfileFixtures;
 import com.bt.openlink.OpenlinkXmppNamespace;
 import com.bt.openlink.smack.Fixtures;
-import com.bt.openlink.type.DeviceId;
-import com.bt.openlink.type.Key;
-import com.bt.openlink.type.KeyColor;
-import com.bt.openlink.type.KeyFunction;
-import com.bt.openlink.type.KeyId;
-import com.bt.openlink.type.KeyInterest;
-import com.bt.openlink.type.KeyLabel;
-import com.bt.openlink.type.KeyModifier;
-import com.bt.openlink.type.KeyPage;
-import com.bt.openlink.type.KeyPageId;
-import com.bt.openlink.type.KeyPageLabel;
-import com.bt.openlink.type.KeyPageLocalKeyPage;
-import com.bt.openlink.type.KeyPageModule;
-import com.bt.openlink.type.KeyQualifier;
 import com.bt.openlink.type.Profile;
 
 @SuppressWarnings("OptionalGetWithoutIsPresent")

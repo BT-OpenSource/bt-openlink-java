@@ -97,6 +97,7 @@ public final class CoreFixtures {
     public static final InterestId INTEREST_ID = InterestId.from("test-interest-id").get();
     public static final InterestType INTEREST_TYPE = InterestType.from("test-interest-type").get();
     public static final PhoneNumber INTEREST_NUMBER = PhoneNumber.from("test-interest-number").get();
+    public static final PhoneNumber CALL_FORWARD_NUMBER = PhoneNumber.from("test-forwarded-to-number").get();
     public static final FeatureId FEATURE_ID = FeatureId.from("test-feature-id").get();
     public static final FeatureId SPEAKER_CHANNEL_ID = FeatureId.from("test-speaker-id").get();
     public static final long SPEAKER_CHANNEL_NUMBER = 42;
@@ -196,7 +197,6 @@ public final class CoreFixtures {
             .build();
     public static final Profile KEYPAGE_PROFILE_NO_KEYPAGES = Profile.Builder.start()
             .setOnline(true)
-            .setDeviceId(DeviceId.from("271").get())
             .addKeyPages(new ArrayList<>())
             .build();
     public static final CallFeature CALL_FEATURE = CallFeatureBoolean.Builder.start()
@@ -275,6 +275,7 @@ public final class CoreFixtures {
             .setCallStatus(CALL_STATUS)
             .setMaxCalls(3)
             .setNumber(INTEREST_NUMBER)
+            .setCallForward(CALL_FORWARD_NUMBER)
             .build();
 
     public static final String START_TIME_ISO_8601 = ISO_8601_FORMATTER.format(START_TIME.atZone(ZoneOffset.UTC));

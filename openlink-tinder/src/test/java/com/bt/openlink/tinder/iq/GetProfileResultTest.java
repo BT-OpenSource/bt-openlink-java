@@ -6,7 +6,6 @@ import static org.junit.Assert.assertThat;
 import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
 import static org.xmlunit.matchers.CompareMatcher.isIdenticalTo;
 
-import java.util.ArrayList;
 import java.util.Collections;
 
 import org.junit.Rule;
@@ -17,20 +16,6 @@ import org.xmpp.packet.IQ;
 import com.bt.openlink.CoreFixtures;
 import com.bt.openlink.GetProfileFixtures;
 import com.bt.openlink.tinder.Fixtures;
-import com.bt.openlink.type.DeviceId;
-import com.bt.openlink.type.Key;
-import com.bt.openlink.type.KeyColor;
-import com.bt.openlink.type.KeyFunction;
-import com.bt.openlink.type.KeyId;
-import com.bt.openlink.type.KeyInterest;
-import com.bt.openlink.type.KeyLabel;
-import com.bt.openlink.type.KeyModifier;
-import com.bt.openlink.type.KeyPage;
-import com.bt.openlink.type.KeyPageId;
-import com.bt.openlink.type.KeyPageLabel;
-import com.bt.openlink.type.KeyPageLocalKeyPage;
-import com.bt.openlink.type.KeyPageModule;
-import com.bt.openlink.type.KeyQualifier;
 import com.bt.openlink.type.Profile;
 
 @SuppressWarnings("OptionalGetWithoutIsPresent")
