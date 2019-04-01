@@ -1,6 +1,10 @@
 package com.bt.openlink.smack.iq;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -18,6 +22,7 @@ import com.bt.openlink.OpenlinkXmppNamespace;
 import com.bt.openlink.iq.GetProfileResultBuilder;
 import com.bt.openlink.smack.internal.SmackPacketUtil;
 import com.bt.openlink.type.DeviceId;
+import com.bt.openlink.type.DeviceType;
 import com.bt.openlink.type.Key;
 import com.bt.openlink.type.KeyColor;
 import com.bt.openlink.type.KeyFunction;
@@ -57,6 +62,10 @@ public class GetProfileResult extends OpenlinkIQ {
         final List<String> parseErrors = new ArrayList<>();
         if (parser.getName().equals(OpenlinkXmppNamespace.TAG_PROFILE)) {
             final Profile.Builder profileBuilder = Profile.Builder.start();
+            final String namespace = URLDecoder.decode(parser.getNamespace(), StandardCharsets.UTF_8.name());
+            if (namespace.startsWith(OpenlinkXmppNamespace.OPENLINK_PROFILE.uri())) {
+                DeviceType.from(namespace.substring(OpenlinkXmppNamespace.OPENLINK_PROFILE.uri().length())).ifPresent(profileBuilder::setDeviceType);
+            }
             Optional<Boolean> onlineOpt = SmackPacketUtil.getBooleanAttribute(parser, "online", DESCRIPTION, parseErrors);
             onlineOpt.ifPresent(profileBuilder::setOnline);
             Optional<DeviceId> deviceNumOpt = SmackPacketUtil.getStringAttribute(parser, "devicenum").flatMap(DeviceId::from);
@@ -65,7 +74,6 @@ public class GetProfileResult extends OpenlinkIQ {
             parser.nextTag(); // Gets next tag keypage.
             final List<KeyPage> keyPages = new ArrayList<>();
             while (OpenlinkXmppNamespace.TAG_KEYPAGE.equals(parser.getName())) {
-                final int currentKeyPageDepth = parser.getDepth();
                 KeyPage.Builder keyPageBuilder = KeyPage.Builder.start();
                 Optional<KeyPageId> keyPageIdOpt = SmackPacketUtil.getStringAttribute(parser, "id").flatMap(KeyPageId::from);
                 keyPageIdOpt.ifPresent(keyPageBuilder::setkeypageId);
@@ -117,8 +125,14 @@ public class GetProfileResult extends OpenlinkIQ {
                 .rightAngleBracket();
         xml.halfOpenElement(OpenlinkXmppNamespace.TAG_OUT).rightAngleBracket();
         if (profile != null) {
+            String encodedDeviceType;
+            try {
+                encodedDeviceType = URLEncoder.encode(getProfile().flatMap(Profile::getDeviceType).map(DeviceType::value).orElse(""), StandardCharsets.UTF_8.name());
+            } catch (final UnsupportedEncodingException ignored) {
+                encodedDeviceType = "Unknown";
+            }
             xml.halfOpenElement(OpenlinkXmppNamespace.TAG_PROFILE)
-                    .attribute("xmlns", OpenlinkXmppNamespace.OPENLINK_PROFILE.uri());
+                    .attribute("xmlns", OpenlinkXmppNamespace.OPENLINK_PROFILE.uri() + encodedDeviceType);
             profile.isOnline().ifPresent(online -> xml.attribute("online", online));
             profile.getDeviceId().ifPresent(deviceId -> xml.attribute("devicenum", deviceId.value()));
             xml.rightAngleBracket();

@@ -192,11 +192,13 @@ public final class CoreFixtures {
     public static final Profile KEYPAGE_PROFILE = Profile.Builder.start()
             .setOnline(true)
             .setDeviceId(DeviceId.from("271").get())
+            .setDeviceType(DeviceType.from("Netrix Button").get())
             .addKeyPage(KEY_PAGE_1)
             .addKeyPage(KEY_PAGE_2)
             .build();
     public static final Profile KEYPAGE_PROFILE_NO_KEYPAGES = Profile.Builder.start()
             .setOnline(true)
+            .setDeviceType(DeviceType.from("Netrix Button").get())
             .addKeyPages(new ArrayList<>())
             .build();
     public static final CallFeature CALL_FEATURE = CallFeatureBoolean.Builder.start()
