@@ -1,5 +1,8 @@
 package com.bt.openlink.tinder.iq;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -16,6 +19,7 @@ import com.bt.openlink.OpenlinkXmppNamespace;
 import com.bt.openlink.iq.GetProfileResultBuilder;
 import com.bt.openlink.tinder.internal.TinderPacketUtil;
 import com.bt.openlink.type.DeviceId;
+import com.bt.openlink.type.DeviceType;
 import com.bt.openlink.type.Key;
 import com.bt.openlink.type.KeyColor;
 import com.bt.openlink.type.KeyFunction;
@@ -40,7 +44,14 @@ public class GetProfileResult extends OpenlinkIQ {
         super(builder, parseErrors);
         this.profile = builder.getProfile().orElse(null);
         final Element outElement = TinderPacketUtil.addCommandIOOutputElement(this, OpenlinkXmppNamespace.OPENLINK_GET_PROFILE);
-        final Element profileElement = outElement.addElement("profile", OpenlinkXmppNamespace.OPENLINK_PROFILE.uri());
+        String encodedDeviceType;
+        try {
+            encodedDeviceType = URLEncoder.encode(getProfile().flatMap(Profile::getDeviceType).map(DeviceType::value).orElse(""), StandardCharsets.UTF_8.name());
+        } catch (final UnsupportedEncodingException ignored) {
+            encodedDeviceType = "Unknown";
+        }
+
+        final Element profileElement = outElement.addElement("profile", OpenlinkXmppNamespace.OPENLINK_PROFILE.uri() + encodedDeviceType);
         if (this.profile != null) {
             this.profile.isOnline().ifPresent(online -> profileElement.addAttribute("online", String.valueOf(online)));
             this.profile.getDeviceId().ifPresent(deviceId -> profileElement.addAttribute("devicenum", deviceId.value()));
