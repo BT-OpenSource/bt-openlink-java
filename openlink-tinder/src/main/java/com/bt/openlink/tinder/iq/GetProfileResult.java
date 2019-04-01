@@ -1,6 +1,7 @@
 package com.bt.openlink.tinder.iq;
 
 import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -91,6 +92,15 @@ public class GetProfileResult extends OpenlinkIQ {
         final Element profileElement = TinderPacketUtil.getChildElement(outElement, "profile");
         if (profileElement != null) {
             final Profile.Builder profileBuilder = Profile.Builder.start();
+            String decodedNamespace;
+            try {
+                decodedNamespace = URLDecoder.decode(profileElement.getNamespace().getStringValue(), StandardCharsets.UTF_8.name());
+            } catch (UnsupportedEncodingException e) {
+                decodedNamespace = "Unknown";
+            }
+            if (decodedNamespace.startsWith(OpenlinkXmppNamespace.OPENLINK_PROFILE.uri())) {
+                DeviceType.from(decodedNamespace.substring(OpenlinkXmppNamespace.OPENLINK_PROFILE.uri().length())).ifPresent(profileBuilder::setDeviceType);
+            }
             TinderPacketUtil.getBooleanAttribute(profileElement, "online", DESCRIPTION, parseErrors).ifPresent(profileBuilder::setOnline);
             DeviceId.from(TinderPacketUtil.getNullableStringAttribute(profileElement, "devicenum")).ifPresent(profileBuilder::setDeviceId);
             final Element keyPagesElement = TinderPacketUtil.getChildElement(profileElement, OpenlinkXmppNamespace.TAG_KEYPAGES);
