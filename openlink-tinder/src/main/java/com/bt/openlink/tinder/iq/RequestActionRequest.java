@@ -15,7 +15,9 @@ import com.bt.openlink.OpenlinkXmppNamespace;
 import com.bt.openlink.iq.RequestActionRequestBuilder;
 import com.bt.openlink.tinder.internal.TinderPacketUtil;
 import com.bt.openlink.type.CallId;
+import com.bt.openlink.type.FeatureId;
 import com.bt.openlink.type.InterestId;
+import com.bt.openlink.type.MakeCallFeature;
 import com.bt.openlink.type.RequestAction;
 import com.bt.openlink.type.RequestActionValue;
 
@@ -25,6 +27,7 @@ public class RequestActionRequest extends OpenlinkIQ {
     @Nullable private final CallId callId;
     @Nullable private final RequestActionValue value1;
     @Nullable private final RequestActionValue value2;
+    @Nonnull private final List<MakeCallFeature> features;
 
     private RequestActionRequest(@Nonnull Builder builder, @Nullable List<String> parseErrors) {
         super(builder, parseErrors);
@@ -33,14 +36,24 @@ public class RequestActionRequest extends OpenlinkIQ {
         this.callId = builder.getCallId().orElse(null);
         this.value1 = builder.getValue1().orElse(null);
         this.value2 = builder.getValue2().orElse(null);
+        this.features = builder.getFeatures();
         final Element inElement = TinderPacketUtil.addCommandIOInputElement(this, OpenlinkXmppNamespace.OPENLINK_REQUEST_ACTION);
         TinderPacketUtil.addElementWithTextIfNotNull(inElement, "interest", interestId);
         getAction().ifPresent(requestAction->TinderPacketUtil.addElementWithTextIfNotNull(inElement, OpenlinkXmppNamespace.TAG_ACTION, requestAction.getId()));
         TinderPacketUtil.addElementWithTextIfNotNull(inElement, "call", callId);
         TinderPacketUtil.addElementWithTextIfNotNull(inElement, "value1", value1);
         TinderPacketUtil.addElementWithTextIfNotNull(inElement, "value2", value2);
+        if (!features.isEmpty()) {
+            Element featuresElement = inElement.addElement("features");
+            features.forEach(makeCallFeature -> {
+                Element featureElement = featuresElement.addElement("feature");
+                makeCallFeature.getFeatureId().ifPresent(featureId -> TinderPacketUtil.addElementWithTextIfNotNull(featureElement, "id", featureId));
+                makeCallFeature.getValue1().ifPresent(featureValue1 -> TinderPacketUtil.addElementWithTextIfNotNull(featureElement, "value1", featureValue1));
+            });
+        }
     }
 
+    @SuppressWarnings("unchecked")
     @Nonnull
     public static RequestActionRequest from(@Nonnull IQ iq) {
         final List<String> parseErrors = new ArrayList<>();
@@ -51,6 +64,17 @@ public class RequestActionRequest extends OpenlinkIQ {
         CallId.from(TinderPacketUtil.getNullableChildElementString(inElement, "call")).ifPresent(builder::setCallId);
         RequestActionValue.from(TinderPacketUtil.getNullableChildElementString(inElement, "value1")).ifPresent(builder::setValue1);
         RequestActionValue.from(TinderPacketUtil.getNullableChildElementString(inElement, "value2")).ifPresent(builder::setValue2);
+        final Element featuresElement = TinderPacketUtil.getChildElement(inElement, "features");
+        if(null != featuresElement) {
+            final List<Element> featureElements = featuresElement.elements("feature");
+            featureElements.forEach(featureElement -> {
+                MakeCallFeature.Builder featureBuilder = MakeCallFeature.Builder.start();
+                FeatureId.from(TinderPacketUtil.getNullableChildElementString(featureElement, "id")).ifPresent(featureBuilder::setFeatureId);
+                final Optional<String> featureValue1 = Optional.ofNullable(TinderPacketUtil.getNullableChildElementString(featureElement, "value1"));
+                featureValue1.ifPresent(featureBuilder::setValue1);
+                builder.addFeature(featureBuilder.build());
+            });
+        }
         final RequestActionRequest request = builder.build(parseErrors);
         request.setID(iq.getID());
         return request;
@@ -79,6 +103,11 @@ public class RequestActionRequest extends OpenlinkIQ {
     @Nonnull
     public Optional<RequestActionValue> getValue2() {
         return Optional.ofNullable(value2);
+    }
+
+    @Nonnull
+    public List<MakeCallFeature> getFeatures() {
+        return features;
     }
 
     public static final class Builder extends RequestActionRequestBuilder<Builder, JID, Type> {

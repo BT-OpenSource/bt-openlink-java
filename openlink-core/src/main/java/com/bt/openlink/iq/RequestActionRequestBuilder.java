@@ -1,5 +1,6 @@
 package com.bt.openlink.iq;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -8,6 +9,7 @@ import javax.annotation.Nullable;
 
 import com.bt.openlink.type.CallId;
 import com.bt.openlink.type.InterestId;
+import com.bt.openlink.type.MakeCallFeature;
 import com.bt.openlink.type.RequestAction;
 import com.bt.openlink.type.RequestActionValue;
 
@@ -18,6 +20,7 @@ public abstract class RequestActionRequestBuilder<B extends RequestActionRequest
     @Nullable private CallId callId;
     @Nullable private RequestActionValue value2;
     @Nullable private RequestActionValue value1;
+    @Nonnull private final List<MakeCallFeature> features = new ArrayList<>();
 
     protected RequestActionRequestBuilder(final Class<T> typeClass) {
         super(typeClass);
@@ -87,6 +90,25 @@ public abstract class RequestActionRequestBuilder<B extends RequestActionRequest
     @Nonnull
     public Optional<RequestActionValue> getValue2() {
         return Optional.ofNullable(value2);
+    }
+
+    @Nonnull
+    @SuppressWarnings("unchecked")
+    public B addFeatures(@Nonnull final List<MakeCallFeature> features) {
+        this.features.addAll(features);
+        return (B) this;
+    }
+
+    @Nonnull
+    @SuppressWarnings("unchecked")
+    public B addFeature(@Nonnull final MakeCallFeature feature) {
+        this.features.add(feature);
+        return (B) this;
+    }
+
+    @Nonnull
+    public List<MakeCallFeature> getFeatures() {
+        return features;
     }
 
     @Override
