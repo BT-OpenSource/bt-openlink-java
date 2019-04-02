@@ -4,7 +4,9 @@ import com.bt.openlink.OpenlinkXmppNamespace;
 import com.bt.openlink.iq.RequestActionRequestBuilder;
 import com.bt.openlink.smack.internal.SmackPacketUtil;
 import com.bt.openlink.type.CallId;
+import com.bt.openlink.type.FeatureId;
 import com.bt.openlink.type.InterestId;
+import com.bt.openlink.type.MakeCallFeature;
 import com.bt.openlink.type.RequestAction;
 import com.bt.openlink.type.RequestActionValue;
 import org.jivesoftware.smack.packet.IQ;
@@ -28,6 +30,7 @@ public class RequestActionRequest extends OpenlinkIQ {
     @Nullable private final RequestActionValue value1;
     @Nullable private final RequestActionValue value2;
     @Nullable private final CallId callId;
+    @Nonnull private final List<MakeCallFeature> features;
 
     private RequestActionRequest(@Nonnull RequestActionRequest.Builder builder,
             @Nullable List<String> parseErrors) {
@@ -37,6 +40,7 @@ public class RequestActionRequest extends OpenlinkIQ {
         this.action = builder.getAction().orElse(null);
         this.value1 = builder.getValue1().orElse(null);
         this.value2 = builder.getValue2().orElse(null);
+        this.features = builder.getFeatures();
     }
 
     @Nonnull
@@ -65,6 +69,18 @@ public class RequestActionRequest extends OpenlinkIQ {
                 case "value2":
                     SmackPacketUtil.getElementTextString(parser).ifPresent(requestActionValue -> builder.setValue2(RequestActionValue.from(requestActionValue).orElse(null)));
                     break;
+                case "features":
+                    parser.nextTag();
+                    while ("feature".equals(parser.getName())) {
+                        parser.nextTag();
+                        MakeCallFeature.Builder featureBuilder = MakeCallFeature.Builder.start();
+                        SmackPacketUtil.getElementTextString(parser).ifPresent(featureIdElemnet -> FeatureId.from(featureIdElemnet).ifPresent(featureBuilder::setFeatureId));
+                        parser.nextTag();
+                        SmackPacketUtil.getElementTextString(parser).ifPresent(featureBuilder::setValue1);
+                        builder.addFeature(featureBuilder.build(parseErrors));
+                    }
+                    ParserUtils.forwardToEndTagOfDepth(parser, parser.getDepth());
+                    break;
             }
 
             ParserUtils.forwardToEndTagOfDepth(parser, inDepth + 1);
@@ -73,7 +89,7 @@ public class RequestActionRequest extends OpenlinkIQ {
         return builder.build(parseErrors);
     }
 
-        @Override
+    @Override
     protected IQChildElementXmlStringBuilder getIQChildElementBuilder(final IQChildElementXmlStringBuilder xml) {
         xml.attribute("action", "execute")
                 .attribute("node", OpenlinkXmppNamespace.OPENLINK_REQUEST_ACTION.uri())
@@ -89,6 +105,17 @@ public class RequestActionRequest extends OpenlinkIQ {
         getCallId().ifPresent(callId -> xml.element("call", callId.value()));
         getValue1().ifPresent(requestActionValue -> xml.optElement("value1", requestActionValue.value()));
         getValue2().ifPresent(requestActionValue -> xml.optElement("value2", requestActionValue.value()));
+
+        if(!getFeatures().isEmpty()) {
+            xml.openElement("features");
+            getFeatures().forEach(makeCallFeature -> {
+                xml.openElement("feature");
+                makeCallFeature.getFeatureId().ifPresent(featureId -> xml.element("id", featureId.value()));
+                makeCallFeature.getValue1().ifPresent(value1 -> xml.element("value1", value1));
+                xml.closeElement("feature");
+            });
+            xml.closeElement("features");
+        }
 
         xml.closeElement(OpenlinkXmppNamespace.TAG_IN);
         xml.closeElement(OpenlinkXmppNamespace.TAG_IODATA);
@@ -118,6 +145,11 @@ public class RequestActionRequest extends OpenlinkIQ {
     @Nonnull
     public Optional<CallId> getCallId() {
         return Optional.ofNullable(callId);
+    }
+
+    @Nonnull
+    public List<MakeCallFeature> getFeatures() {
+        return features;
     }
 
     public static final class Builder extends RequestActionRequestBuilder<RequestActionRequest.Builder, Jid, Type> {
