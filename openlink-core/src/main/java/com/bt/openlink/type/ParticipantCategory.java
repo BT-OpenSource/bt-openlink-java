@@ -9,7 +9,8 @@ public enum ParticipantCategory {
 
     CONF("CONF"),
     ADD3P("ADD3P"),
-    BARGE("BARGE");
+    BARGE("BARGE"),
+    VOICE_DROP("VoiceDrop");
 
     @Nonnull private final String id;
 
