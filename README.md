@@ -58,7 +58,7 @@ dependencies {
 
 The library uses a fluent API throughout, so all the Openlink stanzas are built in a very similar fashion. For 
 example, to build an Openlink `get-profiles` request stanza:
-```
+```java
 import com.bt.openlink.smack.iq.GetProfilesRequest;
    ...
    final GetProfilesRequest getProfilesRequest = GetProfilesRequest.Builder.start()
@@ -79,7 +79,7 @@ built unless the JID is set for example.
 The library provides a Smack IQ provider, so it's easy for packets to be parsed. Adding the provider will also ensure
 that Openlink packets received by the Smack library will be parsed as they are received from the server before they
 are passed back to client code. 
-```
+```java
 import org.jivesoftware.smack.provider.ProviderManager;
 import org.jivesoftware.smack.util.PacketParserUtils;
 
@@ -92,7 +92,7 @@ import com.bt.openlink.smack.iq.GetProfilesResult;
 ``` 
 Note that if the stanza is not an Openlink `get-profiles` result packet, an exception will be thrown. To avoid this,
 it may be necessary to check the type of the result first. For example:
-```
+```java
   final Stanza stanza = PacketParserUtils.parseStanza("<iq type='result' ...</iq>");
   if (stanza instanceof GetProfilesResult) {
     final GetProfilesResult getProfilesResult = (GetProfilesResult)stanza;
@@ -153,7 +153,7 @@ dependencies {
 ### Building a packet in code
 
 This is essentially identical to the Smack, so to build an Openlink `get-profiles` request stanza:
-```
+```java
 import com.bt.openlink.tinder.iq.GetProfilesRequest;
    ...
    final GetProfilesRequest getProfilesRequest = GetProfilesRequest.Builder.start()
@@ -172,7 +172,7 @@ a JID.
 ### Parsing a packet
 
 The library provides a parse of IQ packets.
-```
+```java
 import org.xmpp.packet.IQ;
 
 import com.bt.openlink.tinder.iq.OpenlinkIQParser;
@@ -185,7 +185,7 @@ import com.bt.openlink.tinder.iq.GetProfilesResult;
 though if the code is not already sure of the type of packet being parsed it may be necessary to check the type of 
 the value returned:
 
-```
+```java
   final IQ iq = ...
   final IQ parsedIQ = OpenlinkIQParser.parse(iq);
   if (parsedIQ instanceof GetProfilesResult) {
